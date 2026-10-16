@@ -21,9 +21,9 @@ let main argv =
     //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
     
     //DispatchSortableTests.makeParamsAndRun()
-    //DispatchSorterEval.makeParamsAndRun()
+    DispatchSorterEval.makeParamsAndRun()
     //DispatchSorterMutate.makeParamsAndRun()
-    DispatchSorterSgd.makeParamsAndRun()
+    //DispatchSorterSgd.makeParamsAndRun()
 
     let duration = DateTime.Now - startTime
     Thread.Sleep(100)

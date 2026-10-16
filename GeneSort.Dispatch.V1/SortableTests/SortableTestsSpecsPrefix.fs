@@ -21,9 +21,9 @@ module SortableTestsSpecsPrefix =
                     (sprintf @"Prefix24-4b_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
-                dataFomatBitv512
-                prefixLib_Prefix24_3a
-            ]
+                        dataFomatBitv512
+                        prefixLib_Prefix24_3a
+                    ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity
@@ -41,9 +41,9 @@ module SortableTestsSpecsPrefix =
                     (sprintf @"Prefix-24s_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
-                dataFomatBitv512
-                prefixLib_Prefix24s
-            ]
+                        dataFomatBitv512
+                        prefixLib_Prefix24s
+                    ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity
@@ -59,9 +59,9 @@ module SortableTestsSpecsPrefix =
                     (sprintf @"Prefix-32_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
-                dataFomatBitv512
-                prefixLib_Prefix32_4
-            ]
+                        dataFomatBitv512
+                        prefixLib_Prefix32_4
+                    ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity

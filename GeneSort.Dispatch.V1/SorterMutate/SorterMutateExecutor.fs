@@ -475,7 +475,7 @@ module SorterMutateExecutor =
                     SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet makeMutantPrefixSorterModels host allowOverwrite cts
                 ])
                 (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup)
                 (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
         host.WithSetupContext(context)
 

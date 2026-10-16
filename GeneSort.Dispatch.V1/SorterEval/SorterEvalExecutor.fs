@@ -114,10 +114,8 @@ module SorterEvalExecutor =
 
 
 
-
-
         
-    let private bindSetup (host: runHost) allowOverwrite (cts: CancellationTokenSource) =
+    let private bindSetup (host: runHost) allowOverwrite (cts: CancellationTokenSource) : runHost =
         let checkedSetup (setup: setupFunction) : setupFunction =
             fun rp -> asyncResult {
                 do! checkCancellation cts.Token
@@ -129,9 +127,10 @@ module SorterEvalExecutor =
                     SorterModelSetCatalogNames.uniform, SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite |> checkedSetup
                 ])
                 (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup)
                 (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
         host.WithSetupContext(context)
+
 
     let standardExecutor =
         { new IRunParamsExecutor with

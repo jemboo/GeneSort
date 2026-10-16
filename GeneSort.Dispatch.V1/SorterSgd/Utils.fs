@@ -8,6 +8,8 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.SortingOps
+open GeneSort.Eval.V1.Sgd.Soss
 
 module Utils =
 

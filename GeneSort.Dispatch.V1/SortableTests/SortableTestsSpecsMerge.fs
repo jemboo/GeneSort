@@ -21,9 +21,9 @@ module SortableTestsSpecsMerge =
                     (sprintf @"Merge-Test_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
                     "Int8 merge sorter test sets"
                     [
-                mergeLib_Merge32s
-                dataFormatInt8v512
-            ]
+                        mergeLib_Merge32s
+                        dataFormatInt8v512
+                    ]
                     QueryCatalogNames.sortableTestMerge
                     SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth

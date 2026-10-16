@@ -47,7 +47,7 @@ module SortableTestsMakers =
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
 
-    let makeMergeTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
+    let getMergeTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
                 let repl = 0 |> UMX.tag<replNumber>   
