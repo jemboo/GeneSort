@@ -25,13 +25,13 @@ open GeneSort.Eval.V1.Sgd.Soss
 
 let private emptyParameters = runParameters.create Map.empty
 
-let private context : evolutionMakerContext = {
-    LoadMergeTests = fun _ _ _ -> async { return Error "merge tests loader" }
-    LoadPrefixTests = fun _ _ _ -> async { return Error "prefix tests loader" }
-    LoadStandardSorterEvals = fun _ _ _ -> async { return Error "standard eval loader" }
-    LoadMergeSorterEvals = fun _ _ _ -> async { return Error "merge eval loader" }
-    LoadPrefixSorterEvals = fun _ _ _ -> async { return Error "prefix eval loader" }
-}
+let private context : evolutionMakerContext =
+    evolutionMakerContext.create
+        (fun _ _ _ -> async { return Error "merge tests loader" })
+        (fun _ _ _ -> async { return Error "prefix tests loader" })
+        (fun _ _ _ -> async { return Error "standard eval loader" })
+        (fun _ _ _ -> async { return Error "merge eval loader" })
+        (fun _ _ _ -> async { return Error "prefix eval loader" })
 
 let private errorOf result =
     match result with
@@ -41,14 +41,14 @@ let private errorOf result =
 let private makeRun names (projectName: string) (runName: string) =
     SgdRun.create names (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
         "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
-        QueryCatalogNames.sorterSgdMsufStandard RunParamBuilderNames.Filter.identity
+        QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard RunParamBuilderNames.Filter.identity
         RunParamBuilderNames.Enhancer.msuf32MutationRate false
     |> run.SgdRun
 
 [<Fact>]
 let ``SGD host resolves custom configured makers`` () =
     let key = Guid.NewGuid().ToString()
-    let names = { SortableTests = key; SeedPoolSet = key; Mutator = key }
+    let names = evolutionMakerNames.create (key) (key) (key)
     SortableTestsMakerCatalog.register key (fun _ _ -> async { return Error "host tests" })
     SeedSorterPoolSetMakerCatalog.register key (fun _ _ -> async { return Error "host seed" })
     MutatorMakerCatalog.register key (fun _ -> async { return Error "host mutator" })
@@ -68,16 +68,16 @@ let ``SGD host rejects unknown makers before execution`` field =
     let unknown = Guid.NewGuid().ToString()
     let names =
         match field with
-        | "tests" -> { EvolutionMakerNames.standard with SortableTests = unknown }
-        | "seed" -> { EvolutionMakerNames.standard with SeedPoolSet = unknown }
-        | _ -> { EvolutionMakerNames.standard with Mutator = unknown }
+        | "tests" -> EvolutionMakerNames.standard.WithSortableTests(unknown)
+        | "seed" -> EvolutionMakerNames.standard.WithSeedPoolSet(unknown)
+        | _ -> EvolutionMakerNames.standard.WithMutator(unknown)
     let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create (makeRun names "Tests" "Unknown") 1 |> ignore)
     Assert.Contains(unknown, error.Message)
 
 [<Fact>]
 let ``SGD maker names survive MessagePack round trip`` () =
     MessagePackSetup.configure ()
-    let names = { SortableTests = "custom.tests"; SeedPoolSet = "custom.seed"; Mutator = "custom.mutator" }
+    let names = evolutionMakerNames.create ("custom.tests") ("custom.seed") ("custom.mutator")
     let dto = makeRun names "Tests" "Custom" |> RunDto.fromDomain
     let restored = MessagePackSerializer.Serialize dto |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(Some names, restored.MakerNames)
@@ -111,7 +111,7 @@ let ``partially configured saved runs are rejected`` () =
 [<InlineData("seed-sorter-pool-set.merge", "seed-pool.soss.merge")>]
 [<InlineData("seed-sorter-pool-set.prefix", "seed-pool.soss.prefix")>]
 let ``legacy Soss seed names migrate to Soss variants`` oldName expected =
-    let names = { EvolutionMakerNames.prefix with SeedPoolSet = oldName }
+    let names = EvolutionMakerNames.prefix.WithSeedPoolSet(oldName)
     let restored = makeRun names "Tests" "OldGenSoss" |> RunDto.fromDomain |> RunDto.toDomain
     Assert.Equal(expected, restored.MakerNames.Value.SeedPoolSet)
 
@@ -129,12 +129,10 @@ let ``seed catalogs produce the requested pool variant`` (name: string) (expectS
             (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
             (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
     let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
-    let supplied = {
-        context with
-            LoadStandardSorterEvals = fun _ _ _ -> async { return Ok evaluations }
-            LoadMergeSorterEvals = fun _ _ _ -> async { return Ok evaluations }
-            LoadPrefixSorterEvals = fun _ _ _ -> async { return Ok evaluations }
-    }
+    let supplied =
+        context.WithLoadStandardSorterEvals(fun _ _ _ -> async { return Ok evaluations })
+            .WithLoadMergeSorterEvals(fun _ _ _ -> async { return Ok evaluations })
+            .WithLoadPrefixSorterEvals(fun _ _ _ -> async { return Ok evaluations })
     let parameters =
         emptyParameters.WithSortingWidth(Some 32<sortingWidth>)
             .WithRepl(Some 0<replNumber>)
@@ -205,7 +203,7 @@ let ``merge test maker uses the supplied storage context`` () =
             Assert.Equal(sortableDataFormat.BitVector512, format)
             return Error "supplied loader result"
         }
-    let suppliedContext = { context with LoadMergeTests = loadMergeTests }
+    let suppliedContext = context.WithLoadMergeTests(loadMergeTests)
     ProjectCatalogs.registerAll ()
     let actual = SortableTestsMakerCatalog.get SortableTestsMakerNames.merge suppliedContext parameters |> Async.RunSynchronously |> errorOf
     Assert.True(called)

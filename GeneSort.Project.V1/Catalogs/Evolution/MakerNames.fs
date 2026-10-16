@@ -1,11 +1,31 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
 /// Serializable selections, independent of the evolution strategy and storage host.
-type evolutionMakerNames = {
-    SortableTests: string
-    SeedPoolSet: string
-    Mutator: string
-}
+type evolutionMakerNames =
+    private {
+        sortableTests: string
+        seedPoolSet: string
+        mutator: string
+    }
+
+    static member create
+            (sortableTests: string)
+            (seedPoolSet: string)
+            (mutator: string)
+            : evolutionMakerNames =
+        {
+            sortableTests = sortableTests
+            seedPoolSet = seedPoolSet
+            mutator = mutator
+        }
+
+    member this.SortableTests with get() = this.sortableTests
+    member this.SeedPoolSet with get() = this.seedPoolSet
+    member this.Mutator with get() = this.mutator
+
+    member this.WithSortableTests(value) = { this with sortableTests = value }
+    member this.WithSeedPoolSet(value) = { this with seedPoolSet = value }
+    member this.WithMutator(value) = { this with mutator = value }
 
 module MutatorMakerNames =
     [<Literal>]
@@ -45,18 +65,14 @@ module SeedSorterPoolSetMakerNames =
     let prefix = "seed-sorter-pool-set.prefix"
 
 module EvolutionMakerNames =
-    let standard = {
-        SortableTests = SortableTestsMakerNames.standard
-        SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.standard
-        Mutator = MutatorMakerNames.simpleSorterModel
-    }
-    let merge = { standard with SortableTests = SortableTestsMakerNames.merge; SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.merge }
-    let prefix = { standard with SortableTests = SortableTestsMakerNames.prefix; SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.prefix }
-    let sossStandard = { standard with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.standard }
-    let sossMerge = { merge with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.merge }
-    let sossPrefix = { prefix with SeedPoolSet = SeedSorterPoolSetMakerNames.Soss.prefix }
+    let standard = evolutionMakerNames.create SortableTestsMakerNames.standard SeedSorterPoolSetMakerNames.Standard.standard MutatorMakerNames.simpleSorterModel
+    let merge = standard.WithSortableTests(SortableTestsMakerNames.merge).WithSeedPoolSet(SeedSorterPoolSetMakerNames.Standard.merge)
+    let prefix = standard.WithSortableTests(SortableTestsMakerNames.prefix).WithSeedPoolSet(SeedSorterPoolSetMakerNames.Standard.prefix)
+    let sossStandard = standard.WithSeedPoolSet(SeedSorterPoolSetMakerNames.Soss.standard)
+    let sossMerge = merge.WithSeedPoolSet(SeedSorterPoolSetMakerNames.Soss.merge)
+    let sossPrefix = prefix.WithSeedPoolSet(SeedSorterPoolSetMakerNames.Soss.prefix)
 
-    let validate names =
+    let validate (names: evolutionMakerNames) =
         for field, value in ["SortableTests", names.SortableTests; "SeedPoolSet", names.SeedPoolSet; "Mutator", names.Mutator] do
             if System.String.IsNullOrWhiteSpace value then
                 invalidArg field "An evolution maker catalog name cannot be empty."

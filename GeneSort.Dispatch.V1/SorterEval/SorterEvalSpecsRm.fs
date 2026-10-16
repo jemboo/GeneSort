@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Core
@@ -32,6 +33,7 @@ module SorterEvalSpecsRm =
                 smallSorterCount
             ]
                     QueryCatalogNames.sorterEvalMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -56,6 +58,7 @@ module SorterEvalSpecsRm =
                 extraLargeSorterCount
             ]
                     QueryCatalogNames.sorterEvalMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -80,6 +83,7 @@ module SorterEvalSpecsRm =
                 largeSorterCount
             ]
                     QueryCatalogNames.sorterEvalMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -104,6 +108,7 @@ module SorterEvalSpecsRm =
                 largeSorterCount
             ]
                     QueryCatalogNames.sorterEvalMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
@@ -128,6 +133,7 @@ module SorterEvalSpecsRm =
                 largeSorterCount
             ]
                     QueryCatalogNames.sorterEvalMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false

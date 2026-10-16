@@ -16,6 +16,8 @@
     <Compile Include="Catalogs\Queries\QueryParamsBuilders.fs" />
     <Compile Include="QueryProperties.fs" />
     <Compile Include="Catalogs\Evolution\MakerNames.fs" />
+    <Compile Include="Catalogs\SorterModelSet\SorterModelSetCatalogNames.fs" />
+    <Compile Include="Catalogs\Setup\SetupCatalogNames.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="Catalogs\RunParameters\RunParamFunctionCatalogs.fs" />
     <Compile Include="OutputData.fs" />

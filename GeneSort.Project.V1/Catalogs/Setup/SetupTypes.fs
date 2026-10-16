@@ -5,12 +5,36 @@ open GeneSort.Project.V1
 type setupFunction = runParameters -> Async<Result<unit, string>>
 
 /// Per-run storage bindings. Catalogs never retain a host or overwrite policy.
-type setupContext = {
-    MakeUniformSorterModelSet: setupFunction
-    MakeStandardTestsWithPrefix: setupFunction
-    MakeMergeTestsWithPrefix: setupFunction
-    MakePrefixTestsWithPrefix: setupFunction
-}
+type setupContext =
+    private {
+        makeSorterModelSets: Map<string, setupFunction>
+        makeStandardTestsWithPrefix: setupFunction
+        makeMergeTestsWithPrefix: setupFunction
+        makePrefixTestsWithPrefix: setupFunction
+    }
+
+    static member create
+            (makeSorterModelSets: Map<string, setupFunction>)
+            (makeStandardTestsWithPrefix: setupFunction)
+            (makeMergeTestsWithPrefix: setupFunction)
+            (makePrefixTestsWithPrefix: setupFunction)
+            : setupContext =
+        {
+            makeSorterModelSets = makeSorterModelSets
+            makeStandardTestsWithPrefix = makeStandardTestsWithPrefix
+            makeMergeTestsWithPrefix = makeMergeTestsWithPrefix
+            makePrefixTestsWithPrefix = makePrefixTestsWithPrefix
+        }
+
+    member this.MakeSorterModelSets with get() = this.makeSorterModelSets
+    member this.MakeStandardTestsWithPrefix with get() = this.makeStandardTestsWithPrefix
+    member this.MakeMergeTestsWithPrefix with get() = this.makeMergeTestsWithPrefix
+    member this.MakePrefixTestsWithPrefix with get() = this.makePrefixTestsWithPrefix
+
+    member this.WithMakeSorterModelSets(value) = { this with makeSorterModelSets = value }
+    member this.WithMakeStandardTestsWithPrefix(value) = { this with makeStandardTestsWithPrefix = value }
+    member this.WithMakeMergeTestsWithPrefix(value) = { this with makeMergeTestsWithPrefix = value }
+    member this.WithMakePrefixTestsWithPrefix(value) = { this with makePrefixTestsWithPrefix = value }
 
 type setupBuilder = setupContext -> setupFunction
 

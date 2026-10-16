@@ -8,6 +8,8 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
@@ -321,9 +323,34 @@ module SorterMutateExecutor =
 
 
 
-    let _evaluateMutants 
-            (makeMutantSorterModels: runParameters -> Async<Result<sorterModel seq, string>> )
-            (makeSortableTests: runParameters -> Async<Result<sortableTests * (ce array), string>>)
+    let storeMutantSorterModelSet
+            (makeModels: runParameters -> Async<Result<sorterModel seq, string>>)
+            (host: runHost)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (rp: runParameters) : Async<Result<unit, string>> =
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let! query =
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
+                    |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
+                let! modelStream = makeModels rp
+                let models =
+                    modelStream
+                    |> Seq.map (fun model -> cts.Token.ThrowIfCancellationRequested(); model)
+                    |> Seq.toArray
+                let rawCeLength =
+                    if Array.isEmpty models then 0<ceLength>
+                    else models |> Array.map SorterModel.getCeLength |> Array.max
+                let modelSet = sorterModelSet.create (UMX.tag %query.Id) models rawCeLength
+                do! checkCancellation cts.Token
+                return! host.RunDb.saveAsync geneSortDataMode.Setup query (outputData.SorterModelSet modelSet) allowOverwrite
+            with error ->
+                return! Error (sprintf "Failed to generate or save mutant SorterModelSet: %s" error.Message)
+        }
+
+    let _evaluateMutants
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -337,9 +364,15 @@ module SorterMutateExecutor =
             try
                 do! checkCancellation cts.Token
                 let collectTests = false |> UMX.tag<collectNewSortableTests>
-                // 1. Fetch mutant sorter models as a lazy stream sequence
-                log "Generating Mutant Sorter Models Stream..."
-                let! (allMutantStream: sorterModel seq) = makeMutantSorterModels rp
+                // 1. Persist setup, then load the inputs used for evaluation.
+                log "Generating and saving mutant evaluation setup..."
+                do! host.Setup rp
+                do! checkCancellation cts.Token
+                let! qpModels =
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
+                    |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
+                let! savedModels = host.RunDb.loadAsync geneSortDataMode.Setup qpModels
+                let! modelSet = savedModels |> OutputData.asSorterModelSet
                 
                 let sortersPerSplit = 1000
                 
@@ -348,8 +381,12 @@ module SorterMutateExecutor =
                     |> Result.ofOption "Missing sorterEvalType."
 
                 do! checkCancellation cts.Token
-                log "Generating Sortable Tests..."
-                let! tests, ces = makeSortableTests rp 
+                log "Loading saved Sortable Tests with prefix..."
+                let! qpTests =
+                    host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
+                    |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
+                let! savedTests = host.RunDb.loadAsync geneSortDataMode.Setup qpTests
+                let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
                 let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
 
                 let! qpSorterSet = 
@@ -367,7 +404,7 @@ module SorterMutateExecutor =
                 let allChunksEvals = ResizeArray<sorterEval[]>()
                 let mutable chunkCounter = 0
 
-                let chunkedMutants = allMutantStream |> Seq.chunkBySize sortersPerSplit
+                let chunkedMutants = modelSet.SorterModels |> Seq.chunkBySize sortersPerSplit
 
                 for modelChunk in chunkedMutants do
                     do! checkCancellation cts.Token
@@ -424,29 +461,41 @@ module SorterMutateExecutor =
 
 
 
+    let private bindSetup (host: runHost) allowOverwrite (cts: CancellationTokenSource) =
+        let checkedSetup (setup: setupFunction) : setupFunction =
+            fun rp -> asyncResult {
+                do! checkCancellation cts.Token
+                return! setup rp
+            }
+        let context =
+            setupContext.create
+                (Map.ofList [
+                    SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet makeMutantStandardSorterModels host allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet makeMutantMergeSorterModels host allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet makeMutantPrefixSorterModels host allowOverwrite cts
+                ])
+                (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
+        host.WithSetupContext(context)
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantStandardSorterModels
-                    SortableTestsMakers.makeStandardTests
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _evaluateMutants host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantMergeSorterModels
-                    SortableTestsMakers.makeMergeTests
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _evaluateMutants host rp allowOverwrite cts progress }
 
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants 
-                    makeMutantPrefixSorterModels
-                    SortableTestsMakers.getPrefixTests
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _evaluateMutants host rp allowOverwrite cts progress }
 
 
     let mergeReportExecutor =

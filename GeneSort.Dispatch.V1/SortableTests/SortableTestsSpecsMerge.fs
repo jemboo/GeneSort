@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SortableTests
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -24,6 +25,7 @@ module SortableTestsSpecsMerge =
                 dataFormatInt8v512
             ]
                     QueryCatalogNames.sortableTestMerge
+                    SetupCatalogNames.merge
                     RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
                     RunParamBuilderNames.Enhancer.sortableTests
                     false

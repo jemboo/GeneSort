@@ -6,15 +6,32 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Project.V1.Catalogs.SortableTestsWithPrefix
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Dispatch.V1
+open FSharp.UMX
+open GeneSort.Project.Mp.V1
+open GeneSort.Core.Mp
+open MessagePack
 
 let private parameters = runParameters.create Map.empty
 
-let private context (step: string -> setupFunction) : setupContext = {
-    MakeUniformSorterModelSet = step "models"
-    MakeStandardTestsWithPrefix = step "standard"
-    MakeMergeTestsWithPrefix = step "merge"
-    MakePrefixTestsWithPrefix = step "prefix"
-}
+let private makeRun queryCatalog setupCatalog =
+    SimpleRun.create (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
+        queryCatalog setupCatalog "identity" "sortable-test" false |> run.SimpleRun
+
+let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
+
+let private context (step: string -> setupFunction) : setupContext =
+    setupContext.create
+        (Map.ofList [
+            SorterModelSetCatalogNames.uniform, step "models"
+            SorterModelSetCatalogNames.mutantStandard, step "mutant-standard"
+            SorterModelSetCatalogNames.mutantMerge, step "mutant-merge"
+            SorterModelSetCatalogNames.mutantPrefix, step "mutant-prefix"
+        ])
+        (step "standard")
+        (step "merge")
+        (step "prefix")
 
 [<Theory>]
 [<InlineData("setup.standard", "standard")>]
@@ -30,6 +47,88 @@ let ``combined setup executes models then the selected tests`` name expectedTest
     let result = SetupCatalog.get name bindings parameters |> Async.RunSynchronously
     Assert.Equal(Ok (), result)
     Assert.Equal<string list>(["models"; expectedTests], List.ofSeq calls)
+
+[<Theory>]
+[<InlineData("setup.mutant-standard", "mutant-standard", "standard")>]
+[<InlineData("setup.mutant-merge", "mutant-merge", "merge")>]
+[<InlineData("setup.mutant-prefix", "mutant-prefix", "prefix")>]
+let ``mutant setup selects matching model and test makers`` name expectedModels expectedTests =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label rp -> async {
+        Assert.Same(parameters, rp)
+        calls.Add label
+        return Ok ()
+    })
+    Assert.Equal(Ok (), SetupCatalog.get name bindings parameters |> Async.RunSynchronously)
+    Assert.Equal<string list>([expectedModels; expectedTests], List.ofSeq calls)
+
+[<Theory>]
+[<InlineData("mutant-standard")>]
+[<InlineData("standard")>]
+let ``mutant evaluation stops when either setup step fails`` failingStep =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async {
+        calls.Add label
+        return if label = failingStep then Error "setup failed" else Ok ()
+    })
+    use cts = new System.Threading.CancellationTokenSource()
+    let host = (makeHost ()).WithSetupContext(bindings)
+    let result =
+        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor._evaluateMutants
+            host parameters (UMX.tag false) cts None
+        |> Async.RunSynchronously
+    Assert.Equal(Error "setup failed", result)
+    let expected = if failingStep = "mutant-standard" then ["mutant-standard"] else ["mutant-standard"; "standard"]
+    Assert.Equal<string list>(expected, List.ofSeq calls)
+
+[<Fact>]
+let ``unbound mutant setup reports an error without running tests`` () =
+    let calls = ResizeArray<string>()
+    let bindings = (context (fun label _ -> async { calls.Add label; return Ok () })).WithMakeSorterModelSets(Map.empty)
+    let result = SetupCatalog.get SetupCatalogNames.mutantPrefix bindings parameters |> Async.RunSynchronously
+    Assert.True(Result.isError result)
+    Assert.Empty(calls)
+
+[<Theory>]
+[<InlineData("sorter-eval.standard", "setup.standard")>]
+[<InlineData("sorter-eval.standard", "setup.prefix")>]
+[<InlineData("sorter-eval.merge", "setup.merge")>]
+[<InlineData("sorter-eval.prefix", "setup.prefix")>]
+[<InlineData("sorter-mutate.standard", "setup.mutant-standard")>]
+[<InlineData("sorter-mutate.merge", "setup.mutant-merge")>]
+[<InlineData("sorter-mutate.prefix", "setup.mutant-prefix")>]
+let ``explicit setup catalog survives serialization`` queryCatalog expected =
+    MessagePackSetup.configure ()
+    let configured = makeRun queryCatalog expected
+    Assert.Equal(expected, configured.SetupCatalogName)
+    let dto = RunDto.fromDomain configured
+    let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
+
+    let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+    Assert.Equal(expected, restored.SetupCatalogName)
+
+[<Fact>]
+let ``saved runs must specify a setup catalog name`` () =
+    MessagePackSetup.configure ()
+    let dto = makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.prefix |> RunDto.fromDomain
+    let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
+    json.AsObject().Remove("SetupCatalogName") |> ignore
+    let legacyDto = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto>
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain legacyDto |> ignore) |> ignore
+
+[<Fact>]
+let ``host setup honors the run setup catalog and custom names round trip`` () =
+    MessagePackSetup.configure ()
+    let customName = string (Guid.NewGuid())
+    SetupCatalog.register customName (SetupFunctions.fromCatalogs SorterModelSetCatalogNames.mutantMerge SortableTestsWithPrefixCatalogNames.prefix)
+    let configured = (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard).WithSetupCatalogName customName
+    let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+    Assert.Equal(customName, restored.SetupCatalogName)
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
+    let host = (runHost.Create restored 1).WithSetupContext(bindings)
+    Assert.Equal(Ok (), host.Setup parameters |> Async.RunSynchronously)
+    Assert.Equal<string list>(["mutant-merge"; "prefix"], List.ofSeq calls)
 
 [<Theory>]
 [<InlineData("models")>]
@@ -58,7 +157,7 @@ let ``setup catalog bindings do not leak across runs`` () =
 [<Fact>]
 let ``custom catalog entries can be composed and reject invalid registrations`` () =
     let modelName, testName, setupName = string (Guid.NewGuid()), string (Guid.NewGuid()), string (Guid.NewGuid())
-    let modelBuilder : setupBuilder = fun ctx -> ctx.MakeUniformSorterModelSet
+    let modelBuilder : setupBuilder = fun ctx -> ctx.MakeSorterModelSets.[SorterModelSetCatalogNames.uniform]
     let testsBuilder : setupBuilder = fun ctx -> ctx.MakeMergeTestsWithPrefix
     SorterModelSetCatalog.register modelName modelBuilder
     SortableTestsWithPrefixCatalog.register testName testsBuilder

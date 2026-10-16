@@ -11,10 +11,26 @@ open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 
 /// Context available to a run parameter enhancer without depending on dispatch infrastructure.
-type runParamEnhancerContext = {
-    QueryParamsFromRunParams: queryParamsBuilder
-    Run: run
-}
+type runParamEnhancerContext =
+    private {
+        queryParamsFromRunParams: queryParamsBuilder
+        run: run
+    }
+
+    static member create
+            (queryParamsFromRunParams: queryParamsBuilder)
+            (run: run)
+            : runParamEnhancerContext =
+        {
+            queryParamsFromRunParams = queryParamsFromRunParams
+            run = run
+        }
+
+    member this.QueryParamsFromRunParams with get() = this.queryParamsFromRunParams
+    member this.Run with get() = this.run
+
+    member this.WithQueryParamsFromRunParams(value) = { this with queryParamsFromRunParams = value }
+    member this.WithRun(value) = { this with run = value }
 
 type runParamFilterBuilder = runParameters -> runParameters option
 type runParamEnhancerBuilder = runParamEnhancerContext -> runParameters -> runParameters

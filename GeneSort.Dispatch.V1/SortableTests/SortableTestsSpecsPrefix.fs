@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SortableTests
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -24,6 +25,7 @@ module SortableTestsSpecsPrefix =
                 prefixLib_Prefix24_3a
             ]
                     QueryCatalogNames.sortableTestPrefix
+                    SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
@@ -43,6 +45,7 @@ module SortableTestsSpecsPrefix =
                 prefixLib_Prefix24s
             ]
                     QueryCatalogNames.sortableTestPrefix
+                    SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
@@ -60,6 +63,7 @@ module SortableTestsSpecsPrefix =
                 prefixLib_Prefix32_4
             ]
                     QueryCatalogNames.sortableTestPrefix
+                    SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false

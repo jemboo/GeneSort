@@ -10,6 +10,7 @@ open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
@@ -20,7 +21,6 @@ open GeneSort.Dispatch.V1.OpsUtils
 module SorterEvalExecutor =
 
     let _makeSorterEvals 
-            (makeSetup: setupFunction)
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -37,7 +37,7 @@ module SorterEvalExecutor =
                 
                 // 1. Unpack run configuration
                 log "Generating and saving evaluation setup..."
-                do! makeSetup rp
+                do! host.Setup rp
                 do! checkCancellation cts.Token
                 let! qpModels =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
@@ -117,40 +117,39 @@ module SorterEvalExecutor =
 
 
         
-    let private makeSetup name host allowOverwrite (cts: CancellationTokenSource) =
+    let private bindSetup (host: runHost) allowOverwrite (cts: CancellationTokenSource) =
         let checkedSetup (setup: setupFunction) : setupFunction =
             fun rp -> asyncResult {
                 do! checkCancellation cts.Token
                 return! setup rp
             }
-        let context = {
-            MakeUniformSorterModelSet = SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite |> checkedSetup
-            MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup
-            MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup
-            MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup
-        }
-        SetupCatalog.get name context
+        let context =
+            setupContext.create
+                (Map.ofList [
+                    SorterModelSetCatalogNames.uniform, SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite |> checkedSetup
+                ])
+                (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup)
+                (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
+        host.WithSetupContext(context)
 
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvals 
-                    (makeSetup SetupCatalogNames.standard host allowOverwrite cts)
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _makeSorterEvals host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvals 
-                    (makeSetup SetupCatalogNames.merge host allowOverwrite cts)
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _makeSorterEvals host rp allowOverwrite cts progress }
 
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSorterEvals 
-                    (makeSetup SetupCatalogNames.prefix host allowOverwrite cts)
-                    host rp allowOverwrite cts progress }
+                let host = bindSetup host allowOverwrite cts
+                _makeSorterEvals host rp allowOverwrite cts progress }
 
 
     let stageStatsReportExecutor =

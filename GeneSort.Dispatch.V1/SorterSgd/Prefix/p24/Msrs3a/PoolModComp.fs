@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.PoolModComp
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
 open FSharp.UMX
@@ -44,6 +45,7 @@ module Specs =
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
+                SetupCatalogNames.standard
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
@@ -67,6 +69,7 @@ module Specs =
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
+                SetupCatalogNames.standard
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
@@ -90,6 +93,7 @@ module Specs =
                 "expInterval100_L50ss"
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
+                SetupCatalogNames.standard
                 RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false

@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Core
@@ -31,6 +32,7 @@ module SorterEvalSpecsTestPrefix =
                 largeSorterCount
             ]
                     QueryCatalogNames.sorterEvalPrefix
+                    SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
@@ -53,6 +55,7 @@ module SorterEvalSpecsTestPrefix =
                 largeSorterCount
             ]
                     QueryCatalogNames.sorterEvalPrefix
+                    SetupCatalogNames.prefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false

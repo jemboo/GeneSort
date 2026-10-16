@@ -4,6 +4,7 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs
+open GeneSort.Project.V1.Catalogs.Setup
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
@@ -23,6 +24,7 @@ type simpleRunHost = private {
     run: simpleRun
     queryParamsFromRunParams: queryParamsBuilder
     maxParallel: int
+    setup: setupFunction option
 }
 
 type sgdRunHost = private {
@@ -57,7 +59,8 @@ type runHost =
                       run.QueryCatalogName
                       run.ProjectName
                       run.DatabaseName
-              maxParallel = maxParallel }
+              maxParallel = maxParallel
+              setup = None }
 
         let lookupInterval name =
             match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
@@ -109,6 +112,22 @@ type runHost =
 
     member this.AllowOverwrite = this.Run.AllowOverwrite |> UMX.tag<allowOverwrite>
 
+    /// Bind storage and cancellation to the complete setup selected by the run.
+    member this.WithSetupContext(context: setupContext) =
+        let setup = SetupCatalog.get this.Run.SetupCatalogName context
+        match this with
+        | SimpleRunHost host -> SimpleRunHost { host with setup = Some setup }
+        | SgdRunHost host -> SgdRunHost { host with simpleHost = { host.simpleHost with setup = Some setup } }
+
+    member this.Setup with get() : setupFunction =
+        let configured =
+            match this with
+            | SimpleRunHost host -> host.setup
+            | SgdRunHost host -> host.simpleHost.setup
+        match configured with
+        | Some setup -> setup
+        | None -> fun _ -> async { return Error "Run host setup is not bound. Call WithSetupContext before executing setup." }
+
     member this.MaxParallel =
         match this with
         | SimpleRunHost host -> host.maxParallel
@@ -117,6 +136,6 @@ type runHost =
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
         let filter = RunParamFilterBuilders.get this.Run.FilterCatalogName
         let enhancer = RunParamEnhancerBuilders.get this.Run.EnhancerCatalogName
-        let context = { QueryParamsFromRunParams = this.QueryParamsFromRunParams; Run = this.Run }
+        let context = runParamEnhancerContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
         |> Seq.choose (filter >> Option.map (enhancer context))

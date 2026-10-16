@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.Mp.V1
+namespace GeneSort.Project.Mp.V1
 
 open GeneSort.Project.V1.Catalogs.Evolution
 open MessagePack
@@ -29,6 +29,7 @@ type runDto =
         SortableTestsMakerName: string
         SeedPoolSetMakerName: string
         MutatorMakerName: string
+        SetupCatalogName: string
     }
 
 module RunDto =
@@ -44,6 +45,7 @@ module RunDto =
             GenSaveIntervalsName = saveIntervalsName
             GenSaveSubIntervalsName = saveSubIntervalsName
             QueryCatalogName = project.QueryCatalogName
+            SetupCatalogName = project.SetupCatalogName
             FilterCatalogName = project.FilterCatalogName
             EnhancerCatalogName = project.EnhancerCatalogName
             AllowOverwrite = project.AllowOverwrite
@@ -73,6 +75,9 @@ module RunDto =
         let filterCatalogName = dto.FilterCatalogName |> Option.ofObj |> Option.defaultValue "identity"
         let enhancerCatalogName = dto.EnhancerCatalogName |> Option.ofObj |> Option.defaultValue "sortable-test"
         let allowOverwrite = dto.AllowOverwrite
+        let setupCatalogName = dto.SetupCatalogName
+        if System.String.IsNullOrWhiteSpace setupCatalogName then
+            invalidArg "dto" "Run data must specify an explicit SetupCatalogName."
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
         | None, None ->
             SimpleRun (
@@ -83,6 +88,7 @@ module RunDto =
                     dto.Description
                     parameterSpans
                     queryCatalogName
+                    setupCatalogName
                     filterCatalogName
                     enhancerCatalogName
                     allowOverwrite)
@@ -98,7 +104,7 @@ module RunDto =
                         | SeedSorterPoolSetMakerNames.merge -> if isSoss then SeedSorterPoolSetMakerNames.Soss.merge else SeedSorterPoolSetMakerNames.Standard.merge
                         | SeedSorterPoolSetMakerNames.prefix -> if isSoss then SeedSorterPoolSetMakerNames.Soss.prefix else SeedSorterPoolSetMakerNames.Standard.prefix
                         | _ -> seed
-                    { SortableTests = tests; SeedPoolSet = seedName; Mutator = mutator }
+                    evolutionMakerNames.create tests seedName mutator
                 | None, None, None ->
                     // Older runs encoded input selection in their project/executor names.
                     let projectParts = (dto.ProjectName |> Option.ofObj |> Option.defaultValue "").Split('.')
@@ -128,6 +134,7 @@ module RunDto =
                     (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
                     (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
                     queryCatalogName
+                    setupCatalogName
                     filterCatalogName
                     enhancerCatalogName
                     allowOverwrite

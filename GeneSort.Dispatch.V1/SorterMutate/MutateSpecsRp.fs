@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
@@ -43,6 +44,7 @@ module MutateSpecsRp =
                 mutationMod1
             ]
                     QueryCatalogNames.sorterMutatePrefix
+                    SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -70,6 +72,7 @@ module MutateSpecsRp =
                 mutationMod1
             ]
                     QueryCatalogNames.sorterMutatePrefix
+                    SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -97,6 +100,7 @@ module MutateSpecsRp =
                 mutationMod1
             ]
                     QueryCatalogNames.sorterMutatePrefix
+                    SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
@@ -123,6 +127,7 @@ module MutateSpecsRp =
                 mutationMod1
             ]
                     QueryCatalogNames.sorterMutatePrefix
+                    SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false

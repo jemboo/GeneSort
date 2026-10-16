@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msrs4a
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
 open FSharp.UMX
@@ -55,6 +56,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -83,6 +85,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -112,6 +115,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -143,6 +147,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -170,6 +175,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -198,6 +204,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
@@ -230,6 +237,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
@@ -261,6 +269,7 @@ module MutationRate =
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
