@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="Tests.fs" />
     <Compile Include="MakerCatalogTests.fs" />
+    <Compile Include="SetupCatalogTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

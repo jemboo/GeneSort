@@ -9,6 +9,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
@@ -19,8 +20,7 @@ open GeneSort.Dispatch.V1.OpsUtils
 module SorterEvalExecutor =
 
     let _makeSorterEvals 
-            (makeSorterModelSet: runParameters -> Async<Result<unit, string>>)
-            (makeSortableTests: runParameters -> Async<Result<unit, string>>)
+            (makeSetup: setupFunction)
             (host: runHost)
             (rp: runParameters) 
             (allowOverwrite: bool<allowOverwrite>) 
@@ -36,8 +36,8 @@ module SorterEvalExecutor =
                 do! checkCancellation cts.Token
                 
                 // 1. Unpack run configuration
-                log "Generating and saving SorterModelSet..."
-                do! makeSorterModelSet rp
+                log "Generating and saving evaluation setup..."
+                do! makeSetup rp
                 do! checkCancellation cts.Token
                 let! qpModels =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
@@ -59,9 +59,6 @@ module SorterEvalExecutor =
                     |> Result.ofOption "Missing collectNewSortableTests."
 
                 // 2. Generate common evaluation dependencies
-                do! checkCancellation cts.Token
-                log "Generating and saving Sortable Tests with prefix..."
-                do! makeSortableTests rp
                 do! checkCancellation cts.Token
                 let! qpTests =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
@@ -120,28 +117,39 @@ module SorterEvalExecutor =
 
 
         
+    let private makeSetup name host allowOverwrite (cts: CancellationTokenSource) =
+        let checkedSetup (setup: setupFunction) : setupFunction =
+            fun rp -> asyncResult {
+                do! checkCancellation cts.Token
+                return! setup rp
+            }
+        let context = {
+            MakeUniformSorterModelSet = SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite |> checkedSetup
+            MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup
+            MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite |> checkedSetup
+            MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup
+        }
+        SetupCatalog.get name context
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
-                    (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite)
+                    (makeSetup SetupCatalogNames.standard host allowOverwrite cts)
                     host rp allowOverwrite cts progress }
 
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
-                    (SortableTestsMakers.storeTests SortableTestsMakers.makeMergeTests host allowOverwrite)
+                    (makeSetup SetupCatalogNames.merge host allowOverwrite cts)
                     host rp allowOverwrite cts progress }
 
     let prefixExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
                 _makeSorterEvals 
-                    (SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite)
-                    (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite)
+                    (makeSetup SetupCatalogNames.prefix host allowOverwrite cts)
                     host rp allowOverwrite cts progress }
 
 

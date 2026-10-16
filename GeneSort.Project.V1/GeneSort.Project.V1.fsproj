@@ -25,6 +25,10 @@
     <Compile Include="Catalogs\Evolution\SeedPoolSetMakers.fs" />
     <Compile Include="Catalogs\Evolution\MutatorMakers.fs" />
     <Compile Include="Catalogs\Evolution\MakerCatalogs.fs" />
+    <Compile Include="Catalogs\Setup\SetupTypes.fs" />
+    <Compile Include="Catalogs\SorterModelSet\SorterModelSetCatalog.fs" />
+    <Compile Include="Catalogs\SortableTestsWithPrefix\SortableTestsWithPrefixCatalog.fs" />
+    <Compile Include="Catalogs\Setup\SetupCatalog.fs" />
     <Compile Include="Catalogs\ProjectCatalogs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
