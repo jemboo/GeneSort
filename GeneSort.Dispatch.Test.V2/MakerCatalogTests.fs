@@ -219,11 +219,11 @@ let ``built-in names resolve to the corresponding makers`` variant =
     let testsName, testsMaker, seedName, seedMaker =
         match variant with
         | "standard" -> SortableTestsMakerNames.standard, EvolutionTestMakers.makeStandardTests,
-                        SeedSorterPoolSetMakerNames.standard, SeedPoolSetMakers.createSeedSorterPoolSetStandard
+                        SeedSorterPoolSetMakerNames.standard, SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
         | "merge" -> SortableTestsMakerNames.merge, EvolutionTestMakers.makeMergeTests,
-                     SeedSorterPoolSetMakerNames.merge, SeedPoolSetMakers.createSeedSorterPoolSetMerge
+                     SeedSorterPoolSetMakerNames.merge, SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
         | _ -> SortableTestsMakerNames.prefix, EvolutionTestMakers.makePrefixTests,
-               SeedSorterPoolSetMakerNames.prefix, SeedPoolSetMakers.createSeedSorterPoolSetPrefix
+               SeedSorterPoolSetMakerNames.prefix, SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
     let expectedTests = testsMaker context emptyParameters |> Async.RunSynchronously |> errorOf
     let actualTests = SortableTestsMakerCatalog.get testsName context emptyParameters |> Async.RunSynchronously |> errorOf
     Assert.Equal(expectedTests, actualTests)

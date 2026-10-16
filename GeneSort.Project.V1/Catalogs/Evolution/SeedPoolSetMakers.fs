@@ -271,9 +271,9 @@ module SeedPoolSetMakers =
         builder context rp
         |> Async.map (Result.map (GeneSort.Eval.V1.Sgd.Soss.SorterPoolSet_Soss.fromStandard >> sorterPoolSet.Soss))
 
-    let createSeedSorterPoolSetStandard context rp = wrapStandard buildStandard context rp
-    let createSeedSorterPoolSetMerge context rp = wrapStandard buildMerge context rp
-    let createSeedSorterPoolSetPrefix context rp = wrapStandard buildPrefix context rp
+    let createStandardSeedSorterPoolSetStandard context rp = wrapStandard buildStandard context rp
+    let createStandardSeedSorterPoolSetMerge context rp = wrapStandard buildMerge context rp
+    let createStandardSeedSorterPoolSetPrefix context rp = wrapStandard buildPrefix context rp
     let createSossSeedSorterPoolSetStandard context rp = wrapSoss buildStandard context rp
     let createSossSeedSorterPoolSetMerge context rp = wrapSoss buildMerge context rp
     let createSossSeedSorterPoolSetPrefix context rp = wrapSoss buildPrefix context rp

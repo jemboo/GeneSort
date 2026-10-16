@@ -20,7 +20,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 
 module SgdEx_Standard =
 
-    /// Handles initialization, evaluation, and DB saving when no checkpoint exists
+    /// Creates, evaluates, and saves the initial pool as Setup when no saved pool exists
     let initializeAndSaveSeedPoolSet 
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortDb)
@@ -33,7 +33,7 @@ module SgdEx_Standard =
 
         asyncResult {
             let evalType = sorterEvalType.V2
-            log "No saved checkpoint found. Creating initial seedSorterPoolSet..."
+            log "No saved checkpoint or Setup pool found. Creating initial seedSorterPoolSet..."
             let! seed = sorterPoolSetCreator rp
             let! seedPoolSet = SorterPoolSet.asStandard seed
             
@@ -52,12 +52,12 @@ module SgdEx_Standard =
                 |> SorterPoolSet_Standard.updateSorterEvals computedEvals
                 |> SorterPoolSet_Standard.withSelectionMeasure selectionMeasure
 
-            // Save SorterPoolSetSummaries
+            // Save the evaluated initial pool for reuse when no Results checkpoint exists
             let! qpSsrr = 
                 genDb.makeQueryParamsFromRunParams rp (geneSortDataType.SorterPoolSet "")
                 |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
-            do! genDb.saveAsync geneSortDataMode.Results qpSsrr (evaluatedSeedSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
-            log (sprintf "Initial seedSorterPoolSet saved at generation %d." %evaluatedSeedSet.GenerationNumber)
+            do! genDb.saveAsync geneSortDataMode.Setup qpSsrr (evaluatedSeedSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
+            log (sprintf "Initial seedSorterPoolSet saved as Setup at generation %d." %evaluatedSeedSet.GenerationNumber)
 
             return evaluatedSeedSet
         }
@@ -95,16 +95,28 @@ module SgdEx_Standard =
                 // 1. Check for existing checkpoints directly via genDb
                 let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSet saveIntervals genDb rp
 
-                // 2. Conditionally initialize or resume from the highest discovered checkpoint
+                // 2. Resume Results, reuse Setup, or create and save a new Setup pool
                 let! (activeSeedPoolSet, activeRp) = 
                     match highestPoolSetOpt with
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! (seedSet: sorterPoolSet_Standard) = 
-                                        initializeAndSaveSeedPoolSet 
-                                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
-                            return seedSet, initRp
+                            let! setupQuery =
+                                genDb.makeQueryParamsFromRunParams initRp (geneSortDataType.SorterPoolSet "")
+                                |> Result.ofOption "Failed to create QueryParams for initial Setup sorterPoolSet."
+                            let! setupPoolSetOpt = genDb.loadIfFoundAsync geneSortDataMode.Setup setupQuery
+                            let! (seedSet: sorterPoolSet_Standard) =
+                                match setupPoolSetOpt with
+                                | Some setupData ->
+                                    asyncResult {
+                                        let! setupPoolSet = OutputData.asSorterPoolSetStandard setupData
+                                        log (sprintf "Found initial Setup sorterPoolSet at generation %d. Beginning evolution." %setupPoolSet.GenerationNumber)
+                                        return setupPoolSet
+                                    }
+                                | None ->
+                                    initializeAndSaveSeedPoolSet
+                                        sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
+                            return seedSet, initRp.WithGenerationCurrent(Some seedSet.GenerationNumber)
                         }
                     | Some (highestPoolSet: sorterPoolSet_Standard) -> 
                         asyncResult {

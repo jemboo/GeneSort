@@ -162,6 +162,10 @@ module Utils =
                         | Some qp ->
                             let! exists = generationalDb.doesOutPutDataExist geneSortDataMode.Results qp
                             if exists then return! findHighestExistingIndex (mid + 1) high (Some mid)
+                            // Generation zero is now stored as Setup, so its absence from
+                            // Results must not hide the first evolved checkpoint.
+                            elif intervals.[mid] = UMX.tag<generationNumber> 0 then
+                                return! findHighestExistingIndex (mid + 1) high bestIdx
                             else return! findHighestExistingIndex low (mid - 1) bestIdx
                 }
 

@@ -57,12 +57,12 @@ module SorterSgdMakerCatalogs =
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.standard EvolutionTestMakers.makeStandardTests
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.merge EvolutionTestMakers.makeMergeTests
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.prefix EvolutionTestMakers.makePrefixTests
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.standard SeedPoolSetMakers.createSeedSorterPoolSetStandard
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.merge SeedPoolSetMakers.createSeedSorterPoolSetMerge
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.prefix SeedPoolSetMakers.createSeedSorterPoolSetPrefix
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.standard SeedPoolSetMakers.createSeedSorterPoolSetStandard
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.merge SeedPoolSetMakers.createSeedSorterPoolSetMerge
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.prefix SeedPoolSetMakers.createSeedSorterPoolSetPrefix
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.standard SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.merge SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.prefix SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.standard SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.merge SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
+                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.prefix SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.standard SeedPoolSetMakers.createSossSeedSorterPoolSetStandard
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.merge SeedPoolSetMakers.createSossSeedSorterPoolSetMerge
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Soss.prefix SeedPoolSetMakers.createSossSeedSorterPoolSetPrefix
