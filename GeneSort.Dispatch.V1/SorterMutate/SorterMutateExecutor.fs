@@ -353,113 +353,8 @@ module SorterMutateExecutor =
                 return! Error (sprintf "Failed to generate or save mutant SorterModelSet: %s" error.Message)
         }
 
-    let _evaluateMutants
-            (host: runHost)
-            (rp: runParameters) 
-            (allowOverwrite: bool<allowOverwrite>) 
-            (cts: CancellationTokenSource) 
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
-
-        let log msg = OpsUtils.report progress 
-                        (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
-
-        asyncResult {
-            try
-                do! checkCancellation cts.Token
-                let collectTests = false |> UMX.tag<collectNewSortableTests>
-                // 1. Load the inputs prepared by the setup phase.
-                let! qpModels =
-                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
-                    |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
-                let! savedModels = host.RunDb.loadAsync geneSortDataMode.Setup qpModels
-                let! modelSet = savedModels |> OutputData.asSorterModelSet
-                
-                let sortersPerSplit = 1000
-                
-                let! sorterEvalType =
-                    rp.GetSorterEvalType() 
-                    |> Result.ofOption "Missing sorterEvalType."
-
-                do! checkCancellation cts.Token
-                log "Loading saved Sortable Tests with prefix..."
-                let! qpTests =
-                    host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
-                    |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
-                let! savedTests = host.RunDb.loadAsync geneSortDataMode.Setup qpTests
-                let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
-                let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
-
-                let! qpSorterSet = 
-                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterSet "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSet."
-
-                let! qpEval = 
-                    host.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
-                    |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
-
-                let testId = tests |> SortableTests.getId
-                
-                // 2. Setup Accumulators and Lazy Chunk Loop via Seq.chunkBySize
-                log "Running Split Sorter Generation, Stream Chunk Evaluations, & Aggregation..."
-                let allChunksEvals = ResizeArray<sorterEval[]>()
-                let mutable chunkCounter = 0
-
-                let chunkedMutants = modelSet.SorterModels |> Seq.chunkBySize sortersPerSplit
-
-                for modelChunk in chunkedMutants do
-                    do! checkCancellation cts.Token
-                    chunkCounter <- chunkCounter + 1
-                    log (sprintf "Processing mutant chunk %d..." chunkCounter)
-                    
-                    // Wrap the subset models into an explicit SorterModelSet container
-                    let modelSetChunk = sorterModelSet.create 
-                                            (Guid.Empty |> UMX.tag) 
-                                            modelChunk
-                                            (modelChunk.[0] |> SorterModel.getCeLength)
-
-                    // Materialize into a functional SorterSet chunk
-                    let maxCeCount = None
-                    let fullSorterSetChunk = 
-                        SorterModelSet.makeSorterSet (Guid.Empty |> UMX.tag) maxCeCount modelSetChunk
-
-                    // Compute sorter evaluations directly from the targeted network chunk
-                    let sorterEvalsChunk = 
-                        SorterSetEval.makeSorterEvals fullSorterSetChunk.Sorters prefixBlock tests sorterEvalType collectTests
-
-                    // Accumulate transient array chunk results
-                    allChunksEvals.Add(sorterEvalsChunk)
-                    
-                    // Explicit GC collection cycle over the finished slice to drop garbage immediately
-                    System.Runtime.GCSettings.LargeObjectHeapCompactionMode <- System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce
-                    GC.Collect(2, GCCollectionMode.Forced, true, true)
-
-                // 3. Compile Master SorterSetEval structure
-                log "Compiling final Master Mutant SorterSetEval structure..."
-                let correctSorterSetId = (%qpSorterSet.Id) |> UMX.tag<sorterSetId>
-                
-                let finalEvalsArray = allChunksEvals |> Array.concat
-                let finalSorterSetEval = 
-                    sorterSetEval.create 
-                        (%qpEval.Id |> UMX.tag) 
-                        correctSorterSetId 
-                        testId 
-                        finalEvalsArray
-
-                // 4. Persistence
-                log (sprintf "Saving Combined Mutant SorterSetEval %s" (string %qpEval.Id))
-                do! host.RunDb.saveAsync geneSortDataMode.Results qpEval (finalSorterSetEval |> outputData.SorterSetEval) allowOverwrite
-                
-                log "Mutant Evaluation Run Complete."
-                return rp.WithRunFinished (Some true)
-
-            with e -> 
-                let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
-                log errorMsg 
-                return! Error errorMsg
-        } |> Async.map (logResult progress log)
-
-
-
+    let _evaluateMutants (host: runHost) rp allowOverwrite cts progress =
+        SorterMutateExecution._evaluateMutants host.ExecutionContext rp allowOverwrite cts progress
 
     let private bindSetup (host: runHost) allowOverwrite (cts: CancellationTokenSource) =
         let checkedSetup (setup: setupFunction) : setupFunction =
@@ -488,7 +383,7 @@ module SorterMutateExecutor =
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _evaluateMutants host rp allowOverwrite cts progress }
+                host.ExecuteFunction host.ExecutionContext rp allowOverwrite cts progress }
 
     let mergeExecutor = standardExecutor
 
@@ -515,16 +410,3 @@ module SorterMutateExecutor =
                 Reporting.makeMutantReport
                     Reporting.makePrefixMutantDetails
                     host rp allowOverwrite cts progress }
-
-
-
-    let getExecutor (executorType: sorterMutateExecutorType) : IRunParamsExecutor =
-        match executorType with
-        | sorterMutateExecutorType.GenStandard -> standardExecutor
-        | sorterMutateExecutorType.GenMerge -> mergeExecutor
-        | sorterMutateExecutorType.GenPrefix -> prefixExecutor
-        | sorterMutateExecutorType.StandardReport -> standardReportExecutor
-        | sorterMutateExecutorType.MergeReport -> mergeReportExecutor
-        | sorterMutateExecutorType.PrefixReport -> prefixReportExecutor
-
-

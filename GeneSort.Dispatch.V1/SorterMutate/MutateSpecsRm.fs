@@ -23,12 +23,12 @@ module MutateSpecsRm =
 
     module Specs =
 
-        let Test_Msce (executorType: sorterMutateExecutorType)  : run =
+        let Test_Msce ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomMerge.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Test-Msce_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test-Msce_%s" "GenMerge" |> UMX.tag)
                     "Mutation analysis for merge Msce"
                     [
                 msceModelType
@@ -51,12 +51,12 @@ module MutateSpecsRm =
             )
 
 
-        let Test_Mssi (executorType: sorterMutateExecutorType)  : run =
+        let Test_Mssi ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomMerge.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Test-Mssi_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test-Mssi_%s" "GenMerge" |> UMX.tag)
                     "Mutation analysis for merge Mssi"
                     [
                 mssiModelType
@@ -79,12 +79,12 @@ module MutateSpecsRm =
             )
 
 
-        let Test_Msrs (executorType: sorterMutateExecutorType)  : run =
+        let Test_Msrs ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomMerge.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Test-Msrs_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test-Msrs_%s" "GenMerge" |> UMX.tag)
                     "Mutation analysis for merge Msrs"
                     [
                 msrsModelType
@@ -106,12 +106,12 @@ module MutateSpecsRm =
                     false
             )
 
-        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : run =
+        let Test_Msuf4 ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomMerge.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Test-Msuf4_%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test-Msuf4_%s" "GenMerge" |> UMX.tag)
                     "Mutation analysis for merge Msuf4"
                     [
                 msuf4ModelType
@@ -149,8 +149,8 @@ module MutateSpecsRm =
                         (configType.Test_Msuf4, Specs.Test_Msuf4);
                     ]
 
-    let getRun (config: configType) (executorType: sorterMutateExecutorType) : run =
+    let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
-        specFunc executorType
+        specFunc ()
 
 

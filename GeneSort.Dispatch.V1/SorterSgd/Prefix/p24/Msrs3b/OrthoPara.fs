@@ -22,12 +22,12 @@ let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
 module Specs =
 
-    let NoMods (executorType: sorterSgdExecutorType)  : run =
+    let NoMods ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbOrthoPara32Name
                 projName
-                (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
                 "OrthroPara rate comp for 24pfx3b Msrs, NoMods"
                 [
             (runParameters.codeModKey, ["NoMods"] |> List.map string)

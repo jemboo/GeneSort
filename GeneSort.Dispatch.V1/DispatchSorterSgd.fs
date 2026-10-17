@@ -14,7 +14,9 @@ module DispatchSorterSgd =
 
     let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-        let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
+        let logFolder = Path.Combine(RunHost.projectsRoot (), "Logs")
+        Directory.CreateDirectory(logFolder) |> ignore
+        let logFileName = Path.Combine(logFolder, sprintf "session_%s_%s.log" sessionTimestamp (Guid.NewGuid().ToString("N")))
     
         // Explicit synchronization object to protect file access across threads
         let lockObj = obj()
@@ -46,149 +48,58 @@ module DispatchSorterSgd =
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-    ////********** Msuf6SgdSpecsPrefix **********
-    //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: runHost = runHost.Create (Prefix.p24.Msuf63b.MutationRate.VarModR_32.Test executorType) 8
-
-    //let private executor = SorterSgdExecutorType.getExecutor executorType
-    //let private minReplica = 0<replNumber>
-    //let private maxReplica = 1<replNumber>
-
-    //********** Soss Msuf32p4a **********
-    let private executorType = sorterSgdExecutorType.GenSoss
-    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_4_Debug executorType) 8
-
-    //********** Msuf4SgdSpecsPrefix **********
-    //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.VarModR_32.Pool_32_Test executorType) 8
-
-    let private executor = SorterSgdExecutorType.getExecutor executorType
+    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_4_Debug ()) 8
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 
-    //********** MsrsSgdSpecsPrefix **********
-    //let private executorType = sorterSgdExecutorType.GenStandard
-    //let private host: runHost = runHost.Create (Prefix.p32.Msrs4a.MutationRate.VarModR_64.NarrowTest executorType) 16
+    let private initializeParameters() =
+        ParamOps.initRunAndParamFiles host.RunDb (Some progress) host.Run
+            minReplica maxReplica host.AllowOverwrite host.ParamMapRefiner host.Run.ParameterSpans
 
-    //let private executor = SorterSgdExecutorType.getExecutor executorType
-    //let private minReplica = 1<replNumber>
-    //let private maxReplica = 5<replNumber>
-
-
-    //********** MssiSgdSpecsPrefix **********
-    //let private executorType = sorterSgdExecutorType.SummaryReport
-    //let private host: runHost = runHost.Create (Prefix.p24.Mssi3b.OrthoPara.Specs64.SymForceDiff1 executorType) 8
-
-    //let private executor = SorterSgdExecutorType.getExecutor executorType
-    //let private minReplica = 0<replNumber>
-    //let private maxReplica = 1<replNumber>
-
-
-
-    let private setupExecutor =
-        match executorType with
-        | sorterSgdExecutorType.GenStandard | sorterSgdExecutorType.GenSoss -> Some (SorterSgdExecutorType.getSetupExecutor executorType)
-        | _ -> None
-
-    /// Creates Setup artifacts for the saved run parameters.
-    let setupRunParams() =
-        async {
-            match setupExecutor with
-            | None -> printfn "This report workflow has no setup phase."
-            | Some setup ->
-                let! result =
-                    ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
-                        (Some progress) host setup host.MaxParallel
-                match result with
-                | Error error -> printfn "Setup Error: %s" error
-                | Ok results ->
-                    let summary = RunResult.analyze results
-                    printfn "Setup complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
-        } |> Async.RunSynchronously
-    let makeParamsAndRun() =
-
-        async {
-
-            printfn "Init Project: %s" %host.Run.DatabaseName
-    
-            let! initResult =
-                ParamOps.initRunAndParamFiles
-                    host.RunDb
-                    (Some progress) 
-                    host.Run
-                    minReplica
-                    maxReplica
-                    host.AllowOverwrite
-                    host.ParamMapRefiner
-                    host.Run.ParameterSpans
-
-
-            match initResult with
-            | Error e -> printfn "Init Failure: %s" e
-            | Ok () ->
-                let! execResult = 
-                    ProjectOps.executeSetupAndRuns
-                        minReplica 
-                        maxReplica
-                        host.AllowOverwrite 
-                        cts 
-                        (Some progress)
-                        host
-                        setupExecutor
-                        executor
-                        host.MaxParallel
-
-                match execResult with
-                | Ok results -> printfn "Success: %d records processed." results.Length
-                | Error e -> printfn "Runtime Error: %s" e
-
-        } |> Async.RunSynchronously
-
+    let private showResult result =
+        match result with
+        | Ok results ->
+            let summary = RunResult.analyze results
+            printfn "Complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
+            if summary.IssueLog.Length > 0 then
+                failwith (String.concat Environment.NewLine summary.IssueLog)
+        | Error error -> failwith error
 
     let makeRunParams() =
-
         async {
-            printfn "Init Run: %s" %host.Run.RunName
-    
-            let! initResult = 
-                ParamOps.initRunAndParamFiles
-                    host.RunDb           
-                    (Some progress) 
-                    host.Run              
-                    minReplica 
-                    maxReplica 
-                    host.AllowOverwrite 
-                    host.ParamMapRefiner      
-                    host.Run.ParameterSpans
-
-            match initResult with
-            | Error e -> printfn "Init Failure: %s" e
-            | Ok () -> printfn "Init Success: %s" %host.Run.RunName
-
-
+            let! result = initializeParameters()
+            match result with
+            | Ok () -> printfn "Parameters initialized."
+            | Error error -> failwithf "Init failure: %s" error
         } |> Async.RunSynchronously
 
+    let setupRunParams() =
+        ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
 
-    let runRunParameters() =
+    let runRunParams() =
+        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
 
+    /// Local phase: initialize parameters and materialize Setup dependencies only.
+    let prepareRun() =
         async {
-
-            let! execResult = 
-                ProjectOps.executeRuns 
-                        minReplica 
-                        maxReplica
-                        host.AllowOverwrite 
-                        cts 
-                        (Some progress)
-                        host
-                        executor
-                        host.MaxParallel
-
-            match execResult with
-            | Ok results -> printfn "Success: %d records processed." results.Length
-            | Error e -> printfn "Runtime Error: %s" e
-
+            let! initialized = initializeParameters()
+            match initialized with
+            | Error error -> failwithf "Init failure: %s" error
+            | Ok () ->
+                let! result =
+                    ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+                        (Some progress) host host.MaxParallel
+                showResult result
         } |> Async.RunSynchronously
 
-    /// Run phase alias consistent with the other dispatch modules.
-    let runRunParams() = runRunParameters()
+    /// Runs a named report against saved parameters, including completed runs.
+    let runReport name =
+        ReportOps.executeReport name minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
+
+    let runRunParameters() = runRunParams()

@@ -6,8 +6,8 @@ open GeneSort.Sorting.Sortable
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Model.Sorting.Simple.V1
 
-type sortableTestsMaker = evolutionMakerContext -> runParameters -> Async<Result<sortableTests * ce array, string>>
-type seedSorterPoolSetMaker = evolutionMakerContext -> runParameters -> Async<Result<sorterPoolSet, string>>
+type sortableTestsMaker = evolutionSetupSources -> runParameters -> Async<Result<sortableTests * ce array, string>>
+type seedSorterPoolSetMaker = evolutionSetupSources -> runParameters -> Async<Result<sorterPoolSet, string>>
 type sorterModelMutatorMaker = runParameters -> Async<Result<simpleSorterModelMutator, string>>
 
 module private MakerCatalog =
@@ -57,9 +57,6 @@ module SorterSgdMakerCatalogs =
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.standard EvolutionTestMakers.makeStandardTests
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.merge EvolutionTestMakers.makeMergeTests
                 SortableTestsMakerCatalog.register SortableTestsMakerNames.prefix EvolutionTestMakers.makePrefixTests
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.standard SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.merge SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
-                SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.prefix SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.standard SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.merge SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
                 SeedSorterPoolSetMakerCatalog.register SeedSorterPoolSetMakerNames.Standard.prefix SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix

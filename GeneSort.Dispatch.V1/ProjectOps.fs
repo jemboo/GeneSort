@@ -11,7 +11,7 @@ open GeneSort.Db.V1
 module ProjectOps =
 
     /// Internal logic for a single unit of work
-    let private runTask (db: IGeneSortDb)
+    let private runTask skipFinished persistParameters (db: IGeneSortDb)
                         (runName: string<runName>)
                         (buildQueryParams: runParameters -> geneSortDataType -> queryParams option)
                         executor 
@@ -24,7 +24,7 @@ module ProjectOps =
             let repl = rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
     
             try
-                if rp.GetRunFinished() |> Option.defaultValue false then
+                if skipFinished && (rp.GetRunFinished() |> Option.defaultValue false) then
                     return Skipped (id, repl, sprintf "\n%s" (rp |> RunParameters.reportKvps))
                 else
                     report progress 
@@ -40,7 +40,7 @@ module ProjectOps =
                     match execResult with
                     | Error m -> 
                         return Failure (id, repl, sprintf "%s\n%s" m (rp |> RunParameters.reportKvps))
-                    | Ok updated ->
+                    | Ok updated when persistParameters ->
                         let qp = buildQueryParams updated (geneSortDataType.RunParameters %runName)
                                  |> Option.defaultWith (fun () -> 
                                         let msg = sprintf "Failed to build query parameters for saving results of run %s, repl %d" 
@@ -49,8 +49,11 @@ module ProjectOps =
                                         raise (Exception msg)
                                     )
                         // 2. Standard async bind (no Result wrapper here)
-                        let! _ = db.saveAsync geneSortDataMode.Project qp (updated |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
-                    
+                        let! saved = db.saveAsync geneSortDataMode.Project qp (updated |> outputData.RunParameters) (true |> UMX.tag<allowOverwrite>)
+                        match saved with
+                        | Ok () -> return Success (id, repl, (updated |> RunParameters.reportKvps))
+                        | Error error -> return Failure (id, repl, sprintf "Failed to save run parameters: %s" error)
+                    | Ok updated ->
                         return Success (id, repl, (updated |> RunParameters.reportKvps))
             with 
             | :? OperationCanceledException -> return Cancelled (id, repl)
@@ -58,7 +61,7 @@ module ProjectOps =
         }
 
     /// The single entry point for executing a batch of runs
-    let executeRuns
+    let private executeBatch skipFinished persistParameters
             (minRepl: int<replNumber>)
             (maxRepl: int<replNumber>)
             (allowOverwrite: bool<allowOverwrite>)
@@ -68,6 +71,7 @@ module ProjectOps =
             (executor: IRunParamsExecutor)
             (maxParallel: int) =
         asyncResult {
+            let timer = System.Diagnostics.Stopwatch.StartNew()
             let db = host.RunDb
             let runName = host.Run.RunName
 
@@ -85,7 +89,7 @@ module ProjectOps =
                     // Map parameters to tasks and execute with internal throttling
                     let! results = 
                         paramsArray 
-                        |> Seq.map (runTask db runName host.QueryParamsFromRunParams
+                        |> Seq.map (runTask skipFinished persistParameters db runName host.QueryParamsFromRunParams
                                             (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 
@@ -96,7 +100,8 @@ module ProjectOps =
                             | Skipped _ -> (s, f, sk+1, c) | Cancelled _ -> (s, f, sk, c+1)
                         ) (0, 0, 0, 0)
 
-                    report progress (sprintf "\n=== Batch Complete ===\nSucceeded: %d, Failed: %d, Skipped: %d, Cancelled: %d" s f sk c)
+                    timer.Stop()
+                    report progress (sprintf "\n=== Batch Complete ===\nTotal elapsed time: %s\nSucceeded: %d, Failed: %d, Skipped: %d, Cancelled: %d" (timer.Elapsed.ToString("c")) s f sk c)
                     return results
             with e -> 
                 let msg = sprintf "Fatal: %s" e.Message
@@ -104,15 +109,20 @@ module ProjectOps =
                 return! async { return Error msg }
         }
 
-    /// Completes the setup batch before starting any run work.
-    let executeSetupAndRuns minRepl maxRepl allowOverwrite cts progress host setupExecutor executor maxParallel =
+    /// Executes the run function resolved on the host.
+    let executeRuns minRepl maxRepl allowOverwrite cts progress host maxParallel =
+        executeBatch true true minRepl maxRepl allowOverwrite cts progress host RunParamsExecutor.hostExecutor maxParallel
+
+    /// Local preparation only. Persist all Setup artifacts before transferring Project and Setup.
+    let executeSetupRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =
         asyncResult {
-            match setupExecutor with
-            | Some setup ->
-                let! results = executeRuns minRepl maxRepl allowOverwrite cts progress host setup maxParallel
-                let issues = (RunResult.analyze results).IssueLog
-                do! if Array.isEmpty issues then Ok ()
-                    else Error ("Setup failed or was cancelled. Run phase was not started.\n" + String.concat "\n" issues)
-            | None -> ()
-            return! executeRuns minRepl maxRepl allowOverwrite cts progress host executor maxParallel
+            try
+                let setupExecutor = host.SetupExecutor
+                return! executeBatch true true minRepl maxRepl allowOverwrite cts progress host setupExecutor maxParallel
+            with error ->
+                return! Error (sprintf "Failed to resolve or execute setup: %s" error.Message)
         }
+
+    /// Reports include completed runs and never rewrite run parameters.
+    let executeReportRuns minRepl maxRepl allowOverwrite cts progress host reportExecutor maxParallel =
+        executeBatch false false minRepl maxRepl allowOverwrite cts progress host reportExecutor maxParallel

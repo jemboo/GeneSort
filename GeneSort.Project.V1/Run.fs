@@ -19,6 +19,7 @@ type simpleRun =
           filterCatalogName: string
           enhancerCatalogName: string
           allowOverwrite: bool
+          executeFunctionName: string option
         }
 
 module SimpleRun =
@@ -48,6 +49,7 @@ module SimpleRun =
           filterCatalogName = filterCatalogName
           enhancerCatalogName = enhancerCatalogName
           allowOverwrite = allowOverwrite
+          executeFunctionName = None
         }
 
     let databaseName (run: simpleRun) = run.dataBaseName
@@ -64,6 +66,17 @@ module SimpleRun =
     let filterCatalogName (run: simpleRun) = run.filterCatalogName
     let enhancerCatalogName (run: simpleRun) = run.enhancerCatalogName
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
+    let executeFunctionName (run: simpleRun) = run.executeFunctionName
+    let withExecuteFunctionName name (run: simpleRun) =
+        if String.IsNullOrWhiteSpace name then
+            invalidArg (nameof name) "Execute function name cannot be empty."
+        { run with executeFunctionName = Some name }
+
+    let createWithExecuteFunction name databaseName projectName runName description parameterSpans
+                                  queryCatalogName setupCatalogName filterCatalogName enhancerCatalogName allowOverwrite =
+        create databaseName projectName runName description parameterSpans queryCatalogName setupCatalogName
+            filterCatalogName enhancerCatalogName allowOverwrite
+        |> withExecuteFunctionName name
 
 type sgdRun =
     private
@@ -72,11 +85,13 @@ type sgdRun =
           genSaveIntervalsName: string
           genSaveSubIntervalsName: string
           makerNames: evolutionMakerNames
+          executeFunctionName: string
         }
 
 module SgdRun =
     let create
             (makerNames: evolutionMakerNames)
+            (executeFunctionName: string)
             (databaseName: string<databaseName>)
             (projectName: string<projectName>)
             (runName: string<runName>)
@@ -90,6 +105,8 @@ module SgdRun =
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : sgdRun =
         EvolutionMakerNames.validate makerNames
+        if String.IsNullOrWhiteSpace executeFunctionName then
+            invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace genSaveIntervalsName then
             invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
         if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
@@ -110,10 +127,16 @@ module SgdRun =
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
           makerNames = makerNames
+          executeFunctionName = executeFunctionName
         }
 
     let baseRun (run: sgdRun) = run.baseRun
     let makerNames (run: sgdRun) = run.makerNames
+    let executeFunctionName (run: sgdRun) = run.executeFunctionName
+    let withExecuteFunctionName name (run: sgdRun) =
+        if String.IsNullOrWhiteSpace name then
+            invalidArg (nameof name) "Execute function name cannot be empty."
+        { run with executeFunctionName = name }
     let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
     let genSaveSubIntervalsName (run: sgdRun) = run.genSaveSubIntervalsName
     let withSetupCatalogName name (run: sgdRun) =
@@ -148,6 +171,14 @@ type run =
         match this with
         | SimpleRun _ -> None
         | SgdRun value -> Some (SgdRun.makerNames value)
+    member this.ExecuteFunctionName =
+        match this with
+        | SimpleRun value -> SimpleRun.executeFunctionName value
+        | SgdRun value -> Some (SgdRun.executeFunctionName value)
+    member this.WithExecuteFunctionName(name) =
+        match this with
+        | SimpleRun value -> SimpleRun (SimpleRun.withExecuteFunctionName name value)
+        | SgdRun value -> SgdRun (SgdRun.withExecuteFunctionName name value)
     member this.GenSaveSubIntervalsName =
         match this with
         | SimpleRun _ -> None

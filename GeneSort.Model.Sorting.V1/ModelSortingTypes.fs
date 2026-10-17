@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1
+namespace GeneSort.Model.Sorting.V1
 
 open System
 open FSharp.UMX
@@ -53,28 +53,12 @@ module MutationMod =
     let toString (w: int<mutationMod> option) : string =
         UmxExt.intOptionToString w
 
-module MutationRate =
-    let toString (w: float<mutationRate> option) : string =
-        UmxExt.floatOptionToString w
-
-module InsertionRate =
-    let toString (w: float<insertionRate> option) : string =
-        UmxExt.floatOptionToString w
-
-module DeletionRate =
-    let toString (w: float<deletionRate> option) : string =
-        UmxExt.floatOptionToString w
-
 module SeedModificationRate =
     let toString (w: float<seedModificationRate> option) : string =
         UmxExt.floatOptionToString w
 
 module ModificationRate =
     let toString (w: float<modificationRate> option) : string =
-        UmxExt.floatOptionToString w
-
-module OrthoRate =
-    let toString (w: float<orthoRate> option) : string =
         UmxExt.floatOptionToString w
 
 module ParaRate =

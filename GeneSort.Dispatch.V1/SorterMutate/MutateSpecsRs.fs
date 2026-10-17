@@ -24,12 +24,12 @@ module MutateSpecsRs =
 
     module Specs =
 
-        let Test_Msrs (executorType: sorterMutateExecutorType)  : run =
+        let Test_Msrs ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Rand-Test_Msrs%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
                     "Mutation analysis for Msrs"
                     [
                 msrsModelType
@@ -52,12 +52,12 @@ module MutateSpecsRs =
             )
 
 
-        let Test_Msuf4 (executorType: sorterMutateExecutorType)  : run =
+        let Test_Msuf4 ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
-                    (sprintf @"Rand-Test_Msuf4%s" (SorterMutateExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)
                     "Mutation analysis for Msuf4"
                     [
                 msuf4ModelType
@@ -93,8 +93,8 @@ module MutateSpecsRs =
                         (configType.Test_Msrs, Specs.Test_Msrs); 
                     ]
 
-    let getRun (config: configType) (executorType: sorterMutateExecutorType) : run =
+    let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
-        specFunc executorType
+        specFunc ()
 
 

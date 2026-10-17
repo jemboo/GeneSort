@@ -35,12 +35,12 @@ let private sorterEvalMeasures =
 module VarModR_32 =
 
 
-    let Test (executorType: sorterSgdExecutorType) : run =
+    let Test () : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbVariableModR_32Name
                 projName
-                (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"Test%s" "GenStandard" |> UMX.tag)
                 "Mutation rate test for Msuf6 24p3b"
                 [
             (runParameters.sorterCountPerPoolSetKey, [256] |> List.map string)
@@ -65,12 +65,12 @@ module VarModR_32 =
                 false
         )
 
-    let WideTest (executorType: sorterSgdExecutorType) : run =
+    let WideTest () : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbVariableModR_32Name
                 projName
-                (sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
                 "Wide mutation rate test for Msuf6 24p3b"
                 [
             (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)

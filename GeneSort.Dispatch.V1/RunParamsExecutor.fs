@@ -18,6 +18,12 @@ type IRunParamsExecutor =
 
 
 module RunParamsExecutor =
+    /// Run execution is selected by ExecuteFunctionName when the host is created.
+    let hostExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                host.ExecuteFunction host.ExecutionContext rp allowOverwrite cts progress }
+
     let execute (executor: IRunParamsExecutor) 
                 (host: runHost) 
                 (rp: runParameters) 

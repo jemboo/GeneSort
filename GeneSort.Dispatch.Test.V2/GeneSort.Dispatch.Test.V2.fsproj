@@ -13,6 +13,7 @@
     <Compile Include="SetupCatalogTests.fs" />
     <Compile Include="SgdCheckpointTests.fs" />
     <Compile Include="WorkflowPhaseTests.fs" />
+    <Compile Include="ExecutionPathTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

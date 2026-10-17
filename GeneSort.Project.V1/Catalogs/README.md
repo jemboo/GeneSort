@@ -25,15 +25,18 @@ functions. `SeedSorterModelGeneration` holds the shared seed-generation rules.
 `merge`, and `prefix` presets. `MakerCatalogs.fs` defines function types,
 registries, and built-in registration.
 
-Test and seed-pool makers take an `evolutionMakerContext` before `runParameters`.
-The context supplies typed library loaders. This keeps database implementations,
+Test and seed-pool makers take an `evolutionSetupSources` before `runParameters`.
+The plain record in `Evolution/EvolutionSetupSources.fs` supplies five named loader functions.
+Construct it with named fields; replace individual loaders with F# record updates.
+This keeps database implementations,
 filesystem paths, and host configuration out of Project, avoids a dependency cycle,
 and allows tests or other hosts to provide alternative storage.
 
 Dispatch binds its existing library databases in
-`SorterSgd/MakerContext.fs`. `SgdRun.create` takes an `evolutionMakerNames` record
+`SorterSgd/FileEvolutionSetupSources.fs`. `SgdRun.create` takes an `evolutionMakerNames` record
 as its first argument. `sgdRunHost` resolves all three functions when created,
-so unknown names fail before execution. The executor supplies the storage context.
+so unknown names fail before execution. The setup executor supplies
+`FileEvolutionSetupSources.sources`; these loaders are only needed during setup.
 Mutator makers require only run parameters.
 
 The generation strategy is independent: use `GenStandard` or `GenSoss` with any
@@ -41,11 +44,9 @@ appropriate maker preset. The former `GenMerge` and `GenPrefix` SGD cases are
 replaced by `GenStandard` plus the merge or prefix preset. Reporting cases are
 unchanged.
 
-Maker names are saved with the run. For older saved SGD runs without maker fields,
-the DTO reader recovers prefix/merge presets from project segments or legacy
-generation suffixes (including Soss's former prefix default); other legacy runs
-use standard. Explicit names always take precedence, and partially populated
-maker fields are rejected.
+Maker names are saved with the run. SGD DTOs must provide all three nonblank maker
+names and an explicit execution function name. Project and run labels never infer
+or rewrite maker selections.
 
 Seed makers return the `sorterPoolSet` union. Seed catalog keys identify both the
 output variant and input source: `seed-pool.standard.standard`,
@@ -55,10 +56,8 @@ output variant and input source: `seed-pool.standard.standard`,
 
 Each workflow unwraps its expected variant before evaluation or saving and returns
 an error for an incompatible maker. The Soss makers perform seed conversion;
-generation pipelines remain strongly typed. Legacy `seed-sorter-pool-set.*` keys
-remain Standard aliases. The DTO reader upgrades these legacy keys for saved runs
-ending in `GenSoss` to the matching Soss key; custom and explicit variant keys are
-preserved.
+generation pipelines remain strongly typed. Only current variant-specific keys
+and explicitly registered custom keys are supported.
 
 ```fsharp
 ProjectCatalogs.registerAll ()

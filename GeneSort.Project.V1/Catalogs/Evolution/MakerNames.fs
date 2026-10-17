@@ -56,14 +56,6 @@ module SeedSorterPoolSetMakerNames =
         [<Literal>]
         let prefix = "seed-pool.soss.prefix"
 
-    // Legacy keys retained for saved configurations.
-    [<Literal>]
-    let standard = "seed-sorter-pool-set.standard"
-    [<Literal>]
-    let merge = "seed-sorter-pool-set.merge"
-    [<Literal>]
-    let prefix = "seed-sorter-pool-set.prefix"
-
 module EvolutionMakerNames =
     let standard = evolutionMakerNames.create SortableTestsMakerNames.standard SeedSorterPoolSetMakerNames.Standard.standard MutatorMakerNames.simpleSorterModel
     let merge = standard.WithSortableTests(SortableTestsMakerNames.merge).WithSeedPoolSet(SeedSorterPoolSetMakerNames.Standard.merge)

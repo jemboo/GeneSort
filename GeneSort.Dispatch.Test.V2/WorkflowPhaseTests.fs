@@ -16,6 +16,9 @@ open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Dispatch.V1.SorterSgd.Standard
 open GeneSort.Dispatch.V1.SorterSgd.Soss
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SortableTests
+open GeneSort.SortingLib.Sorter
 
 let private parameters =
     (runParameters.create Map.empty)
@@ -65,6 +68,32 @@ let private save (db: IGeneSortDb) mode (generation: int) dataType value =
     let rp = parameters.WithGenerationCurrent(Some (UMX.tag generation))
     let query = db.makeQueryParamsFromRunParams rp dataType |> Option.get
     db.saveAsync mode query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``standalone tests have no setup and generate Results during execution`` prefix =
+    let memory = MemoryDb()
+    let spec = if prefix then SortableTestsSpecsPrefix.Specs.Prefix_Test () else SortableTestsSpecsMerge.Specs.Merge_Test ()
+    let host = (runHost.Create spec 1).WithRunDb(memory)
+    let rp =
+        let basic = (runParameters.create Map.empty).WithRepl(Some 0<replNumber>).WithSortableDataFormat(Some sortableDataFormat.BoolArray)
+        if prefix then basic.WithPrefixLibId(Some (prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA))
+        else basic.WithMergeLibId(Some (mergeLibId.create 4<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA))
+    use cts = new CancellationTokenSource()
+    let prepared = host.SetupExecutor.Execute host rp (UMX.tag false) cts None |> Async.RunSynchronously
+    match prepared with
+    | Ok unchanged -> Assert.Equal(rp, unchanged)
+    | Error error -> failwith error
+    Assert.Empty(memory.Reads)
+    Assert.Empty(memory.Writes)
+    let executed = host.ExecuteFunction host.ExecutionContext rp (UMX.tag false) cts None |> Async.RunSynchronously
+    match executed with
+    | Ok finished -> Assert.Equal(Some true, finished.GetRunFinished())
+    | Error error -> failwith error
+    Assert.Empty(memory.Reads)
+    Assert.Equal<(geneSortDataMode * geneSortDataType) list>(
+        [geneSortDataMode.Results, geneSortDataType.SortableTests ""], List.ofSeq memory.Writes)
 
 [<Theory>]
 [<InlineData(false)>]

@@ -22,25 +22,25 @@ let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
-let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
+let Pool_32_Test ()  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.prefix
+        SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool32TestName
             projName
-            (sprintf @"Pool_32_Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+            (sprintf @"Pool_32_Test%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
             [
-        (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-        (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
-        (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [2] |> List.map string)
-        (runParameters.paraRateKey,    [1.15;] |> List.map string)
-        (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-        (runParameters.mutationModKey, [0;] |> List.map string)
-        (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-        (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-        (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-    ]
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationIntervalLastKey, [2] |> List.map string)
+                (runParameters.paraRateKey,    [1.15;] |> List.map string)
+                (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+                (runParameters.mutationModKey, [0;] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+                (runParameters.modificationRateKey, [0.035;]  |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard
@@ -50,25 +50,25 @@ let Pool_32_Test (executorType: sorterSgdExecutorType)  : run =
             false
     )
 
-let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
+let Pool_32_V1 ()  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.prefix
+        SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool32name
             projName
-            (sprintf @"Pool_32_V1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+            (sprintf @"Pool_32_V1%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
             [
-        (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-        (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [3] |> List.map string)
-        (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-        (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-        (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-        (runParameters.mutationModKey, [0] |> List.map string)
-        (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-        (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
-        (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-    ]
+                (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationIntervalLastKey, [3] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+                (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
+                (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard
@@ -78,25 +78,25 @@ let Pool_32_V1 (executorType: sorterSgdExecutorType)  : run =
             false
     )
 
-let Pool_512_V2a (executorType: sorterSgdExecutorType)  : run =
+let Pool_512_V2a ()  : run =
     run.SgdRun (
-        SgdRun.create EvolutionMakerNames.prefix
+        SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool512name
             projName
-            (sprintf @"Pool_512_V2a%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+            (sprintf @"Pool_512_V2a%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
             [
-        (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-        (runParameters.codeModKey, ["NoMods"] |> List.map string)
-        (runParameters.generationIntervalLastKey, [3] |> List.map string)
-        (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
-        (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-        (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-        (runParameters.mutationModKey, [0] |> List.map string)
-        (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
-        (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
-        (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
-    ]
+                (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                (runParameters.generationIntervalLastKey, [3] |> List.map string)
+                (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
+                (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+                (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+                (runParameters.mutationModKey, [0] |> List.map string)
+                (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
+                (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
+                (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
+            ]
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard

@@ -30,6 +30,7 @@ type runDto =
         SeedPoolSetMakerName: string
         MutatorMakerName: string
         SetupCatalogName: string
+        ExecuteFunctionName: string
     }
 
 module RunDto =
@@ -46,6 +47,7 @@ module RunDto =
             GenSaveSubIntervalsName = saveSubIntervalsName
             QueryCatalogName = project.QueryCatalogName
             SetupCatalogName = project.SetupCatalogName
+            ExecuteFunctionName = project.ExecuteFunctionName |> Option.toObj
             FilterCatalogName = project.FilterCatalogName
             EnhancerCatalogName = project.EnhancerCatalogName
             AllowOverwrite = project.AllowOverwrite
@@ -91,41 +93,27 @@ module RunDto =
                     setupCatalogName
                     filterCatalogName
                     enhancerCatalogName
-                    allowOverwrite)
+                    allowOverwrite
+                |> fun simple ->
+                    match Option.ofObj dto.ExecuteFunctionName with
+                    | Some name -> SimpleRun.withExecuteFunctionName name simple
+                    | None -> simple)
         | saveIntervals, saveSubIntervals ->
+            if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
+                invalidArg "dto" "An SGD run must specify an explicit ExecuteFunctionName."
+            let requireMakerName field value =
+                if System.String.IsNullOrWhiteSpace value then
+                    invalidArg "dto" (sprintf "An SGD run must specify an explicit %s." field)
+                value
             let makerNames =
-                match Option.ofObj dto.SortableTestsMakerName, Option.ofObj dto.SeedPoolSetMakerName, Option.ofObj dto.MutatorMakerName with
-                | Some tests, Some seed, Some mutator ->
-                    let seedName =
-                        // Before variant-specific keys, Soss converted Standard seeds internally.
-                        let isSoss = dto.RunName <> null && dto.RunName.EndsWith("GenSoss")
-                        match seed with
-                        | SeedSorterPoolSetMakerNames.standard -> if isSoss then SeedSorterPoolSetMakerNames.Soss.standard else SeedSorterPoolSetMakerNames.Standard.standard
-                        | SeedSorterPoolSetMakerNames.merge -> if isSoss then SeedSorterPoolSetMakerNames.Soss.merge else SeedSorterPoolSetMakerNames.Standard.merge
-                        | SeedSorterPoolSetMakerNames.prefix -> if isSoss then SeedSorterPoolSetMakerNames.Soss.prefix else SeedSorterPoolSetMakerNames.Standard.prefix
-                        | _ -> seed
-                    evolutionMakerNames.create tests seedName mutator
-                | None, None, None ->
-                    // Older runs encoded input selection in their project/executor names.
-                    let projectParts = (dto.ProjectName |> Option.ofObj |> Option.defaultValue "").Split('.')
-                    let runName = dto.RunName |> Option.ofObj |> Option.defaultValue ""
-                    if runName.EndsWith("GenSoss") then
-                        EvolutionMakerNames.sossPrefix
-                    elif runName.EndsWith("GenPrefix") then
-                        EvolutionMakerNames.prefix
-                    elif runName.EndsWith("GenMerge") then
-                        EvolutionMakerNames.merge
-                    elif runName.EndsWith("GenStandard") then
-                        EvolutionMakerNames.standard
-                    elif Array.contains "Prefix" projectParts then
-                        EvolutionMakerNames.prefix
-                    elif Array.contains "Merge" projectParts then
-                        EvolutionMakerNames.merge
-                    else EvolutionMakerNames.standard
-                | _ -> invalidArg "dto" "An SGD run must specify all three evolution maker names, or omit all three for a legacy run."
+                evolutionMakerNames.create
+                    (requireMakerName "SortableTestsMakerName" dto.SortableTestsMakerName)
+                    (requireMakerName "SeedPoolSetMakerName" dto.SeedPoolSetMakerName)
+                    (requireMakerName "MutatorMakerName" dto.MutatorMakerName)
             SgdRun (
                 SgdRun.create
                     makerNames
+                    dto.ExecuteFunctionName
                     databaseName
                     projectName
                     runName

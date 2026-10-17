@@ -25,13 +25,13 @@ open GeneSort.Eval.V1.Sgd.Soss
 
 let private emptyParameters = runParameters.create Map.empty
 
-let private context : evolutionMakerContext =
-    evolutionMakerContext.create
-        (fun _ _ _ -> async { return Error "merge tests loader" })
-        (fun _ _ _ -> async { return Error "prefix tests loader" })
-        (fun _ _ _ -> async { return Error "standard eval loader" })
-        (fun _ _ _ -> async { return Error "merge eval loader" })
-        (fun _ _ _ -> async { return Error "prefix eval loader" })
+let private sources : evolutionSetupSources = {
+    LoadMergeTests = fun _ _ _ -> async { return Error "merge tests loader" }
+    LoadPrefixTests = fun _ _ _ -> async { return Error "prefix tests loader" }
+    LoadStandardSorterEvals = fun _ _ _ -> async { return Error "standard eval loader" }
+    LoadMergeSorterEvals = fun _ _ _ -> async { return Error "merge eval loader" }
+    LoadPrefixSorterEvals = fun _ _ _ -> async { return Error "prefix eval loader" }
+}
 
 let private errorOf result =
     match result with
@@ -39,11 +39,129 @@ let private errorOf result =
     | Ok _ -> failwith "Expected missing run parameters to fail."
 
 let private makeRun names (projectName: string) (runName: string) =
-    SgdRun.create names (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
+    SgdRun.create names ExecuteFunctionNames.standard (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
         "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
         QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard RunParamBuilderNames.Filter.identity
         RunParamBuilderNames.Enhancer.msuf32MutationRate false
     |> run.SgdRun
+
+let private makeSimpleRun executeName =
+    SimpleRun.createWithExecuteFunction executeName
+        (UMX.tag "CatalogTests") (UMX.tag "Tests") (UMX.tag "SimpleExecution") "Execution test" []
+        QueryCatalogNames.sorterEvalStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
+        RunParamBuilderNames.Filter.identity RunParamBuilderNames.Enhancer.sorterEvalStandard false
+    |> run.SimpleRun
+
+[<Theory>]
+[<InlineData("sorter-eval.evaluate")>]
+[<InlineData("sorter-mutate.evaluate")>]
+let ``simple run execution names persist and resolve on host creation`` name =
+    MessagePackSetup.configure ()
+    let restored = makeSimpleRun name |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+    Assert.Equal(Some name, restored.ExecuteFunctionName)
+    let host = runHost.Create restored 1
+    Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
+    Assert.True(host.ExecutionContext.MakeMutator.IsNone)
+    Assert.True(host.ExecutionContext.GenSaveIntervals.IsNone)
+
+[<Fact>]
+let ``simple host rejects unknown execution names`` () =
+    let name = Guid.NewGuid().ToString()
+    let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create (makeSimpleRun name) 1 |> ignore)
+    Assert.Contains(name, error.Message)
+
+[<Fact>]
+let ``evaluation and mutation executors use the simple host configured function`` () =
+    let name = Guid.NewGuid().ToString()
+    let mutable calls = 0
+    ExecuteFunctionCatalog.register name (fun context rp _ _ _ -> async {
+        Assert.Equal("CatalogTests", %context.RunDb.databaseName)
+        calls <- calls + 1
+        return Ok rp
+    })
+    let host = runHost.Create ((makeSimpleRun ExecuteFunctionNames.sorterEval).WithExecuteFunctionName name) 1
+    use cts = new System.Threading.CancellationTokenSource()
+    let executors = [
+        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.standardExecutor
+        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.mergeExecutor
+        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.prefixExecutor
+        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.standardExecutor
+        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.mergeExecutor
+        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.prefixExecutor
+    ]
+    for executor in executors do
+        let result = executor.Execute host emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
+        Assert.Equal(Ok emptyParameters, result)
+    Assert.Equal(6, calls)
+
+[<Fact>]
+let ``evolution entry reports missing SGD context on simple runs`` () =
+    let host = runHost.Create (makeSimpleRun ExecuteFunctionNames.standard) 1
+    use cts = new System.Threading.CancellationTokenSource()
+    let result = host.ExecuteFunction host.ExecutionContext emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
+    Assert.Contains("SGD context", errorOf result)
+
+[<Theory>]
+[<InlineData("evolution.standard")>]
+[<InlineData("evolution.soss")>]
+let ``host resolves built-in evolution functions at creation`` name =
+    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Execute").WithExecuteFunctionName(name)
+    Assert.Equal(Some name, configured.ExecuteFunctionName)
+    match runHost.Create configured 1 with
+    | SgdRunHost host -> Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
+    | _ -> failwith "Expected SGD host"
+
+[<Fact>]
+let ``execution uses the configured function regardless of executor label`` () =
+    let name = Guid.NewGuid().ToString()
+    let mutable calls = 0
+    ExecuteFunctionCatalog.register name (fun _ rp _ _ _ -> async {
+        calls <- calls + 1
+        return Ok rp
+    })
+    let configured = (makeRun EvolutionMakerNames.standard "Tests" "CustomExecution").WithExecuteFunctionName(name)
+    let host = runHost.Create configured 1
+    use cts = new System.Threading.CancellationTokenSource()
+    for _ in 1..2 do
+        let result = RunParamsExecutor.hostExecutor.Execute host emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
+        match result with
+        | Ok rp -> Assert.Same(emptyParameters, rp)
+        | Error error -> failwith error
+    Assert.Equal(2, calls)
+
+[<Fact>]
+let ``unknown evolution function is rejected when making the host`` () =
+    let unknown = Guid.NewGuid().ToString()
+    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Unknown").WithExecuteFunctionName(unknown)
+    let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create configured 1 |> ignore)
+    Assert.Contains(unknown, error.Message)
+
+[<Fact>]
+let ``execute catalog rejects blank names and duplicate registrations`` () =
+    let execute = ExecuteFunctionCatalog.get ExecuteFunctionNames.standard
+    Assert.Throws<ArgumentException>(fun () -> ExecuteFunctionCatalog.register " " execute) |> ignore
+    Assert.Throws<InvalidOperationException>(fun () -> ExecuteFunctionCatalog.register ExecuteFunctionNames.standard execute) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> (makeRun EvolutionMakerNames.standard "Tests" "Blank").WithExecuteFunctionName("") |> ignore) |> ignore
+
+[<Theory>]
+[<InlineData("evolution.standard")>]
+[<InlineData("evolution.soss")>]
+[<InlineData("custom.evolution")>]
+let ``execute function name survives MessagePack round trip`` name =
+    MessagePackSetup.configure ()
+    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Serialized").WithExecuteFunctionName(name)
+    let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+    Assert.Equal(Some name, restored.ExecuteFunctionName)
+
+[<Fact>]
+let ``saved SGD runs must name their execute function explicitly`` () =
+    MessagePackSetup.configure ()
+    let dto = makeRun EvolutionMakerNames.standard "Tests" "MissingExecution" |> RunDto.fromDomain
+    let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
+    Assert.True(json.AsObject().Remove "ExecuteFunctionName")
+    let missing = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto>
+    let error = Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain missing |> ignore)
+    Assert.Contains("ExecuteFunctionName", error.Message)
 
 [<Fact>]
 let ``SGD host resolves custom configured makers`` () =
@@ -56,8 +174,8 @@ let ``SGD host resolves custom configured makers`` () =
     | SimpleRunHost _ -> failwith "Expected SGD host"
     | SgdRunHost host ->
         Assert.Equal(names, host.MakerNames)
-        Assert.Equal("host tests", host.MakeSortableTests context emptyParameters |> Async.RunSynchronously |> errorOf)
-        Assert.Equal("host seed", host.MakeSeedPoolSet context emptyParameters |> Async.RunSynchronously |> errorOf)
+        Assert.Equal("host tests", host.MakeSortableTests sources emptyParameters |> Async.RunSynchronously |> errorOf)
+        Assert.Equal("host seed", host.MakeSeedPoolSet sources emptyParameters |> Async.RunSynchronously |> errorOf)
         Assert.Equal("host mutator", host.MakeMutator emptyParameters |> Async.RunSynchronously |> errorOf)
 
 [<Theory>]
@@ -83,37 +201,24 @@ let ``SGD maker names survive MessagePack round trip`` () =
     Assert.Equal(Some names, restored.MakerNames)
 
 [<Theory>]
-[<InlineData("SorterSgd.Prefix.32p4a.Msuf", "Report", "prefix")>]
-[<InlineData("SorterSgd.Merge", "Report", "merge")>]
-[<InlineData("Tests", "OldGenPrefix", "prefix")>]
-[<InlineData("Tests", "OldGenMerge", "merge")>]
-[<InlineData("Tests", "OldGenSoss", "sossPrefix")>]
-[<InlineData("Tests", "OldGenStandard", "standard")>]
-[<InlineData("SorterSgd.Prefix", "OldGenStandard", "standard")>]
-[<InlineData("SorterSgd.Prefix", "OldGenMerge", "merge")>]
-let ``legacy saved runs recover maker presets without new fields`` projectName runName expected =
-    MessagePackSetup.configure ()
-    let dto = makeRun EvolutionMakerNames.standard projectName runName |> RunDto.fromDomain
-    let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
-    for key in ["SortableTestsMakerName"; "SeedPoolSetMakerName"; "MutatorMakerName"] do
-        Assert.True(json.AsObject().Remove key)
-    let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    let names = match expected with "sossPrefix" -> EvolutionMakerNames.sossPrefix | "prefix" -> EvolutionMakerNames.prefix | "merge" -> EvolutionMakerNames.merge | _ -> EvolutionMakerNames.standard
-    Assert.Equal(Some names, restored.MakerNames)
+[<InlineData(null)>]
+[<InlineData("")>]
+[<InlineData("  ")>]
+let ``saved SGD runs require every explicit maker name`` missing =
+    let dto = makeRun EvolutionMakerNames.standard "SorterSgd.Prefix" "OldGenSoss" |> RunDto.fromDomain
+    for invalid in [
+        { dto with SortableTestsMakerName = missing }
+        { dto with SeedPoolSetMakerName = missing }
+        { dto with MutatorMakerName = missing }
+        { dto with SortableTestsMakerName = missing; SeedPoolSetMakerName = missing; MutatorMakerName = missing }
+    ] do
+        Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain invalid |> ignore) |> ignore
 
 [<Fact>]
-let ``partially configured saved runs are rejected`` () =
-    let dto = makeRun EvolutionMakerNames.standard "Tests" "Partial" |> RunDto.fromDomain
-    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with MutatorMakerName = null } |> ignore) |> ignore
-
-[<Theory>]
-[<InlineData("seed-sorter-pool-set.standard", "seed-pool.soss.standard")>]
-[<InlineData("seed-sorter-pool-set.merge", "seed-pool.soss.merge")>]
-[<InlineData("seed-sorter-pool-set.prefix", "seed-pool.soss.prefix")>]
-let ``legacy Soss seed names migrate to Soss variants`` oldName expected =
-    let names = EvolutionMakerNames.prefix.WithSeedPoolSet(oldName)
-    let restored = makeRun names "Tests" "OldGenSoss" |> RunDto.fromDomain |> RunDto.toDomain
-    Assert.Equal(expected, restored.MakerNames.Value.SeedPoolSet)
+let ``run labels do not change explicit maker names`` () =
+    let names = EvolutionMakerNames.standard
+    let restored = makeRun names "SorterSgd.Prefix" "OldGenSoss" |> RunDto.fromDomain |> RunDto.toDomain
+    Assert.Equal(Some names, restored.MakerNames)
 
 [<Theory>]
 [<InlineData("seed-pool.standard.standard", false)>]
@@ -129,10 +234,12 @@ let ``seed catalogs produce the requested pool variant`` (name: string) (expectS
             (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
             (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
     let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
-    let supplied =
-        context.WithLoadStandardSorterEvals(fun _ _ _ -> async { return Ok evaluations })
-            .WithLoadMergeSorterEvals(fun _ _ _ -> async { return Ok evaluations })
-            .WithLoadPrefixSorterEvals(fun _ _ _ -> async { return Ok evaluations })
+    let supplied = {
+        sources with
+            LoadStandardSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+            LoadMergeSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+            LoadPrefixSorterEvals = fun _ _ _ -> async { return Ok evaluations }
+    }
     let parameters =
         emptyParameters.WithSortingWidth(Some 32<sortingWidth>)
             .WithRepl(Some 0<replNumber>)
@@ -185,13 +292,13 @@ let ``project catalogs initialize together without dispatch dependencies`` () =
     QueryParamsCatalog.get QueryCatalogNames.sortableTestMerge |> ignore
     RunParamFilterBuilders.get RunParamBuilderNames.Filter.identity |> ignore
     MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel |> ignore
-    let assembly = typeof<evolutionMakerContext>.Assembly
+    let assembly = typeof<evolutionSetupSources>.Assembly
     Assert.Equal("GeneSort.Project.V1", assembly.GetName().Name)
     Assert.DoesNotContain(assembly.GetReferencedAssemblies(), fun reference ->
         reference.Name = "GeneSort.Dispatch.V1" || reference.Name = "GeneSort.FileDb.V1" || reference.Name = "GeneSort.Db.V1")
 
 [<Fact>]
-let ``merge test maker uses the supplied storage context`` () =
+let ``merge test maker uses the supplied storage sources`` () =
     let library = mergeLibId.create 16<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
     let parameters = emptyParameters.WithMergeLibId(Some library).WithSortableDataFormat(Some sortableDataFormat.BitVector512)
     let mutable called = false
@@ -203,9 +310,9 @@ let ``merge test maker uses the supplied storage context`` () =
             Assert.Equal(sortableDataFormat.BitVector512, format)
             return Error "supplied loader result"
         }
-    let suppliedContext = context.WithLoadMergeTests(loadMergeTests)
+    let suppliedSources = { sources with LoadMergeTests = loadMergeTests }
     ProjectCatalogs.registerAll ()
-    let actual = SortableTestsMakerCatalog.get SortableTestsMakerNames.merge suppliedContext parameters |> Async.RunSynchronously |> errorOf
+    let actual = SortableTestsMakerCatalog.get SortableTestsMakerNames.merge suppliedSources parameters |> Async.RunSynchronously |> errorOf
     Assert.True(called)
     Assert.Equal("supplied loader result", actual)
 
@@ -219,16 +326,16 @@ let ``built-in names resolve to the corresponding makers`` variant =
     let testsName, testsMaker, seedName, seedMaker =
         match variant with
         | "standard" -> SortableTestsMakerNames.standard, EvolutionTestMakers.makeStandardTests,
-                        SeedSorterPoolSetMakerNames.standard, SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
+                        SeedSorterPoolSetMakerNames.Standard.standard, SeedPoolSetMakers.createStandardSeedSorterPoolSetStandard
         | "merge" -> SortableTestsMakerNames.merge, EvolutionTestMakers.makeMergeTests,
-                     SeedSorterPoolSetMakerNames.merge, SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
+                     SeedSorterPoolSetMakerNames.Standard.merge, SeedPoolSetMakers.createStandardSeedSorterPoolSetMerge
         | _ -> SortableTestsMakerNames.prefix, EvolutionTestMakers.makePrefixTests,
-               SeedSorterPoolSetMakerNames.prefix, SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
-    let expectedTests = testsMaker context emptyParameters |> Async.RunSynchronously |> errorOf
-    let actualTests = SortableTestsMakerCatalog.get testsName context emptyParameters |> Async.RunSynchronously |> errorOf
+               SeedSorterPoolSetMakerNames.Standard.prefix, SeedPoolSetMakers.createStandardSeedSorterPoolSetPrefix
+    let expectedTests = testsMaker sources emptyParameters |> Async.RunSynchronously |> errorOf
+    let actualTests = SortableTestsMakerCatalog.get testsName sources emptyParameters |> Async.RunSynchronously |> errorOf
     Assert.Equal(expectedTests, actualTests)
-    let expectedSeed = seedMaker context emptyParameters |> Async.RunSynchronously |> errorOf
-    let actualSeed = SeedSorterPoolSetMakerCatalog.get seedName context emptyParameters |> Async.RunSynchronously |> errorOf
+    let expectedSeed = seedMaker sources emptyParameters |> Async.RunSynchronously |> errorOf
+    let actualSeed = SeedSorterPoolSetMakerCatalog.get seedName sources emptyParameters |> Async.RunSynchronously |> errorOf
     Assert.Equal(expectedSeed, actualSeed)
 
 [<Fact>]
@@ -236,8 +343,8 @@ let ``custom makers can be registered and invoked by name`` () =
     let name = Guid.NewGuid().ToString()
     SortableTestsMakerCatalog.register name (fun _ _ -> async { return Error "custom tests" })
     SeedSorterPoolSetMakerCatalog.register name (fun _ _ -> async { return Error "custom seed" })
-    Assert.Equal("custom tests", SortableTestsMakerCatalog.get name context emptyParameters |> Async.RunSynchronously |> errorOf)
-    Assert.Equal("custom seed", SeedSorterPoolSetMakerCatalog.get name context emptyParameters |> Async.RunSynchronously |> errorOf)
+    Assert.Equal("custom tests", SortableTestsMakerCatalog.get name sources emptyParameters |> Async.RunSynchronously |> errorOf)
+    Assert.Equal("custom seed", SeedSorterPoolSetMakerCatalog.get name sources emptyParameters |> Async.RunSynchronously |> errorOf)
     Assert.Throws<InvalidOperationException>(fun () ->
         SortableTestsMakerCatalog.register name (fun _ _ -> async { return Error "replacement" })) |> ignore
     Assert.Throws<InvalidOperationException>(fun () ->
@@ -273,9 +380,8 @@ let ``mutator catalog supports custom makers and validates names`` () =
         MutatorMakerCatalog.register name (fun _ -> async { return Error "replacement" })) |> ignore
 
 [<Fact>]
-let ``all generation executors initialize the catalogs`` () =
-    for executorType in [GenStandard; GenSoss] do
-        Assert.NotNull(SorterSgdExecutorType.getExecutor executorType)
+let ``host creation initializes the maker catalogs`` () =
+    runHost.Create (makeRun EvolutionMakerNames.standard "Tests" "CatalogInitialization") 1 |> ignore
     SortableTestsMakerCatalog.get SortableTestsMakerNames.prefix |> ignore
-    SeedSorterPoolSetMakerCatalog.get SeedSorterPoolSetMakerNames.prefix |> ignore
+    SeedSorterPoolSetMakerCatalog.get SeedSorterPoolSetMakerNames.Standard.prefix |> ignore
     MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel |> ignore

@@ -23,12 +23,12 @@ let dbOrthoPara128Name = "OrthoPara128" |> UMX.tag<databaseName>
 
 module Specs64 =
 
-    let NoMods (executorType: sorterSgdExecutorType)  : run =
+    let NoMods ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbOrthoPara64Name
                 projName
-                (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
                 "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 [
             (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -50,12 +50,12 @@ module Specs64 =
         )
 
 
-    let SymForceDiff1 (executorType: sorterSgdExecutorType)  : run =
+    let SymForceDiff1 ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbOrthoPara64Name
                 projName
-                (sprintf @"SymForce_Diff1%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"SymForce_Diff1%s" "GenStandard" |> UMX.tag)
                 "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 [
             (runParameters.codeModKey, ["SymForce_Diff1"] |> List.map string)
@@ -77,12 +77,12 @@ module Specs64 =
         )
 
 
-    let SymForce (executorType: sorterSgdExecutorType)  : run =
+    let SymForce ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbOrthoPara64Name
                 projName
-                (sprintf @"SymForce%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"SymForce%s" "GenStandard" |> UMX.tag)
                 "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 [
             (runParameters.codeModKey, ["SymForce"] |> List.map string)
@@ -106,12 +106,12 @@ module Specs64 =
 
 module Specs128 =
 
-    let NoMods (executorType: sorterSgdExecutorType)  : run =
+    let NoMods ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbOrthoPara128Name
                 projName
-                (sprintf @"NoMods%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
                 "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 [
             (runParameters.codeModKey, ["NoMods"] |> List.map string)

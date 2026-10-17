@@ -25,12 +25,12 @@ let dbNamePoolSz128 = "PoolSelSz128" |> UMX.tag<databaseName>
 
 module Specs =
 
-    let TestSpec (executorType: sorterSgdExecutorType)  : run =
+    let TestSpec ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbNamePoolSz128
                 projName
-                (sprintf @"PoolSz32_Mod_Testc%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"PoolSz32_Mod_Testc%s" "GenStandard" |> UMX.tag)
                 "Para rate comp for 24pfx3a Msrs"
                 [
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -52,12 +52,12 @@ module Specs =
         )
 
 
-    let Sz_2048_Of_4096 (executorType: sorterSgdExecutorType)  : run =
+    let Sz_2048_Of_4096 ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbName_Sz_2048_Of_4096
                 projName
-                (sprintf @"Sz_2048_Of_4096_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"Sz_2048_Of_4096_%s" "GenStandard" |> UMX.tag)
                 "Selection size comp for 24pfx3a Msrs"
                 [
             (runParameters.generationCurrentKey, [0] |> List.map string)
@@ -76,12 +76,12 @@ module Specs =
         )
 
 
-    let PoolSz_2n256 (executorType: sorterSgdExecutorType)  : run =
+    let PoolSz_2n256 ()  : run =
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix
+            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                 dbNamePools4096_2_vs_256
                 projName
-                (sprintf @"PoolSz_2_vs_256_%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                (sprintf @"PoolSz_2_vs_256_%s" "GenStandard" |> UMX.tag)
                 "Pool size comp (2 vs 256) for 24pfx3a Msrs"
                 [
             (runParameters.generationCurrentKey, [0] |> List.map string)

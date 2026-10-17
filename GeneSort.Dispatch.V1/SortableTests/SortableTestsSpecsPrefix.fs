@@ -13,12 +13,12 @@ module SortableTestsSpecsPrefix =
 
     module Specs =
 
-        let Prefix_Test  (executorType: sortableTestsExecutorType) : run =
+        let Prefix_Test  () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbNameTest
                     CommonSortableTests.projectName
-                    (sprintf @"Prefix24-4b_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Prefix24-4b_%s" "GenPrefix" |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
                         dataFomatBitv512
@@ -33,12 +33,12 @@ module SortableTestsSpecsPrefix =
 
 
 
-        let Prefix_24s  (executorType: sortableTestsExecutorType) : run =
+        let Prefix_24s  () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbName
                     CommonSortableTests.projectName
-                    (sprintf @"Prefix-24s_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Prefix-24s_%s" "GenPrefix" |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
                         dataFomatBitv512
@@ -51,12 +51,12 @@ module SortableTestsSpecsPrefix =
                     false
             )
 
-        let Prefix_32  (executorType: sortableTestsExecutorType) : run =
+        let Prefix_32  () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbName
                     CommonSortableTests.projectName
-                    (sprintf @"Prefix-32_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Prefix-32_%s" "GenPrefix" |> UMX.tag)
                     "Bitv512 prefix sorter test sets"
                     [
                         dataFomatBitv512
@@ -80,6 +80,6 @@ module SortableTestsSpecsPrefix =
                         (configType.Prefix_32, Specs.Prefix_32);
                     ]
 
-    let getRun (config: configType) (executorType: sortableTestsExecutorType) : run =
+    let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
-        specFunc executorType
+        specFunc ()

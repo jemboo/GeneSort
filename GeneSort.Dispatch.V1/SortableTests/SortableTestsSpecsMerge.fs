@@ -13,12 +13,12 @@ module SortableTestsSpecsMerge =
 
     module Specs =
 
-        let Merge_Test  (executorType: sortableTestsExecutorType) : run =
+        let Merge_Test  () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Merge.dbName
                     CommonSortableTests.projectName
-                    (sprintf @"Merge-Test_%s" (SortableTestsExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Merge-Test_%s" "GenMerge" |> UMX.tag)
                     "Int8 merge sorter test sets"
                     [
                         mergeLib_Merge32s
@@ -41,6 +41,6 @@ module SortableTestsSpecsMerge =
                         (configType.Merge_Test, Specs.Merge_Test); 
                     ]
 
-    let getRun (config: configType) (executorType: sortableTestsExecutorType) : run =
+    let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
-        specFunc executorType
+        specFunc ()

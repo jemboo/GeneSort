@@ -17,20 +17,20 @@ module SorterEvalSpecsRs =
 
     module Specs =
 
-        let Rand_Test (executorType: sorterEvalExecutorType)  : run =
+        let Rand_Test ()  : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
-                    (sprintf @"Rand-Test16_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Rand-Test16_%s" "GenStandard" |> UMX.tag)
                     "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     [
-                rngTypeLcg
-                sorterEvalTypeV2
-                sortingWidth16
-                allSimpleSorterModelTypes
-                largeSorterCount
-            ]
+                        rngTypeLcg
+                        sorterEvalTypeV2
+                        sortingWidth16
+                        allSimpleSorterModelTypes
+                        largeSorterCount
+                    ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
@@ -38,20 +38,20 @@ module SorterEvalSpecsRs =
                     false
             )
 
-        let Rand_Small (executorType: sorterEvalExecutorType) : run =
+        let Rand_Small () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
-                    (sprintf @"Rand-Small_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Rand-Small_%s" "GenStandard" |> UMX.tag)
                     "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     [
-                rngTypeLcg
-                sorterEvalTypeV2
-                smallSortingWidths
-                allSimpleSorterModelTypes
-                extraLargeSorterCount
-            ]
+                        rngTypeLcg
+                        sorterEvalTypeV2
+                        smallSortingWidths
+                        allSimpleSorterModelTypes
+                        extraLargeSorterCount
+                    ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
@@ -59,20 +59,20 @@ module SorterEvalSpecsRs =
                     false
             )
 
-        let Rand_Medium (executorType: sorterEvalExecutorType) : run =
+        let Rand_Medium () : run =
             run.SimpleRun (
-                SimpleRun.create
+                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
-                    (sprintf @"Rand-Medium_%s" (SorterEvalExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Rand-Medium_%s" "GenStandard" |> UMX.tag)
                     "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     [
-                rngTypeLcg
-                sorterEvalTypeV2
-                mediumSortingWidths
-                allSimpleSorterModelTypes
-                extraLargeSorterCount
-            ]
+                        rngTypeLcg
+                        sorterEvalTypeV2
+                        mediumSortingWidths
+                        allSimpleSorterModelTypes
+                        extraLargeSorterCount
+                    ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Filter.standardSorterModelCompatibility
@@ -92,6 +92,6 @@ module SorterEvalSpecsRs =
                         (configType.Rand_Medium, Specs.Rand_Medium);
                     ]
 
-    let getRun (config: configType) (executorType: sorterEvalExecutorType) : run =
+    let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
-        specFunc executorType
+        specFunc ()

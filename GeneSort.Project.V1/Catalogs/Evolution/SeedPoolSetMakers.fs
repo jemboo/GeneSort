@@ -19,7 +19,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 module SeedPoolSetMakers =
 
     let private buildStandard
-            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (sources: evolutionSetupSources) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
             let! sortingWidth = 
                     rp.GetSortingWidth() 
@@ -61,7 +61,7 @@ module SeedPoolSetMakers =
 
 
             let! (parentSorterSetEval: sorterSetEval) = 
-                context.LoadStandardSorterEvals 
+                sources.LoadStandardSorterEvals
                     sortingWidth 
                     simpleSorterModelType 
                     GeneSort.SortingOps.sorterEvalType.V2
@@ -98,7 +98,7 @@ module SeedPoolSetMakers =
 
 
     let private buildMerge
-            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (sources: evolutionSetupSources) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -142,7 +142,7 @@ module SeedPoolSetMakers =
                     |> Result.ofOption "Missing excludeSelfCe"
             
             let! (parentSorterSetEval: sorterSetEval) = 
-                context.LoadMergeSorterEvals
+                sources.LoadMergeSorterEvals
                     mrgLibid
                     repl
                     simpleSorterModelType
@@ -182,7 +182,7 @@ module SeedPoolSetMakers =
 
 
     let private buildPrefix
-            (context: evolutionMakerContext) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
+            (sources: evolutionSetupSources) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
 
             let! repl =
@@ -228,7 +228,7 @@ module SeedPoolSetMakers =
 
 
             let! (parentSorterSetEval: sorterSetEval) = 
-                context.LoadPrefixSorterEvals 
+                sources.LoadPrefixSorterEvals
                     pfxLibId
                     repl
                     simpleSorterModelType
@@ -264,16 +264,16 @@ module SeedPoolSetMakers =
         }
 
 
-    let private wrapStandard builder context rp =
-        builder context rp |> Async.map (Result.map sorterPoolSet.Standard)
+    let private wrapStandard builder sources rp =
+        builder sources rp |> Async.map (Result.map sorterPoolSet.Standard)
 
-    let private wrapSoss builder context rp =
-        builder context rp
+    let private wrapSoss builder sources rp =
+        builder sources rp
         |> Async.map (Result.map (GeneSort.Eval.V1.Sgd.Soss.SorterPoolSet_Soss.fromStandard >> sorterPoolSet.Soss))
 
-    let createStandardSeedSorterPoolSetStandard context rp = wrapStandard buildStandard context rp
-    let createStandardSeedSorterPoolSetMerge context rp = wrapStandard buildMerge context rp
-    let createStandardSeedSorterPoolSetPrefix context rp = wrapStandard buildPrefix context rp
-    let createSossSeedSorterPoolSetStandard context rp = wrapSoss buildStandard context rp
-    let createSossSeedSorterPoolSetMerge context rp = wrapSoss buildMerge context rp
-    let createSossSeedSorterPoolSetPrefix context rp = wrapSoss buildPrefix context rp
+    let createStandardSeedSorterPoolSetStandard sources rp = wrapStandard buildStandard sources rp
+    let createStandardSeedSorterPoolSetMerge sources rp = wrapStandard buildMerge sources rp
+    let createStandardSeedSorterPoolSetPrefix sources rp = wrapStandard buildPrefix sources rp
+    let createSossSeedSorterPoolSetStandard sources rp = wrapSoss buildStandard sources rp
+    let createSossSeedSorterPoolSetMerge sources rp = wrapSoss buildMerge sources rp
+    let createSossSeedSorterPoolSetPrefix sources rp = wrapSoss buildPrefix sources rp

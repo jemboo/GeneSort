@@ -1,60 +1,43 @@
 module Program
 
-open GeneSort.Project.V1.Catalogs
 open System
-open System.Threading
+open GeneSort.Project.V1.Catalogs
 open GeneSort.Core.Mp
-open MessagePack
 open GeneSort.Dispatch.V1
-open GeneSort.Project.V1
 
 [<EntryPoint>]
 let main argv =
-    // 1. Force MessagePack setup FIRST before opening or executing any dispatch logic
     MessagePackSetup.configure ()
     ProjectCatalogs.registerAll ()
 
-    let startTime = DateTime.Now
-    printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
+    // Each command runs exactly one phase, using the spec configured in its dispatch module.
+    //let yab = [| "setup"; "sgd" |]
+    let yab = [| "execute"; "sgd" |]
 
-    // 2. Call your dispatch logic strictly AFTER configuration
-    //GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
-    
-    //DispatchSortableTests.makeParamsAndRun()
-    //DispatchSorterEval.makeParamsAndRun()
-    //DispatchSorterMutate.makeParamsAndRun()
-    DispatchSorterSgd.makeParamsAndRun()
+    let command =
+        match yab with
+        | [| "setup"; "sgd" |] -> Some DispatchSorterSgd.prepareRun
+        | [| "execute"; "sgd" |] -> Some DispatchSorterSgd.runRunParams
+        | [| "setup"; "eval" |] -> Some DispatchSorterEval.prepareRun
+        | [| "execute"; "eval" |] -> Some DispatchSorterEval.runRunParams
+        | [| "setup"; "mutate" |] -> Some DispatchSorterMutate.prepareRun
+        | [| "execute"; "mutate" |] -> Some DispatchSorterMutate.runRunParams
+        | [| "setup"; "tests" |] -> Some DispatchSortableTests.prepareRun
+        | [| "execute"; "tests" |] -> Some DispatchSortableTests.runRunParams
+        | _ -> None
 
-    let duration = DateTime.Now - startTime
-    Thread.Sleep(100)
-    printfn "********************************************"
-    printfn $"Total Time: {duration.ToString()}"
-    printfn "********************************************"
-    Console.ReadLine() |> ignore
-    0
-
-
-//[<EntryPoint>]
-//let main argv =
-//    MessagePackSetup.configure()
-
-//    // Test resolution explicitly to catch the offending DTO type
-//    try
-//        let options = MessagePackSerializer.DefaultOptions
-//        let resolver = options.Resolver
-        
-//        // Force resolver lookup on your primary DTOs
-//        printfn "Testing RunParametersDto resolver..."
-//        resolver.GetFormatter<GeneSort.Project.Mp.V1.runParametersDto>() |> ignore
-        
-//        printfn "Testing RunDto resolver..."
-//        resolver.GetFormatter<GeneSort.Project.Mp.V1.runDto>() |> ignore
-        
-//        printfn "All DTO resolvers resolved successfully!"
-//    with ex ->
-//        printfn "FAILED RESOLUTION: %s" ex.Message
-//        printfn "Stack Trace:\n%s" ex.StackTrace
-
-//    // Continue execution...
-//    GeneSort.Dispatch.V1.DispatchSorterSgd.makeParamsAndRun()
-//    0
+    match command with
+    | None ->
+        eprintfn "Usage: GeneSort.Dispatch.V1 <setup|execute> <sgd|eval|mutate|tests>"
+        eprintfn "Set GENESORT_PROJECTS_ROOT to the parent of your project folders."
+        2
+    | Some action ->
+        try
+            action ()
+            Console.ReadKey() |> ignore
+            0
+        with error ->
+            eprintfn "%s" error.Message
+            
+            Console.ReadKey() |> ignore
+            1

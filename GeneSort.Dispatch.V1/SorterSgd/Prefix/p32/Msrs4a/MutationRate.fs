@@ -34,12 +34,12 @@ module MutationRate =
 
 
 
-        let Test (executorType: sorterSgdExecutorType) : run =
+        let Test () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
-                    (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -63,12 +63,12 @@ module MutationRate =
             )
 
 
-        let EqualOPS (executorType: sorterSgdExecutorType) : run =
+        let EqualOPS () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
-                    (sprintf @"EqualOPS%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"EqualOPS%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -93,12 +93,12 @@ module MutationRate =
 
         
 
-        let EqualOPS2 (executorType: sorterSgdExecutorType) : run =
+        let EqualOPS2 () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
-                    (sprintf @"EqualOPS2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"EqualOPS2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -126,12 +126,12 @@ module MutationRate =
 
 
 
-        let Test (executorType: sorterSgdExecutorType) : run =
+        let Test () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
-                    (sprintf @"Test%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -154,12 +154,12 @@ module MutationRate =
             )
 
 
-        let WideTest (executorType: sorterSgdExecutorType) : run =
+        let WideTest () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
-                    (sprintf @"WideTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -183,12 +183,12 @@ module MutationRate =
 
         
 
-        let NarrowTest (executorType: sorterSgdExecutorType) : run =
+        let NarrowTest () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
-                    (sprintf @"NarrowTest%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"NarrowTest%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -217,12 +217,12 @@ module MutationRate =
 
 
         
-        let Test2 (executorType: sorterSgdExecutorType) : run =
+        let Test2 () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbMaxModRate_32Name
                     projName
-                    (sprintf @"Test2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"Test2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)
@@ -249,12 +249,12 @@ module MutationRate =
 
 
         
-        let WideTest (executorType: sorterSgdExecutorType) : run =
+        let WideTest () : run =
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix
+                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbMaxModRate_64Name
                     projName
-                    (sprintf @"WideTest2%s" (SorterSgdExecutorType.toString executorType) |> UMX.tag)
+                    (sprintf @"WideTest2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     [
                 (runParameters.codeModKey, ["NoMods"] |> List.map string)

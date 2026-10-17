@@ -17,7 +17,11 @@ open GeneSort.Dispatch.V1.SorterEval
 let private parameters = runParameters.create Map.empty
 
 let private makeRun queryCatalog setupCatalog =
-    SimpleRun.create (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
+    let executeName =
+        if queryCatalog = QueryCatalogNames.sorterMutateStandard || queryCatalog = QueryCatalogNames.sorterMutateMerge || queryCatalog = QueryCatalogNames.sorterMutatePrefix then
+            GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+        else GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+    SimpleRun.createWithExecuteFunction executeName (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
         queryCatalog setupCatalog "identity" "sortable-test" false |> run.SimpleRun
 
 let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
@@ -211,15 +215,15 @@ let ``evaluation setup phase stops on failure`` failingStep =
 let ``evaluation run phase never invokes setup`` variant =
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async { calls.Add label; return Error "Setup must not run" })
-    let executorType, queryCatalog, setupCatalog =
+    let queryCatalog, setupCatalog =
         match variant with
-        | "standard" -> GenStandard, QueryCatalogNames.sorterEvalStandard, SetupCatalogNames.standard
-        | "merge" -> GenMerge, QueryCatalogNames.sorterEvalMerge, SetupCatalogNames.merge
-        | _ -> GenPrefix, QueryCatalogNames.sorterEvalPrefix, SetupCatalogNames.prefix
+        | "standard" -> QueryCatalogNames.sorterEvalStandard, SetupCatalogNames.standard
+        | "merge" -> QueryCatalogNames.sorterEvalMerge, SetupCatalogNames.merge
+        | _ -> QueryCatalogNames.sorterEvalPrefix, SetupCatalogNames.prefix
     let host = (runHost.Create (makeRun queryCatalog setupCatalog) 1).WithSetupContext(bindings)
     use cts = new System.Threading.CancellationTokenSource()
     // Missing query parameters stop evaluation before disk access, after the old setup call site.
-    let result = (SorterEvalExecutor.getExecutor executorType).Execute host parameters (UMX.tag false) cts None |> Async.RunSynchronously
+    let result = RunParamsExecutor.hostExecutor.Execute host parameters (UMX.tag false) cts None |> Async.RunSynchronously
     Assert.Equal(Error "Failed to create QueryParams for SorterModelSet.", result)
     Assert.Empty(calls)
 

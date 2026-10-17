@@ -17,7 +17,9 @@ module DispatchSorterEval =
 
     let private createThreadSafeProgress () =
         let sessionTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-        let logFileName = sprintf @"c:\Projects\session_%s.log" sessionTimestamp
+        let logFolder = Path.Combine(RunHost.projectsRoot (), "Logs")
+        Directory.CreateDirectory(logFolder) |> ignore
+        let logFileName = Path.Combine(logFolder, sprintf "session_%s_%s.log" sessionTimestamp (Guid.NewGuid().ToString("N")))
     
         // Explicit synchronization object to protect file access across threads
         let lockObj = obj()
@@ -48,142 +50,56 @@ module DispatchSorterEval =
 
 
 
-    //********** SorterEval Standard **********
-    //let configType = SorterEvalSpecsRs.configType.Rand_Test
-    //let executorType = sorterEvalExecutorType.GenStandard
-    //let host: runHost = 
-    //    let spec = SorterEvalSpecsRs.getRun configType executorType
-    //    SorterEvalDbs.createRunHost spec
-
-
-    //********** SorterEval Merge **********
-    //let configType = SorterEvalSpecsRm.configType.Rand_MergeTest_Test
-    //let executorType = sorterEvalExecutorType.GenMerge
-    //let host: runHost = 
-    //    let spec = SorterEvalSpecsRm.getRun configType executorType
-    //    SorterEvalDbs.createRunHost spec
-
-
-
-    //********** SorterEval Prefix **********
-    //let private configType = SorterEvalSpecsTestPrefix.configType.Prefix_32
-    //let private executorType = sorterEvalExecutorType.GenPrefix
-    //let private host: runHost = 
-    //    let run = SorterEvalSpecsTestPrefix.getRun configType executorType
-    //    runHost.Create run 8
-    //let private executor = SorterEvalExecutor.getExecutor executorType
-
-
-    let private executorType = sorterEvalExecutorType.GenPrefix
-    let private host: runHost = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_32 executorType) 5
-    let private executor = SorterEvalExecutor.getExecutor executorType
-
-
-
-
+    let private host: runHost = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_32 ()) 5
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 
+    let private initializeParameters() =
+        ParamOps.initRunAndParamFiles host.RunDb (Some progress) host.Run
+            minReplica maxReplica host.AllowOverwrite host.ParamMapRefiner host.Run.ParameterSpans
 
-    let makeParamsAndRun() =
-
-        async {
-
-            printfn "Init Project: %s" %host.Run.DatabaseName
-    
-            let! initResult = 
-                ParamOps.initRunAndParamFiles
-                    host.RunDb           
-                    (Some progress) 
-                    host.Run              
-                    minReplica 
-                    maxReplica 
-                    host.AllowOverwrite 
-                    host.ParamMapRefiner      
-                    host.Run.ParameterSpans
-
-
-            match initResult with
-            | Error e -> printfn "Init Failure: %s" e
-            | Ok () ->
-                let! setupResult =
-                    match executorType with
-                    | sorterEvalExecutorType.GenStandard
-                    | sorterEvalExecutorType.GenMerge
-                    | sorterEvalExecutorType.GenPrefix ->
-                        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
-                            (Some progress) host SorterEvalExecutor.setupExecutor host.MaxParallel
-                    | _ -> async { return Ok [||] }
-                match setupResult with
-                | Error e -> printfn "Setup Error: %s" e
-                | Ok results when results |> Array.exists (function Failure _ | Cancelled _ -> true | _ -> false) ->
-                    printfn "Setup failed or was cancelled. Evaluation was not started."
-                | Ok _ ->
-                    let! execResult =
-                        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
-                            (Some progress) host executor host.MaxParallel
-                    match execResult with
-                    | Ok results -> printfn "Success: %d records processed." results.Length
-                    | Error e -> printfn "Runtime Error: %s" e
-
-        } |> Async.RunSynchronously
-
+    let private showResult result =
+        match result with
+        | Ok results ->
+            let summary = RunResult.analyze results
+            printfn "Complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
+            if summary.IssueLog.Length > 0 then
+                failwith (String.concat Environment.NewLine summary.IssueLog)
+        | Error error -> failwith error
 
     let makeRunParams() =
-
         async {
-            printfn "Init Run: %s" %host.Run.RunName
-    
-            let! initResult = 
-                ParamOps.initRunAndParamFiles
-                    host.RunDb           
-                    (Some progress) 
-                    host.Run              
-                    minReplica 
-                    maxReplica 
-                    host.AllowOverwrite 
-                    host.ParamMapRefiner      
-                    host.Run.ParameterSpans
-
-            match initResult with
-            | Error e -> printfn "Init Failure: %s" e
-            | Ok () -> printfn "Init Success: %s" %host.Run.RunName
-
-
+            let! result = initializeParameters()
+            match result with
+            | Ok () -> printfn "Parameters initialized."
+            | Error error -> failwithf "Init failure: %s" error
         } |> Async.RunSynchronously
 
-
-    /// Creates SorterModelSet and SortableTestsWithPrefix Setup files for saved parameters.
     let setupRunParams() =
-        async {
-            let! setupResult =
-                ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
-                    (Some progress) host SorterEvalExecutor.setupExecutor host.MaxParallel
-            match setupResult with
-            | Ok results ->
-                let summary = RunResult.analyze results
-                printfn "Setup complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
-            | Error e -> printfn "Setup Error: %s" e
-        } |> Async.RunSynchronously
+        ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
 
-    /// Evaluates saved Setup files; run setupRunParams first.
     let runRunParams() =
+        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
 
+    /// Local phase: initialize parameters and materialize Setup dependencies only.
+    let prepareRun() =
         async {
-
-            let! execResult = 
-                ProjectOps.executeRuns 
-                        minReplica 
-                        maxReplica
-                        host.AllowOverwrite 
-                        cts 
-                        (Some progress)
-                        host
-                        executor
-                        host.MaxParallel
-
-            match execResult with
-            | Ok results -> printfn "Success: %d records processed." results.Length
-            | Error e -> printfn "Runtime Error: %s" e
-
+            let! initialized = initializeParameters()
+            match initialized with
+            | Error error -> failwithf "Init failure: %s" error
+            | Ok () ->
+                let! result =
+                    ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+                        (Some progress) host host.MaxParallel
+                showResult result
         } |> Async.RunSynchronously
+
+    /// Runs a named report against saved parameters, including completed runs.
+    let runReport name =
+        ReportOps.executeReport name minReplica maxReplica host.AllowOverwrite cts
+            (Some progress) host host.MaxParallel
+        |> Async.RunSynchronously |> showResult
