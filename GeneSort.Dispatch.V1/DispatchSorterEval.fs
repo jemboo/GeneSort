@@ -106,20 +106,25 @@ module DispatchSorterEval =
             match initResult with
             | Error e -> printfn "Init Failure: %s" e
             | Ok () ->
-                let! execResult = 
-                    ProjectOps.executeRuns  
-                        minReplica 
-                        maxReplica
-                        host.AllowOverwrite 
-                        cts 
-                        (Some progress)
-                        host
-                        executor
-                        host.MaxParallel
-
-                match execResult with
-                | Ok results -> printfn "Success: %d records processed." results.Length
-                | Error e -> printfn "Runtime Error: %s" e
+                let! setupResult =
+                    match executorType with
+                    | sorterEvalExecutorType.GenStandard
+                    | sorterEvalExecutorType.GenMerge
+                    | sorterEvalExecutorType.GenPrefix ->
+                        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+                            (Some progress) host SorterEvalExecutor.setupExecutor host.MaxParallel
+                    | _ -> async { return Ok [||] }
+                match setupResult with
+                | Error e -> printfn "Setup Error: %s" e
+                | Ok results when results |> Array.exists (function Failure _ | Cancelled _ -> true | _ -> false) ->
+                    printfn "Setup failed or was cancelled. Evaluation was not started."
+                | Ok _ ->
+                    let! execResult =
+                        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+                            (Some progress) host executor host.MaxParallel
+                    match execResult with
+                    | Ok results -> printfn "Success: %d records processed." results.Length
+                    | Error e -> printfn "Runtime Error: %s" e
 
         } |> Async.RunSynchronously
 
@@ -148,6 +153,20 @@ module DispatchSorterEval =
         } |> Async.RunSynchronously
 
 
+    /// Creates SorterModelSet and SortableTestsWithPrefix Setup files for saved parameters.
+    let setupRunParams() =
+        async {
+            let! setupResult =
+                ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+                    (Some progress) host SorterEvalExecutor.setupExecutor host.MaxParallel
+            match setupResult with
+            | Ok results ->
+                let summary = RunResult.analyze results
+                printfn "Setup complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
+            | Error e -> printfn "Setup Error: %s" e
+        } |> Async.RunSynchronously
+
+    /// Evaluates saved Setup files; run setupRunParams first.
     let runRunParams() =
 
         async {

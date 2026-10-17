@@ -20,6 +20,31 @@ open GeneSort.Dispatch.V1.OpsUtils
 
 module SorterEvalExecutor =
 
+    /// Creates the Setup artifacts without evaluating sorters or completing the run.
+    /// The host must have its setup context bound before calling this function.
+    let _makeSetup
+            (host: runHost)
+            (rp: runParameters)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        let log msg =
+            OpsUtils.report progress
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (RunParameters.getIdString rp) msg)
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                log "Generating and saving evaluation setup..."
+                do! host.Setup rp
+                do! checkCancellation cts.Token
+                log "Setup complete. Ready to run evaluation."
+                return rp
+            with e ->
+                let errorMsg = sprintf "Setup error in %s: %s" (RunParameters.getIdString rp) e.Message
+                log errorMsg
+                return! Error errorMsg
+        } |> Async.map (logResult progress log)
+
+    /// Runs evaluation using previously saved Setup artifacts.
     let _makeSorterEvals 
             (host: runHost)
             (rp: runParameters) 
@@ -36,9 +61,6 @@ module SorterEvalExecutor =
                 do! checkCancellation cts.Token
                 
                 // 1. Unpack run configuration
-                log "Generating and saving evaluation setup..."
-                do! host.Setup rp
-                do! checkCancellation cts.Token
                 let! qpModels =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
@@ -58,7 +80,7 @@ module SorterEvalExecutor =
                     rp.GetCollectNewSortableTests() 
                     |> Result.ofOption "Missing collectNewSortableTests."
 
-                // 2. Generate common evaluation dependencies
+                // 2. Load saved evaluation dependencies
                 do! checkCancellation cts.Token
                 let! qpTests =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
@@ -132,23 +154,21 @@ module SorterEvalExecutor =
         host.WithSetupContext(context)
 
 
+    /// Uses the run's setup catalog for Standard, Merge, or Prefix setup.
+    let setupExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                let host = bindSetup host allowOverwrite cts
+                _makeSetup host rp cts progress }
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
                 _makeSorterEvals host rp allowOverwrite cts progress }
 
-    let mergeExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
-                _makeSorterEvals host rp allowOverwrite cts progress }
+    let mergeExecutor = standardExecutor
 
-    let prefixExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
-                _makeSorterEvals host rp allowOverwrite cts progress }
+    let prefixExecutor = standardExecutor
 
 
     let stageStatsReportExecutor =

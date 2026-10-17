@@ -22,12 +22,27 @@ module SorterSgdExecutorType =
         match host with
         | SgdRunHost sgdHost ->
             evaluateEvolution
-                (sgdHost.MakeSortableTests EvolutionMakerContext.fileDb)
-                (sgdHost.MakeSeedPoolSet EvolutionMakerContext.fileDb)
                 sgdHost.MakeMutator
                 host.RunDb sgdHost.GenSaveIntervals sgdHost.GenSaveSubIntervals rp allowOverwrite cts progress
         | SimpleRunHost _ ->
             async { return Error "SGD execution requires an SgdRun with generation save interval names." }
+
+    let private setupExecutor prepare =
+        { new IRunParamsExecutor with
+            member _.Execute host rp _ cts progress =
+                match host with
+                | SgdRunHost sgdHost ->
+                    prepare
+                        (sgdHost.MakeSortableTests EvolutionMakerContext.fileDb)
+                        (sgdHost.MakeSeedPoolSet EvolutionMakerContext.fileDb)
+                        host.RunDb sgdHost.GenSaveIntervals sgdHost.GenSaveSubIntervals rp cts progress
+                | SimpleRunHost _ ->
+                    async { return Error "SGD setup requires an SgdRun with generation save interval names." } }
+
+    let getSetupExecutor = function
+        | GenStandard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard
+        | GenSoss -> setupExecutor SgdEx_Soss.setupEvolutionRunSoss
+        | executorType -> invalidArg (nameof executorType) "Reports do not have a setup phase."
 
 
     let toString = function

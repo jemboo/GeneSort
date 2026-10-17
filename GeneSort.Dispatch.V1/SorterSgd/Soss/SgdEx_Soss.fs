@@ -65,11 +65,50 @@ module SgdEx_Soss =
         }
 
 
+    /// Prepares reusable generation-zero tests and the evaluated seed pool.
+    let setupEvolutionRunSoss
+            (makeSortableTests: runParameters -> Async<Result<sortableTests * ce array, string>>)
+            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
+            (genDb: IGeneSortDb)
+            (saveIntervals: genIntervalConfig)
+            (subIntervals: genIntervalConfig)
+            (rp: runParameters)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        let log msg =
+            OpsUtils.report progress
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (RunParameters.getIdString rp) msg)
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let initRp = rp.WithGenerationCurrent(Some (UMX.tag<generationNumber> 0))
+                let! width = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+                let! (tests, ces) = Utils.loadOrCreateSortableTestsWithPrefix makeSortableTests genDb initRp
+                do! checkCancellation cts.Token
+                let! query =
+                    genDb.makeQueryParamsFromRunParams initRp (geneSortDataType.SorterPoolSet "")
+                    |> Result.ofOption "Failed to create QueryParams for initial Setup sorterPoolSet."
+                let! exists = genDb.doesOutPutDataExist geneSortDataMode.Setup query
+                if exists then
+                    let! saved = genDb.loadAsync geneSortDataMode.Setup query
+                    let! _ = OutputData.asSorterPoolSetSoss saved
+                    log "Reusing initial Setup sorterPoolSet."
+                else
+                    let prefix = ceBlock.create (UMX.tag Guid.Empty) width ces
+                    let! (_: sorterPoolSet_Soss) =
+                        initializeAndSaveSeedPoolSet
+                            sorterPoolSetCreator genDb saveIntervals subIntervals initRp tests prefix log
+                    ()
+                do! checkCancellation cts.Token
+                log "Evolution setup complete."
+                return rp
+            with e ->
+                return! Error (sprintf "Error in evolution setup: %s" e.Message)
+        } |> Async.map (OpsUtils.logResult progress log)
+
     /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRunSoss
-            (makeSortableTests: runParameters ->  Async<Result<sortableTests * (ce array), string>> )
-            (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (makeMutator: sorterModelMutatorMaker)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
@@ -90,11 +129,11 @@ module SgdEx_Soss =
                 let! partitionCount = rp.GetPartitionCount() |> Result.ofOption "Missing PartitionCount."
                 do! if %partitionCount > 0 then Ok () else Error "PartitionCount must be greater than zero."
 
-                log "Loading or creating Setup SortableTestsWithPrefix..."
+                log "Loading saved Setup SortableTestsWithPrefix..."
                 let! sWidth = 
                     rp.GetSortingWidth() 
                     |> Result.ofOption "Missing sorting width."
-                let! (sortableTests, ces) = Utils.loadOrCreateSortableTestsWithPrefix makeSortableTests genDb rp
+                let! (sortableTests, ces) = Utils.loadSortableTestsWithPrefix genDb rp
                 let! seedSoss =
                     rp.GetSeedSoss()
                     |> Result.ofOption "Missing SeedSoss."
@@ -123,27 +162,15 @@ module SgdEx_Soss =
                 // 1. Check for existing checkpoints directly via genDb
                 let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSetSoss saveIntervals genDb rp
 
-                // 2. Resume Results, reuse Setup, or create and save a new Setup pool
+                // 2. Resume Results or load the initial pool prepared by setup
                 let! (activeSeedPoolSet, activeRp) = 
                     match highestPoolSetOpt with
                     | None -> 
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! setupQuery =
-                                genDb.makeQueryParamsFromRunParams initRp (geneSortDataType.SorterPoolSet "")
-                                |> Result.ofOption "Failed to create QueryParams for initial Setup sorterPoolSet."
-                            let! setupPoolSetOpt = genDb.loadIfFoundAsync geneSortDataMode.Setup setupQuery
-                            let! (seedSet: sorterPoolSet_Soss) =
-                                match setupPoolSetOpt with
-                                | Some setupData ->
-                                    asyncResult {
-                                        let! setupPoolSet = OutputData.asSorterPoolSetSoss setupData
-                                        log (sprintf "Found initial Setup sorterPoolSet at generation %d. Beginning evolution." %setupPoolSet.GenerationNumber)
-                                        return setupPoolSet
-                                    }
-                                | None ->
-                                    initializeAndSaveSeedPoolSet
-                                        sorterPoolSetCreator genDb saveIntervals subIntervals initRp sortableTests prefix log
+                            let! setupData = Utils.loadSetupOutputData genDb initRp (geneSortDataType.SorterPoolSet "")
+                            let! seedSet = OutputData.asSorterPoolSetSoss setupData
+                            log "Loaded initial Setup sorterPoolSet. Beginning evolution."
                             return seedSet, initRp.WithGenerationCurrent(Some seedSet.GenerationNumber)
                         }
                     | Some (highestPoolSet: sorterPoolSet_Soss) ->

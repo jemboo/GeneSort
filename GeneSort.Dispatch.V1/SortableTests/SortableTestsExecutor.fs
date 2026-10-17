@@ -14,7 +14,7 @@ open GeneSort.SortingLib.Sorter
 
 module SortableTestsExecutor =
 
-    let _makeSortableTestsMerge
+    let _setupSortableTestsMerge
         (host: runHost)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
@@ -61,17 +61,17 @@ module SortableTestsExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTests %s" (string %qpForSortableTests.Id))
 
-                do! host.RunDb.saveAsync geneSortDataMode.Results qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
+                do! host.RunDb.saveAsync geneSortDataMode.Setup qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
                 
-                log "Run Complete."
-                return rp.WithRunFinished (Some true)
+                log "Setup complete."
+                return rp
             with e -> 
                 return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
         } |> Async.map (logResult progress log)
 
 
 
-    let _makeSortableTestsPrefix
+    let _setupSortableTestsPrefix
         (host: runHost)
         (rp: runParameters) 
         (allowOverwrite: bool<allowOverwrite>) 
@@ -113,26 +113,53 @@ module SortableTestsExecutor =
                 // 4. Save
                 log (sprintf "Saving SortableTests %s" (string %qpForSortableTests.Id))
 
-                do! host.RunDb.saveAsync geneSortDataMode.Results qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
+                do! host.RunDb.saveAsync geneSortDataMode.Setup qpForSortableTests (sortableTests |> outputData.SortableTests) allowOverwrite
                 
-                log "Run Complete."
-                return rp.WithRunFinished (Some true)
+                log "Setup complete."
+                return rp
             with e -> 
                 return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message) |> async.Return
         } |> Async.map (logResult progress log)
 
 
+    /// Publishes prepared tests as Results for downstream evaluation workflows.
+    let _runSortableTests
+            (host: runHost)
+            (rp: runParameters)
+            (allowOverwrite: bool<allowOverwrite>)
+            (cts: CancellationTokenSource)
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+        let log msg = OpsUtils.report progress msg
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let! query = host.QueryParamsFromRunParams rp (geneSortDataType.SortableTests "")
+                             |> Result.ofOption "Failed to create query parameters for SortableTests"
+                let! saved = host.RunDb.loadAsync geneSortDataMode.Setup query
+                let! tests = OutputData.asSortableTests saved
+                do! checkCancellation cts.Token
+                do! host.RunDb.saveAsync geneSortDataMode.Results query (outputData.SortableTests tests) allowOverwrite
+                log "Sortable tests published. Run complete."
+                return rp.WithRunFinished(Some true)
+            with e ->
+                return! Error (sprintf "Error publishing sortable tests: %s" e.Message)
+        } |> Async.map (logResult progress log)
+
+    let private setupExecutor prepare =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                prepare host rp allowOverwrite cts progress }
+
+    let getSetupExecutor = function
+        | GenMerge -> setupExecutor _setupSortableTestsMerge
+        | GenPrefix -> setupExecutor _setupSortableTestsPrefix
+
     let mergeExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                _makeSortableTestsMerge 
-                    host rp allowOverwrite cts progress }
+                _runSortableTests host rp allowOverwrite cts progress }
 
-    let prefixExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                _makeSortableTestsPrefix 
-                    host rp allowOverwrite cts progress }
+    let prefixExecutor = mergeExecutor
 
     let getExecutor (executorType: sortableTestsExecutorType) : IRunParamsExecutor =
         match executorType with

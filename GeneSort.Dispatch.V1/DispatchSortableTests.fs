@@ -69,6 +69,24 @@ module DispatchSortableTests =
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 
+    let private setupExecutor =
+        Some (SortableTestsExecutor.getSetupExecutor executorType)
+
+    /// Creates Setup artifacts for the saved run parameters.
+    let setupRunParams() =
+        async {
+            match setupExecutor with
+            | None -> printfn "This report workflow has no setup phase."
+            | Some setup ->
+                let! result =
+                    ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+                        (Some progress) host setup host.MaxParallel
+                match result with
+                | Error error -> printfn "Setup Error: %s" error
+                | Ok results ->
+                    let summary = RunResult.analyze results
+                    printfn "Setup complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
+        } |> Async.RunSynchronously
     let makeParamsAndRun() =
 
         async {
@@ -91,13 +109,14 @@ module DispatchSortableTests =
             | Error e -> printfn "Init Failure: %s" e
             | Ok () ->
                 let! execResult = 
-                    ProjectOps.executeRuns  
+                    ProjectOps.executeSetupAndRuns
                         minReplica 
                         maxReplica
                         host.AllowOverwrite 
                         cts 
                         (Some progress)
                         host
+                        setupExecutor
                         executor
                         host.MaxParallel
 

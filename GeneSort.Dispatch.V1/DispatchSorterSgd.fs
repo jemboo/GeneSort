@@ -85,6 +85,26 @@ module DispatchSorterSgd =
 
 
 
+    let private setupExecutor =
+        match executorType with
+        | sorterSgdExecutorType.GenStandard | sorterSgdExecutorType.GenSoss -> Some (SorterSgdExecutorType.getSetupExecutor executorType)
+        | _ -> None
+
+    /// Creates Setup artifacts for the saved run parameters.
+    let setupRunParams() =
+        async {
+            match setupExecutor with
+            | None -> printfn "This report workflow has no setup phase."
+            | Some setup ->
+                let! result =
+                    ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
+                        (Some progress) host setup host.MaxParallel
+                match result with
+                | Error error -> printfn "Setup Error: %s" error
+                | Ok results ->
+                    let summary = RunResult.analyze results
+                    printfn "Setup complete: %d succeeded, %d failed or cancelled." summary.Successes summary.IssueLog.Length
+        } |> Async.RunSynchronously
     let makeParamsAndRun() =
 
         async {
@@ -107,13 +127,14 @@ module DispatchSorterSgd =
             | Error e -> printfn "Init Failure: %s" e
             | Ok () ->
                 let! execResult = 
-                    ProjectOps.executeRuns  
+                    ProjectOps.executeSetupAndRuns
                         minReplica 
                         maxReplica
                         host.AllowOverwrite 
                         cts 
                         (Some progress)
                         host
+                        setupExecutor
                         executor
                         host.MaxParallel
 
@@ -168,3 +189,6 @@ module DispatchSorterSgd =
             | Error e -> printfn "Runtime Error: %s" e
 
         } |> Async.RunSynchronously
+
+    /// Run phase alias consistent with the other dispatch modules.
+    let runRunParams() = runRunParameters()

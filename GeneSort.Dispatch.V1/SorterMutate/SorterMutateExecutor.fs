@@ -24,6 +24,9 @@ open GeneSort.Project.V1.RunParamBundles
 
 module SorterMutateExecutor =
 
+    /// Runs the bound setup catalog without evaluating mutants or completing the run.
+    let _makeSetup = SorterEvalExecutor._makeSetup
+
     let makeMutantStandardSorterModels (rp:runParameters) : Async<Result<sorterModel seq, string>> =
         asyncResult {
 
@@ -364,10 +367,7 @@ module SorterMutateExecutor =
             try
                 do! checkCancellation cts.Token
                 let collectTests = false |> UMX.tag<collectNewSortableTests>
-                // 1. Persist setup, then load the inputs used for evaluation.
-                log "Generating and saving mutant evaluation setup..."
-                do! host.Setup rp
-                do! checkCancellation cts.Token
+                // 1. Load the inputs prepared by the setup phase.
                 let! qpModels =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
@@ -479,23 +479,20 @@ module SorterMutateExecutor =
                 (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
         host.WithSetupContext(context)
 
+    let setupExecutor =
+        { new IRunParamsExecutor with
+            member _.Execute host rp allowOverwrite cts progress =
+                let host = bindSetup host allowOverwrite cts
+                _makeSetup host rp cts progress }
+
     let standardExecutor =
         { new IRunParamsExecutor with
             member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
                 _evaluateMutants host rp allowOverwrite cts progress }
 
-    let mergeExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
-                _evaluateMutants host rp allowOverwrite cts progress }
+    let mergeExecutor = standardExecutor
 
-    let prefixExecutor =
-        { new IRunParamsExecutor with
-            member _.Execute host rp allowOverwrite cts progress =
-                let host = bindSetup host allowOverwrite cts
-                _evaluateMutants host rp allowOverwrite cts progress }
+    let prefixExecutor = standardExecutor
 
 
     let mergeReportExecutor =

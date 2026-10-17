@@ -12,6 +12,7 @@
     <Compile Include="MakerCatalogTests.fs" />
     <Compile Include="SetupCatalogTests.fs" />
     <Compile Include="SgdCheckpointTests.fs" />
+    <Compile Include="WorkflowPhaseTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

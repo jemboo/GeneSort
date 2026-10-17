@@ -15,6 +15,22 @@ open GeneSort.Sorting.Sorter
 
 module Utils =
 
+    /// Loads generation-zero setup strictly; run phases never create missing setup.
+    let loadSetupOutputData (genDb: IGeneSortDb) (rp: runParameters) dataType =
+        asyncResult {
+            let setupRp = rp.WithGenerationCurrent(Some (UMX.tag<generationNumber> 0))
+            let! query =
+                genDb.makeQueryParamsFromRunParams setupRp dataType
+                |> Result.ofOption "Failed to create QueryParams for evolution Setup."
+            return! genDb.loadAsync geneSortDataMode.Setup query
+        }
+
+    let loadSortableTestsWithPrefix genDb rp =
+        asyncResult {
+            let! saved = loadSetupOutputData genDb rp (geneSortDataType.SortableTestsWithPrefix "")
+            return! OutputData.asSortableTestsWithPrefix saved
+        }
+
     /// Reuses run setup across checkpoints, or creates and persists it before evolution.
     let loadOrCreateSortableTestsWithPrefix
             (makeTests: runParameters -> Async<Result<sortableTests * ce array, string>>)

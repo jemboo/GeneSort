@@ -12,6 +12,7 @@ open FSharp.UMX
 open GeneSort.Project.Mp.V1
 open GeneSort.Core.Mp
 open MessagePack
+open GeneSort.Dispatch.V1.SorterEval
 
 let private parameters = runParameters.create Map.empty
 
@@ -65,7 +66,7 @@ let ``mutant setup selects matching model and test makers`` name expectedModels 
 [<Theory>]
 [<InlineData("mutant-standard")>]
 [<InlineData("standard")>]
-let ``mutant evaluation stops when either setup step fails`` failingStep =
+let ``mutant setup phase stops when either setup step fails`` failingStep =
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async {
         calls.Add label
@@ -74,8 +75,8 @@ let ``mutant evaluation stops when either setup step fails`` failingStep =
     use cts = new System.Threading.CancellationTokenSource()
     let host = (makeHost ()).WithSetupContext(bindings)
     let result =
-        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor._evaluateMutants
-            host parameters (UMX.tag false) cts None
+        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor._makeSetup
+            host parameters cts None
         |> Async.RunSynchronously
     Assert.Equal(Error "setup failed", result)
     let expected = if failingStep = "mutant-standard" then ["mutant-standard"] else ["mutant-standard"; "standard"]
@@ -171,3 +172,82 @@ let ``custom catalog entries can be composed and reject invalid registrations`` 
     Assert.Throws<InvalidOperationException>(fun () -> SetupCatalog.register setupName modelBuilder) |> ignore
     Assert.Throws<ArgumentException>(fun () -> SetupCatalog.register " " modelBuilder) |> ignore
     Assert.Throws<InvalidOperationException>(fun () -> SetupCatalog.get "missing-setup" |> ignore) |> ignore
+
+[<Theory>]
+[<InlineData("setup.standard", "standard")>]
+[<InlineData("setup.merge", "merge")>]
+[<InlineData("setup.prefix", "prefix")>]
+let ``evaluation setup phase creates setup without completing the run`` catalog testStep =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
+    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard catalog) 1).WithSetupContext(bindings)
+    use cts = new System.Threading.CancellationTokenSource()
+    let result = SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously
+    match result with
+    | Ok updated ->
+        Assert.Same(parameters, updated)
+        Assert.NotEqual(Some true, updated.GetRunFinished())
+    | Error error -> failwith error
+    Assert.Equal<string list>(["models"; testStep], List.ofSeq calls)
+
+[<Theory>]
+[<InlineData("models")>]
+[<InlineData("standard")>]
+let ``evaluation setup phase stops on failure`` failingStep =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async {
+        calls.Add label
+        return if label = failingStep then Error "setup failed" else Ok ()
+    })
+    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
+    use cts = new System.Threading.CancellationTokenSource()
+    Assert.Equal(Error "setup failed", SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously)
+    Assert.Equal<string list>((if failingStep = "models" then ["models"] else ["models"; "standard"]), List.ofSeq calls)
+
+[<Theory>]
+[<InlineData("standard")>]
+[<InlineData("merge")>]
+[<InlineData("prefix")>]
+let ``evaluation run phase never invokes setup`` variant =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async { calls.Add label; return Error "Setup must not run" })
+    let executorType, queryCatalog, setupCatalog =
+        match variant with
+        | "standard" -> GenStandard, QueryCatalogNames.sorterEvalStandard, SetupCatalogNames.standard
+        | "merge" -> GenMerge, QueryCatalogNames.sorterEvalMerge, SetupCatalogNames.merge
+        | _ -> GenPrefix, QueryCatalogNames.sorterEvalPrefix, SetupCatalogNames.prefix
+    let host = (runHost.Create (makeRun queryCatalog setupCatalog) 1).WithSetupContext(bindings)
+    use cts = new System.Threading.CancellationTokenSource()
+    // Missing query parameters stop evaluation before disk access, after the old setup call site.
+    let result = (SorterEvalExecutor.getExecutor executorType).Execute host parameters (UMX.tag false) cts None |> Async.RunSynchronously
+    Assert.Equal(Error "Failed to create QueryParams for SorterModelSet.", result)
+    Assert.Empty(calls)
+
+[<Fact>]
+let ``cancelled evaluation setup does not invoke makers`` () =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
+    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
+    use cts = new System.Threading.CancellationTokenSource()
+    cts.Cancel()
+    let result = SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously
+    Assert.True(Result.isError result)
+    Assert.Empty(calls)
+
+[<Theory>]
+[<InlineData("standard")>]
+[<InlineData("merge")>]
+[<InlineData("prefix")>]
+let ``mutant run phase does not execute setup`` variant =
+    let calls = ResizeArray<string>()
+    let bindings = context (fun label _ -> async { calls.Add label; return Error "Unexpected setup" })
+    let host = (makeHost ()).WithSetupContext(bindings)
+    let executor =
+        match variant with
+        | "standard" -> GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.standardExecutor
+        | "merge" -> GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.mergeExecutor
+        | _ -> GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.prefixExecutor
+    use cts = new System.Threading.CancellationTokenSource()
+    let result = executor.Execute host parameters (UMX.tag false) cts None |> Async.RunSynchronously
+    Assert.Equal(Error "Failed to create QueryParams for mutant SorterModelSet.", result)
+    Assert.Empty(calls)

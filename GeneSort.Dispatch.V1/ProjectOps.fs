@@ -103,3 +103,16 @@ module ProjectOps =
                 report progress msg
                 return! async { return Error msg }
         }
+
+    /// Completes the setup batch before starting any run work.
+    let executeSetupAndRuns minRepl maxRepl allowOverwrite cts progress host setupExecutor executor maxParallel =
+        asyncResult {
+            match setupExecutor with
+            | Some setup ->
+                let! results = executeRuns minRepl maxRepl allowOverwrite cts progress host setup maxParallel
+                let issues = (RunResult.analyze results).IssueLog
+                do! if Array.isEmpty issues then Ok ()
+                    else Error ("Setup failed or was cancelled. Run phase was not started.\n" + String.concat "\n" issues)
+            | None -> ()
+            return! executeRuns minRepl maxRepl allowOverwrite cts progress host executor maxParallel
+        }
