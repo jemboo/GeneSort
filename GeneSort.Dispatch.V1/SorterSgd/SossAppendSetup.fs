@@ -28,7 +28,7 @@ module SossAppendSetup =
             let! sourceRun = OutputData.asRun sourceData
             do! if sourceRun.ProjectName = sourceProject && sourceRun.DatabaseName = sourceDatabase && sourceRun.RunName = sourceRunName then Ok ()
                 else Error "Source run identity does not match the requested source."
-            do! if sourceRun.ExecuteFunctionName = Some ExecuteFunctionNames.soss && sourceRun.QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss then Ok ()
+            do! if sourceRun.ExecuteFunctionName = ExecuteFunctionNames.soss && sourceRun.QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss then Ok ()
                 else Error "Append setup currently requires a Soss_32 source run."
             let! intervalName = sourceRun.GenSaveIntervalsName |> Result.ofOption "Source run has no generation interval configuration."
             let! intervals =

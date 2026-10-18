@@ -15,7 +15,7 @@ module SortableTestsSpecsPrefix =
 
         let Prefix_Test  () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbNameTest
                     CommonSortableTests.projectName
                     (sprintf @"Prefix24-4b_%s" "GenPrefix" |> UMX.tag)
@@ -35,7 +35,7 @@ module SortableTestsSpecsPrefix =
 
         let Prefix_24s  () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbName
                     CommonSortableTests.projectName
                     (sprintf @"Prefix-24s_%s" "GenPrefix" |> UMX.tag)
@@ -53,7 +53,7 @@ module SortableTestsSpecsPrefix =
 
         let Prefix_32  () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Prefix.dbName
                     CommonSortableTests.projectName
                     (sprintf @"Prefix-32_%s" "GenPrefix" |> UMX.tag)

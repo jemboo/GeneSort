@@ -27,7 +27,7 @@ module SetupExecutorCatalog =
             builders <- Map.add name builder builders)
 
     let get (host: runHost) =
-        let name = host.Run.ExecuteFunctionName |> Option.defaultWith (fun () -> invalidOp "Setup requires an ExecuteFunctionName.")
+        let name = host.Run.ExecuteFunctionName
         let builder = lock syncRoot (fun () ->
             Map.tryFind name builders
             |> Option.defaultWith (fun () -> invalidOp (sprintf "No setup executor is registered for execute function '%s'." name)))

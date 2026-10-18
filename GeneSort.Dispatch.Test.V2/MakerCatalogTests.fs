@@ -46,7 +46,7 @@ let private makeRun names (projectName: string) (runName: string) =
     |> run.SgdRun
 
 let private makeSimpleRun executeName =
-    SimpleRun.createWithExecuteFunction executeName
+    SimpleRun.create executeName
         (UMX.tag "CatalogTests") (UMX.tag "Tests") (UMX.tag "SimpleExecution") "Execution test" []
         QueryCatalogNames.sorterEvalStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
         RunParamBuilderNames.Filter.identity RunParamBuilderNames.Enhancer.sorterEvalStandard false
@@ -58,7 +58,7 @@ let private makeSimpleRun executeName =
 let ``simple run execution names persist and resolve on host creation`` name =
     MessagePackSetup.configure ()
     let restored = makeSimpleRun name |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(Some name, restored.ExecuteFunctionName)
+    Assert.Equal(name, restored.ExecuteFunctionName)
     let host = runHost.Create restored 1
     Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
     Assert.True(host.ExecutionContext.MakeMutator.IsNone)
@@ -106,7 +106,8 @@ let ``evolution entry reports missing SGD context on simple runs`` () =
 [<InlineData("evolution.soss")>]
 let ``host resolves built-in evolution functions at creation`` name =
     let configured = (makeRun EvolutionMakerNames.standard "Tests" "Execute").WithExecuteFunctionName(name)
-    Assert.Equal(Some name, configured.ExecuteFunctionName)
+    Assert.Equal(name, configured.ExecuteFunctionName)
+    Assert.Equal(name, SimpleRun.executeFunctionName configured.BaseRun)
     match runHost.Create configured 1 with
     | SgdRunHost host -> Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
     | _ -> failwith "Expected SGD host"
@@ -151,7 +152,22 @@ let ``execute function name survives MessagePack round trip`` name =
     MessagePackSetup.configure ()
     let configured = (makeRun EvolutionMakerNames.standard "Tests" "Serialized").WithExecuteFunctionName(name)
     let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(Some name, restored.ExecuteFunctionName)
+    Assert.Equal(name, restored.ExecuteFunctionName)
+    Assert.Equal(name, SimpleRun.executeFunctionName restored.BaseRun)
+
+[<Theory>]
+[<InlineData(null)>]
+[<InlineData("")>]
+[<InlineData("  ")>]
+let ``simple runs require execution names at construction and deserialization`` missing =
+    Assert.Throws<ArgumentException>(fun () -> makeSimpleRun missing |> ignore) |> ignore
+    let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with ExecuteFunctionName = missing } |> ignore) |> ignore
+
+[<Fact>]
+let ``SGD construction initializes execution in the base run`` () =
+    let configured = makeRun EvolutionMakerNames.standard "Tests" "BaseExecution"
+    Assert.Equal(ExecuteFunctionNames.standard, SimpleRun.executeFunctionName configured.BaseRun)
 
 [<Fact>]
 let ``saved SGD runs must name their execute function explicitly`` () =

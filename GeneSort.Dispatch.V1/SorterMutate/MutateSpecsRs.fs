@@ -26,7 +26,7 @@ module MutateSpecsRs =
 
         let Test_Msrs ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
@@ -54,7 +54,7 @@ module MutateSpecsRs =
 
         let Test_Msuf4 ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)

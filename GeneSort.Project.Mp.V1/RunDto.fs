@@ -47,7 +47,7 @@ module RunDto =
             GenSaveSubIntervalsName = saveSubIntervalsName
             QueryCatalogName = project.QueryCatalogName
             SetupCatalogName = project.SetupCatalogName
-            ExecuteFunctionName = project.ExecuteFunctionName |> Option.toObj
+            ExecuteFunctionName = project.ExecuteFunctionName
             FilterCatalogName = project.FilterCatalogName
             EnhancerCatalogName = project.EnhancerCatalogName
             AllowOverwrite = project.AllowOverwrite
@@ -78,12 +78,15 @@ module RunDto =
         let enhancerCatalogName = dto.EnhancerCatalogName |> Option.ofObj |> Option.defaultValue "sortable-test"
         let allowOverwrite = dto.AllowOverwrite
         let setupCatalogName = dto.SetupCatalogName
+        if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
+            invalidArg "dto" "Run data must specify an explicit ExecuteFunctionName."
         if System.String.IsNullOrWhiteSpace setupCatalogName then
             invalidArg "dto" "Run data must specify an explicit SetupCatalogName."
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
         | None, None ->
             SimpleRun (
                 SimpleRun.create
+                    dto.ExecuteFunctionName
                     databaseName
                     projectName
                     runName
@@ -93,14 +96,8 @@ module RunDto =
                     setupCatalogName
                     filterCatalogName
                     enhancerCatalogName
-                    allowOverwrite
-                |> fun simple ->
-                    match Option.ofObj dto.ExecuteFunctionName with
-                    | Some name -> SimpleRun.withExecuteFunctionName name simple
-                    | None -> simple)
+                    allowOverwrite)
         | saveIntervals, saveSubIntervals ->
-            if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
-                invalidArg "dto" "An SGD run must specify an explicit ExecuteFunctionName."
             let requireMakerName field value =
                 if System.String.IsNullOrWhiteSpace value then
                     invalidArg "dto" (sprintf "An SGD run must specify an explicit %s." field)

@@ -33,7 +33,7 @@ type simpleRunHost = private {
     queryParamsFromRunParams: queryParamsBuilder
     maxParallel: int
     setup: setupFunction option
-    executeFunction: executeFunction option
+    executeFunction: executeFunction
 }
 
 type sgdRunHost = private {
@@ -51,7 +51,7 @@ type sgdRunHost = private {
     member this.MakeSortableTests = this.makeSortableTests
     member this.MakeSeedPoolSet = this.makeSeedPoolSet
     member this.MakeMutator = this.makeMutator
-    member this.ExecuteFunction = this.simpleHost.executeFunction.Value
+    member this.ExecuteFunction = this.simpleHost.executeFunction
 
 type runHost =
     | SimpleRunHost of simpleRunHost
@@ -71,7 +71,7 @@ type runHost =
                       run.DatabaseName
               maxParallel = maxParallel
               setup = None
-              executeFunction = run.ExecuteFunctionName |> Option.map ExecuteFunctionCatalog.get }
+              executeFunction = ExecuteFunctionCatalog.get run.ExecuteFunctionName }
 
         let lookupInterval name =
             match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
@@ -138,13 +138,9 @@ type runHost =
     }
 
     member this.ExecuteFunction : executeFunction =
-        let configured =
-            match this with
-            | SimpleRunHost host -> host.executeFunction
-            | SgdRunHost host -> host.simpleHost.executeFunction
-        match configured with
-        | Some execute -> execute
-        | None -> fun _ _ _ _ _ -> async { return Error "Run must specify an ExecuteFunctionName before execution." }
+        match this with
+        | SimpleRunHost host -> host.executeFunction
+        | SgdRunHost host -> host.simpleHost.executeFunction
 
     /// Bind storage and cancellation to the complete setup selected by the run.
     member this.WithSetupContext(context: setupContext) =

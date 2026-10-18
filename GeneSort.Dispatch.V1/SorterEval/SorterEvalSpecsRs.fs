@@ -19,7 +19,7 @@ module SorterEvalSpecsRs =
 
         let Rand_Test ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand-Test16_%s" "GenStandard" |> UMX.tag)
@@ -40,7 +40,7 @@ module SorterEvalSpecsRs =
 
         let Rand_Small () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand-Small_%s" "GenStandard" |> UMX.tag)
@@ -61,7 +61,7 @@ module SorterEvalSpecsRs =
 
         let Rand_Medium () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Standard.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand-Medium_%s" "GenStandard" |> UMX.tag)

@@ -19,11 +19,12 @@ type simpleRun =
           filterCatalogName: string
           enhancerCatalogName: string
           allowOverwrite: bool
-          executeFunctionName: string option
+          executeFunctionName: string
         }
 
 module SimpleRun =
     let create
+            (executeFunctionName: string)
             (databaseName: string<databaseName>)
             (projectName: string<projectName>)
             (runName: string<runName>)
@@ -34,6 +35,8 @@ module SimpleRun =
             (filterCatalogName: string)
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : simpleRun =
+        if String.IsNullOrWhiteSpace executeFunctionName then
+            invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace setupCatalogName then
             invalidArg (nameof setupCatalogName) "Setup catalog name cannot be empty."
         if String.IsNullOrWhiteSpace %databaseName then
@@ -49,7 +52,7 @@ module SimpleRun =
           filterCatalogName = filterCatalogName
           enhancerCatalogName = enhancerCatalogName
           allowOverwrite = allowOverwrite
-          executeFunctionName = None
+          executeFunctionName = executeFunctionName
         }
 
     let databaseName (run: simpleRun) = run.dataBaseName
@@ -70,13 +73,7 @@ module SimpleRun =
     let withExecuteFunctionName name (run: simpleRun) =
         if String.IsNullOrWhiteSpace name then
             invalidArg (nameof name) "Execute function name cannot be empty."
-        { run with executeFunctionName = Some name }
-
-    let createWithExecuteFunction name databaseName projectName runName description parameterSpans
-                                  queryCatalogName setupCatalogName filterCatalogName enhancerCatalogName allowOverwrite =
-        create databaseName projectName runName description parameterSpans queryCatalogName setupCatalogName
-            filterCatalogName enhancerCatalogName allowOverwrite
-        |> withExecuteFunctionName name
+        { run with executeFunctionName = name }
 
 type sgdRun =
     private
@@ -85,7 +82,6 @@ type sgdRun =
           genSaveIntervalsName: string
           genSaveSubIntervalsName: string
           makerNames: evolutionMakerNames
-          executeFunctionName: string
         }
 
 module SgdRun =
@@ -105,8 +101,6 @@ module SgdRun =
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : sgdRun =
         EvolutionMakerNames.validate makerNames
-        if String.IsNullOrWhiteSpace executeFunctionName then
-            invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace genSaveIntervalsName then
             invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
         if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
@@ -114,6 +108,7 @@ module SgdRun =
         {
           baseRun =
               SimpleRun.create
+                  executeFunctionName
                   databaseName
                   projectName
                   runName
@@ -127,16 +122,13 @@ module SgdRun =
           genSaveIntervalsName = genSaveIntervalsName
           genSaveSubIntervalsName = genSaveSubIntervalsName
           makerNames = makerNames
-          executeFunctionName = executeFunctionName
         }
 
     let baseRun (run: sgdRun) = run.baseRun
     let makerNames (run: sgdRun) = run.makerNames
-    let executeFunctionName (run: sgdRun) = run.executeFunctionName
+    let executeFunctionName (run: sgdRun) = SimpleRun.executeFunctionName run.baseRun
     let withExecuteFunctionName name (run: sgdRun) =
-        if String.IsNullOrWhiteSpace name then
-            invalidArg (nameof name) "Execute function name cannot be empty."
-        { run with executeFunctionName = name }
+        { run with baseRun = SimpleRun.withExecuteFunctionName name run.baseRun }
     let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
     let genSaveSubIntervalsName (run: sgdRun) = run.genSaveSubIntervalsName
     let withSetupCatalogName name (run: sgdRun) =
@@ -171,10 +163,7 @@ type run =
         match this with
         | SimpleRun _ -> None
         | SgdRun value -> Some (SgdRun.makerNames value)
-    member this.ExecuteFunctionName =
-        match this with
-        | SimpleRun value -> SimpleRun.executeFunctionName value
-        | SgdRun value -> Some (SgdRun.executeFunctionName value)
+    member this.ExecuteFunctionName = SimpleRun.executeFunctionName this.BaseRun
     member this.WithExecuteFunctionName(name) =
         match this with
         | SimpleRun value -> SimpleRun (SimpleRun.withExecuteFunctionName name value)

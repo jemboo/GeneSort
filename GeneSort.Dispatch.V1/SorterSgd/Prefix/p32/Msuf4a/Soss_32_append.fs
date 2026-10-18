@@ -11,7 +11,7 @@ let projName = "SorterSgd.Soss.32p4a.Msuf.Append" |> UMX.tag<projectName>
 /// Inherit source parameter combinations; append evolution through a later interval.
 /// Both interval arguments are zero-based save-interval indices, not generation numbers.
 let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
-    if source.ExecuteFunctionName <> Some ExecuteFunctionNames.soss || source.QueryCatalogName <> QueryCatalogNames.sorterSgdMsufSoss then
+    if source.ExecuteFunctionName <> ExecuteFunctionNames.soss || source.QueryCatalogName <> QueryCatalogNames.sorterSgdMsufSoss then
         invalidArg (nameof source) "Expected a Soss_32 source run."
     if sourceInterval < 0 || lastInterval <= sourceInterval then
         invalidArg (nameof lastInterval) "The final interval must follow the nonnegative source interval."

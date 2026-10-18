@@ -16,7 +16,7 @@ let private createHostWithSaveResult saveResult finished execute =
     QueryParamsCatalog.register name (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
     let configured =
-        SimpleRun.createWithExecuteFunction name (UMX.tag "Tests") (UMX.tag "Tests") (UMX.tag "Paths")
+        SimpleRun.create name (UMX.tag "Tests") (UMX.tag "Tests") (UMX.tag "Paths")
             "Path test" [] name SetupCatalogNames.standard "identity" "sortable-test" false
         |> run.SimpleRun
     let rp = (runParameters.create Map.empty).WithRunFinished(Some finished).WithRepl(Some (UMX.tag 0))
@@ -75,7 +75,7 @@ let ``setup phase never invokes execution`` setupFails =
                 return if setupFails then Error "Setup failed" else Ok rp
             } }
     use cts = new CancellationTokenSource()
-    SetupExecutorCatalog.register host.Run.ExecuteFunctionName.Value (fun _ -> setup)
+    SetupExecutorCatalog.register host.Run.ExecuteFunctionName (fun _ -> setup)
     let result = ProjectOps.executeSetupRuns (UMX.tag 0) (UMX.tag 1) (UMX.tag false) cts None host 1 |> Async.RunSynchronously
     if setupFails then
         match result with | Ok [|Failure _|] -> () | other -> failwithf "Expected setup failure, got %A" other

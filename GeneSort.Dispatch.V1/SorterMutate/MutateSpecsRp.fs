@@ -25,7 +25,7 @@ module MutateSpecsRp =
 
         let Test_Msce ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msce_%s" "GenPrefix" |> UMX.tag)
@@ -53,7 +53,7 @@ module MutateSpecsRp =
 
         let Test_Mssi ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Mssi_%s" "GenPrefix" |> UMX.tag)
@@ -81,7 +81,7 @@ module MutateSpecsRp =
 
         let Test_Msrs ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msrs_%s" "GenPrefix" |> UMX.tag)
@@ -108,7 +108,7 @@ module MutateSpecsRp =
 
         let Test_Msuf4 ()  : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msuf4_%s" "GenPrefix" |> UMX.tag)

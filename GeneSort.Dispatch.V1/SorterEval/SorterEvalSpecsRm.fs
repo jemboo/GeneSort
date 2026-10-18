@@ -18,7 +18,7 @@ module SorterEvalSpecsRm =
 
         let Rand_MergeTest_Test () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Merge.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand_MergeTest-Test_%s" "GenMerge" |> UMX.tag)
@@ -42,7 +42,7 @@ module SorterEvalSpecsRm =
 
         let Rand_MergeTest_Small () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Merge.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand_MergeTest-Small_%s" "GenMerge" |> UMX.tag)
@@ -67,7 +67,7 @@ module SorterEvalSpecsRm =
 
         let Rand_MergeTest_MediumLd () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Merge.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand_MergeTest-MediumLd_%s" "GenMerge" |> UMX.tag)
@@ -92,7 +92,7 @@ module SorterEvalSpecsRm =
 
         let Rand_MergeTest_MediumHd () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Merge.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand_MergeTest-MediumHd_%s" "GenMerge" |> UMX.tag)
@@ -117,7 +117,7 @@ module SorterEvalSpecsRm =
 
         let Rand_MergeTest_LargeLd () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
                     SorterEvalDbs.Merge.dbName
                     SorterEvalDbs.projectName
                     (sprintf @"Rand_MergeTest-LargeLd_%s" "GenMerge" |> UMX.tag)

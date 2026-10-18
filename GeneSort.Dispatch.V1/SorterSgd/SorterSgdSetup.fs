@@ -28,7 +28,7 @@ module SorterSgdSetup =
 
     let getSetupExecutor (host: runHost) =
         match host.Run.ExecuteFunctionName with
-        | Some ExecuteFunctionNames.soss when host.Run.SetupCatalogName = SetupCatalogNames.sossAppend ->
+        | ExecuteFunctionNames.soss when host.Run.SetupCatalogName = SetupCatalogNames.sossAppend ->
             { new IRunParamsExecutor with
                 member _.Execute host rp allowOverwrite cts progress = asyncResult {
                     let! project = rp.GetSourceProjectName() |> Result.ofOption "Missing SourceProjectName."
@@ -37,6 +37,6 @@ module SorterSgdSetup =
                     let source = new GeneSortDbMp(root, QueryCatalogNames.sorterSgdMsufSoss)
                     return! SossAppendSetup.prepare source host rp allowOverwrite cts progress
                 } }
-        | Some ExecuteFunctionNames.standard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard
-        | Some ExecuteFunctionNames.soss -> setupExecutor SgdEx_Soss.setupEvolutionRunSoss
+        | ExecuteFunctionNames.standard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard
+        | ExecuteFunctionNames.soss -> setupExecutor SgdEx_Soss.setupEvolutionRunSoss
         | name -> invalidArg (nameof host) (sprintf "No evolution setup is configured for execute function %A." name)

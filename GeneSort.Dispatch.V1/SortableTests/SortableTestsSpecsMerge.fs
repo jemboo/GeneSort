@@ -15,7 +15,7 @@ module SortableTestsSpecsMerge =
 
         let Merge_Test  () : run =
             run.SimpleRun (
-                SimpleRun.createWithExecuteFunction GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
+                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
                     SortableTestsDbs.Merge.dbName
                     CommonSortableTests.projectName
                     (sprintf @"Merge-Test_%s" "GenMerge" |> UMX.tag)
