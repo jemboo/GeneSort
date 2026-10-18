@@ -7,7 +7,7 @@ depth or changing persisted catalog keys.
 | Folder | Purpose | Entry points |
 | --- | --- | --- |
 | `Queries` | Build storage query metadata from run parameters | `QueryCatalogNames`, `QueryParamsCatalog`, `QueryParamsBuilders` |
-| `RunParameters` | Filter and enhance run parameters | `RunParamBuilderNames`, `RunParamFilterBuilders`, `RunParamEnhancerBuilders` |
+| `RunParameters` | Enhance run parameters | `RunParamBuilderNames`, `RunParamEnhancerBuilders` |
 | `Evolution` | Build tests, seed pools, and mutators | `SortableTestsMakerCatalog`, `SeedSorterPoolSetMakerCatalog`, `MutatorMakerCatalog` |
 
 Call `ProjectCatalogs.registerAll()` at startup to register all built-ins. This is
@@ -16,6 +16,10 @@ Register additional implementations under distinct names, then resolve them with
 the relevant catalog's `get` function. Query and evolution catalogs reject
 duplicate registrations; run-parameter catalogs retain their existing replacement
 behavior.
+
+Run parameter combinations pass directly to the selected enhancer. Specify the
+desired combinations in the run's parameter spans; refinement retains every
+combination.
 
 ## Evolution makers
 

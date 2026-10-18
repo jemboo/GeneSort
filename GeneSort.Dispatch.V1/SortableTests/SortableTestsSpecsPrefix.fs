@@ -26,7 +26,6 @@ module SortableTestsSpecsPrefix =
                     ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
             )
@@ -46,7 +45,6 @@ module SortableTestsSpecsPrefix =
                     ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
             )
@@ -64,7 +62,6 @@ module SortableTestsSpecsPrefix =
                     ]
                     QueryCatalogNames.sortableTestPrefix
                     SetupCatalogNames.prefix
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
             )

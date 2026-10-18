@@ -29,10 +29,7 @@ type runParamEnhancerContext =
     member this.QueryParamsFromRunParams with get() = this.queryParamsFromRunParams
     member this.Run with get() = this.run
 
-    member this.WithQueryParamsFromRunParams(value) = { this with queryParamsFromRunParams = value }
-    member this.WithRun(value) = { this with run = value }
 
-type runParamFilterBuilder = runParameters -> runParameters option
 type runParamEnhancerBuilder = runParamEnhancerContext -> runParameters -> runParameters
 
 module private RunParamCatalog =
@@ -48,61 +45,6 @@ module private RunParamCatalog =
             match Map.tryFind name catalog.Value with
             | Some value -> value
             | None -> invalidOp (sprintf "No %s named '%s' is registered." catalogName name))
-
-module RunParamFilterBuilders =
-    let private syncRoot = obj ()
-    let private filters: Map<string, runParamFilterBuilder> ref = ref Map.empty
-
-    let register name filter = RunParamCatalog.register "run parameter filter" name filter filters syncRoot
-    let get name = RunParamCatalog.get "run parameter filter" name filters syncRoot
-
-    let identity (rp: runParameters) = Some rp
-
-    let seedModificationRateDiffers (rp: runParameters) =
-        match rp.GetSeedModificationRate(), rp.GetModificationRate() with
-        | Some seedRate, Some modificationRate when %seedRate <> %modificationRate -> Some rp
-        | _ -> None
-
-    let private modelTypeAndWidthFilter (rp: runParameters) (getWidth: runParameters -> int<sortingWidth> option) (checkWidth: int<sortingWidth> -> bool) =
-        match rp.GetSimpleSorterModelType(), getWidth rp with
-        | Some modelType, Some width ->
-            let isPowerOfTwo = MathUtils.isAPowerOfTwo %width
-            let isDivisibleByTwo = (%width % 2 = 0)
-            let isValid =
-                match modelType with
-                | simpleSorterModelType.Msce -> true
-                | simpleSorterModelType.Mssi | simpleSorterModelType.Msrs -> isDivisibleByTwo
-                | simpleSorterModelType.Msuf4 -> isPowerOfTwo
-                | simpleSorterModelType.Msuf6 -> (%width % 3 = 0) && MathUtils.isAPowerOfTwo (%width / 3)
-            if isValid && checkWidth width then Some rp else None
-        | _ -> None
-
-    let mergeSorterModelCompatibility (rp: runParameters) =
-        match rp.GetMergeLibId() with
-        | Some libId ->
-            modelTypeAndWidthFilter rp (fun _ -> Some libId.SortingWidth)
-                (fun width -> %width % %libId.MergeDimension = 0)
-        | None -> None
-
-    let prefixSorterModelCompatibility (rp: runParameters) =
-        modelTypeAndWidthFilter rp (fun value -> value.GetPrefixLibId() |> Option.map (fun libId -> libId.SortingWidth)) (fun _ -> true)
-
-    let standardSorterModelCompatibility (rp: runParameters) =
-        match rp.GetSimpleSorterModelType(), rp.GetSortingWidth() with
-        | Some modelType, Some width ->
-            let isPowerOfTwo = (%width &&& (%width - 1) = 0)
-            let isValid =
-                (%width > 4)
-                && (modelType = simpleSorterModelType.Msce
-                    || ((modelType = simpleSorterModelType.Mssi || modelType = simpleSorterModelType.Msrs) && %width % 2 = 0)
-                    || (modelType = simpleSorterModelType.Msuf4 && isPowerOfTwo))
-            if isValid then Some rp else None
-        | _ -> None
-
-    let mergeDimensionDividesSortingWidth (rp: runParameters) =
-        match rp.GetMergeLibId() with
-        | Some mergeLibId when %mergeLibId.SortingWidth % %mergeLibId.MergeDimension = 0 -> Some rp
-        | _ -> None
 
 module RunParamEnhancerBuilders =
     let private syncRoot = obj ()
@@ -309,20 +251,6 @@ module RunParamEnhancerBuilders =
                 None
 
 module RunParamBuilderNames =
-    module Filter =
-        [<Literal>]
-        let identity = "identity"
-        [<Literal>]
-        let seedModificationRateDiffers = "seed-modification-rate-differs"
-        [<Literal>]
-        let mergeSorterModelCompatibility = "merge-sorter-model-compatibility"
-        [<Literal>]
-        let prefixSorterModelCompatibility = "prefix-sorter-model-compatibility"
-        [<Literal>]
-        let standardSorterModelCompatibility = "standard-sorter-model-compatibility"
-        [<Literal>]
-        let mergeDimensionDividesSortingWidth = "merge-dimension-divides-sorting-width"
-
     module Enhancer =
         [<Literal>]
         let sortableTests = "sortable-test"
@@ -360,12 +288,6 @@ module RunParamBuilders =
     let registerAll () =
         lock registrationLock (fun () ->
             if not registered then
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.identity RunParamFilterBuilders.identity |> ignore
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.seedModificationRateDiffers RunParamFilterBuilders.seedModificationRateDiffers |> ignore
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.mergeSorterModelCompatibility RunParamFilterBuilders.mergeSorterModelCompatibility |> ignore
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.prefixSorterModelCompatibility RunParamFilterBuilders.prefixSorterModelCompatibility |> ignore
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.standardSorterModelCompatibility RunParamFilterBuilders.standardSorterModelCompatibility |> ignore
-                RunParamFilterBuilders.register RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth RunParamFilterBuilders.mergeDimensionDividesSortingWidth |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sortableTests RunParamEnhancerBuilders.sortableTests |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterEvalStandard RunParamEnhancerBuilders.sorterEvalStandard |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterEvalMerge RunParamEnhancerBuilders.sorterEvalMerge |> ignore

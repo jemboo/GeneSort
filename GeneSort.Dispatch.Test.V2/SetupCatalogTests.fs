@@ -22,7 +22,7 @@ let private makeRun queryCatalog setupCatalog =
             GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
         else GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
     SimpleRun.create executeName (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
-        queryCatalog setupCatalog "identity" "sortable-test" false |> run.SimpleRun
+        queryCatalog setupCatalog "sortable-test" false |> run.SimpleRun
 
 let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 

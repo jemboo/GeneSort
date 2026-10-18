@@ -57,7 +57,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -86,7 +85,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -116,7 +114,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -148,7 +145,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -176,7 +172,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -205,7 +200,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
             )
@@ -238,7 +232,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
             )
@@ -270,7 +263,6 @@ module MutationRate =
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.identity
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
             )

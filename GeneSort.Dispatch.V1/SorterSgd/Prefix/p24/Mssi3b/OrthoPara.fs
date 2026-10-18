@@ -44,7 +44,6 @@ module Specs64 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMssiOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
         )
@@ -71,7 +70,6 @@ module Specs64 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMssiOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
         )
@@ -98,7 +96,6 @@ module Specs64 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMssiOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
         )
@@ -127,7 +124,6 @@ module Specs128 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMssiOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 false
         )

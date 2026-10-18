@@ -16,8 +16,12 @@ open GeneSort.Eval.V1.Sgd.Standard
 module CommonParams =
 
     // SimpleSorterModelTypes
-    let allSimpleSorterModelTypes = 
-            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.all() 
+    let withMsuf4 = 
+            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf4() 
+            |> List.map SimpleSorterModelType.toString)
+
+    let withMsuf6 = 
+            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf6() 
             |> List.map SimpleSorterModelType.toString)
 
     let msceModelType = 

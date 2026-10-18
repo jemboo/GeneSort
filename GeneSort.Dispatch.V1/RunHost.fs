@@ -164,8 +164,7 @@ type runHost =
         | SgdRunHost host -> host.simpleHost.maxParallel
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
-        let filter = RunParamFilterBuilders.get this.Run.FilterCatalogName
         let enhancer = RunParamEnhancerBuilders.get this.Run.EnhancerCatalogName
         let context = runParamEnhancerContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
-        |> Seq.choose (filter >> Option.map (enhancer context))
+        |> Seq.map (enhancer context)

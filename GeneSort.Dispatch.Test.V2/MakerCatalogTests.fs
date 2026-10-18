@@ -41,7 +41,7 @@ let private errorOf result =
 let private makeRun names (projectName: string) (runName: string) =
     SgdRun.create names ExecuteFunctionNames.standard (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
         "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
-        QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard RunParamBuilderNames.Filter.identity
+        QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
         RunParamBuilderNames.Enhancer.msuf32MutationRate false
     |> run.SgdRun
 
@@ -49,8 +49,25 @@ let private makeSimpleRun executeName =
     SimpleRun.create executeName
         (UMX.tag "CatalogTests") (UMX.tag "Tests") (UMX.tag "SimpleExecution") "Execution test" []
         QueryCatalogNames.sorterEvalStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
-        RunParamBuilderNames.Filter.identity RunParamBuilderNames.Enhancer.sorterEvalStandard false
+        RunParamBuilderNames.Enhancer.sorterEvalStandard false
     |> run.SimpleRun
+
+[<Fact>]
+let ``parameter refinement enhances every parameter combination`` () =
+    let enhancerName = "tests.enhance-every-combination"
+    RunParamEnhancerBuilders.register enhancerName (fun _ rp -> rp.WithRunFinished(Some false)) |> ignore
+    let dto = makeSimpleRun ExecuteFunctionNames.standard |> RunDto.fromDomain
+    let configuredRun = { dto with EnhancerCatalogName = enhancerName } |> RunDto.toDomain
+    let host = runHost.Create configuredRun 1
+    let inputs =
+        [| for width in [ 3; 4; 5; 8 ] ->
+            emptyParameters.WithSortingWidth(Some (UMX.tag<sortingWidth> width))
+                .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4) |]
+    let results = host.ParamMapRefiner inputs |> Seq.toArray
+    Assert.Equal(inputs.Length, results.Length)
+    Array.iter2 (fun (input: runParameters) (result: runParameters) ->
+        Assert.Equal(input.GetSortingWidth(), result.GetSortingWidth())
+        Assert.Equal(Some false, result.GetRunFinished())) inputs results
 
 [<Theory>]
 [<InlineData("sorter-eval.evaluate")>]
@@ -306,7 +323,6 @@ let ``project catalogs initialize together without dispatch dependencies`` () =
     ProjectCatalogs.registerAll ()
     ProjectCatalogs.registerAll ()
     QueryParamsCatalog.get QueryCatalogNames.sortableTestMerge |> ignore
-    RunParamFilterBuilders.get RunParamBuilderNames.Filter.identity |> ignore
     MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel |> ignore
     let assembly = typeof<evolutionSetupSources>.Assembly
     Assert.Equal("GeneSort.Project.V1", assembly.GetName().Name)

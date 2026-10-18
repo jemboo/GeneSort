@@ -30,7 +30,7 @@ let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
         (sprintf "Continue %s/%s from interval %d" %source.ProjectName %source.DatabaseName sourceInterval)
         spans source.GenSaveIntervalsName.Value source.GenSaveSubIntervalsName.Value
         QueryCatalogNames.sorterSgdMsufSossAppend SetupCatalogNames.sossAppend
-        source.FilterCatalogName source.EnhancerCatalogName false
+        source.EnhancerCatalogName false
     |> run.SgdRun
 
 let Pool_4_Debug () = fromSource (Soss_32.Pool_4_Debug ()) 1 2

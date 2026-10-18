@@ -45,7 +45,6 @@ module MutateSpecsRp =
             ]
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
             )
@@ -73,7 +72,6 @@ module MutateSpecsRp =
             ]
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
             )
@@ -101,7 +99,6 @@ module MutateSpecsRp =
             ]
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
             )
@@ -128,7 +125,6 @@ module MutateSpecsRp =
             ]
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
             )

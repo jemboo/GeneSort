@@ -46,7 +46,6 @@ module Specs =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
         )
@@ -70,7 +69,6 @@ module Specs =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
         )
@@ -94,7 +92,6 @@ module Specs =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsPoolModComp
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 false
         )

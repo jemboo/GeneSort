@@ -46,7 +46,6 @@ module Specs =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 false
         )
@@ -72,7 +71,6 @@ module Specs =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdMsrsOrthoPara
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 false
         )

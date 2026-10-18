@@ -28,12 +28,11 @@ module SorterEvalSpecsRs =
                         rngTypeLcg
                         sorterEvalTypeV2
                         sortingWidth16
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         largeSorterCount
                     ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false
             )
@@ -49,12 +48,11 @@ module SorterEvalSpecsRs =
                         rngTypeLcg
                         sorterEvalTypeV2
                         smallSortingWidths
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         extraLargeSorterCount
                     ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false
             )
@@ -70,12 +68,11 @@ module SorterEvalSpecsRs =
                         rngTypeLcg
                         sorterEvalTypeV2
                         mediumSortingWidths
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         extraLargeSorterCount
                     ]
                     QueryCatalogNames.sorterEvalStandard
                     SetupCatalogNames.standard
-                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalStandard
                     false
             )

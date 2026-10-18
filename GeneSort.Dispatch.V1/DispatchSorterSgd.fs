@@ -48,7 +48,7 @@ module DispatchSorterSgd =
     printfn $"**** GeneSort Engine Active: {startTime.ToString()} ****"
 
 
-    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32_append.Pool_4_Debug ()) 8
+    let private host: runHost = runHost.Create (Prefix.p32.Msuf4a.Soss_32.Pool_4_Debug ()) 8
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

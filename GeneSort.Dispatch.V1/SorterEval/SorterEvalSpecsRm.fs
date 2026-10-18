@@ -27,14 +27,13 @@ module SorterEvalSpecsRm =
                         rngTypeLcg
                         mergeLib_Merge32s
                         dataFormatInt8v512
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         noSuffixSuffixType
                         sorterEvalTypeV2
                         smallSorterCount
                     ]
                     QueryCatalogNames.sorterEvalMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
             )
@@ -50,7 +49,7 @@ module SorterEvalSpecsRm =
                     [
                         rngTypeLcg
                         dataFormatInt8v512
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         noSuffixSuffixType
                         sorterEvalTypeV2
                         smallMergeSortingWidths
@@ -59,7 +58,6 @@ module SorterEvalSpecsRm =
                     ]
                     QueryCatalogNames.sorterEvalMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
             )
@@ -75,7 +73,7 @@ module SorterEvalSpecsRm =
                     [
                         rngTypeLcg
                         dataFormatInt8v512
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         noSuffixSuffixType
                         sorterEvalTypeV2
                         mediumMergeSortingWidths
@@ -84,7 +82,6 @@ module SorterEvalSpecsRm =
                     ]
                     QueryCatalogNames.sorterEvalMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
             )
@@ -101,7 +98,7 @@ module SorterEvalSpecsRm =
                         rngTypeLcg
                         dataFormatInt8v512
                         noSuffixSuffixType
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         sorterEvalTypeV2
                         sortingWidth96
                         mergeDimension6
@@ -109,7 +106,6 @@ module SorterEvalSpecsRm =
                     ]
                     QueryCatalogNames.sorterEvalMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
             )
@@ -126,7 +122,7 @@ module SorterEvalSpecsRm =
                         rngTypeLcg
                         dataFormatInt8v512
                         noSuffixSuffixType
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         sorterEvalTypeV2
                         largeMergeSortingWidths
                         mergeDimension2
@@ -134,7 +130,6 @@ module SorterEvalSpecsRm =
                     ]
                     QueryCatalogNames.sorterEvalMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalMerge
                     false
             )

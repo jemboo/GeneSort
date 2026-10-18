@@ -28,10 +28,11 @@ module SimpleSorterModelType =
         | "Msuf6" -> Msuf6
         | _ -> failwithf "Unknown SorterModelType: %s" s
 
-    let all () : simpleSorterModelType list =
-        [ Msce; Mssi; Msrs; Msuf4; Msuf6 ]
+    let withMsuf4 () : simpleSorterModelType list =
+        [ Msce; Mssi; Msrs; Msuf4 ]
 
-
+    let withMsuf6 () : simpleSorterModelType list =
+        [ Msce; Mssi; Msrs; Msuf6 ]
 
 
 type sorterModelType = 

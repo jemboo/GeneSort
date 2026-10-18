@@ -26,7 +26,6 @@ module SortableTestsSpecsMerge =
                     ]
                     QueryCatalogNames.sortableTestMerge
                     SetupCatalogNames.merge
-                    RunParamBuilderNames.Filter.mergeDimensionDividesSortingWidth
                     RunParamBuilderNames.Enhancer.sortableTests
                     false
             )

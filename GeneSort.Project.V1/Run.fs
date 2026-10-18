@@ -16,7 +16,6 @@ type simpleRun =
           parameterSpans: (string * string list) list
           queryCatalogName: string
           setupCatalogName: string
-          filterCatalogName: string
           enhancerCatalogName: string
           allowOverwrite: bool
           executeFunctionName: string
@@ -32,7 +31,6 @@ module SimpleRun =
             (parameterSpans: (string * string list) list)
             (queryCatalogName: string)
             (setupCatalogName: string)
-            (filterCatalogName: string)
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : simpleRun =
         if String.IsNullOrWhiteSpace executeFunctionName then
@@ -49,7 +47,6 @@ module SimpleRun =
           parameterSpans = parameterSpans
           queryCatalogName = queryCatalogName
           setupCatalogName = setupCatalogName
-          filterCatalogName = filterCatalogName
           enhancerCatalogName = enhancerCatalogName
           allowOverwrite = allowOverwrite
           executeFunctionName = executeFunctionName
@@ -66,7 +63,6 @@ module SimpleRun =
         if String.IsNullOrWhiteSpace name then
             invalidArg (nameof name) "Setup catalog name cannot be empty."
         { run with setupCatalogName = name }
-    let filterCatalogName (run: simpleRun) = run.filterCatalogName
     let enhancerCatalogName (run: simpleRun) = run.enhancerCatalogName
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
     let executeFunctionName (run: simpleRun) = run.executeFunctionName
@@ -97,7 +93,6 @@ module SgdRun =
             (genSaveSubIntervalsName: string)
             (queryCatalogName: string)
             (setupCatalogName: string)
-            (filterCatalogName: string)
             (enhancerCatalogName: string)
             (allowOverwrite: bool) : sgdRun =
         EvolutionMakerNames.validate makerNames
@@ -116,7 +111,6 @@ module SgdRun =
                   parameterSpans
                   queryCatalogName
                   setupCatalogName
-                  filterCatalogName
                   enhancerCatalogName
                   allowOverwrite
           genSaveIntervalsName = genSaveIntervalsName
@@ -152,7 +146,6 @@ type run =
         match this with
         | SimpleRun value -> SimpleRun (SimpleRun.withSetupCatalogName name value)
         | SgdRun value -> SgdRun (SgdRun.withSetupCatalogName name value)
-    member this.FilterCatalogName = SimpleRun.filterCatalogName this.BaseRun
     member this.EnhancerCatalogName = SimpleRun.enhancerCatalogName this.BaseRun
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
     member this.GenSaveIntervalsName =

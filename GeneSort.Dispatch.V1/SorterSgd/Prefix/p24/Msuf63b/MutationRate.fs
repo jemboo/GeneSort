@@ -60,7 +60,6 @@ module VarModR_32 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdUf6MutationRate
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 false
         )
@@ -90,7 +89,6 @@ module VarModR_32 =
                 "summaryInterval_C.1p5C"
                 QueryCatalogNames.sorterSgdUf6MutationRate
                 SetupCatalogNames.standard
-                RunParamBuilderNames.Filter.identity
                 RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 false
         )

@@ -26,14 +26,13 @@ module SorterEvalSpecsTestPrefix =
                     [   
                         rngTypeLcg
                         prefixLib_Prefix24s
-                        allSimpleSorterModelTypes
+                        withMsuf6
                         dataFomatBitv512
                         sorterEvalTypeV2
                         largeSorterCount
                     ]
                     QueryCatalogNames.sorterEvalPrefix
                     SetupCatalogNames.prefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
             )
@@ -49,14 +48,13 @@ module SorterEvalSpecsTestPrefix =
                     [   
                         rngTypeLcg
                         prefixLib_Prefix32_4
-                        allSimpleSorterModelTypes
+                        withMsuf4
                         dataFomatBitv512
                         sorterEvalTypeV2
                         largeSorterCount
                     ]
                     QueryCatalogNames.sorterEvalPrefix
                     SetupCatalogNames.prefix
-                    RunParamBuilderNames.Filter.prefixSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
             )

@@ -23,7 +23,6 @@ type runDto =
         GenSaveIntervalsName: string
         GenSaveSubIntervalsName: string
         QueryCatalogName: string
-        FilterCatalogName: string
         EnhancerCatalogName: string
         AllowOverwrite: bool
         SortableTestsMakerName: string
@@ -48,7 +47,6 @@ module RunDto =
             QueryCatalogName = project.QueryCatalogName
             SetupCatalogName = project.SetupCatalogName
             ExecuteFunctionName = project.ExecuteFunctionName
-            FilterCatalogName = project.FilterCatalogName
             EnhancerCatalogName = project.EnhancerCatalogName
             AllowOverwrite = project.AllowOverwrite
             SortableTestsMakerName = project.MakerNames |> Option.map (fun names -> names.SortableTests) |> Option.toObj
@@ -74,7 +72,6 @@ module RunDto =
             dto.QueryCatalogName
             |> Option.ofObj
             |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName)
-        let filterCatalogName = dto.FilterCatalogName |> Option.ofObj |> Option.defaultValue "identity"
         let enhancerCatalogName = dto.EnhancerCatalogName |> Option.ofObj |> Option.defaultValue "sortable-test"
         let allowOverwrite = dto.AllowOverwrite
         let setupCatalogName = dto.SetupCatalogName
@@ -94,7 +91,6 @@ module RunDto =
                     parameterSpans
                     queryCatalogName
                     setupCatalogName
-                    filterCatalogName
                     enhancerCatalogName
                     allowOverwrite)
         | saveIntervals, saveSubIntervals ->
@@ -120,7 +116,6 @@ module RunDto =
                     (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
                     queryCatalogName
                     setupCatalogName
-                    filterCatalogName
                     enhancerCatalogName
                     allowOverwrite
             )

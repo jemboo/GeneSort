@@ -55,7 +55,6 @@ let Pool_4_Debug ()  : run =
             "uniformInterval2"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
@@ -91,7 +90,6 @@ let Pool_32_Gens15 ()  : run =
             "uniformInterval5"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
@@ -127,7 +125,6 @@ let Pool_32_Test_null ()  : run =
             "uniformInterval5"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
@@ -165,7 +162,6 @@ let Pool_128_Test ()  : run =
             "uniformInterval10"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
@@ -203,7 +199,6 @@ let Pool_32_V1 ()  : run =
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )
@@ -237,7 +232,6 @@ let Pool_512_V2a ()  : run =
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufSoss
             SetupCatalogNames.standard
-            RunParamBuilderNames.Filter.identity
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
     )

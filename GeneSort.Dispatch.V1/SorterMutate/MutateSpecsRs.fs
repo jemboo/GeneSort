@@ -46,7 +46,6 @@ module MutateSpecsRs =
             ]
                     QueryCatalogNames.sorterMutateStandard
                     SetupCatalogNames.mutantStandard
-                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false
             )
@@ -74,7 +73,6 @@ module MutateSpecsRs =
             ]
                     QueryCatalogNames.sorterMutateStandard
                     SetupCatalogNames.mutantStandard
-                    RunParamBuilderNames.Filter.standardSorterModelCompatibility
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false
             )
