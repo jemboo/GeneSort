@@ -14,6 +14,7 @@
     <Compile Include="SgdCheckpointTests.fs" />
     <Compile Include="WorkflowPhaseTests.fs" />
     <Compile Include="ExecutionPathTests.fs" />
+    <Compile Include="ParameterSetTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,7 +10,9 @@
     <Compile Include="GeneSortDataType.fs" />
     <Compile Include="ParamBundles\MutatorParams.fs" />
     <Compile Include="ParamBundles\SorterTestsCycleProfile.fs" />
+    <Compile Include="Parameters\ParameterSet.fs" />
     <Compile Include="Parameters\RunParameters.fs" />
+    <Compile Include="Parameters\SetupParameters.fs" />
     <Compile Include="Parameters\QueryParams.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsCatalog.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsBuilders.fs" />
