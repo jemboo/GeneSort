@@ -54,22 +54,30 @@ module VarModR_32 =
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbVariableModR_32Name
-                projName
-                (sprintf @"Test%s" "GenStandard" |> UMX.tag)
-                "Mutation rate test for Msuf6 24p3b"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdUf6MutationRate
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdUf6MutationRate
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbVariableModR_32Name
+                ProjectName = projName
+                RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                Description = "Mutation rate test for Msuf6 24p3b"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdUf6MutationRate
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdUf6MutationRate
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )
 
     let WideTest () : run =
@@ -89,20 +97,28 @@ module VarModR_32 =
                 (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbVariableModR_32Name
-                projName
-                (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
-                "Wide mutation rate test for Msuf6 24p3b"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdUf6MutationRate
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdUf6MutationRate
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbVariableModR_32Name
+                ProjectName = projName
+                RunName = (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
+                Description = "Wide mutation rate test for Msuf6 24p3b"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdUf6MutationRate
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdUf6MutationRate
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )

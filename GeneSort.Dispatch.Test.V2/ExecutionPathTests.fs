@@ -18,12 +18,26 @@ let private createHostWithSaveResult saveResult finished execute =
     QueryParamsCatalog.register name (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
     let configured =
-        SimpleRun.create name (UMX.tag "Tests") (UMX.tag "Tests") (UMX.tag "Paths")
-            "Path test" [] name SetupCatalogNames.standard "sortable-test" false
-            []
-            name
-            SetupEnhancerFunctionNames.noOp
-            []
+        SimpleRun.create {
+            DatabaseName = (UMX.tag "Tests")
+            ProjectName = (UMX.tag "Tests")
+            RunName = (UMX.tag "Paths")
+            Description = "Path test"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = name
+                ParameterSpans = []
+                QueryCatalogName = name
+                EnhancerFunctionName = "sortable-test"
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = []
+                QueryCatalogName = name
+                EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+                OutputTypes = []
+            }
+        }
         |> run.SimpleRun
     let rp = (runParameters.create Map.empty).WithRunFinished(Some finished).WithRepl(Some (UMX.tag 0))
     let writes = ResizeArray<geneSortDataMode>()

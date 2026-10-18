@@ -41,27 +41,55 @@ let private errorOf result =
     | Ok _ -> failwith "Expected missing run parameters to fail."
 
 let private makeRunWithExecuteName executeName names (projectName: string) (runName: string) =
-    SgdRun.create names executeName (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
-        "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
-        QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
-        RunParamBuilderNames.Enhancer.msuf32MutationRate false
-        []
-        QueryCatalogNames.sorterSgdMsufStandard
-        SetupEnhancerFunctionNames.noOp
-        []
+    SgdRun.create {
+        DatabaseName = (UMX.tag "CatalogTests")
+        ProjectName = (UMX.tag projectName)
+        RunName = (UMX.tag runName)
+        Description = "Catalog configuration test"
+        AllowOverwrite = false
+        Execution = {
+            FunctionName = executeName
+            ParameterSpans = []
+            QueryCatalogName = QueryCatalogNames.sorterSgdMsufStandard
+            EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+        }
+        Setup = {
+            FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
+            ParameterSpans = []
+            QueryCatalogName = QueryCatalogNames.sorterSgdMsufStandard
+            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            OutputTypes = []
+        }
+    } {
+        MakerNames = names
+        GenSaveIntervalsName = "expInterval100_L50ss"
+        GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+    }
     |> run.SgdRun
 
 let private makeRun = makeRunWithExecuteName ExecuteFunctionNames.standard
 
 let private makeSimpleRun executeName =
-    SimpleRun.create executeName
-        (UMX.tag "CatalogTests") (UMX.tag "Tests") (UMX.tag "SimpleExecution") "Execution test" []
-        QueryCatalogNames.sorterEvalStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
-        RunParamBuilderNames.Enhancer.sorterEvalStandard false
-        []
-        QueryCatalogNames.sorterEvalStandard
-        SetupEnhancerFunctionNames.noOp
-        []
+    SimpleRun.create {
+        DatabaseName = (UMX.tag "CatalogTests")
+        ProjectName = (UMX.tag "Tests")
+        RunName = (UMX.tag "SimpleExecution")
+        Description = "Execution test"
+        AllowOverwrite = false
+        Execution = {
+            FunctionName = executeName
+            ParameterSpans = []
+            QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+        }
+        Setup = {
+            FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
+            ParameterSpans = []
+            QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            OutputTypes = []
+        }
+    }
     |> run.SimpleRun
 
 [<Fact>]

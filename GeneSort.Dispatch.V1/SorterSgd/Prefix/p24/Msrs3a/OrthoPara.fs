@@ -40,22 +40,30 @@ module Specs =
                 (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara32Name
-                projName
-                (sprintf @"PickMode2_2_%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMsrsOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMsrsOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara32Name
+                ProjectName = projName
+                RunName = (sprintf @"PickMode2_2_%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )
 
     let NoMods ()  : run =
@@ -71,20 +79,28 @@ module Specs =
                 (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara32Name
-                projName
-                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3a Msrs, NoMods"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMsrsOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMsrsOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara32Name
+                ProjectName = projName
+                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3a Msrs, NoMods"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )

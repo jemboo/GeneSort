@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
@@ -42,20 +43,26 @@ module MutateSpecsRs =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomStandard.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
-                    "Mutation analysis for Msrs"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateStandard
-                    SetupCatalogNames.mutantStandard
-                    RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateStandard
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
+                    Description = "Mutation analysis for Msrs"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateStandard
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantStandard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateStandard
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
 
@@ -75,20 +82,26 @@ module MutateSpecsRs =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomStandard.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)
-                    "Mutation analysis for Msuf4"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateStandard
-                    SetupCatalogNames.mutantStandard
-                    RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateStandard
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)
+                    Description = "Mutation analysis for Msuf4"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateStandard
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantStandard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateStandard
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
 

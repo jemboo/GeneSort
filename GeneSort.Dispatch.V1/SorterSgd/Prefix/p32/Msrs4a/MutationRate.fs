@@ -51,22 +51,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_32Name
-                    projName
-                    (sprintf @"Test%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_32Name
+                    ProjectName = projName
+                    RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
 
@@ -85,22 +93,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_32Name
-                    projName
-                    (sprintf @"EqualOPS%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_32Name
+                    ProjectName = projName
+                    RunName = (sprintf @"EqualOPS%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
         
@@ -120,22 +136,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_32Name
-                    projName
-                    (sprintf @"EqualOPS2%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_32Name
+                    ProjectName = projName
+                    RunName = (sprintf @"EqualOPS2%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
         
@@ -157,22 +181,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_64Name
-                    projName
-                    (sprintf @"Test%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_64Name
+                    ProjectName = projName
+                    RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
 
@@ -190,22 +222,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_64Name
-                    projName
-                    (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_64Name
+                    ProjectName = projName
+                    RunName = (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
         
@@ -224,22 +264,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbVariableModR_64Name
-                    projName
-                    (sprintf @"NarrowTest%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRate
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbVariableModR_64Name
+                    ProjectName = projName
+                    RunName = (sprintf @"NarrowTest%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
 
@@ -262,22 +310,30 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbMaxModRate_32Name
-                    projName
-                    (sprintf @"Test2%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRateMax
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbMaxModRate_32Name
+                    ProjectName = projName
+                    RunName = (sprintf @"Test2%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )
 
 
@@ -299,20 +355,28 @@ module MutationRate =
                     (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
             run.SgdRun (
-                SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                    dbMaxModRate_64Name
-                    projName
-                    (sprintf @"WideTest2%s" "GenStandard" |> UMX.tag)
-                    "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    parameterSpans
-                    "expInterval100_L50ss"
-                    "summaryInterval_C.1p5C"
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.msrs32MutationRateMax
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate
-                    SetupEnhancerFunctionNames.sorterSgd
-                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SgdRun.create {
+                    DatabaseName = dbMaxModRate_64Name
+                    ProjectName = projName
+                    RunName = (sprintf @"WideTest2%s" "GenStandard" |> UMX.tag)
+                    Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterSgdMsrs32MutationRate
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                } {
+                    MakerNames = EvolutionMakerNames.prefix
+                    GenSaveIntervalsName = "expInterval100_L50ss"
+                    GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                }
             )

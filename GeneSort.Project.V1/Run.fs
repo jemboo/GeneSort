@@ -36,6 +36,41 @@ module private ParameterGeneration =
         refinedParameters
 
 
+/// Settings for the execution phase.
+type executionConfig = {
+    FunctionName: string
+    ParameterSpans: (string * string list) list
+    QueryCatalogName: string
+    EnhancerFunctionName: string
+}
+
+/// Settings for the setup phase.
+type setupConfig = {
+    FunctionName: string
+    ParameterSpans: (string * string list) list
+    QueryCatalogName: string
+    EnhancerFunctionName: string
+    OutputTypes: geneSortDataType list
+}
+
+/// Complete configuration validated by SimpleRun.create.
+type simpleRunConfig = {
+    DatabaseName: string<databaseName>
+    ProjectName: string<projectName>
+    RunName: string<runName>
+    Description: string
+    AllowOverwrite: bool
+    Execution: executionConfig
+    Setup: setupConfig
+}
+
+/// Additional settings validated by SgdRun.create.
+type sgdRunConfig = {
+    MakerNames: evolutionMakerNames
+    GenSaveIntervalsName: string
+    GenSaveSubIntervalsName: string
+}
+
 type simpleRun =
     private
         {
@@ -62,21 +97,21 @@ module SimpleRun =
     let makeSetupParameters minReplica maxReplica refiner (run: simpleRun) : setupParameters[] =
         ParameterGeneration.make minReplica maxReplica run.setupParameterSpans refiner
 
-    let create
-            (executeFunctionName: string)
-            (databaseName: string<databaseName>)
-            (projectName: string<projectName>)
-            (runName: string<runName>)
-            (description: string)
-            (runParameterSpans: (string * string list) list)
-            (runQueryCatalogName: string)
-            (setupFunctionName: string)
-            (runEnhancerFunctionName: string)
-            (allowOverwrite: bool)
-            (setupParameterSpans: (string * string list) list)
-            (setupQueryCatalogName: string)
-            (setupEnhancerFunctionName: string)
-            (setupOutputTypes: geneSortDataType list) : simpleRun =
+    let create (config: simpleRunConfig) : simpleRun =
+        let executeFunctionName = config.Execution.FunctionName
+        let databaseName = config.DatabaseName
+        let projectName = config.ProjectName
+        let runName = config.RunName
+        let description = config.Description
+        let runParameterSpans = config.Execution.ParameterSpans
+        let runQueryCatalogName = config.Execution.QueryCatalogName
+        let setupFunctionName = config.Setup.FunctionName
+        let runEnhancerFunctionName = config.Execution.EnhancerFunctionName
+        let allowOverwrite = config.AllowOverwrite
+        let setupParameterSpans = config.Setup.ParameterSpans
+        let setupQueryCatalogName = config.Setup.QueryCatalogName
+        let setupEnhancerFunctionName = config.Setup.EnhancerFunctionName
+        let setupOutputTypes = config.Setup.OutputTypes
         if String.IsNullOrWhiteSpace executeFunctionName then
             invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace runQueryCatalogName then
@@ -130,49 +165,17 @@ type sgdRun =
         }
 
 module SgdRun =
-    let create
-            (makerNames: evolutionMakerNames)
-            (executeFunctionName: string)
-            (databaseName: string<databaseName>)
-            (projectName: string<projectName>)
-            (runName: string<runName>)
-            (description: string)
-            (runParameterSpans: (string * string list) list)
-            (genSaveIntervalsName: string)
-            (genSaveSubIntervalsName: string)
-            (runQueryCatalogName: string)
-            (setupFunctionName: string)
-            (runEnhancerFunctionName: string)
-            (allowOverwrite: bool)
-            (setupParameterSpans: (string * string list) list)
-            (setupQueryCatalogName: string)
-            (setupEnhancerFunctionName: string)
-            (setupOutputTypes: geneSortDataType list) : sgdRun =
-        EvolutionMakerNames.validate makerNames
-        if String.IsNullOrWhiteSpace genSaveIntervalsName then
-            invalidArg (nameof genSaveIntervalsName) "Generation save interval name cannot be empty"
-        if String.IsNullOrWhiteSpace genSaveSubIntervalsName then
-            invalidArg (nameof genSaveSubIntervalsName) "Generation summary interval name cannot be empty"
+    let create (config: simpleRunConfig) (sgd: sgdRunConfig) : sgdRun =
+        EvolutionMakerNames.validate sgd.MakerNames
+        if String.IsNullOrWhiteSpace sgd.GenSaveIntervalsName then
+            invalidArg "GenSaveIntervalsName" "Generation save interval name cannot be empty"
+        if String.IsNullOrWhiteSpace sgd.GenSaveSubIntervalsName then
+            invalidArg "GenSaveSubIntervalsName" "Generation summary interval name cannot be empty"
         {
-          baseRun =
-              SimpleRun.create
-                  executeFunctionName
-                  databaseName
-                  projectName
-                  runName
-                  description
-                  runParameterSpans
-                  runQueryCatalogName
-                  setupFunctionName
-                  runEnhancerFunctionName
-                  allowOverwrite
-                  setupParameterSpans
-                  setupQueryCatalogName
-                  setupEnhancerFunctionName
-                  setupOutputTypes
-          genSaveIntervalsName = genSaveIntervalsName
-          genSaveSubIntervalsName = genSaveSubIntervalsName
-          makerNames = makerNames
+          baseRun = SimpleRun.create config
+          genSaveIntervalsName = sgd.GenSaveIntervalsName
+          genSaveSubIntervalsName = sgd.GenSaveSubIntervalsName
+          makerNames = sgd.MakerNames
         }
 
     let baseRun (run: sgdRun) = run.baseRun

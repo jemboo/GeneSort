@@ -23,12 +23,26 @@ let private makeRun queryCatalog setupCatalog =
         if queryCatalog = QueryCatalogNames.sorterMutateStandard || queryCatalog = QueryCatalogNames.sorterMutateMerge || queryCatalog = QueryCatalogNames.sorterMutatePrefix then
             GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
         else GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
-    SimpleRun.create executeName (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
-        queryCatalog setupCatalog "sortable-test" false
-        []
-        queryCatalog
-        SetupEnhancerFunctionNames.noOp
-        [] |> run.SimpleRun
+    SimpleRun.create {
+        DatabaseName = (UMX.tag "SetupTests")
+        ProjectName = (UMX.tag "Tests")
+        RunName = (UMX.tag "SetupTests")
+        Description = "Setup test"
+        AllowOverwrite = false
+        Execution = {
+            FunctionName = executeName
+            ParameterSpans = []
+            QueryCatalogName = queryCatalog
+            EnhancerFunctionName = "sortable-test"
+        }
+        Setup = {
+            FunctionName = setupCatalog
+            ParameterSpans = []
+            QueryCatalogName = queryCatalog
+            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            OutputTypes = []
+        }
+    } |> run.SimpleRun
 
 let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 

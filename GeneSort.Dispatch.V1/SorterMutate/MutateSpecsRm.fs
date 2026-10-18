@@ -2,6 +2,7 @@ namespace GeneSort.Dispatch.V1.SorterMutate
 
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
@@ -41,20 +42,26 @@ module MutateSpecsRm =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomMerge.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Test-Msce_%s" "GenMerge" |> UMX.tag)
-                    "Mutation analysis for merge Msce"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupCatalogNames.mutantMerge
-                    RunParamBuilderNames.Enhancer.sorterMutateStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Test-Msce_%s" "GenMerge" |> UMX.tag)
+                    Description = "Mutation analysis for merge Msce"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantMerge
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
 
@@ -74,20 +81,26 @@ module MutateSpecsRm =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomMerge.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Test-Mssi_%s" "GenMerge" |> UMX.tag)
-                    "Mutation analysis for merge Mssi"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupCatalogNames.mutantMerge
-                    RunParamBuilderNames.Enhancer.sorterMutateStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Test-Mssi_%s" "GenMerge" |> UMX.tag)
+                    Description = "Mutation analysis for merge Mssi"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantMerge
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
 
@@ -107,20 +120,26 @@ module MutateSpecsRm =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomMerge.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Test-Msrs_%s" "GenMerge" |> UMX.tag)
-                    "Mutation analysis for merge Msrs"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupCatalogNames.mutantMerge
-                    RunParamBuilderNames.Enhancer.sorterMutateStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Test-Msrs_%s" "GenMerge" |> UMX.tag)
+                    Description = "Mutation analysis for merge Msrs"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantMerge
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
         let Test_Msuf4 ()  : run =
@@ -139,20 +158,26 @@ module MutateSpecsRm =
                     mutationMod1
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
-                    SorterMutateDbs.RandomMerge.Uniform.dbName
-                    SorterMutateDbs.projectName
-                    (sprintf @"Test-Msuf4_%s" "GenMerge" |> UMX.tag)
-                    "Mutation analysis for merge Msuf4"
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupCatalogNames.mutantMerge
-                    RunParamBuilderNames.Enhancer.sorterMutateStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterMutateMerge
-                    SetupEnhancerFunctionNames.sorterMutate
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterMutateDbs.RandomMerge.Uniform.dbName
+                    ProjectName = SorterMutateDbs.projectName
+                    RunName = (sprintf @"Test-Msuf4_%s" "GenMerge" |> UMX.tag)
+                    Description = "Mutation analysis for merge Msuf4"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterMutate
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.mutantMerge
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterMutateMerge
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
 

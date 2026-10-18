@@ -38,22 +38,30 @@ module Specs64 =
                 (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara64Name
-                projName
-                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara64Name
+                ProjectName = projName
+                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )
 
 
@@ -70,22 +78,30 @@ module Specs64 =
                 (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara64Name
-                projName
-                (sprintf @"SymForce_Diff1%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara64Name
+                ProjectName = projName
+                RunName = (sprintf @"SymForce_Diff1%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )
 
 
@@ -102,22 +118,30 @@ module Specs64 =
                 (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara64Name
-                projName
-                (sprintf @"SymForce%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara64Name
+                ProjectName = projName
+                RunName = (sprintf @"SymForce%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )
 
 
@@ -136,20 +160,28 @@ module Specs128 =
                 (runParameters.selectedSorterCountPerPoolKey, [128;] |> List.map string)
             ]
         run.SgdRun (
-            SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
-                dbOrthoPara128Name
-                projName
-                (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
-                "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
-                parameterSpans
-                "expInterval100_L50ss"
-                "summaryInterval_C.1p5C"
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupCatalogNames.standard
-                RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
-                false
-                parameterSpans
-                QueryCatalogNames.sorterSgdMssiOrthoPara
-                SetupEnhancerFunctionNames.sorterSgd
-                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            SgdRun.create {
+                DatabaseName = dbOrthoPara128Name
+                ProjectName = projName
+                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                }
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                }
+            } {
+                MakerNames = EvolutionMakerNames.prefix
+                GenSaveIntervalsName = "expInterval100_L50ss"
+                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+            }
         )

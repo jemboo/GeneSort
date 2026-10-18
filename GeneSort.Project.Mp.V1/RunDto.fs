@@ -92,24 +92,30 @@ module RunDto =
             invalidArg "dto" "Run data must specify an explicit ExecuteFunctionName."
         if System.String.IsNullOrWhiteSpace setupFunctionName then
             invalidArg "dto" "Run data must specify an explicit SetupFunctionName."
+        let config: simpleRunConfig = {
+            DatabaseName = databaseName
+            ProjectName = projectName
+            RunName = runName
+            Description = dto.Description
+            AllowOverwrite = allowOverwrite
+            Execution = {
+                FunctionName = dto.ExecuteFunctionName
+                ParameterSpans = runParameterSpans
+                QueryCatalogName = runQueryCatalogName
+                EnhancerFunctionName = runEnhancerFunctionName
+            }
+            Setup = {
+                FunctionName = setupFunctionName
+                ParameterSpans = setupParameterSpans
+                QueryCatalogName = dto.SetupQueryCatalogName
+                EnhancerFunctionName = dto.SetupEnhancerFunctionName
+                OutputTypes = setupOutputTypes
+            }
+        }
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
         | None, None ->
             SimpleRun (
-                SimpleRun.create
-                    dto.ExecuteFunctionName
-                    databaseName
-                    projectName
-                    runName
-                    dto.Description
-                    runParameterSpans
-                    runQueryCatalogName
-                    setupFunctionName
-                    runEnhancerFunctionName
-                    allowOverwrite
-                    setupParameterSpans
-                    dto.SetupQueryCatalogName
-                    dto.SetupEnhancerFunctionName
-                    setupOutputTypes)
+                SimpleRun.create config)
         | saveIntervals, saveSubIntervals ->
             let requireMakerName field value =
                 if System.String.IsNullOrWhiteSpace value then
@@ -121,22 +127,9 @@ module RunDto =
                     (requireMakerName "SeedPoolSetMakerName" dto.SeedPoolSetMakerName)
                     (requireMakerName "MutatorMakerName" dto.MutatorMakerName)
             SgdRun (
-                SgdRun.create
-                    makerNames
-                    dto.ExecuteFunctionName
-                    databaseName
-                    projectName
-                    runName
-                    dto.Description
-                    runParameterSpans
-                    (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
-                    (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
-                    runQueryCatalogName
-                    setupFunctionName
-                    runEnhancerFunctionName
-                    allowOverwrite
-                    setupParameterSpans
-                    dto.SetupQueryCatalogName
-                    dto.SetupEnhancerFunctionName
-                    setupOutputTypes
+                SgdRun.create config {
+                    MakerNames = makerNames
+                    GenSaveIntervalsName = (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
+                    GenSaveSubIntervalsName = (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
+                }
             )

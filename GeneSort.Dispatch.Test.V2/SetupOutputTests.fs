@@ -10,11 +10,26 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 
 let private makeRun spans query enhancer =
     // Execution and run-only catalogs need not exist to predict setup outputs.
-    SimpleRun.create "unused.execute" (UMX.tag "Database") (UMX.tag "Project")
-        (UMX.tag "Run") "Setup output test" ["RunOnly", ["unused"]]
-        "unused.run-query" "unused.setup-function" "unused.run-enhancer" false
-        spans query enhancer
-        []
+    SimpleRun.create {
+        DatabaseName = (UMX.tag "Database")
+        ProjectName = (UMX.tag "Project")
+        RunName = (UMX.tag "Run")
+        Description = "Setup output test"
+        AllowOverwrite = false
+        Execution = {
+            FunctionName = "unused.execute"
+            ParameterSpans = ["RunOnly", ["unused"]]
+            QueryCatalogName = "unused.run-query"
+            EnhancerFunctionName = "unused.run-enhancer"
+        }
+        Setup = {
+            FunctionName = "unused.setup-function"
+            ParameterSpans = spans
+            QueryCatalogName = query
+            EnhancerFunctionName = enhancer
+            OutputTypes = []
+        }
+    }
 
 let private unwrap = function Ok value -> value | Error error -> failwith error
 

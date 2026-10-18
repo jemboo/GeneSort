@@ -27,16 +27,30 @@ let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
             runParameters.sourceGenerationIntervalKey, [string sourceInterval]
             runParameters.generationIntervalLastKey, [string lastInterval]
         ]
-    SgdRun.create source.MakerNames.Value ExecuteFunctionNames.soss
-        source.DatabaseName projName (UMX.tag (sprintf "%s_Append_%d" %source.RunName sourceInterval))
-        (sprintf "Continue %s/%s from interval %d" %source.ProjectName %source.DatabaseName sourceInterval)
-        spans source.GenSaveIntervalsName.Value source.GenSaveSubIntervalsName.Value
-        QueryCatalogNames.sorterSgdMsufSossAppend SetupCatalogNames.sossAppend
-        source.RunEnhancerFunctionName false
-        spans
-        QueryCatalogNames.sorterSgdMsufSossAppend
-        SetupEnhancerFunctionNames.sorterSgd
-        [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+    SgdRun.create {
+        DatabaseName = source.DatabaseName
+        ProjectName = projName
+        RunName = (UMX.tag (sprintf "%s_Append_%d" %source.RunName sourceInterval))
+        Description = (sprintf "Continue %s/%s from interval %d" %source.ProjectName %source.DatabaseName sourceInterval)
+        AllowOverwrite = false
+        Execution = {
+            FunctionName = ExecuteFunctionNames.soss
+            ParameterSpans = spans
+            QueryCatalogName = QueryCatalogNames.sorterSgdMsufSossAppend
+            EnhancerFunctionName = source.RunEnhancerFunctionName
+        }
+        Setup = {
+            FunctionName = SetupCatalogNames.sossAppend
+            ParameterSpans = spans
+            QueryCatalogName = QueryCatalogNames.sorterSgdMsufSossAppend
+            EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+            OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        }
+    } {
+        MakerNames = source.MakerNames.Value
+        GenSaveIntervalsName = source.GenSaveIntervalsName.Value
+        GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
+    }
     |> run.SgdRun
 
 let Pool_4_Debug () = fromSource (Soss_32.Pool_4_Debug ()) 1 2

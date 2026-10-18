@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SortableTests
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
@@ -21,20 +22,26 @@ module SortableTestsSpecsPrefix =
                     prefixLib_Prefix24_3a
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
-                    SortableTestsDbs.Prefix.dbNameTest
-                    CommonSortableTests.projectName
-                    (sprintf @"Prefix24-4b_%s" "GenPrefix" |> UMX.tag)
-                    "Bitv512 prefix sorter test sets"
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupCatalogNames.prefix
-                    RunParamBuilderNames.Enhancer.sortableTests
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupEnhancerFunctionNames.sortableTests
-                    []
+                SimpleRun.create {
+                    DatabaseName = SortableTestsDbs.Prefix.dbNameTest
+                    ProjectName = CommonSortableTests.projectName
+                    RunName = (sprintf @"Prefix24-4b_%s" "GenPrefix" |> UMX.tag)
+                    Description = "Bitv512 prefix sorter test sets"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sortableTests
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.prefix
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                        OutputTypes = []
+                    }
+                }
             )
 
 
@@ -46,20 +53,26 @@ module SortableTestsSpecsPrefix =
                     prefixLib_Prefix24s
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
-                    SortableTestsDbs.Prefix.dbName
-                    CommonSortableTests.projectName
-                    (sprintf @"Prefix-24s_%s" "GenPrefix" |> UMX.tag)
-                    "Bitv512 prefix sorter test sets"
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupCatalogNames.prefix
-                    RunParamBuilderNames.Enhancer.sortableTests
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupEnhancerFunctionNames.sortableTests
-                    []
+                SimpleRun.create {
+                    DatabaseName = SortableTestsDbs.Prefix.dbName
+                    ProjectName = CommonSortableTests.projectName
+                    RunName = (sprintf @"Prefix-24s_%s" "GenPrefix" |> UMX.tag)
+                    Description = "Bitv512 prefix sorter test sets"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sortableTests
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.prefix
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                        OutputTypes = []
+                    }
+                }
             )
 
         let Prefix_32  () : run =
@@ -69,20 +82,26 @@ module SortableTestsSpecsPrefix =
                     prefixLib_Prefix32_4
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
-                    SortableTestsDbs.Prefix.dbName
-                    CommonSortableTests.projectName
-                    (sprintf @"Prefix-32_%s" "GenPrefix" |> UMX.tag)
-                    "Bitv512 prefix sorter test sets"
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupCatalogNames.prefix
-                    RunParamBuilderNames.Enhancer.sortableTests
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sortableTestPrefix
-                    SetupEnhancerFunctionNames.sortableTests
-                    []
+                SimpleRun.create {
+                    DatabaseName = SortableTestsDbs.Prefix.dbName
+                    ProjectName = CommonSortableTests.projectName
+                    RunName = (sprintf @"Prefix-32_%s" "GenPrefix" |> UMX.tag)
+                    Description = "Bitv512 prefix sorter test sets"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sortableTests
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.prefix
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                        OutputTypes = []
+                    }
+                }
             )
 
 

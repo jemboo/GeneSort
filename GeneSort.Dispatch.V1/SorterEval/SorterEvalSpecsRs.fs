@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
@@ -28,20 +29,26 @@ module SorterEvalSpecsRs =
                     largeSorterCount
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
-                    SorterEvalDbs.Standard.dbName
-                    SorterEvalDbs.projectName
-                    (sprintf @"Rand-Test16_%s" "GenStandard" |> UMX.tag)
-                    "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.sorterEvalStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupEnhancerFunctionNames.sorterEval
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterEvalDbs.Standard.dbName
+                    ProjectName = SorterEvalDbs.projectName
+                    RunName = (sprintf @"Rand-Test16_%s" "GenStandard" |> UMX.tag)
+                    Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterEval
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
         let Rand_Small () : run =
@@ -54,20 +61,26 @@ module SorterEvalSpecsRs =
                     extraLargeSorterCount
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
-                    SorterEvalDbs.Standard.dbName
-                    SorterEvalDbs.projectName
-                    (sprintf @"Rand-Small_%s" "GenStandard" |> UMX.tag)
-                    "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.sorterEvalStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupEnhancerFunctionNames.sorterEval
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterEvalDbs.Standard.dbName
+                    ProjectName = SorterEvalDbs.projectName
+                    RunName = (sprintf @"Rand-Small_%s" "GenStandard" |> UMX.tag)
+                    Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterEval
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
         let Rand_Medium () : run =
@@ -80,20 +93,26 @@ module SorterEvalSpecsRs =
                     extraLargeSorterCount
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
-                    SorterEvalDbs.Standard.dbName
-                    SorterEvalDbs.projectName
-                    (sprintf @"Rand-Medium_%s" "GenStandard" |> UMX.tag)
-                    "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupCatalogNames.standard
-                    RunParamBuilderNames.Enhancer.sorterEvalStandard
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sorterEvalStandard
-                    SetupEnhancerFunctionNames.sorterEval
-                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                SimpleRun.create {
+                    DatabaseName = SorterEvalDbs.Standard.dbName
+                    ProjectName = SorterEvalDbs.projectName
+                    RunName = (sprintf @"Rand-Medium_%s" "GenStandard" |> UMX.tag)
+                    Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterEval
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.standard
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                    }
+                }
             )
 
     type configType =

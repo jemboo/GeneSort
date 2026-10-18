@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SortableTests
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
@@ -21,20 +22,26 @@ module SortableTestsSpecsMerge =
                     dataFormatInt8v512
                 ]
             run.SimpleRun (
-                SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sortableTests
-                    SortableTestsDbs.Merge.dbName
-                    CommonSortableTests.projectName
-                    (sprintf @"Merge-Test_%s" "GenMerge" |> UMX.tag)
-                    "Int8 merge sorter test sets"
-                    parameterSpans
-                    QueryCatalogNames.sortableTestMerge
-                    SetupCatalogNames.merge
-                    RunParamBuilderNames.Enhancer.sortableTests
-                    false
-                    parameterSpans
-                    QueryCatalogNames.sortableTestMerge
-                    SetupEnhancerFunctionNames.sortableTests
-                    []
+                SimpleRun.create {
+                    DatabaseName = SortableTestsDbs.Merge.dbName
+                    ProjectName = CommonSortableTests.projectName
+                    RunName = (sprintf @"Merge-Test_%s" "GenMerge" |> UMX.tag)
+                    Description = "Int8 merge sorter test sets"
+                    AllowOverwrite = false
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sortableTests
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestMerge
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    }
+                    Setup = {
+                        FunctionName = SetupCatalogNames.merge
+                        ParameterSpans = parameterSpans
+                        QueryCatalogName = QueryCatalogNames.sortableTestMerge
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                        OutputTypes = []
+                    }
+                }
             )
 
 

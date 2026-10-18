@@ -47,24 +47,30 @@ let Pool_4_Debug ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-            EvolutionMakerNames.sossPrefix 
-            ExecuteFunctionNames.soss
-            dbPool4name
-            projName
-            (sprintf @"Pool_4_Debug%s" "GenSoss" |> UMX.tag<runName>)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "uniformInterval2"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool4name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_4_Debug%s" "GenSoss" |> UMX.tag<runName>)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "uniformInterval2"
+        }
     )
 
 
@@ -88,24 +94,30 @@ let Pool_32_Gens15 ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-            EvolutionMakerNames.sossPrefix 
-            ExecuteFunctionNames.soss
-            dbPool32name
-            projName
-            (sprintf @"Pool_32_Gens15%s" "GenSoss" |> UMX.tag<runName>)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "uniformInterval5"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool32name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_32_Gens15%s" "GenSoss" |> UMX.tag<runName>)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "uniformInterval5"
+        }
     )
 
 
@@ -130,23 +142,30 @@ let Pool_32_Test_null ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-            EvolutionMakerNames.sossPrefix ExecuteFunctionNames.soss
-            dbPool32name
-            projName
-            (sprintf @"Pool_32_Test%s" "GenSoss" |> UMX.tag<runName>)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "uniformInterval5"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool32name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_32_Test%s" "GenSoss" |> UMX.tag<runName>)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "uniformInterval5"
+        }
     )
 
 
@@ -173,23 +192,30 @@ let Pool_128_Test ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-            EvolutionMakerNames.sossPrefix ExecuteFunctionNames.soss
-            dbPool128name
-            projName
-            (sprintf @"Pool_128_Test%s" "GenSoss" |> UMX.tag<runName>)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "uniformInterval10"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool128name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_128_Test%s" "GenSoss" |> UMX.tag<runName>)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "uniformInterval10"
+        }
     )
 
 
@@ -216,23 +242,30 @@ let Pool_32_V1 ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-           EvolutionMakerNames.sossPrefix ExecuteFunctionNames.soss
-            dbPool32name
-            projName
-            (sprintf @"Pool_32_V1%s" "GenSoss" |> UMX.tag)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "summaryInterval_C.1p5C"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool32name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_32_V1%s" "GenSoss" |> UMX.tag)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+        }
     )
 
 let Pool_512_V2a ()  : run =
@@ -255,21 +288,28 @@ let Pool_512_V2a ()  : run =
             (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
-        SgdRun.create 
-            EvolutionMakerNames.sossPrefix ExecuteFunctionNames.soss
-            dbPool512name
-            projName
-            (sprintf @"Pool_512_V2a%s" "GenSoss" |> UMX.tag)
-            "Soss rate comparison for Msuf32p4a"
-            parameterSpans
-            "expInterval100_L50ss"
-            "summaryInterval_C.1p5C"
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupCatalogNames.standard
-            RunParamBuilderNames.Enhancer.msuf32MutationRate
-            false
-            parameterSpans
-            QueryCatalogNames.sorterSgdMsufSoss
-            SetupEnhancerFunctionNames.sorterSgd
-            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+        SgdRun.create {
+            DatabaseName = dbPool512name
+            ProjectName = projName
+            RunName = (sprintf @"Pool_512_V2a%s" "GenSoss" |> UMX.tag)
+            Description = "Soss rate comparison for Msuf32p4a"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = ExecuteFunctionNames.soss
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            }
+            Setup = {
+                FunctionName = SetupCatalogNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            }
+        } {
+            MakerNames = EvolutionMakerNames.sossPrefix
+            GenSaveIntervalsName = "expInterval100_L50ss"
+            GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+        }
     )
