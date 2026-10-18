@@ -2,6 +2,8 @@ namespace GeneSort.Project.V1.Catalogs.Setup
 
 module SetupCatalogNames =
     [<Literal>]
+    let sossAppend = "setup.soss-append"
+    [<Literal>]
     let standard = "setup.standard"
     [<Literal>]
     let merge = "setup.merge"

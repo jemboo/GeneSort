@@ -27,6 +27,10 @@ type runParameters =
     static member codeModKey = "CodeModKey"
     static member collectSortableTestsKey = "CollectSortableTests"
     static member databaseNameKey = "DatabaseName"
+    static member sourceProjectNameKey = "SourceProjectName"
+    static member sourceDbNameKey = "SourceDbName"
+    static member sourceRunNameKey = "SourceRunName"
+    static member sourceGenerationIntervalKey = "SourceGenerationInterval"
     static member deletionRateKey = "DeletionRate"
     static member distinctSorterHashesKey = "DistinctSorterHashes"
     static member elapsedTimeKey = "ElapsedTime"
@@ -146,6 +150,19 @@ type runParameters =
     member this.GetDatabaseName() =
         this.paramMap.TryFind runParameters.databaseNameKey
         |> Option.map UMX.tag<databaseName>
+
+    member this.GetSourceProjectName() =
+        this.paramMap.TryFind runParameters.sourceProjectNameKey |> Option.map UMX.tag<projectName>
+
+    member this.GetSourceDbName() =
+        this.paramMap.TryFind runParameters.sourceDbNameKey |> Option.map UMX.tag<databaseName>
+
+    member this.GetSourceRunName() =
+        this.paramMap.TryFind runParameters.sourceRunNameKey |> Option.map UMX.tag<runName>
+
+    /// Zero-based index in the source run's generation save interval configuration.
+    member this.GetSourceGenerationInterval() =
+        runParameters.tryGetInt runParameters.sourceGenerationIntervalKey this.paramMap
 
     member this.GetDeletionRate() =
         runParameters.tryGetFloat runParameters.deletionRateKey this.paramMap
@@ -426,6 +443,18 @@ type runParameters =
 
     member this.WithDatabaseName(dbn: string<databaseName> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.databaseNameKey (dbn |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceProjectName(value: string<projectName> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sourceProjectNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceDbName(value: string<databaseName> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sourceDbNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceRunName(value: string<runName> option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sourceRunNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceGenerationInterval(value: int option) =
+        { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.sourceGenerationIntervalKey (value |> Option.map string) }
 
     member this.WithDeletionRate(dr: float<deletionRate> option) = 
         { paramMap = this.paramMap |> runParameters.addOrRemove runParameters.deletionRateKey (dr |> Option.map UmxExt.floatToRaw) }

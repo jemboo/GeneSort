@@ -6,6 +6,11 @@ open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1.SorterSgd.Standard
 open GeneSort.Dispatch.V1.SorterSgd.Soss
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.FileDb.V1
+open GeneSort.Core
+open FSharp.UMX
 
 module SorterSgdSetup =
 
@@ -23,6 +28,15 @@ module SorterSgdSetup =
 
     let getSetupExecutor (host: runHost) =
         match host.Run.ExecuteFunctionName with
+        | Some ExecuteFunctionNames.soss when host.Run.SetupCatalogName = SetupCatalogNames.sossAppend ->
+            { new IRunParamsExecutor with
+                member _.Execute host rp allowOverwrite cts progress = asyncResult {
+                    let! project = rp.GetSourceProjectName() |> Result.ofOption "Missing SourceProjectName."
+                    let! database = rp.GetSourceDbName() |> Result.ofOption "Missing SourceDbName."
+                    let root = System.IO.Path.Combine(RunHost.projectsRoot (), %project, %database, "Data") |> UMX.tag<pathToRootFolder>
+                    let source = new GeneSortDbMp(root, QueryCatalogNames.sorterSgdMsufSoss)
+                    return! SossAppendSetup.prepare source host rp allowOverwrite cts progress
+                } }
         | Some ExecuteFunctionNames.standard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard
         | Some ExecuteFunctionNames.soss -> setupExecutor SgdEx_Soss.setupEvolutionRunSoss
         | name -> invalidArg (nameof host) (sprintf "No evolution setup is configured for execute function %A." name)

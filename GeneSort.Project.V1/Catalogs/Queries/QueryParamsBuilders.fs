@@ -222,6 +222,23 @@ module QueryParamsBuilders =
                         return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                     }
 
+        module SossAppend =
+            let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+                maybe {
+                    let! query = Msuf.Soss.queryParamsFromRunParams projectName dbName rp odt
+                    let! sourceProject = rp.GetSourceProjectName()
+                    let! sourceDb = rp.GetSourceDbName()
+                    let! sourceRun = rp.GetSourceRunName()
+                    let! sourceInterval = rp.GetSourceGenerationInterval()
+                    let properties =
+                        query.Properties
+                        |> Map.add runParameters.sourceProjectNameKey %sourceProject
+                        |> Map.add runParameters.sourceDbNameKey %sourceDb
+                        |> Map.add runParameters.sourceRunNameKey %sourceRun
+                        |> Map.add runParameters.sourceGenerationIntervalKey (string sourceInterval)
+                    return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
+                }
+
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
@@ -473,6 +490,7 @@ module QueryParamsBuilders =
                     QueryCatalogNames.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromRunParams
+                    QueryCatalogNames.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
                     QueryCatalogNames.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
                     QueryCatalogNames.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams

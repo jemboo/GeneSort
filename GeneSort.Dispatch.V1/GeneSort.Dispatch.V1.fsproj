@@ -54,6 +54,7 @@
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterSgd\FileEvolutionSetupSources.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
+    <Compile Include="SorterSgd\SossAppendSetup.fs" />
     <Compile Include="SorterSgd\SorterSgdSetup.fs" />
     <Compile Include="SetupExecutorCatalog.fs" />
     <Compile Include="ProjectOps.fs" />
@@ -61,6 +62,7 @@
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Common.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\VarModR_32.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Soss_32.fs" />
+    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Soss_32_append.fs" />
     <Compile Include="SorterSgd\Prefix\p24\Msuf63b\Common.fs" />
     <Compile Include="SorterSgd\Prefix\p24\Msuf63b\MutationRate.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msrs4a\Common.fs" />

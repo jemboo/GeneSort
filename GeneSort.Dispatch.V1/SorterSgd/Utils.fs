@@ -15,10 +15,14 @@ open GeneSort.Sorting.Sorter
 
 module Utils =
 
-    /// Loads generation-zero setup strictly; run phases never create missing setup.
+    /// Initial pools may start at an imported generation; test inputs are stored at zero.
     let loadSetupOutputData (genDb: IGeneSortDb) (rp: runParameters) dataType =
         asyncResult {
-            let setupRp = rp.WithGenerationCurrent(Some (UMX.tag<generationNumber> 0))
+            let initialGeneration =
+                match dataType with
+                | geneSortDataType.SorterPoolSet _ -> rp.GetGenerationFirst() |> Option.defaultValue (UMX.tag 0)
+                | _ -> UMX.tag 0
+            let setupRp = rp.WithGenerationCurrent(Some initialGeneration)
             let! query =
                 genDb.makeQueryParamsFromRunParams setupRp dataType
                 |> Result.ofOption "Failed to create QueryParams for evolution Setup."
@@ -99,7 +103,10 @@ module Utils =
             (cts: CancellationToken)
             (log: string -> unit) : Async<seq<'T>> =
         async {
-            let genSequence = GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
+            let genSequence =
+                GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
+                |> Seq.filter (fun generation ->
+                    rp.GetGenerationFirst() |> Option.forall (fun first -> generation > %first))
             let rec discoverLazy (gens: int seq) = seq {
                 match Seq.tryHead gens with
                 | None -> ()
@@ -185,6 +192,8 @@ module Utils =
                 |> Seq.map (fun gen -> int (ceil (float gen * saveConfig.Scale)))
                 |> Seq.toArray
                 |> Array.map (fun gen -> %gen : int<generationNumber>)
+                // An imported initial pool lives only in Setup. Results start after it.
+                |> Array.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
 
             let getQueryParams index =
                 let currentGen = intervals.[index]

@@ -5,17 +5,38 @@ open GeneSort.Dispatch.V1.SorterMutate
 
 /// Reports are selected independently of a run's ExecuteFunctionName.
 module ReportCatalog =
+    [<Literal>]
+    let sorterEvalFull = "sorter-eval.full"
+    [<Literal>]
+    let sorterEvalStageStats = "sorter-eval.stage-stats"
+    [<Literal>]
+    let sorterEvalCeBins = "sorter-eval.ce-bins"
+    [<Literal>]
+    let sorterMutateStandard = "sorter-mutate.standard"
+    [<Literal>]
+    let sorterMutateMerge = "sorter-mutate.merge"
+    [<Literal>]
+    let sorterMutatePrefix = "sorter-mutate.prefix"
+    [<Literal>]
+    let evolutionSummary = "evolution.summary"
+    [<Literal>]
+    let evolutionSnapshot = "evolution.snapshot"
+    [<Literal>]
+    let evolutionHistory = "evolution.history"
+    [<Literal>]
+    let evolutionBins = "evolution.bins"
+
     let private reports = Map.ofList [
-        "sorter-eval.full", SorterEvalExecutor.fullReportExecutor
-        "sorter-eval.stage-stats", SorterEvalExecutor.stageStatsReportExecutor
-        "sorter-eval.ce-bins", SorterEvalExecutor.ceBinsReportExecutor
-        "sorter-mutate.standard", SorterMutateExecutor.standardReportExecutor
-        "sorter-mutate.merge", SorterMutateExecutor.mergeReportExecutor
-        "sorter-mutate.prefix", SorterMutateExecutor.prefixReportExecutor
-        "evolution.summary", SorterSgd.Reporting.summaryReportExecutor
-        "evolution.snapshot", SorterSgd.Reporting.snapshotReportExecutor
-        "evolution.history", SorterSgd.Reporting.poolHistoryReportExecutor
-        "evolution.bins", SorterSgd.Reporting.poolBinsReportExecutor
+        sorterEvalFull, SorterEvalExecutor.fullReportExecutor
+        sorterEvalStageStats, SorterEvalExecutor.stageStatsReportExecutor
+        sorterEvalCeBins, SorterEvalExecutor.ceBinsReportExecutor
+        sorterMutateStandard, SorterMutateExecutor.standardReportExecutor
+        sorterMutateMerge, SorterMutateExecutor.mergeReportExecutor
+        sorterMutatePrefix, SorterMutateExecutor.prefixReportExecutor
+        evolutionSummary, SorterSgd.Reporting.summaryReportExecutor
+        evolutionSnapshot, SorterSgd.Reporting.snapshotReportExecutor
+        evolutionHistory, SorterSgd.Reporting.poolHistoryReportExecutor
+        evolutionBins, SorterSgd.Reporting.poolBinsReportExecutor
     ]
 
     let names = reports |> Map.keys |> Seq.toList
