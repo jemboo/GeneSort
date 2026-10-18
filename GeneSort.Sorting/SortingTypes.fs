@@ -145,3 +145,13 @@ module StageLength =
         else
             ((%stageLength * %sortingWidth) / 2) |> UMX.tag<ceLength> 
 
+
+
+module AdjustCeLengthFrequency =
+
+    let toString (w: int<adjustCeLengthFrequency> option) : string =
+       match w with
+        | Some v -> sprintf "%d" %v
+        | None -> "None"
+
+

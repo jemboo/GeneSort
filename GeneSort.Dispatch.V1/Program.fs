@@ -11,8 +11,8 @@ let main argv =
     ProjectCatalogs.registerAll ()
 
     // Each command runs exactly one phase, using the spec configured in its dispatch module.
-    //let yab = [| "setup"; "sgd" |]
-    //let yab = [| "execute"; "sgd" |]
+   // let yab = [| "setup"; "sgd" |]
+   // let yab = [| "execute"; "sgd" |]
     let yab = [| "report"; "sgd"; "summary" |]
 
     let command =
