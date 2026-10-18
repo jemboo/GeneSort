@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -23,6 +23,7 @@
     <Compile Include="Catalogs\Setup\SetupCatalogNames.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="Catalogs\RunParameters\RunParamFunctionCatalogs.fs" />
+    <Compile Include="Catalogs\SetupParameters\SetupEnhancerCatalog.fs" />
     <Compile Include="OutputData.fs" />
     <Compile Include="Catalogs\Evolution\EvolutionSetupSources.fs" />
     <Compile Include="Catalogs\Evolution\SeedSorterModelGeneration.fs" />
@@ -35,6 +36,7 @@
     <Compile Include="Catalogs\SortableTestsWithPrefix\SortableTestsWithPrefixCatalog.fs" />
     <Compile Include="Catalogs\Setup\SetupCatalog.fs" />
     <Compile Include="Catalogs\ProjectCatalogs.fs" />
+    <Compile Include="SetupOutputs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

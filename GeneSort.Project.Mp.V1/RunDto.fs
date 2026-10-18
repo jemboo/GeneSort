@@ -19,16 +19,20 @@ type runDto =
         ProjectName: string
         RunName: string
         Description: string
-        ParameterSpans: parameterSpanDto []
+        RunParameterSpans: parameterSpanDto []
+        SetupParameterSpans: parameterSpanDto []
         GenSaveIntervalsName: string
         GenSaveSubIntervalsName: string
-        QueryCatalogName: string
-        EnhancerCatalogName: string
+        RunQueryCatalogName: string
+        SetupQueryCatalogName: string
+        RunEnhancerFunctionName: string
+        SetupEnhancerFunctionName: string
+        SetupOutputTypes: outputDataTypeDto []
         AllowOverwrite: bool
         SortableTestsMakerName: string
         SeedPoolSetMakerName: string
         MutatorMakerName: string
-        SetupCatalogName: string
+        SetupFunctionName: string
         ExecuteFunctionName: string
     }
 
@@ -44,16 +48,23 @@ module RunDto =
             Description = project.Description
             GenSaveIntervalsName = saveIntervalsName
             GenSaveSubIntervalsName = saveSubIntervalsName
-            QueryCatalogName = project.QueryCatalogName
-            SetupCatalogName = project.SetupCatalogName
+            RunQueryCatalogName = project.RunQueryCatalogName
+            SetupQueryCatalogName = project.SetupQueryCatalogName
+            SetupParameterSpans =
+                project.SetupParameterSpans
+                |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
+                |> List.toArray
+            SetupFunctionName = project.SetupFunctionName
             ExecuteFunctionName = project.ExecuteFunctionName
-            EnhancerCatalogName = project.EnhancerCatalogName
+            RunEnhancerFunctionName = project.RunEnhancerFunctionName
+            SetupEnhancerFunctionName = project.SetupEnhancerFunctionName
+            SetupOutputTypes = project.SetupOutputTypes |> List.map OutputDataTypeDto.fromDomain |> List.toArray
             AllowOverwrite = project.AllowOverwrite
             SortableTestsMakerName = project.MakerNames |> Option.map (fun names -> names.SortableTests) |> Option.toObj
             SeedPoolSetMakerName = project.MakerNames |> Option.map (fun names -> names.SeedPoolSet) |> Option.toObj
             MutatorMakerName = project.MakerNames |> Option.map (fun names -> names.Mutator) |> Option.toObj
-            ParameterSpans =
-                project.ParameterSpans
+            RunParameterSpans =
+                project.RunParameterSpans
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
                 |> List.toArray
         }
@@ -62,23 +73,25 @@ module RunDto =
         let databaseName = dto.DataBaseName |> UMX.tag<databaseName>
         let projectName = dto.ProjectName |> UMX.tag<projectName>
         let runName = dto.RunName |> UMX.tag<runName>
-        let parameterSpans =
-            dto.ParameterSpans
+        let setupOutputTypes = dto.SetupOutputTypes |> Array.map OutputDataTypeDto.toDomain |> Array.toList
+        let setupParameterSpans =
+            dto.SetupParameterSpans
+            |> Array.map (fun span -> span.Key, Array.toList span.Values)
+            |> Array.toList
+        let runParameterSpans =
+            dto.RunParameterSpans
             |> Option.ofObj
             |> Option.defaultValue [||]
             |> Array.map (fun span -> span.Key, (span.Values |> Array.toList))
             |> Array.toList
-        let queryCatalogName =
-            dto.QueryCatalogName
-            |> Option.ofObj
-            |> Option.defaultValue (sprintf "%s.%s" dto.ProjectName dto.DataBaseName)
-        let enhancerCatalogName = dto.EnhancerCatalogName |> Option.ofObj |> Option.defaultValue "sortable-test"
+        let runQueryCatalogName = dto.RunQueryCatalogName
+        let runEnhancerFunctionName = dto.RunEnhancerFunctionName
         let allowOverwrite = dto.AllowOverwrite
-        let setupCatalogName = dto.SetupCatalogName
+        let setupFunctionName = dto.SetupFunctionName
         if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
             invalidArg "dto" "Run data must specify an explicit ExecuteFunctionName."
-        if System.String.IsNullOrWhiteSpace setupCatalogName then
-            invalidArg "dto" "Run data must specify an explicit SetupCatalogName."
+        if System.String.IsNullOrWhiteSpace setupFunctionName then
+            invalidArg "dto" "Run data must specify an explicit SetupFunctionName."
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
         | None, None ->
             SimpleRun (
@@ -88,11 +101,15 @@ module RunDto =
                     projectName
                     runName
                     dto.Description
-                    parameterSpans
-                    queryCatalogName
-                    setupCatalogName
-                    enhancerCatalogName
-                    allowOverwrite)
+                    runParameterSpans
+                    runQueryCatalogName
+                    setupFunctionName
+                    runEnhancerFunctionName
+                    allowOverwrite
+                    setupParameterSpans
+                    dto.SetupQueryCatalogName
+                    dto.SetupEnhancerFunctionName
+                    setupOutputTypes)
         | saveIntervals, saveSubIntervals ->
             let requireMakerName field value =
                 if System.String.IsNullOrWhiteSpace value then
@@ -111,11 +128,15 @@ module RunDto =
                     projectName
                     runName
                     dto.Description
-                    parameterSpans
+                    runParameterSpans
                     (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
                     (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
-                    queryCatalogName
-                    setupCatalogName
-                    enhancerCatalogName
+                    runQueryCatalogName
+                    setupFunctionName
+                    runEnhancerFunctionName
                     allowOverwrite
+                    setupParameterSpans
+                    dto.SetupQueryCatalogName
+                    dto.SetupEnhancerFunctionName
+                    setupOutputTypes
             )

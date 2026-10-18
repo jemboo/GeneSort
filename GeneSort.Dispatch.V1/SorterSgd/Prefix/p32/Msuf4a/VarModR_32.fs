@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.VarModR_32
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
@@ -24,82 +25,100 @@ let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
 let Pool_32_Test ()  : run =
+    let parameterSpans =
+        [
+            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+            (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
+            (runParameters.codeModKey, ["NoMods"] |> List.map string)
+            (runParameters.generationIntervalLastKey, [2] |> List.map string)
+            (runParameters.paraRateKey,    [1.15;] |> List.map string)
+            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
+            (runParameters.mutationModKey, [0;] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
+            (runParameters.modificationRateKey, [0.035;]  |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+        ]
     run.SgdRun (
         SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool32TestName
             projName
             (sprintf @"Pool_32_Test%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
-            [
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationIntervalLastKey, [2] |> List.map string)
-                (runParameters.paraRateKey,    [1.15;] |> List.map string)
-                (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-                (runParameters.mutationModKey, [0;] |> List.map string)
-                (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-                (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-            ]
+            parameterSpans
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard
             SetupCatalogNames.standard
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
+            parameterSpans
+            QueryCatalogNames.sorterSgdMsufStandard
+            SetupEnhancerFunctionNames.sorterSgd
+            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     )
 
 let Pool_32_V1 ()  : run =
+    let parameterSpans =
+        [
+            (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
+            (runParameters.codeModKey, ["NoMods"] |> List.map string)
+            (runParameters.generationIntervalLastKey, [3] |> List.map string)
+            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+            (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+            (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+            (runParameters.mutationModKey, [0] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
+            (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+        ]
     run.SgdRun (
         SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool32name
             projName
             (sprintf @"Pool_32_V1%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
-            [
-                (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationIntervalLastKey, [3] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-                (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-                (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+            parameterSpans
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard
             SetupCatalogNames.standard
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
+            parameterSpans
+            QueryCatalogNames.sorterSgdMsufStandard
+            SetupEnhancerFunctionNames.sorterSgd
+            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     )
 
 let Pool_512_V2a ()  : run =
+    let parameterSpans =
+        [
+            (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
+            (runParameters.codeModKey, ["NoMods"] |> List.map string)
+            (runParameters.generationIntervalLastKey, [3] |> List.map string)
+            (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
+            (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+            (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+            (runParameters.mutationModKey, [0] |> List.map string)
+            (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
+            (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
+            (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
+        ]
     run.SgdRun (
         SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
             dbPool512name
             projName
             (sprintf @"Pool_512_V2a%s" "GenStandard" |> UMX.tag)
             "Rate comp for 32p4a Msuf4"
-            [
-                (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationIntervalLastKey, [3] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
-                (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-                (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
-                (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
-            ]
+            parameterSpans
             "expInterval100_L50ss"
             "summaryInterval_C.1p5C"
             QueryCatalogNames.sorterSgdMsufStandard
             SetupCatalogNames.standard
             RunParamBuilderNames.Enhancer.msuf32MutationRate
             false
+            parameterSpans
+            QueryCatalogNames.sorterSgdMsufStandard
+            SetupEnhancerFunctionNames.sorterSgd
+            [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     )

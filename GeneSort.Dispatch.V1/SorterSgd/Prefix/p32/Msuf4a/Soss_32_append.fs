@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32_append
 
 open FSharp.UMX
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Setup
@@ -12,12 +13,12 @@ let projName = "SorterSgd.Soss.32p4a.Msuf.Append" |> UMX.tag<projectName>
 /// Inherit source parameter combinations; append evolution through a later interval.
 /// Both interval arguments are zero-based save-interval indices, not generation numbers.
 let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
-    if source.ExecuteFunctionName <> ExecuteFunctionNames.soss || source.QueryCatalogName <> QueryCatalogNames.sorterSgdMsufSoss then
+    if source.ExecuteFunctionName <> ExecuteFunctionNames.soss || source.RunQueryCatalogName <> QueryCatalogNames.sorterSgdMsufSoss then
         invalidArg (nameof source) "Expected a Soss_32 source run."
     if sourceInterval < 0 || lastInterval <= sourceInterval then
         invalidArg (nameof lastInterval) "The final interval must follow the nonnegative source interval."
     let spans =
-        source.ParameterSpans
+        source.RunParameterSpans
         |> List.filter (fun (key, _) -> key <> runParameters.generationIntervalLastKey)
         |> fun inherited -> inherited @ [
             runParameters.sourceProjectNameKey, [%source.ProjectName]
@@ -31,7 +32,11 @@ let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
         (sprintf "Continue %s/%s from interval %d" %source.ProjectName %source.DatabaseName sourceInterval)
         spans source.GenSaveIntervalsName.Value source.GenSaveSubIntervalsName.Value
         QueryCatalogNames.sorterSgdMsufSossAppend SetupCatalogNames.sossAppend
-        source.EnhancerCatalogName false
+        source.RunEnhancerFunctionName false
+        spans
+        QueryCatalogNames.sorterSgdMsufSossAppend
+        SetupEnhancerFunctionNames.sorterSgd
+        [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     |> run.SgdRun
 
 let Pool_4_Debug () = fromSource (Soss_32.Pool_4_Debug ()) 1 2

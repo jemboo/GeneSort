@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs
@@ -26,12 +27,13 @@ module RunHost =
         |> UMX.tag<pathToRootFolder>
 
     let makeDatabase (run: run) : IGeneSortDb =
-        new GeneSortDbMp(makeDataFolder run, run.QueryCatalogName)
+        new GeneSortDbMp(makeDataFolder run, run.RunQueryCatalogName)
 
 type simpleRunHost = private {
     projectDb: IGeneSortDb
     run: simpleRun
     queryParamsFromRunParams: queryParamsBuilder
+    queryParamsFromSetupParams: setupQueryParamsBuilder
     maxParallel: int
     setup: setupFunction option
     executeFunction: executeFunction
@@ -65,9 +67,11 @@ type runHost =
         let makeSimpleHost (simple: simpleRun) =
             { projectDb = db
               run = simple
+              queryParamsFromSetupParams =
+                  QueryParamsCatalog.getForSetup run.SetupQueryCatalogName run.ProjectName run.DatabaseName
               queryParamsFromRunParams =
                   QueryParamsCatalog.get
-                      run.QueryCatalogName
+                      run.RunQueryCatalogName
                       run.ProjectName
                       run.DatabaseName
               maxParallel = maxParallel
@@ -118,6 +122,11 @@ type runHost =
         | SimpleRunHost host -> host.queryParamsFromRunParams
         | SgdRunHost host -> host.simpleHost.queryParamsFromRunParams
 
+    member this.QueryParamsFromSetupParams =
+        match this with
+        | SimpleRunHost host -> host.queryParamsFromSetupParams
+        | SgdRunHost host -> host.simpleHost.queryParamsFromSetupParams
+
     member this.GenSaveIntervals =
         match this with
         | SimpleRunHost _ -> None
@@ -145,7 +154,7 @@ type runHost =
 
     /// Bind storage and cancellation to the complete setup selected by the run.
     member this.WithSetupContext(context: setupContext) =
-        let setup = SetupCatalog.get this.Run.SetupCatalogName context
+        let setup = SetupCatalog.get this.Run.SetupFunctionName context
         match this with
         | SimpleRunHost host -> SimpleRunHost { host with setup = Some setup }
         | SgdRunHost host -> SgdRunHost { host with simpleHost = { host.simpleHost with setup = Some setup } }
@@ -165,7 +174,18 @@ type runHost =
         | SgdRunHost host -> host.simpleHost.maxParallel
 
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
-        let enhancer = RunParamEnhancerBuilders.get this.Run.EnhancerCatalogName
+        let enhancer = RunParamEnhancerBuilders.get this.Run.RunEnhancerFunctionName
         let context = runParamEnhancerContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
         |> Seq.map (enhancer context)
+
+    member this.SetupParamMapRefiner (parameters: setupParameters seq) : setupParameters seq =
+        let enhancer = SetupEnhancerCatalog.get this.Run.SetupEnhancerFunctionName
+        let context = { Run = this.Run; QueryParamsFromSetupParams = this.QueryParamsFromSetupParams }
+        parameters |> Seq.map (enhancer context)
+
+    member this.MakeRunParameters minReplica maxReplica =
+        SimpleRun.makeRunParameters minReplica maxReplica this.ParamMapRefiner this.Run.BaseRun
+
+    member this.MakeSetupParameters minReplica maxReplica =
+        SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun

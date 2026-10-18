@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
@@ -26,56 +27,68 @@ module MutateSpecsRs =
     module Specs =
 
         let Test_Msrs ()  : run =
+            let parameterSpans =
+                [
+                    msrsModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV1
+                    sorterEvalSelectionType
+                    sorterEvalMeasure_CestM_Scw
+                    (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg)
+                    modificationRate90
+                    sortingWidth16
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
                     "Mutation analysis for Msrs"
-                    [
-                msrsModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV1
-                sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Scw
-                (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate90
-                sortingWidth16
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutateStandard
                     SetupCatalogNames.mutantStandard
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutateStandard
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
         let Test_Msuf4 ()  : run =
+            let parameterSpans =
+                [
+                    msuf4ModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV1
+                    sorterEvalSelectionType
+                    sorterEvalMeasure_CestM_Scw
+                    (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg )
+                    modificationRate90
+                    sortingWidth16
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomStandard.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)
                     "Mutation analysis for Msuf4"
-                    [
-                msuf4ModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV1
-                sorterEvalSelectionType
-                sorterEvalMeasure_CestM_Scw
-                (mutatorSpansMsrs 16<sortingWidth> mutatorVariant.V1 rngType.Lcg )
-                modificationRate90
-                sortingWidth16
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutateStandard
                     SetupCatalogNames.mutantStandard
                     RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutateStandard
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 

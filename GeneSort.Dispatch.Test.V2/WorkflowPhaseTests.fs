@@ -84,7 +84,7 @@ let private save (db: IGeneSortDb) mode (generation: int) dataType value =
 let ``Soss checkpoints label the produced generation and stop exactly at the target`` startingGeneration =
     let sourceRun = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32.Pool_4_Debug ()
     let host = runHost.Create sourceRun 1
-    let rp = (Run.makeRunParameters 0<replNumber> 1<replNumber> sourceRun.ParameterSpans host.ParamMapRefiner |> Array.exactlyOne)
+    let rp = (Run.makeRunParameters 0<replNumber> 1<replNumber> sourceRun.RunParameterSpans host.ParamMapRefiner |> Array.exactlyOne)
                  .WithGenerationIntervalLast(Some (UMX.tag 2))
     let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
@@ -113,7 +113,7 @@ let ``Soss append copies the selected source checkpoint and tests only after val
     let destinationMemory = MemoryDb(configured.QueryParamsFromRunParams)
     let sourceDb = sourceMemory :> IGeneSortDb
     let host = configured.WithRunDb(destinationMemory)
-    let rp = Run.makeRunParameters 0<replNumber> 1<replNumber> appendRun.ParameterSpans host.ParamMapRefiner |> Array.exactlyOne
+    let rp = Run.makeRunParameters 0<replNumber> 1<replNumber> appendRun.RunParameterSpans host.ParamMapRefiner |> Array.exactlyOne
     let generation = GenIntervalConfig.getSampleAtIndex sourceHost.GenSaveIntervals.Value 1 |> Option.get
     let persist mode query data = sourceDb.saveAsync mode query data (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
     persist geneSortDataMode.Project (queryParams.createForRun sourceRun.DatabaseName sourceRun.ProjectName sourceRun.RunName) (outputData.Run sourceRun)

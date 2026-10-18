@@ -52,7 +52,7 @@ module DispatchSortableTests =
 
     let private initializeParameters() =
         ParamOps.initRunAndParamFiles host.RunDb (Some progress) host.Run
-            minReplica maxReplica host.AllowOverwrite host.ParamMapRefiner host.Run.ParameterSpans
+            minReplica maxReplica host.AllowOverwrite host.ParamMapRefiner host.Run.RunParameterSpans
 
     let private showResult result =
         match result with

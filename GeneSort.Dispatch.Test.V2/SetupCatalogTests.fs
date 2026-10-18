@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.Test.V2.SetupCatalogTests
 
 open System
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open Xunit
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Setup
@@ -23,7 +24,11 @@ let private makeRun queryCatalog setupCatalog =
             GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
         else GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
     SimpleRun.create executeName (UMX.tag "SetupTests") (UMX.tag "Tests") (UMX.tag "SetupTests") "Setup test" []
-        queryCatalog setupCatalog "sortable-test" false |> run.SimpleRun
+        queryCatalog setupCatalog "sortable-test" false
+        []
+        queryCatalog
+        SetupEnhancerFunctionNames.noOp
+        [] |> run.SimpleRun
 
 let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 
@@ -103,33 +108,33 @@ let ``unbound mutant setup reports an error without running tests`` () =
 [<InlineData("sorter-mutate.standard", "setup.mutant-standard")>]
 [<InlineData("sorter-mutate.merge", "setup.mutant-merge")>]
 [<InlineData("sorter-mutate.prefix", "setup.mutant-prefix")>]
-let ``explicit setup catalog survives serialization`` queryCatalog expected =
+let ``explicit setup function name survives serialization`` queryCatalog expected =
     MessagePackSetup.configure ()
     let configured = makeRun queryCatalog expected
-    Assert.Equal(expected, configured.SetupCatalogName)
+    Assert.Equal(expected, configured.SetupFunctionName)
     let dto = RunDto.fromDomain configured
     let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
 
     let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(expected, restored.SetupCatalogName)
+    Assert.Equal(expected, restored.SetupFunctionName)
 
 [<Fact>]
-let ``saved runs must specify a setup catalog name`` () =
+let ``saved runs must specify a setup function name`` () =
     MessagePackSetup.configure ()
     let dto = makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.prefix |> RunDto.fromDomain
     let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
-    json.AsObject().Remove("SetupCatalogName") |> ignore
+    json.AsObject().Remove("SetupFunctionName") |> ignore
     let legacyDto = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto>
     Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain legacyDto |> ignore) |> ignore
 
 [<Fact>]
-let ``host setup honors the run setup catalog and custom names round trip`` () =
+let ``host setup honors the run setup function and custom names round trip`` () =
     MessagePackSetup.configure ()
     let customName = string (Guid.NewGuid())
     SetupCatalog.register customName (SetupFunctions.fromCatalogs SorterModelSetCatalogNames.mutantMerge SortableTestsWithPrefixCatalogNames.prefix)
-    let configured = (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard).WithSetupCatalogName customName
+    let configured = makeRun QueryCatalogNames.sorterMutateStandard customName
     let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(customName, restored.SetupCatalogName)
+    Assert.Equal(customName, restored.SetupFunctionName)
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
     let host = (runHost.Create restored 1).WithSetupContext(bindings)

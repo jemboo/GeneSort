@@ -15,6 +15,7 @@
     <Compile Include="WorkflowPhaseTests.fs" />
     <Compile Include="ExecutionPathTests.fs" />
     <Compile Include="ParameterSetTests.fs" />
+    <Compile Include="SetupOutputTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

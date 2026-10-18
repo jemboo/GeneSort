@@ -7,6 +7,8 @@ open GeneSort.Project.V1.Parameters
 /// A normalized adapter for turning run parameters into the storage path metadata.
 type queryParamsBuilder = runParameters -> geneSortDataType -> queryParams option
 type queryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> queryParamsBuilder
+type setupQueryParamsBuilder = setupParameters -> geneSortDataType -> queryParams option
+type setupQueryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> setupQueryParamsBuilder
 
 module QueryCatalogNames =
     [<Literal>]
@@ -65,3 +67,12 @@ module QueryParamsCatalog =
             match Map.tryFind name builders with
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
+
+    /// Setup and run builders share the named catalog and the same parameter keys.
+    let registerForSetup name (builder: setupQueryParamsCatalogBuilder) =
+        register name (fun project database rp dataType ->
+            builder project database (setupParameters.create rp.ParamMap) dataType)
+
+    let getForSetup name project database : setupQueryParamsBuilder =
+        let builder = get name project database
+        fun parameters dataType -> builder (runParameters.create parameters.ParamMap) dataType

@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.Test.V2.MakerCatalogTests
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs
@@ -39,26 +40,112 @@ let private errorOf result =
     | Error message -> message
     | Ok _ -> failwith "Expected missing run parameters to fail."
 
-let private makeRun names (projectName: string) (runName: string) =
-    SgdRun.create names ExecuteFunctionNames.standard (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
+let private makeRunWithExecuteName executeName names (projectName: string) (runName: string) =
+    SgdRun.create names executeName (UMX.tag "CatalogTests") (UMX.tag projectName) (UMX.tag runName)
         "Catalog configuration test" [] "expInterval100_L50ss" "summaryInterval_C.1p5C"
         QueryCatalogNames.sorterSgdMsufStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
         RunParamBuilderNames.Enhancer.msuf32MutationRate false
+        []
+        QueryCatalogNames.sorterSgdMsufStandard
+        SetupEnhancerFunctionNames.noOp
+        []
     |> run.SgdRun
+
+let private makeRun = makeRunWithExecuteName ExecuteFunctionNames.standard
 
 let private makeSimpleRun executeName =
     SimpleRun.create executeName
         (UMX.tag "CatalogTests") (UMX.tag "Tests") (UMX.tag "SimpleExecution") "Execution test" []
         QueryCatalogNames.sorterEvalStandard GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
         RunParamBuilderNames.Enhancer.sorterEvalStandard false
+        []
+        QueryCatalogNames.sorterEvalStandard
+        SetupEnhancerFunctionNames.noOp
+        []
     |> run.SimpleRun
+
+[<Fact>]
+let ``setup spans and query catalogs survive serialization for simple and SGD runs`` () =
+    MessagePackSetup.configure ()
+    for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
+        let dto = RunDto.fromDomain original
+        let configured = RunDto.toDomain { dto with SetupParameterSpans = [|{ Key = "SetupOnly"; Values = [|"one"; "two"|] }|]; SetupQueryCatalogName = "tests.setup-query" }
+        let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+        Assert.Equal<(string * string list) list>(configured.SetupParameterSpans, restored.SetupParameterSpans)
+        Assert.Equal("tests.setup-query", restored.SetupQueryCatalogName)
+        Assert.Equal<(string * string list) list>(original.RunParameterSpans, restored.RunParameterSpans)
+        Assert.Equal(original.RunQueryCatalogName, restored.RunQueryCatalogName)
+        Assert.Equal(original.RunEnhancerFunctionName, restored.RunEnhancerFunctionName)
+        Assert.Equal(original.SetupEnhancerFunctionName, restored.SetupEnhancerFunctionName)
+
+[<Fact>]
+let ``setup output types preserve every DU case and its value through run serialization`` () =
+    MessagePackSetup.configure ()
+    let outputTypes = [
+        geneSortDataType.Run (UMX.tag "run")
+        geneSortDataType.RunParameters (UMX.tag "parameters")
+        geneSortDataType.SorterPoolSet "seed"
+        geneSortDataType.SorterPoolSetSummarySet "summary"
+        geneSortDataType.SorterSet "sorters"
+        geneSortDataType.SorterModelSet "models"
+        geneSortDataType.SortableTests "tests"
+        geneSortDataType.SortableTestsWithPrefix "prefix"
+        geneSortDataType.SorterSetEval "evaluations"
+        geneSortDataType.SorterPoolBinsSetSeries "bins"
+        geneSortDataType.SorterPoolSetHistory "history"
+        geneSortDataType.TextReport (UMX.tag "report")
+    ]
+    for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
+        for expected in [[]; outputTypes] do
+            let dto = RunDto.fromDomain original
+            let configured = RunDto.toDomain { dto with SetupOutputTypes = expected |> List.map OutputDataTypeDto.fromDomain |> List.toArray }
+            let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+            Assert.Equal<geneSortDataType list>(expected, restored.SetupOutputTypes)
+            Assert.Equal<geneSortDataType list>(expected, SimpleRun.setupOutputTypes restored.BaseRun)
+
+[<Fact>]
+let ``host generates independent setup and run combinations using their own query catalogs`` () =
+    let runQuery = "tests.run-query." + Guid.NewGuid().ToString("N")
+    let setupQuery = "tests.setup-query." + Guid.NewGuid().ToString("N")
+    QueryParamsCatalog.register runQuery (fun project database rp dataType ->
+        Some (queryParams.create database project (rp.GetRepl()) None dataType [|"Phase", "run"|]))
+    QueryParamsCatalog.registerForSetup setupQuery (fun project database sp dataType ->
+        Some (queryParams.create database project (sp.GetRepl()) None dataType [|"Phase", "setup"|]))
+    let setupEnhancerName = "tests.setup-enhancer." + Guid.NewGuid().ToString("N")
+    SetupEnhancerCatalog.register setupEnhancerName (fun context sp ->
+        let query = context.QueryParamsFromSetupParams sp (geneSortDataType.Run context.Run.RunName) |> Option.get
+        sp.WithId(Some query.Id))
+    let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
+    let configured =
+        { dto with
+            RunParameterSpans = [|{ Key = "RunOnly"; Values = [|"a"; "b"; "c"|] }|]
+            RunQueryCatalogName = runQuery
+            SetupParameterSpans = [|{ Key = "SetupOnly"; Values = [|"one"; "two"|] }|]
+            SetupQueryCatalogName = setupQuery
+            SetupEnhancerFunctionName = setupEnhancerName }
+        |> RunDto.toDomain
+    let host = runHost.Create configured 1
+    let runParameters = host.MakeRunParameters 0<replNumber> 2<replNumber>
+    let setupParameters = host.MakeSetupParameters 0<replNumber> 2<replNumber>
+    Assert.Equal(6, runParameters.Length)
+    Assert.Equal(4, setupParameters.Length)
+    for rp in runParameters do
+        Assert.False(rp.ParamMap.ContainsKey "SetupOnly")
+        let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
+        Assert.Equal("run", query.Properties.["Phase"])
+        Assert.Equal(Some query.Id, rp.GetId())
+    for sp in setupParameters do
+        Assert.False(sp.ParamMap.ContainsKey "RunOnly")
+        let query = host.QueryParamsFromSetupParams sp (geneSortDataType.Run configured.RunName) |> Option.get
+        Assert.Equal("setup", query.Properties.["Phase"])
+        Assert.Equal(Some query.Id, sp.GetId())
 
 [<Fact>]
 let ``parameter refinement enhances every parameter combination`` () =
     let enhancerName = "tests.enhance-every-combination"
     RunParamEnhancerBuilders.register enhancerName (fun _ rp -> rp.WithRunFinished(Some false)) |> ignore
     let dto = makeSimpleRun ExecuteFunctionNames.standard |> RunDto.fromDomain
-    let configuredRun = { dto with EnhancerCatalogName = enhancerName } |> RunDto.toDomain
+    let configuredRun = { dto with RunEnhancerFunctionName = enhancerName } |> RunDto.toDomain
     let host = runHost.Create configuredRun 1
     let inputs =
         [| for width in [ 3; 4; 5; 8 ] ->
@@ -69,6 +156,36 @@ let ``parameter refinement enhances every parameter combination`` () =
     Array.iter2 (fun (input: runParameters) (result: runParameters) ->
         Assert.Equal(input.GetSortingWidth(), result.GetSortingWidth())
         Assert.Equal(Some false, result.GetRunFinished())) inputs results
+
+[<Fact>]
+let ``built-in setup enhancers preserve parameters without invoking the run enhancer`` () =
+    let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
+    for name in [SetupEnhancerFunctionNames.noOp; SetupEnhancerFunctionNames.sortableTests;
+                 SetupEnhancerFunctionNames.sorterEval; SetupEnhancerFunctionNames.sorterMutate;
+                 SetupEnhancerFunctionNames.sorterSgd] do
+        let configured = RunDto.toDomain { dto with SetupEnhancerFunctionName = name }
+        let host = runHost.Create configured 1
+        let input = setupParameters.create (Map.ofList ["custom", "preserved"])
+        let result = host.SetupParamMapRefiner [input] |> Seq.exactlyOne
+        Assert.Same(input, result)
+        let generated = host.MakeSetupParameters 0<replNumber> 2<replNumber>
+        Assert.Equal(2, generated.Length)
+        Assert.All(generated, fun sp -> Assert.Equal(1, sp.ParamMap.Count))
+
+[<Theory>]
+[<InlineData(null)>]
+[<InlineData("")>]
+[<InlineData(" ")>]
+let ``both enhancer function names are required when constructing runs`` missing =
+    let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with RunEnhancerFunctionName = missing } |> ignore) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with SetupEnhancerFunctionName = missing } |> ignore) |> ignore
+
+[<Fact>]
+let ``setup enhancer catalog rejects unknown names and duplicate registrations`` () =
+    Assert.Throws<InvalidOperationException>(fun () -> SetupEnhancerCatalog.get (Guid.NewGuid().ToString()) |> ignore) |> ignore
+    Assert.Throws<InvalidOperationException>(fun () -> SetupEnhancerCatalog.register SetupEnhancerFunctionNames.noOp SetupEnhancerCatalog.noOp) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> SetupEnhancerCatalog.register " " SetupEnhancerCatalog.noOp) |> ignore
 
 [<Theory>]
 [<InlineData("sorter-eval.evaluate")>]
@@ -97,7 +214,7 @@ let ``evaluation and mutation executors use the simple host configured function`
         calls <- calls + 1
         return Ok rp
     })
-    let host = runHost.Create ((makeSimpleRun ExecuteFunctionNames.sorterEval).WithExecuteFunctionName name) 1
+    let host = runHost.Create (makeSimpleRun name) 1
     use cts = new System.Threading.CancellationTokenSource()
     let executors = [
         GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.standardExecutor
@@ -123,7 +240,7 @@ let ``evolution entry reports missing SGD context on simple runs`` () =
 [<InlineData("evolution.standard")>]
 [<InlineData("evolution.soss")>]
 let ``host resolves built-in evolution functions at creation`` name =
-    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Execute").WithExecuteFunctionName(name)
+    let configured = makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "Execute"
     Assert.Equal(name, configured.ExecuteFunctionName)
     Assert.Equal(name, SimpleRun.executeFunctionName configured.BaseRun)
     match runHost.Create configured 1 with
@@ -138,7 +255,7 @@ let ``execution uses the configured function regardless of executor label`` () =
         calls <- calls + 1
         return Ok rp
     })
-    let configured = (makeRun EvolutionMakerNames.standard "Tests" "CustomExecution").WithExecuteFunctionName(name)
+    let configured = makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "CustomExecution"
     let host = runHost.Create configured 1
     use cts = new System.Threading.CancellationTokenSource()
     for _ in 1..2 do
@@ -151,7 +268,7 @@ let ``execution uses the configured function regardless of executor label`` () =
 [<Fact>]
 let ``unknown evolution function is rejected when making the host`` () =
     let unknown = Guid.NewGuid().ToString()
-    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Unknown").WithExecuteFunctionName(unknown)
+    let configured = makeRunWithExecuteName unknown EvolutionMakerNames.standard "Tests" "Unknown"
     let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create configured 1 |> ignore)
     Assert.Contains(unknown, error.Message)
 
@@ -160,7 +277,7 @@ let ``execute catalog rejects blank names and duplicate registrations`` () =
     let execute = ExecuteFunctionCatalog.get ExecuteFunctionNames.standard
     Assert.Throws<ArgumentException>(fun () -> ExecuteFunctionCatalog.register " " execute) |> ignore
     Assert.Throws<InvalidOperationException>(fun () -> ExecuteFunctionCatalog.register ExecuteFunctionNames.standard execute) |> ignore
-    Assert.Throws<ArgumentException>(fun () -> (makeRun EvolutionMakerNames.standard "Tests" "Blank").WithExecuteFunctionName("") |> ignore) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> makeRunWithExecuteName "" EvolutionMakerNames.standard "Tests" "Blank" |> ignore) |> ignore
 
 [<Theory>]
 [<InlineData("evolution.standard")>]
@@ -168,7 +285,7 @@ let ``execute catalog rejects blank names and duplicate registrations`` () =
 [<InlineData("custom.evolution")>]
 let ``execute function name survives MessagePack round trip`` name =
     MessagePackSetup.configure ()
-    let configured = (makeRun EvolutionMakerNames.standard "Tests" "Serialized").WithExecuteFunctionName(name)
+    let configured = makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "Serialized"
     let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(name, restored.ExecuteFunctionName)
     Assert.Equal(name, SimpleRun.executeFunctionName restored.BaseRun)

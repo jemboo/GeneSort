@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msrs4a
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
@@ -36,87 +37,105 @@ module MutationRate =
 
 
         let Test () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                    (runParameters.paraRateKey, [4.001] |> List.map string)
+                    (runParameters.selfSymRateKey, [4.001]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (runParameters.modificationRateKey, [0.25;] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
                     (sprintf @"Test%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [12] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [4.001] |> List.map string)
-                (runParameters.selfSymRateKey, [4.001]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
-                (runParameters.modificationRateKey, [0.25;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
         let EqualOPS () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                    (runParameters.paraRateKey, [3.001; 4.001; 5.001] |> List.map string)
+                    (runParameters.selfSymRateKey, [3.001; 4.001; 5.001]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
                     (sprintf @"EqualOPS%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [12] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [3.001; 4.001; 5.001] |> List.map string)
-                (runParameters.selfSymRateKey, [3.001; 4.001; 5.001]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
-                (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
         
 
         let EqualOPS2 () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                    (runParameters.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
+                    (runParameters.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_32Name
                     projName
                     (sprintf @"EqualOPS2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [12] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
-                (runParameters.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
-                (runParameters.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
         
@@ -125,84 +144,102 @@ module MutationRate =
 
 
         let Test () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [12] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                    (runParameters.paraRateKey, [4.001] |> List.map string)
+                    (runParameters.selfSymRateKey, [4.001]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.modificationRateKey, [0.25;] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
                     (sprintf @"Test%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [12] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [4.001] |> List.map string)
-                (runParameters.selfSymRateKey, [4.001]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.modificationRateKey, [0.25;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
         let WideTest () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [5] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                    (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; 1.5;   2.001; 3.001;] |> List.map string)
+                    (runParameters.selfSymRateKey, [1.001; 1.5;   2.001; 3.001; 4.001; 5.001; 6.001]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
                     (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; 1.5;   2.001; 3.001;] |> List.map string)
-                (runParameters.selfSymRateKey, [1.001; 1.5;   2.001; 3.001; 4.001; 5.001; 6.001]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
         
 
         let NarrowTest () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [4] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                    (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; ] |> List.map string)
+                    (runParameters.selfSymRateKey, [1.5;   2.001;]  |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbVariableModR_64Name
                     projName
                     (sprintf @"NarrowTest%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [4] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey,    [0.05;  0.1;   0.5;   1.001; ] |> List.map string)
-                (runParameters.selfSymRateKey, [1.5;   2.001;]  |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRate
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
@@ -213,28 +250,34 @@ module MutationRate =
 
         
         let Test2 () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [10] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
+                    (runParameters.paraRateKey, [0.05; 0.075; 0.1; 0.125] |> List.map string)
+                    (runParameters.selfSymRateKey, [1.25; 1.5; 1.75; 2.5] |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbMaxModRate_32Name
                     projName
                     (sprintf @"Test2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [10] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [0.05; 0.075; 0.1; 0.125] |> List.map string)
-                (runParameters.selfSymRateKey, [1.25; 1.5; 1.75; 2.5] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
@@ -244,26 +287,32 @@ module MutationRate =
 
         
         let WideTest () : run =
+            let parameterSpans =
+                [
+                    (runParameters.codeModKey, ["NoMods"] |> List.map string)
+                    (runParameters.generationCurrentKey, [0] |> List.map string)
+                    (runParameters.generationIntervalCountKey, [10] |> List.map string)
+                    (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
+                    (runParameters.paraRateKey, [0.025; 0.05; 0.75; 0.1] |> List.map string)
+                    (runParameters.selfSymRateKey, [0.75; 1.001; 1.5; 2.001] |> List.map string)
+                    (runParameters.mutationModKey, [0] |> List.map string)
+                    (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+                ]
             run.SgdRun (
                 SgdRun.create EvolutionMakerNames.prefix ExecuteFunctionNames.standard
                     dbMaxModRate_64Name
                     projName
                     (sprintf @"WideTest2%s" "GenStandard" |> UMX.tag)
                     "OrthroPara rate comp for Msrs32p4a Msrs, Test"
-                    [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [10] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [0.025; 0.05; 0.75; 0.1] |> List.map string)
-                (runParameters.selfSymRateKey, [0.75; 1.001; 1.5; 2.001] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
+                    parameterSpans
                     "expInterval100_L50ss"
                     "summaryInterval_C.1p5C"
                     QueryCatalogNames.sorterSgdMsrs32MutationRate
                     SetupCatalogNames.standard
                     RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterSgdMsrs32MutationRate
+                    SetupEnhancerFunctionNames.sorterSgd
+                    [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )

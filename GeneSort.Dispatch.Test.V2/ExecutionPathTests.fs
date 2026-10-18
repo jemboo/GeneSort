@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.Test.V2.ExecutionPathTests
 
 open System
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open System.Threading
 open Xunit
 open FSharp.UMX
@@ -19,6 +20,10 @@ let private createHostWithSaveResult saveResult finished execute =
     let configured =
         SimpleRun.create name (UMX.tag "Tests") (UMX.tag "Tests") (UMX.tag "Paths")
             "Path test" [] name SetupCatalogNames.standard "sortable-test" false
+            []
+            name
+            SetupEnhancerFunctionNames.noOp
+            []
         |> run.SimpleRun
     let rp = (runParameters.create Map.empty).WithRunFinished(Some finished).WithRepl(Some (UMX.tag 0))
     let writes = ResizeArray<geneSortDataMode>()

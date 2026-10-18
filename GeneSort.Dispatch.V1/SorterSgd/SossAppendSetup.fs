@@ -29,7 +29,7 @@ module SossAppendSetup =
             let! sourceRun = OutputData.asRun sourceData
             do! if sourceRun.ProjectName = sourceProject && sourceRun.DatabaseName = sourceDatabase && sourceRun.RunName = sourceRunName then Ok ()
                 else Error "Source run identity does not match the requested source."
-            do! if sourceRun.ExecuteFunctionName = ExecuteFunctionNames.soss && sourceRun.QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss then Ok ()
+            do! if sourceRun.ExecuteFunctionName = ExecuteFunctionNames.soss && sourceRun.RunQueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss then Ok ()
                 else Error "Append setup currently requires a Soss_32 source run."
             let! intervalName = sourceRun.GenSaveIntervalsName |> Result.ofOption "Source run has no generation interval configuration."
             let! intervals =
@@ -44,7 +44,7 @@ module SossAppendSetup =
                                   |> Result.ofOption "Destination GenerationIntervalLast is unavailable."
             do! if lastGeneration > generation then Ok () else Error "Destination final generation must be after the imported generation."
 
-            let sourceQuery = QueryParamsCatalog.get sourceRun.QueryCatalogName sourceProject sourceDatabase
+            let sourceQuery = QueryParamsCatalog.get sourceRun.RunQueryCatalogName sourceProject sourceDatabase
             let atGeneration = rp.WithGenerationCurrent(Some (UMX.tag generation))
             let! poolQuery = sourceQuery atGeneration (geneSortDataType.SorterPoolSet "") |> Result.ofOption "Cannot build source pool query."
             let! poolData = sourceDb.loadAsync geneSortDataMode.Results poolQuery

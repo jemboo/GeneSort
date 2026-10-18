@@ -70,7 +70,7 @@ module ParamOps =
                     report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
-                                (QueryParamsCatalog.get run.QueryCatalogName run.ProjectName run.DatabaseName)
+                                (QueryParamsCatalog.get run.RunQueryCatalogName run.ProjectName run.DatabaseName)
                                 runParametersArray 
                                 allowOverwrite progress
             with e ->

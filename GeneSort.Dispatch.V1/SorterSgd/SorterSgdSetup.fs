@@ -28,7 +28,7 @@ module SorterSgdSetup =
 
     let getSetupExecutor (host: runHost) =
         match host.Run.ExecuteFunctionName with
-        | ExecuteFunctionNames.soss when host.Run.SetupCatalogName = SetupCatalogNames.sossAppend ->
+        | ExecuteFunctionNames.soss when host.Run.SetupFunctionName = SetupCatalogNames.sossAppend ->
             { new IRunParamsExecutor with
                 member _.Execute host rp allowOverwrite cts progress = asyncResult {
                     let! project = rp.GetSourceProjectName() |> Result.ofOption "Missing SourceProjectName."

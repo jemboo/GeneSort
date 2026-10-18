@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
@@ -23,7 +24,7 @@ module SorterEvalSpecsTestPrefix =
                     SorterEvalDbs.projectName
                     (sprintf @"Prefix_24s_%s" "GenPrefix" |> UMX.tag)
                     "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
-                    [   
+                    [
                         rngTypeLcg
                         prefixLib_Prefix24s
                         withMsuf6
@@ -35,6 +36,17 @@ module SorterEvalSpecsTestPrefix =
                     SetupCatalogNames.prefix
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
+                    [
+                        rngTypeLcg
+                        prefixLib_Prefix24s
+                        withMsuf6
+                        dataFomatBitv512
+                        sorterEvalTypeV2
+                        largeSorterCount
+                    ]
+                    QueryCatalogNames.sorterEvalPrefix
+                    SetupEnhancerFunctionNames.sorterEval
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
@@ -45,7 +57,7 @@ module SorterEvalSpecsTestPrefix =
                     SorterEvalDbs.projectName
                     (sprintf @"Prefix_32_%s" "GenPrefix" |> UMX.tag)
                     "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
-                    [   
+                    [
                         rngTypeLcg
                         prefixLib_Prefix32_4
                         withMsuf4
@@ -57,6 +69,17 @@ module SorterEvalSpecsTestPrefix =
                     SetupCatalogNames.prefix
                     RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     false
+                    [
+                        rngTypeLcg
+                        prefixLib_Prefix32_4
+                        withMsuf4
+                        dataFomatBitv512
+                        sorterEvalTypeV2
+                        largeSorterCount
+                    ]
+                    QueryCatalogNames.sorterEvalPrefix
+                    SetupEnhancerFunctionNames.sorterEval
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
@@ -64,8 +87,8 @@ module SorterEvalSpecsTestPrefix =
         | Prefix_24s
         | Prefix_32
 
-    let Configs = Map.ofList 
-                    [ 
+    let Configs = Map.ofList
+                    [
                         (configType.Prefix_24s, Specs.Prefix_24s);
                         (configType.Prefix_32, Specs.Prefix_32);
                     ]

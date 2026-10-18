@@ -1,6 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
 open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
@@ -25,109 +26,133 @@ module MutateSpecsRp =
     module Specs =
 
         let Test_Msce ()  : run =
+            let parameterSpans =
+                [
+                    msceModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV2
+                    seedSorterPoolSelectionType
+                    sorterEvalMeasure_CestM_noScw
+                    prefixLib_Prefix32_4
+                    (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
+                    modificationRate03
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msce_%s" "GenPrefix" |> UMX.tag)
                     "Mutation analysis for merge Msce"
-                    [
-                msceModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutatePrefix
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
         let Test_Mssi ()  : run =
+            let parameterSpans =
+                [
+                    mssiModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV2
+                    seedSorterPoolSelectionType
+                    sorterEvalMeasure_CestM_noScw
+                    prefixLib_Prefix32_4
+                    (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
+                    modificationRate03
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Mssi_%s" "GenPrefix" |> UMX.tag)
                     "Mutation analysis for merge Mssi"
-                    [
-                mssiModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutatePrefix
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
         let Test_Msrs ()  : run =
+            let parameterSpans =
+                [
+                    msrsModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV2
+                    seedSorterPoolSelectionType
+                    sorterEvalMeasure_CestM_noScw
+                    prefixLib_Prefix32_4
+                    (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
+                    modificationRate03
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msrs_%s" "GenPrefix" |> UMX.tag)
                     "Mutation analysis for merge Msrs"
-                    [
-                msrsModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutatePrefix
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
         let Test_Msuf4 ()  : run =
+            let parameterSpans =
+                [
+                    msuf4ModelType
+                    rngTypeLcg
+                    dataFomatBitv512
+                    sorterEvalTypeV2
+                    seedSorterPoolSelectionType
+                    sorterEvalMeasure_CestM_noScw
+                    prefixLib_Prefix32_4
+                    (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
+                    modificationRate03
+                    testChildCount
+                    mutationMod1
+                ]
             run.SimpleRun (
                 SimpleRun.create GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
                     SorterMutateDbs.RandomPrefix.Uniform.dbName
                     SorterMutateDbs.projectName
                     (sprintf @"Test-Msuf4_%s" "GenPrefix" |> UMX.tag)
                     "Mutation analysis for merge Msuf4"
-                    [
-                msuf4ModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
-            ]
+                    parameterSpans
                     QueryCatalogNames.sorterMutatePrefix
                     SetupCatalogNames.mutantPrefix
                     RunParamBuilderNames.Enhancer.sorterMutateStandard
                     false
+                    parameterSpans
+                    QueryCatalogNames.sorterMutatePrefix
+                    SetupEnhancerFunctionNames.sorterMutate
+                    [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             )
 
 
