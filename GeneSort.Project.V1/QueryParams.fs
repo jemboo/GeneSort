@@ -30,7 +30,7 @@ type queryParams =
 
     override this.ToString() : string =
         let replStr    = this.repl           |> UmxExt.intOptionToString
-        let outTypeStr = this.outputDataType |> OutputDataType.toFolderName
+        let outTypeStr = this.outputDataType |> GeneSortDataType.toFolderName
         let propsStr   =
             this.properties
             |> Map.toSeq
@@ -67,7 +67,7 @@ type queryParams =
             | _, None -> 
                 yield box false
 
-            yield box (outputDataType |> OutputDataType.toFolderName)
+            yield box (outputDataType |> GeneSortDataType.toFolderName)
             yield box props.Count
             
             yield! props 

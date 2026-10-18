@@ -50,10 +50,10 @@ module OutputDataFile =
             let folderPath = Path.Combine(%pathToRootFolder, "Run", %runName)
             UMX.tag<fullPathToFolder> folderPath
         | geneSortDataType.RunParameters _   ->
-            Path.Combine(%pathToRootFolder, "Run", outputDataType |> OutputDataType.toFolderName, replString) 
+            Path.Combine(%pathToRootFolder, "Run", outputDataType |> GeneSortDataType.toFolderName, replString) 
             |> UMX.tag<fullPathToFolder>
         | _ -> 
-            Path.Combine(%pathToRootFolder, outputDataType |> OutputDataType.toFolderName, replString) 
+            Path.Combine(%pathToRootFolder, outputDataType |> GeneSortDataType.toFolderName, replString) 
             |> UMX.tag<fullPathToFolder>
 
     let makeOutputDataName (queryParams: queryParams) : string =

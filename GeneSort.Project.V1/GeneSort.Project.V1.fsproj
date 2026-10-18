@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="RunParamBundles\MutatorParams.fs" />
-    <Compile Include="RunParamBundles\SorterTestsCycleProfile.fs" />
     <Compile Include="ProjectTypes.fs" />
+    <Compile Include="ParamBundles\MutatorParams.fs" />
+    <Compile Include="ParamBundles\SorterTestsCycleProfile.fs" />
+    <Compile Include="Parameters\RunParameters.fs" />
     <Compile Include="GeneSortDataType.fs" />
-    <Compile Include="RunParameters.fs" />
     <Compile Include="QueryParams.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsCatalog.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsBuilders.fs" />

@@ -3,8 +3,6 @@ namespace GeneSort.Project.V1
 open FSharp.UMX
 open System
 
-[<Measure>] type textReportName
-
 type geneSortDataMode =
     | Project
     | Setup
@@ -31,12 +29,12 @@ type geneSortDataType =
     | TextReport of string<textReportName>
 
 
-module OutputDataType =
+module GeneSortDataType =
     let private appendParam (prefix: string) (param: string) =
         if String.IsNullOrEmpty param then prefix else prefix + "_" + param
 
-    let toFolderName (outputDataType: geneSortDataType) : string =
-        match outputDataType with
+    let toFolderName (gsDataType: geneSortDataType) : string =
+        match gsDataType with
         | Run s -> "Run"
         | RunParameters s -> appendParam "RunParameters" %s
         | SorterPoolSet s -> appendParam "SorterPoolSet" %s
@@ -71,7 +69,7 @@ module OutputDataType =
         | _ -> None
 
 
-    let extractTextReportNames (outputDataTypes: geneSortDataType array) : string<textReportName> list =
-        outputDataTypes
+    let extractTextReportNames (gsDataType: geneSortDataType array) : string<textReportName> list =
+        gsDataType
         |> Array.choose (function TextReport name -> Some name | _ -> None)
         |> Array.toList

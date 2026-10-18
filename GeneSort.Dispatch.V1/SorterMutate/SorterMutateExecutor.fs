@@ -19,7 +19,7 @@ open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
-open GeneSort.Project.V1.RunParamBundles
+open GeneSort.Project.V1.ParamBundles
 
 
 module SorterMutateExecutor =

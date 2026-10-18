@@ -14,6 +14,8 @@ open GeneSort.Core
 [<Measure>] type replNumber
 [<Measure>] type generationIntervalCount
 [<Measure>] type generationIntervalLast
+[<Measure>] type textReportName
+
 
 
 module DatabaseName =

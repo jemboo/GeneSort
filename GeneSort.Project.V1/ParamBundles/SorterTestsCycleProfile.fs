@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.V1.RunParamBundles
+﻿namespace GeneSort.Project.V1.ParamBundles
 
 open FSharp.UMX
 open GeneSort.Core

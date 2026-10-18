@@ -141,7 +141,7 @@ module OutputUnionTests =
             let serialize value =
                 value |> GeneSort.Model.Sorting.Mp.V1.SorterModelSetDto.fromDomain |> MessagePackSerializer.Serialize
             Assert.True(serialize original = serialize loaded)
-            Assert.Equal(Some dataType, OutputDataType.fromFolderName (OutputDataType.toFolderName dataType))
+            Assert.Equal(Some dataType, GeneSortDataType.fromFolderName (GeneSortDataType.toFolderName dataType))
             Assert.Equal(dataType, dataType |> GeneSort.Project.Mp.V1.OutputDataTypeDto.fromDomain |> GeneSort.Project.Mp.V1.OutputDataTypeDto.toDomain)
             Assert.True(OutputData.asSorterModelSet (outputData.SorterPoolSet (sorterPoolSet.Soss Fixtures.soss)) |> Result.isError)
             let path = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Setup query |> UMX.untag
@@ -175,7 +175,7 @@ module OutputUnionTests =
                 value |> GeneSort.Sorting.Mp.Sortable.SortableTestsDto.fromDomain |> MessagePackSerializer.Serialize
             Assert.True(serializeTests tests = serializeTests loadedTests)
             Assert.True((prefix = loadedPrefix))
-            Assert.Equal(Some dataType, OutputDataType.fromFolderName (OutputDataType.toFolderName dataType))
+            Assert.Equal(Some dataType, GeneSortDataType.fromFolderName (GeneSortDataType.toFolderName dataType))
             Assert.Equal(dataType, dataType |> GeneSort.Project.Mp.V1.OutputDataTypeDto.fromDomain |> GeneSort.Project.Mp.V1.OutputDataTypeDto.toDomain)
             Assert.True(OutputData.asSortableTestsWithPrefix (outputData.SortableTests tests) |> Result.isError)
             let path = OutputDataFile.getFullOutputDataFilePath folder geneSortDataMode.Setup query |> UMX.untag

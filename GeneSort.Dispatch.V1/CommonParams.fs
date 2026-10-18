@@ -9,7 +9,7 @@ open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Project.V1.RunParamBundles
+open GeneSort.Project.V1.ParamBundles
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Standard
 

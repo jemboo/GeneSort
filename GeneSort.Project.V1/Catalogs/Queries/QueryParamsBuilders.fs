@@ -8,7 +8,7 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
-open GeneSort.Project.V1.RunParamBundles
+open GeneSort.Project.V1.ParamBundles
 
 /// Named, configuration-independent query parameter builders.
 module QueryParamsBuilders =
