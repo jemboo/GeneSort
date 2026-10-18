@@ -13,6 +13,7 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1.Parameters
 
 
 

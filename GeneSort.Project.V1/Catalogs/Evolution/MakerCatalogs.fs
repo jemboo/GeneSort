@@ -5,6 +5,7 @@ open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Project.V1.Parameters
 
 type sortableTestsMaker = evolutionSetupSources -> runParameters -> Async<Result<sortableTests * ce array, string>>
 type seedSorterPoolSetMaker = evolutionSetupSources -> runParameters -> Async<Result<sorterPoolSet, string>>

@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
 open GeneSort.Model.Sortable.V1
 open GeneSort.Dispatch.V1.OpsUtils

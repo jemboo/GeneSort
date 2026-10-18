@@ -74,11 +74,11 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta003" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
   </ItemGroup>
 
 </Project>

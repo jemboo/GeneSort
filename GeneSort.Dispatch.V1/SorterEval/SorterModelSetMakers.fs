@@ -8,6 +8,7 @@ open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Parameters
 
 module SorterModelSetMakers =
 

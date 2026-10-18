@@ -7,6 +7,7 @@ open GeneSort.Core
 open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Parameters
 
 /// Inputs available to run functions, independent of the host and executor modules.
 type executeContext = {

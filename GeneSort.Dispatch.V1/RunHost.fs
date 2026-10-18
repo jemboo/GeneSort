@@ -11,6 +11,7 @@ open GeneSort.FileDb.V1
 open GeneSort.Project.V1
 open GeneSort.Core
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Project.V1.Parameters
 
 module RunHost =
     /// Set independently on each machine; project/database identities remain unchanged.

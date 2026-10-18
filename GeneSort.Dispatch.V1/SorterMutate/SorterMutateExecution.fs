@@ -8,6 +8,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Model.Sorting.V1

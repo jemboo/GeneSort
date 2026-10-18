@@ -4,6 +4,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Project.V1.Parameters
 
 
 type simpleRun =

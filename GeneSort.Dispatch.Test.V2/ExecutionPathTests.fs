@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Parameters
 
 let private createHostWithSaveResult saveResult finished execute =
     let name = Guid.NewGuid().ToString()

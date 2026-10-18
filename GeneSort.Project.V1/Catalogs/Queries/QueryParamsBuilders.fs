@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1.ParamBundles
+open GeneSort.Project.V1.Parameters
 
 /// Named, configuration-independent query parameter builders.
 module QueryParamsBuilders =

@@ -26,6 +26,7 @@ open GeneSort.Eval.Mp.V1.Bins
 open GeneSort.Project.V1
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
+open GeneSort.Project.V1.Parameters
 
 module private Fixtures =
     let poolId = (UMX.tag<sorterPoolId> (Guid.NewGuid()))

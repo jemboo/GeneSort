@@ -1,4 +1,4 @@
-namespace GeneSort.Project.V1
+namespace GeneSort.Project.V1.Parameters
 
 open System
 open System.Globalization
@@ -12,6 +12,7 @@ open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Project.V1.ParamBundles
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
 
 type runParameters =
     private { paramMap : Map<string, string> }

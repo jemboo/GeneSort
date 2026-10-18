@@ -10,6 +10,7 @@ open GeneSort.Sorting.Sortable
 
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1.Parameters
 
 
 module EvolutionTestMakers =

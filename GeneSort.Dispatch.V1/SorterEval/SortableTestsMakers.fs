@@ -11,6 +11,7 @@ open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.SortingLib.Sorter
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Parameters
 
 module SortableTestsMakers =
 

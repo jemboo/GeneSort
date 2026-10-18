@@ -12,6 +12,7 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Project.V1.Parameters
 module Reporting =
 
     /// Generic execution engine for dynamic generation-sliced reports.

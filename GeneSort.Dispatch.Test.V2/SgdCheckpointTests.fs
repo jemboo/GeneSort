@@ -13,6 +13,7 @@ open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
+open GeneSort.Project.V1.Parameters
 
 [<Theory>]
 [<InlineData(false, -1)>]

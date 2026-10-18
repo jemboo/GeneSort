@@ -7,11 +7,11 @@
 
   <ItemGroup>
     <Compile Include="ProjectTypes.fs" />
+    <Compile Include="GeneSortDataType.fs" />
     <Compile Include="ParamBundles\MutatorParams.fs" />
     <Compile Include="ParamBundles\SorterTestsCycleProfile.fs" />
     <Compile Include="Parameters\RunParameters.fs" />
-    <Compile Include="GeneSortDataType.fs" />
-    <Compile Include="QueryParams.fs" />
+    <Compile Include="Parameters\QueryParams.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsCatalog.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsBuilders.fs" />
     <Compile Include="QueryProperties.fs" />
@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta003" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
   </ItemGroup>
 
 </Project>

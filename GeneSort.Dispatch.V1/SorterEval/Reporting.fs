@@ -18,6 +18,7 @@ open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1.Parameters
 
 module Reporting =
 

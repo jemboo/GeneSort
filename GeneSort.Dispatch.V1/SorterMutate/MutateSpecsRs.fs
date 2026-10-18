@@ -13,6 +13,7 @@ open GeneSort.Sorting
 open GeneSort.Dispatch.V1.SorterMutate
 open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.SortingOps
+open GeneSort.Project.V1.Parameters
 
 
 module MutateSpecsRs = 

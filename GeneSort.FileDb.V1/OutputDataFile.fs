@@ -8,6 +8,7 @@ open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Project.Mp.V1
 open GeneSort.Sorting.Mp.Sortable
 open GeneSort.Sorting.Sortable

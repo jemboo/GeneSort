@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Eval.V1
+open GeneSort.Project.V1.Parameters
 
 [<Measure>] type allowOverwrite
 

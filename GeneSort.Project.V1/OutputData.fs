@@ -7,6 +7,7 @@ open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Model.Sorting.V1
+open GeneSort.Project.V1.Parameters
 
 
 type outputData =

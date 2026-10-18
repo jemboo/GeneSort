@@ -19,6 +19,7 @@ open GeneSort.Dispatch.V1.SorterSgd.Soss
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1.Parameters
 
 let private parameters =
     (runParameters.create Map.empty)

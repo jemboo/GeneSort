@@ -12,6 +12,7 @@ open GeneSort.SortingOps
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
+open GeneSort.Project.V1.Parameters
 
 module Utils =
 

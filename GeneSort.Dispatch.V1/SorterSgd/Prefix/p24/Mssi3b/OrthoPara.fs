@@ -9,6 +9,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Core
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Eval.V1

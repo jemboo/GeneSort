@@ -1,6 +1,7 @@
 namespace GeneSort.Project.V1.Catalogs.Setup
 
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 
 type setupFunction = runParameters -> Async<Result<unit, string>>
 

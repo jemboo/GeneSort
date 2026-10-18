@@ -2,6 +2,7 @@ module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32_append
 
 open FSharp.UMX
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution

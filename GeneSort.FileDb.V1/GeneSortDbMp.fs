@@ -7,6 +7,7 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 
 
 type private DbMessage =

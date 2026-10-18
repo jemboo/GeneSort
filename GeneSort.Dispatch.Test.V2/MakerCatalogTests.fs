@@ -22,6 +22,7 @@ open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Project.V1.Parameters
 
 let private emptyParameters = runParameters.create Map.empty
 

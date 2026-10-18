@@ -1,5 +1,7 @@
 namespace GeneSort.Project.V1
 
+open GeneSort.Project.V1.Parameters
+
 
 type qpSortableTestsRestriction =
     | NoRestriction

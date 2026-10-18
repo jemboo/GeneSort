@@ -15,6 +15,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Eval.V1.Sgd.Bins.Soss
+open GeneSort.Project.V1.Parameters
 
 module EvoOrch_Soss =
 

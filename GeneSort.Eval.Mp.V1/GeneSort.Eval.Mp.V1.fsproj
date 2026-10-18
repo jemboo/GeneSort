@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -27,8 +27,8 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta001" />
-    <PackageReference Include="MessagePack" Version="3.1.8" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta003" />
+    <PackageReference Include="MessagePack" Version="3.1.12" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
   </ItemGroup>
 
@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="11.0.101-rc1.26425.128" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
   </ItemGroup>
 
 </Project>

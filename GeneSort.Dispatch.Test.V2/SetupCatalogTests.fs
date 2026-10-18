@@ -13,6 +13,7 @@ open GeneSort.Project.Mp.V1
 open GeneSort.Core.Mp
 open MessagePack
 open GeneSort.Dispatch.V1.SorterEval
+open GeneSort.Project.V1.Parameters
 
 let private parameters = runParameters.create Map.empty
 

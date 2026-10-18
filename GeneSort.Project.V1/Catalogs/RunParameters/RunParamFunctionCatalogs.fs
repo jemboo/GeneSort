@@ -9,6 +9,7 @@ open GeneSort.Sorting
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1.Parameters
 
 /// Context available to a run parameter enhancer without depending on dispatch infrastructure.
 type runParamEnhancerContext =
