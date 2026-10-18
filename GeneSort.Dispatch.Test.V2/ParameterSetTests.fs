@@ -59,22 +59,19 @@ let ``Setup tables include all keys and placeholders for missing values`` () =
     Assert.Equal("\tA: 1\n", SetupParameters.reportKvps parameters.[0])
 
 [<Fact>]
-let ``each output case has an independent typed file ID parameter`` () =
+let ``each setup output case has an independent typed file ID parameter`` () =
     let accessors = [|
-        "Run", setupParameters.runIdKey, (fun (p: setupParameters) -> p.GetRunId()), (fun id (p: setupParameters) -> p.WithRunId(id))
-        "RunParameters", setupParameters.runParametersIdKey, (fun (p: setupParameters) -> p.GetRunParametersId()), (fun id (p: setupParameters) -> p.WithRunParametersId(id))
-        "SortableTests", setupParameters.sortableTestsIdKey, (fun (p: setupParameters) -> p.GetSortableTestsId()), (fun id (p: setupParameters) -> p.WithSortableTestsId(id))
-        "SortableTestsWithPrefix", setupParameters.sortableTestsWithPrefixIdKey, (fun (p: setupParameters) -> p.GetSortableTestsWithPrefixId()), (fun id (p: setupParameters) -> p.WithSortableTestsWithPrefixId(id))
-        "SorterPoolSet", setupParameters.sorterPoolSetIdKey, (fun (p: setupParameters) -> p.GetSorterPoolSetId()), (fun id (p: setupParameters) -> p.WithSorterPoolSetId(id))
-        "SorterPoolSetSummarySet", setupParameters.sorterPoolSetSummarySetIdKey, (fun (p: setupParameters) -> p.GetSorterPoolSetSummarySetId()), (fun id (p: setupParameters) -> p.WithSorterPoolSetSummarySetId(id))
-        "SorterSet", setupParameters.sorterSetIdKey, (fun (p: setupParameters) -> p.GetSorterSetId()), (fun id (p: setupParameters) -> p.WithSorterSetId(id))
-        "SorterModelSet", setupParameters.sorterModelSetIdKey, (fun (p: setupParameters) -> p.GetSorterModelSetId()), (fun id (p: setupParameters) -> p.WithSorterModelSetId(id))
-        "SorterSetEval", setupParameters.sorterSetEvalIdKey, (fun (p: setupParameters) -> p.GetSorterSetEvalId()), (fun id (p: setupParameters) -> p.WithSorterSetEvalId(id))
-        "SorterPoolBinsSetSeries", setupParameters.sorterPoolBinsSetSeriesIdKey, (fun (p: setupParameters) -> p.GetSorterPoolBinsSetSeriesId()), (fun id (p: setupParameters) -> p.WithSorterPoolBinsSetSeriesId(id))
-        "SorterPoolSetHistory", setupParameters.sorterPoolSetHistoryIdKey, (fun (p: setupParameters) -> p.GetSorterPoolSetHistoryId()), (fun id (p: setupParameters) -> p.WithSorterPoolSetHistoryId(id))
-        "TextReport", setupParameters.textReportIdKey, (fun (p: setupParameters) -> p.GetTextReportId()), (fun id (p: setupParameters) -> p.WithTextReportId(id))
+        "SortableTests", setupParameters.setupSortableTestsIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsId(id))
+        "SortableTestsWithPrefix", setupParameters.setupSortableTestsWithPrefixIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsWithPrefixId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsWithPrefixId(id))
+        "SorterPoolSet", setupParameters.setupSorterPoolSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetId(id))
+        "SorterPoolSetSummarySet", setupParameters.setupSorterPoolSetSummarySetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetSummarySetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetSummarySetId(id))
+        "SorterSet", setupParameters.setupSorterSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetId(id))
+        "SorterModelSet", setupParameters.setupSorterModelSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterModelSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterModelSetId(id))
+        "SorterSetEval", setupParameters.setupSorterSetEvalIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetEvalId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetEvalId(id))
+        "SorterPoolBinsSetSeries", setupParameters.setupSorterPoolBinsSetSeriesIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolBinsSetSeriesId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolBinsSetSeriesId(id))
+        "SorterPoolSetHistory", setupParameters.setupSorterPoolSetHistoryIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetHistoryId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetHistoryId(id))
     |]
-    let caseNames = Microsoft.FSharp.Reflection.FSharpType.GetUnionCases(typeof<GeneSort.Project.V1.outputData>) |> Array.map (fun c -> c.Name) |> Set.ofArray
+    let caseNames = Microsoft.FSharp.Reflection.FSharpType.GetUnionCases(typeof<GeneSort.Project.V1.outputData>) |> Array.map (fun c -> c.Name) |> Array.filter (fun name -> not (List.contains name ["Run"; "RunParameters"; "TextReport"])) |> Set.ofArray
     Assert.True((caseNames = (accessors |> Array.map (fun (name, _, _, _) -> name) |> Set.ofArray)))
     let original = setupParameters.create Map.empty
     let ids = accessors |> Array.map (fun _ -> FSharp.UMX.UMX.tag<GeneSort.Project.V1.queryParamsId> (System.Guid.NewGuid()))
@@ -84,7 +81,8 @@ let ``each output case has an independent typed file ID parameter`` () =
     Assert.True(original.ParamMap.IsEmpty)
     Assert.Equal(accessors.Length, populated.ParamMap.Count)
     for index in 0 .. accessors.Length - 1 do
-        let _, key, get, set = accessors.[index]
+        let name, key, get, set = accessors.[index]
+        Assert.Equal("Setup" + name + "Id", key)
         Assert.Equal(Some ids.[index], get populated)
         Assert.True((get (setupParameters.create (Map.ofList [key, "invalid-guid"]))).IsNone)
         let removed = set None populated
@@ -93,5 +91,5 @@ let ``each output case has an independent typed file ID parameter`` () =
     let restored = populated |> SetupParametersDto.fromDomain |> SetupParametersDto.toDomain
     Assert.Equal<setupParameters>(populated, restored)
     let run = runParameters.create populated.ParamMap
-    Assert.Equal(Some ids.[0], run.GetRunId())
-    Assert.Equal(Some ids.[accessors.Length - 1], run.GetTextReportId())
+    Assert.Equal(Some ids.[0], run.GetSetupSortableTestsId())
+    Assert.Equal(Some ids.[accessors.Length - 1], run.GetSetupSorterPoolSetHistoryId())
