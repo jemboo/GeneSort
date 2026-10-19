@@ -65,13 +65,17 @@ module QueryParamsCatalogRun =
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
 
-    /// Setup linkage is part of every run query's identity, even for builders that select only a subset of keys.
+    /// Include setup linkage in run identities, except standalone test results with no setup inputs.
     let get name : runQueryParamsCatalogBuilder =
         let builder = lookup name
         fun project database parameters outputType ->
             builder project database parameters outputType
             |> Option.map (fun query ->
-                let references = SetupFileReferences.fromRunParameters parameters
+                let references =
+                    match name, outputType with
+                    | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _
+                    | QueryCatalogNamesRun.sortableTestPrefix, geneSortDataType.SortableTests _ -> []
+                    | _ -> SetupFileReferences.fromRunParameters parameters
                 if List.isEmpty references then query
                 else
                     let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties

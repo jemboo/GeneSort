@@ -12,8 +12,8 @@ let main argv =
 
     // Each command runs exactly one phase, using the spec configured in its dispatch module.
     //let yab = [| "setup"; "tests" |]
-    //let yab = [| "execute"; "tests" |]
-    let yab = [| "setup"; "eval" |]
+    let yab = [| "execute"; "tests" |]
+    //let yab = [| "setup"; "eval" |]
     //let yab = [| "execute"; "eval" |]
     //let yab = [| "setup"; "sgd" |]
     //let yab = [| "execute"; "sgd" |]

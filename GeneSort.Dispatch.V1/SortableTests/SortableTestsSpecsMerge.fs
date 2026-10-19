@@ -37,7 +37,7 @@ module SortableTestsSpecsMerge =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sortableTestMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }

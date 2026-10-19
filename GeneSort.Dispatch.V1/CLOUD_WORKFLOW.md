@@ -4,6 +4,8 @@ The two phases are independent:
 
 Standalone SortableTests (`tests`) is an exception to input preparation: its setup executor is a no-op. The local `setup tests` command only initializes Project parameters. `execute tests` generates merge or prefix tests and saves them directly as Results; it needs no Setup artifacts. Evaluation, mutation, and SGD still prepare their test inputs in Setup.
 
+Standalone test Results use only the source database, replica, prefix/merge library and data format for their identity, without setup links. If tests were generated with a setup-linked identity, regenerate them before evaluation or SGD setup: temporarily set `AllowOverwrite = true` in the selected standalone test spec, run `setup tests` to reset its finished parameters, then run `execute tests`. Restore `AllowOverwrite = false` afterward. In `Program.fs`, select each command through `yab` when using the configured local entry point.
+
 - `ProjectOps.executeSetupRuns` resolves `host.SetupExecutor`, prepares Setup artifacts, and saves updated Project run parameters. It never invokes the execution function.
 - `ProjectOps.executeRuns` resolves the execution function on the host and loads saved inputs. It never invokes setup or regenerates parameters. Completed runs are skipped; SGD resumes from Results checkpoints when available, otherwise from its initial Setup pool.
 

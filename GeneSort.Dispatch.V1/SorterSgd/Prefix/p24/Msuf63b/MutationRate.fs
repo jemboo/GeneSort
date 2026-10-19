@@ -69,7 +69,7 @@ module VarModR_32 =
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }

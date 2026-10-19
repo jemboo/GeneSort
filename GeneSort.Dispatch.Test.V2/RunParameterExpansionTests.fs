@@ -10,6 +10,32 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
+open GeneSort.Dispatch.V1.SortableTests
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``standalone test Results use the same identity for generation and downstream reads`` prefix =
+    let configured =
+        if prefix then SortableTestsSpecsPrefix.Specs.Prefix_32 ()
+        else SortableTestsSpecsMerge.Specs.Merge_Test ()
+    let rp = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> Array.head
+    Assert.True(rp.GetSetupParametersId().IsSome)
+    let output = geneSortDataType.SortableTests ""
+    let generated =
+        QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName rp output
+        |> Option.get
+    let requested =
+        if prefix then
+            SortableTestsDbs.Prefix.makePrefixQueryParams (rp.GetRepl().Value) (rp.GetPrefixLibId().Value) (rp.GetSortableDataFormat().Value) output
+        else
+            SortableTestsDbs.Merge.makeMergeQueryParams (rp.GetRepl().Value) (rp.GetMergeLibId().Value) (rp.GetSortableDataFormat().Value) output
+    Assert.Equal(requested.Id, generated.Id)
+    Assert.False(generated.Properties.ContainsKey ParamKeys.setupParametersIdKey)
+    let runQuery =
+        QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName rp (geneSortDataType.Run configured.RunName)
+        |> Option.get
+    Assert.True(runQuery.Properties.ContainsKey ParamKeys.setupParametersIdKey)
 
 let private configure runValues setupValues outputTypes setupQuery =
     let name = Guid.NewGuid().ToString("N")

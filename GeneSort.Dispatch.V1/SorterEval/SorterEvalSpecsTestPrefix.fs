@@ -44,7 +44,7 @@ module SorterEvalSpecsTestPrefix =
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -78,7 +78,7 @@ module SorterEvalSpecsTestPrefix =
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

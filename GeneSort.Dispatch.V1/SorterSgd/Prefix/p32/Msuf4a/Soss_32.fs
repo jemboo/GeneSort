@@ -62,7 +62,7 @@ let Pool_4_Debug ()  : run =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -109,7 +109,7 @@ let Pool_32_Gens15 ()  : run =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -157,7 +157,7 @@ let Pool_32_Test_null ()  : run =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -207,7 +207,7 @@ let Pool_128_Test ()  : run =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -257,7 +257,7 @@ let Pool_32_V1 ()  : run =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }

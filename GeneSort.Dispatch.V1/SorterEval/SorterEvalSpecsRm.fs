@@ -45,7 +45,7 @@ module SorterEvalSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -81,7 +81,7 @@ module SorterEvalSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -117,7 +117,7 @@ module SorterEvalSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -153,7 +153,7 @@ module SorterEvalSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -189,7 +189,7 @@ module SorterEvalSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

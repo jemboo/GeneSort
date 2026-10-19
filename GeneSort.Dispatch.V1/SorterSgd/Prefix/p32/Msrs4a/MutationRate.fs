@@ -66,7 +66,7 @@ module MutationRate =
                     Setup = {
                         FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                         OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

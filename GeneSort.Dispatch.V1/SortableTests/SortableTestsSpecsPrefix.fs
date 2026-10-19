@@ -37,7 +37,7 @@ module SortableTestsSpecsPrefix =
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }
@@ -68,7 +68,7 @@ module SortableTestsSpecsPrefix =
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }
@@ -97,7 +97,7 @@ module SortableTestsSpecsPrefix =
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }
