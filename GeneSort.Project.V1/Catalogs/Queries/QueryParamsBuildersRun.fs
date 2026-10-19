@@ -12,7 +12,7 @@ open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
 
 /// Named, configuration-independent query parameter builders.
-module QueryParamsBuilders =
+module QueryParamsBuildersRun =
 
     module SorterSgd =
 
@@ -20,7 +20,7 @@ module QueryParamsBuilders =
             match rp.GetAdjustCeLengthFrequency() with
             | None -> query
             | Some frequency ->
-                let properties = query.Properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %frequency)
+                let properties = query.Properties |> Map.add ParamKeys.adjustCeLengthFrequencyKey (string %frequency)
                 queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
 
         module Uf6MutationRate =
@@ -43,16 +43,16 @@ module QueryParamsBuilders =
                     (outDt: geneSortDataType) : queryParams =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
-                        (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.sorterEvalMeasureKey, sorterEvalMeasure |> SorterEvalMeasure.toCompactString)
-                        (runParameters.sorterEvalMeasureInitialKey, sorterEvalMeasureInitial |> SorterEvalMeasure.toCompactString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                        (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
-                        (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                        (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (ParamKeys.sorterEvalMeasureKey, sorterEvalMeasure |> SorterEvalMeasure.toCompactString)
+                        (ParamKeys.sorterEvalMeasureInitialKey, sorterEvalMeasureInitial |> SorterEvalMeasure.toCompactString)
+                        (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                        (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                        (ParamKeys.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                        (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                        (ParamKeys.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
 
             let queryParamsFromRunParams
@@ -82,12 +82,12 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
-                        (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                        (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                        (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                        (ParamKeys.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
 
             let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: geneSortDataType) =
@@ -109,12 +109,12 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt modR para mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
-                        (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                        (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                        (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                        (ParamKeys.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
 
             let queryParamsFromRunParams projectName dbName (rp: runParameters) (odt: geneSortDataType) =
@@ -137,15 +137,15 @@ module QueryParamsBuilders =
                 let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym seedModR modR mmod mutVar outDt  =
                     queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                         [|
-                            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                            (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
-                            (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
-                            (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
+                            (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                            (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                            (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                            (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                            (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                            (ParamKeys.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                            (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                            (ParamKeys.mutationModKey, (Some mmod) |> MutationMod.toString)
+                            (ParamKeys.mutatorVariantKey, mutVar |> MutatorVariant.toString)
                         |]
                 let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                     maybe {
@@ -172,19 +172,19 @@ module QueryParamsBuilders =
                                     modR mmod mutVar seedSoss partCt genSoss genMerged outDt =
                     queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                         [|
-                            (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                            (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                            (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                            (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                            (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                            (runParameters.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
-                            (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                            (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
-                            (runParameters.mutatorVariantKey, mutVar |> MutatorVariant.toString)
-                            (runParameters.seedSossKey, seedSoss |> string)
-                            (runParameters.partitionCountKey, (Some partCt) |> PartitionCount.toString)
-                            (runParameters.generationsPerSubsetKey, (Some genSoss) |> GenerationsPerSubset.toString)
-                            (runParameters.generationsPerMergedSetKey, (Some genMerged) |> GenerationsPerSubset.toString)
+                            (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                            (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                            (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                            (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                            (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                            (ParamKeys.seedModificationRateKey, (Some seedModR) |> SeedModificationRate.toString)
+                            (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                            (ParamKeys.mutationModKey, (Some mmod) |> MutationMod.toString)
+                            (ParamKeys.mutatorVariantKey, mutVar |> MutatorVariant.toString)
+                            (ParamKeys.seedSossKey, seedSoss |> string)
+                            (ParamKeys.partitionCountKey, (Some partCt) |> PartitionCount.toString)
+                            (ParamKeys.generationsPerSubsetKey, (Some genSoss) |> GenerationsPerSubset.toString)
+                            (ParamKeys.generationsPerMergedSetKey, (Some genMerged) |> GenerationsPerSubset.toString)
                         |]
 
                 let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
@@ -211,15 +211,15 @@ module QueryParamsBuilders =
                             |> fun properties ->
                                 match rp.GetPartitionCount() with
                                 | None -> properties
-                                | Some count -> properties |> Map.add runParameters.partitionCountKey (string %count)
+                                | Some count -> properties |> Map.add ParamKeys.partitionCountKey (string %count)
                             |> fun properties ->
                                 match rp.GetGenerationsPerSubset() with
                                 | None -> properties
-                                | Some count -> properties |> Map.add runParameters.generationsPerSubsetKey (string %count)
+                                | Some count -> properties |> Map.add ParamKeys.generationsPerSubsetKey (string %count)
                             |> fun properties ->
                                 match rp.GetAdjustCeLengthFrequency() with
                                 | None -> properties
-                                | Some count -> properties |> Map.add runParameters.adjustCeLengthFrequencyKey (string %count)
+                                | Some count -> properties |> Map.add ParamKeys.adjustCeLengthFrequencyKey (string %count)
                         return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                     }
 
@@ -233,10 +233,10 @@ module QueryParamsBuilders =
                     let! sourceInterval = rp.GetSourceGenerationInterval()
                     let properties =
                         query.Properties
-                        |> Map.add runParameters.sourceProjectNameKey %sourceProject
-                        |> Map.add runParameters.sourceDbNameKey %sourceDb
-                        |> Map.add runParameters.sourceRunNameKey %sourceRun
-                        |> Map.add runParameters.sourceGenerationIntervalKey (string sourceInterval)
+                        |> Map.add ParamKeys.sourceProjectNameKey %sourceProject
+                        |> Map.add ParamKeys.sourceDbNameKey %sourceDb
+                        |> Map.add ParamKeys.sourceRunNameKey %sourceRun
+                        |> Map.add ParamKeys.sourceGenerationIntervalKey (string sourceInterval)
                     return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                 }
 
@@ -244,13 +244,13 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
-                        (runParameters.codeModKey, (Some codeMod) |> CodeModKey.toString)
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                        (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (ParamKeys.codeModKey, (Some codeMod) |> CodeModKey.toString)
+                        (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                        (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                        (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                        (ParamKeys.mutationModKey, (Some %mmod) |> MutationMod.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -271,14 +271,14 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl genCurrent sorterCtPerPool sorterPoolCt modR para selfSym seedSelection selectedSorterCount mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
                     [|
-                        (runParameters.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
-                        (runParameters.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
-                        (runParameters.seedSorterPoolSelectionTypeKey, seedSelection |> SorterSelectionType.toString)
-                        (runParameters.modificationRateKey, (Some modR) |> ModificationRate.toString)
-                        (runParameters.paraRateKey, (Some para) |> ParaRate.toString)
-                        (runParameters.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
-                        (runParameters.selectedSorterCountPerPoolKey, (Some selectedSorterCount) |> SorterCountPerPool.toString)
-                        (runParameters.mutationModKey, (Some %mmod) |> MutationMod.toString)
+                        (ParamKeys.sorterCountPerPoolKey, (Some sorterCtPerPool) |> SorterCountPerPool.toString)
+                        (ParamKeys.sorterPoolCountKey, (Some sorterPoolCt) |> SorterPoolCount.toString)
+                        (ParamKeys.seedSorterPoolSelectionTypeKey, seedSelection |> SorterSelectionType.toString)
+                        (ParamKeys.modificationRateKey, (Some modR) |> ModificationRate.toString)
+                        (ParamKeys.paraRateKey, (Some para) |> ParaRate.toString)
+                        (ParamKeys.selfSymRateKey, (Some selfSym) |> SelfSymRate.toString)
+                        (ParamKeys.selectedSorterCountPerPoolKey, (Some selectedSorterCount) |> SorterCountPerPool.toString)
+                        (ParamKeys.mutationModKey, (Some mmod) |> MutationMod.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -302,8 +302,8 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl (mergeLib: mergeLibId) (sortableDataFormat: sortableDataFormat) outDt =
                 queryParams.create dbName projectName (Some repl) None outDt
                     [|
-                        (runParameters.mergeLibIdKey, MergeLibId.toString mergeLib)
-                        (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat)
+                        (ParamKeys.mergeLibIdKey, MergeLibId.toString mergeLib)
+                        (ParamKeys.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -317,8 +317,8 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl (prefixLib: prefixLibId) (sortableDataFormat: sortableDataFormat) outDt =
                 queryParams.create dbName projectName (Some repl) None outDt
                     [|
-                        (runParameters.prefixLibIdKey, PrefixLibId.toString prefixLib)
-                        (runParameters.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat)
+                        (ParamKeys.prefixLibIdKey, PrefixLibId.toString prefixLib)
+                        (ParamKeys.sortableDataFormatKey, SortableDataFormat.toString sortableDataFormat)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -334,10 +334,10 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl rng sortingWidth simpleModel evalType odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
-                        (runParameters.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
+                        (ParamKeys.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -353,11 +353,11 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl rng mergeLibId model dataFormat evalType odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.mergeLibIdKey, MergeLibId.toString mergeLibId)
-                        (runParameters.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (runParameters.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.mergeLibIdKey, MergeLibId.toString mergeLibId)
+                        (ParamKeys.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -374,11 +374,11 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.prefixLibIdKey, PrefixLibId.toString prefixLibId)
-                        (runParameters.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (runParameters.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.prefixLibIdKey, PrefixLibId.toString prefixLibId)
+                        (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -397,15 +397,15 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl odt rng selection measure sortingWidth simpleModel dataFormat evalType mutatorParams modRate =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
-                        (runParameters.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
-                        (runParameters.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
-                        (runParameters.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
-                        (runParameters.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (runParameters.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
-                        (runParameters.modificationRateKey, (Some modRate) |> ModificationRate.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
+                        (ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
+                        (ParamKeys.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
+                        (ParamKeys.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
+                        (ParamKeys.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
+                        (ParamKeys.modificationRateKey, (Some modRate) |> ModificationRate.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -426,15 +426,15 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl odt rng selection measure mergeLib model format evalType mutatorParams modRate =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
-                        (runParameters.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
-                        (runParameters.mergeLibIdKey, mergeLib |> MergeLibId.toString)
-                        (runParameters.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
-                        (runParameters.sortableDataFormatKey, format |> SortableDataFormat.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (runParameters.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
-                        (runParameters.modificationRateKey, (Some modRate) |> ModificationRate.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
+                        (ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
+                        (ParamKeys.mergeLibIdKey, mergeLib |> MergeLibId.toString)
+                        (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
+                        (ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
+                        (ParamKeys.modificationRateKey, (Some modRate) |> ModificationRate.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -455,15 +455,15 @@ module QueryParamsBuilders =
             let makeQueryParams projectName dbName repl odt rng selection measure prefixLib model format evalType mutatorParams modRate =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
-                        (runParameters.rngTypeKey, rng |> RngType.toString)
-                        (runParameters.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
-                        (runParameters.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
-                        (runParameters.prefixLibIdKey, prefixLib |> PrefixLibId.toString)
-                        (runParameters.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
-                        (runParameters.sortableDataFormatKey, format |> SortableDataFormat.toString)
-                        (runParameters.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (runParameters.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
-                        (runParameters.modificationRateKey, (Some modRate) |> ModificationRate.toString)
+                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
+                        (ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString)
+                        (ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString)
+                        (ParamKeys.prefixLibIdKey, prefixLib |> PrefixLibId.toString)
+                        (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
+                        (ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString)
+                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.mutatorParamsKey, mutatorParams |> MutatorParams.toString)
+                        (ParamKeys.modificationRateKey, (Some modRate) |> ModificationRate.toString)
                     |]
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
@@ -486,24 +486,24 @@ module QueryParamsBuilders =
         lock registrationLock (fun () ->
             if not registered then
                 [
-                    QueryCatalogNames.sorterSgdUf6MutationRate, SorterSgd.Uf6MutationRate.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsrsOrthoPara, SorterSgd.MsrsOrthoPara.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
-                    QueryCatalogNames.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
-                    QueryCatalogNames.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams
-                    QueryCatalogNames.sortableTestPrefix, SortableTests.Prefix.queryParamsFromRunParams
-                    QueryCatalogNames.sorterEvalStandard, SorterEval.Standard.queryParamsFromRunParams
-                    QueryCatalogNames.sorterEvalMerge, SorterEval.Merge.queryParamsFromRunParams
-                    QueryCatalogNames.sorterEvalPrefix, SorterEval.Prefix.queryParamsFromRunParams
-                    QueryCatalogNames.sorterMutateStandard, SorterMutate.Standard.queryParamsFromRunParams
-                    QueryCatalogNames.sorterMutateMerge, SorterMutate.Merge.queryParamsFromRunParams
-                    QueryCatalogNames.sorterMutatePrefix, SorterMutate.Prefix.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdUf6MutationRate, SorterSgd.Uf6MutationRate.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsrsOrthoPara, SorterSgd.MsrsOrthoPara.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sortableTestPrefix, SortableTests.Prefix.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterEvalStandard, SorterEval.Standard.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterEvalMerge, SorterEval.Merge.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterEvalPrefix, SorterEval.Prefix.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterMutateStandard, SorterMutate.Standard.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterMutateMerge, SorterMutate.Merge.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterMutatePrefix, SorterMutate.Prefix.queryParamsFromRunParams
                 ]
-                |> List.iter (fun (name, builder) -> QueryParamsCatalog.register name builder)
+                |> List.iter (fun (name, builder) -> QueryParamsCatalogRun.register name builder)
 
                 registered <- true
         )

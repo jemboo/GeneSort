@@ -18,109 +18,109 @@ module CommonParams =
 
     // SimpleSorterModelTypes
     let withMsuf4 = 
-            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf4() 
+            (ParamKeys.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf4() 
             |> List.map SimpleSorterModelType.toString)
 
     let withMsuf6 = 
-            (runParameters.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf6() 
+            (ParamKeys.simpleSorterModelTypeKey, SimpleSorterModelType.withMsuf6() 
             |> List.map SimpleSorterModelType.toString)
 
     let msceModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
+            (ParamKeys.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
 
     let msrsModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
+            (ParamKeys.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
 
     let mssiModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
+            (ParamKeys.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
 
     let msuf4ModelType = 
-            (runParameters.simpleSorterModelTypeKey, 
+            (ParamKeys.simpleSorterModelTypeKey, 
              [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
 
 
     // SorterCounts
-    let testSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let smallSorterCount = (runParameters.sorterCountKey, ["100";] )
-    let mediumSorterCount = (runParameters.sorterCountKey, ["1000";] )
-    let largeSorterCount = (runParameters.sorterCountKey, ["10000";] )
-    let veryLargeSorterCount = (runParameters.sorterCountKey, ["25000";] )
-    let extraLargeSorterCount = (runParameters.sorterCountKey, ["100000";] )
+    let testSorterCount = (ParamKeys.sorterCountKey, ["1000";] )
+    let smallSorterCount = (ParamKeys.sorterCountKey, ["100";] )
+    let mediumSorterCount = (ParamKeys.sorterCountKey, ["1000";] )
+    let largeSorterCount = (ParamKeys.sorterCountKey, ["10000";] )
+    let veryLargeSorterCount = (ParamKeys.sorterCountKey, ["25000";] )
+    let extraLargeSorterCount = (ParamKeys.sorterCountKey, ["100000";] )
 
     
     // SorterCounts per pool
-    let oneAndTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2";] )
-    let oneToFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1"; "2"; "4"] )
-    let fourTo32SortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
-    let mid3SortersPerPool = (runParameters.sorterCountPerPoolKey, ["64"; "128"; "256"] )
+    let oneAndTwoSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["1"; "2";] )
+    let oneToFourSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["1"; "2"; "4"] )
+    let fourTo32SortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["4"; "8"; "16"; "32"] )
+    let mid3SortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["64"; "128"; "256"] )
 
     
-    let oneSorterPerPool = (runParameters.sorterCountPerPoolKey, ["1";] )
-    let twoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2";] )
-    let fourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4"] )
-    let eightSortersPerPool = (runParameters.sorterCountPerPoolKey, ["18";] )
-    let sixteenSortersPerPool = (runParameters.sorterCountPerPoolKey, ["16";] )
-    let thirtyTwoSortersPerPool = (runParameters.sorterCountPerPoolKey, ["32";] )
-    let sixtyFourSortersPerPool = (runParameters.sorterCountPerPoolKey, ["64";] )
-    let oneTwenty8SortersPerPool = (runParameters.sorterCountPerPoolKey, ["128";] )
-    let twoFifty6SortersPerPool = (runParameters.sorterCountPerPoolKey, ["256";] )
-    let fiveTwelveSortersPerPool = (runParameters.sorterCountPerPoolKey, ["512";] )
-    let oneKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["1024";] )
-    let twoKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["2048";] )
-    let fourKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["4096";] )
-    let eightKSortersPerPool = (runParameters.sorterCountPerPoolKey, ["8192";] )
+    let oneSorterPerPool = (ParamKeys.sorterCountPerPoolKey, ["1";] )
+    let twoSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["2";] )
+    let fourSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["4"] )
+    let eightSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["18";] )
+    let sixteenSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["16";] )
+    let thirtyTwoSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["32";] )
+    let sixtyFourSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["64";] )
+    let oneTwenty8SortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["128";] )
+    let twoFifty6SortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["256";] )
+    let fiveTwelveSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["512";] )
+    let oneKSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["1024";] )
+    let twoKSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["2048";] )
+    let fourKSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["4096";] )
+    let eightKSortersPerPool = (ParamKeys.sorterCountPerPoolKey, ["8192";] )
 
     // sorterCountCycle
-    let sorterCountCycle20 = (runParameters.sorterCountCycleKey, ["20";] )
-    let sorterCountCycle50 = (runParameters.sorterCountCycleKey, ["50";] )
-    let sorterCountCycle100 = (runParameters.sorterCountCycleKey, ["100";] )
-    let sorterCountCycle500 = (runParameters.sorterCountCycleKey, ["500";] )
+    let sorterCountCycle20 = (ParamKeys.sorterCountCycleKey, ["20";] )
+    let sorterCountCycle50 = (ParamKeys.sorterCountCycleKey, ["50";] )
+    let sorterCountCycle100 = (ParamKeys.sorterCountCycleKey, ["100";] )
+    let sorterCountCycle500 = (ParamKeys.sorterCountCycleKey, ["500";] )
 
     // sorterCountCycleMultiplier
-    let sorterCountCycleMultiplier1 = (runParameters.sorterCountCycleMultiplierKey, ["1";] )
-    let sorterCountCycleMultipliers1n2 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "2";] )
-    let sorterCountCycleMultipliers1n4 = (runParameters.sorterCountCycleMultiplierKey, ["1"; "4";] )
-    let sorterCountCycleMultipliersLow = (runParameters.sorterCountCycleMultiplierKey, ["1.001"; "1.2"; "1.4"; "1.8"] )
-    let sorterCountCycleMultiplier4 = (runParameters.sorterCountCycleMultiplierKey, ["4";] )
-    let sorterCountCycleMultiplier8 = (runParameters.sorterCountCycleMultiplierKey, ["8";] )
-    let sorterCountCycleMultiplier16 = (runParameters.sorterCountCycleMultiplierKey, ["16";] )
+    let sorterCountCycleMultiplier1 = (ParamKeys.sorterCountCycleMultiplierKey, ["1";] )
+    let sorterCountCycleMultipliers1n2 = (ParamKeys.sorterCountCycleMultiplierKey, ["1"; "2";] )
+    let sorterCountCycleMultipliers1n4 = (ParamKeys.sorterCountCycleMultiplierKey, ["1"; "4";] )
+    let sorterCountCycleMultipliersLow = (ParamKeys.sorterCountCycleMultiplierKey, ["1.001"; "1.2"; "1.4"; "1.8"] )
+    let sorterCountCycleMultiplier4 = (ParamKeys.sorterCountCycleMultiplierKey, ["4";] )
+    let sorterCountCycleMultiplier8 = (ParamKeys.sorterCountCycleMultiplierKey, ["8";] )
+    let sorterCountCycleMultiplier16 = (ParamKeys.sorterCountCycleMultiplierKey, ["16";] )
 
 
     // SorterPoolCounts
-    let poolCount1 = (runParameters.sorterPoolCountKey, ["1";] )
-    let poolCount2 = (runParameters.sorterPoolCountKey, ["2";] )
-    let poolCount4 = (runParameters.sorterPoolCountKey, ["4";] )
-    let poolCount8 = (runParameters.sorterPoolCountKey, ["8";] )
-    let poolCount16 = (runParameters.sorterPoolCountKey, ["16";] )
-    let poolCount32 = (runParameters.sorterPoolCountKey, ["32";] )
-    let poolCount64 = (runParameters.sorterPoolCountKey, ["64";] )
-    let poolCount128 = (runParameters.sorterPoolCountKey, ["128";] )
-    let poolCount256 = (runParameters.sorterPoolCountKey, ["256";] )
-    let poolCount512 = (runParameters.sorterPoolCountKey, ["512";] )
+    let poolCount1 = (ParamKeys.sorterPoolCountKey, ["1";] )
+    let poolCount2 = (ParamKeys.sorterPoolCountKey, ["2";] )
+    let poolCount4 = (ParamKeys.sorterPoolCountKey, ["4";] )
+    let poolCount8 = (ParamKeys.sorterPoolCountKey, ["8";] )
+    let poolCount16 = (ParamKeys.sorterPoolCountKey, ["16";] )
+    let poolCount32 = (ParamKeys.sorterPoolCountKey, ["32";] )
+    let poolCount64 = (ParamKeys.sorterPoolCountKey, ["64";] )
+    let poolCount128 = (ParamKeys.sorterPoolCountKey, ["128";] )
+    let poolCount256 = (ParamKeys.sorterPoolCountKey, ["256";] )
+    let poolCount512 = (ParamKeys.sorterPoolCountKey, ["512";] )
 
     // SorterChildCounts
-    let oneChildCount = (runParameters.sorterChildCountKey, ["1";] )
-    let twoChildCount = (runParameters.sorterChildCountKey, ["2";] )
-    let oneAndTwoChildCount = (runParameters.sorterChildCountKey, ["1"; "2";])
-    let oneToFourChildCount = (runParameters.sorterChildCountKey, ["1"; "2"; "4";])
-    let testChildCount = (runParameters.sorterChildCountKey, ["1000";] )
-    let smallChildCount = (runParameters.sorterChildCountKey, ["10";] )
-    let mediumChildCount = (runParameters.sorterChildCountKey, ["100";] )
-    let largeChildCount = (runParameters.sorterChildCountKey, ["1000";] )
-    let extraLargeChildCount = (runParameters.sorterChildCountKey, ["10000";] )
+    let oneChildCount = (ParamKeys.sorterChildCountKey, ["1";] )
+    let twoChildCount = (ParamKeys.sorterChildCountKey, ["2";] )
+    let oneAndTwoChildCount = (ParamKeys.sorterChildCountKey, ["1"; "2";])
+    let oneToFourChildCount = (ParamKeys.sorterChildCountKey, ["1"; "2"; "4";])
+    let testChildCount = (ParamKeys.sorterChildCountKey, ["1000";] )
+    let smallChildCount = (ParamKeys.sorterChildCountKey, ["10";] )
+    let mediumChildCount = (ParamKeys.sorterChildCountKey, ["100";] )
+    let largeChildCount = (ParamKeys.sorterChildCountKey, ["1000";] )
+    let extraLargeChildCount = (ParamKeys.sorterChildCountKey, ["10000";] )
 
     let _sorterEvalTypeV1 = sorterEvalType.V1
     let _sorterEvalTypeV2 = sorterEvalType.V2
 
     let sorterEvalTypeV1 = 
-            (runParameters.sorterEvalTypeKey, 
+            (ParamKeys.sorterEvalTypeKey, 
             [ sorterEvalType.V1 ;] |> List.map SorterEvalType.toString)
 
     let sorterEvalTypeV2 = 
-            (runParameters.sorterEvalTypeKey, 
+            (ParamKeys.sorterEvalTypeKey, 
             [ sorterEvalType.V2 ;] |> List.map SorterEvalType.toString)
 
 
@@ -128,89 +128,89 @@ module CommonParams =
 
     // MergeDimensions
     let testMergeDimensions = 
-        (runParameters.mergeDimensionKey, [8;] |> List.map string)
+        (ParamKeys.mergeDimensionKey, [8;] |> List.map string)
     let allMergeDimensions = 
-            (runParameters.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [2; 3; 4; 6; 8] |> List.map string)
     let mergeDimension2 = 
-            (runParameters.mergeDimensionKey, [2;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [2;] |> List.map string)
     let mergeDimension3 = 
-            (runParameters.mergeDimensionKey, [3;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [3;] |> List.map string)
     let mergeDimension4 = 
-            (runParameters.mergeDimensionKey, [4;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [4;] |> List.map string)
     let mergeDimension6 = 
-            (runParameters.mergeDimensionKey, [6;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [6;] |> List.map string)
     let mergeDimension8 = 
-            (runParameters.mergeDimensionKey, [8;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [8;] |> List.map string)
     let lowMergeDimensions = 
-            (runParameters.mergeDimensionKey, [2; 3; 4;] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [2; 3; 4;] |> List.map string)
     let highMergeDimensions = 
-            (runParameters.mergeDimensionKey, [6; 8] |> List.map string)
+            (ParamKeys.mergeDimensionKey, [6; 8] |> List.map string)
     
 
     // SortingWidths
     let testSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
+            (ParamKeys.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let sortingWidth16 = 
-            (runParameters.sortingWidthKey, [16] |> List.map string)
+            (ParamKeys.sortingWidthKey, [16] |> List.map string)
     let sortingWidth24 = 
-            (runParameters.sortingWidthKey, [24] |> List.map string)
+            (ParamKeys.sortingWidthKey, [24] |> List.map string)
     let sortingWidth28 = 
-            (runParameters.sortingWidthKey, [28] |> List.map string)
+            (ParamKeys.sortingWidthKey, [28] |> List.map string)
     let sortingWidth32 = 
-            (runParameters.sortingWidthKey, [32] |> List.map string)
+            (ParamKeys.sortingWidthKey, [32] |> List.map string)
     let smallSortingWidths = 
-            (runParameters.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
+            (ParamKeys.sortingWidthKey, [4;5;6;7;8;9;10;11;12] |> List.map string)
     let mediumSortingWidths = 
-            (runParameters.sortingWidthKey, [14;16;18;20;22] |> List.map string)
+            (ParamKeys.sortingWidthKey, [14;16;18;20;22] |> List.map string)
 
 
     // MergeSortingWidths
     let testMergeSortingWidths = 
-            (runParameters.sortingWidthKey, [32;] |> List.map string)
+            (ParamKeys.sortingWidthKey, [32;] |> List.map string)
 
     let smallMergeSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
+            (ParamKeys.sortingWidthKey, [16; 18; 24; 32; 36; 48; 64] |> List.map string)  
             
     let mediumMergeSortingWidths = 
-            (runParameters.sortingWidthKey,  [96; 128;]  |> List.map string)
+            (ParamKeys.sortingWidthKey,  [96; 128;]  |> List.map string)
 
     let sortingWidth96 = 
-            (runParameters.sortingWidthKey,  [96;]  |> List.map string)
+            (ParamKeys.sortingWidthKey,  [96;]  |> List.map string)
 
     let largeMergeSortingWidths = 
-            (runParameters.sortingWidthKey,  [192; 256; 512]  |> List.map string)
+            (ParamKeys.sortingWidthKey,  [192; 256; 512]  |> List.map string)
 
     let smallP2MergeSortingWidths = 
-            (runParameters.sortingWidthKey, [16; 32; 64;] |> List.map string)
+            (ParamKeys.sortingWidthKey, [16; 32; 64;] |> List.map string)
 
     let mediumP2MergeSortingWidths = 
-            (runParameters.sortingWidthKey, [128;] |> List.map string)
+            (ParamKeys.sortingWidthKey, [128;] |> List.map string)
 
     let largeP2MergeSortingWidths = 
-            (runParameters.sortingWidthKey, [256; 512;] |> List.map string)
+            (ParamKeys.sortingWidthKey, [256; 512;] |> List.map string)
 
 
     // RngType
     let rngTypeLcg = 
-            (runParameters.rngTypeKey, [_rngTypeLcg] |> List.map RngType.toString)
+            (ParamKeys.rngTypeKey, [_rngTypeLcg] |> List.map RngType.toString)
 
 
     // DataFormats
     let dataFormatInt8v512 = 
-            (runParameters.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+            (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
             
     let dataFomatBitv512 = 
-            (runParameters.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+            (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
 
     let noSuffixSuffixType = 
-            (runParameters.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+            (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
 
 
 
     // MutatorParams
 
     let mutatorSpansMsce (srtWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
-            (runParameters.mutatorParamsKey, 
+            (ParamKeys.mutatorParamsKey, 
                 [   
                     MutatorParams.msceParamsR5 srtWdth rType mutVariant
                     //MutatorParams.msceParamsR10 srtWdth rType
@@ -218,7 +218,7 @@ module CommonParams =
             |> List.map MutatorParams.toString)
 
     let mutatorSpansMssi (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
-            (runParameters.mutatorParamsKey, 
+            (ParamKeys.mutatorParamsKey, 
                 [   
                     MutatorParams.mssiParamsRL srtingWdth rType mutVariant
                     //MutatorParams.mssiParamsRM srtingWdth rType
@@ -229,7 +229,7 @@ module CommonParams =
 
 
     let mutatorSpansMsrs (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
-            (runParameters.mutatorParamsKey, 
+            (ParamKeys.mutatorParamsKey, 
                 [   
                     MutatorParams.msrsParamsRL srtingWdth rType mutVariant
                     //MutatorParams.msrsParamsRM srtingWdth rType
@@ -239,7 +239,7 @@ module CommonParams =
 
 
     let mutatorSpansMsuf4 (srtingWdth: int<sortingWidth>) (mutVariant:mutatorVariant) (rType: rngType) = 
-            (runParameters.mutatorParamsKey, 
+            (ParamKeys.mutatorParamsKey, 
                 [   
                     MutatorParams.msuf4ParamsRL srtingWdth rType mutVariant
                     //MutatorParams.msuf4ParamsRC srtingWdth rType
@@ -251,118 +251,118 @@ module CommonParams =
     // MutationRates
 
     let mutationRates =
-            (runParameters.mutationRateKey, [1.0] |> List.map string)
+            (ParamKeys.mutationRateKey, [1.0] |> List.map string)
     let insertionRates =
-            (runParameters.insertionRateKey, [0.1;] |> List.map string)
+            (ParamKeys.insertionRateKey, [0.1;] |> List.map string)
     let deletionRates =
-            (runParameters.deletionRateKey, [0.1;] |> List.map string)
+            (ParamKeys.deletionRateKey, [0.1;] |> List.map string)
 
-    let mRateOrtho =    (runParameters.orthoRateKey, [4.001;] |> List.map string)
-    let mRatePara =     (runParameters.paraRateKey, [0.4;] |> List.map string)
-    let mRatesPara =     (runParameters.paraRateKey, [0.4; 0.6] |> List.map string)
-    let mRateSelfSym =  (runParameters.selfSymRateKey, [2.001; ] |> List.map string)
-    let mRatesSelfSym =  (runParameters.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
+    let mRateOrtho =    (ParamKeys.orthoRateKey, [4.001;] |> List.map string)
+    let mRatePara =     (ParamKeys.paraRateKey, [0.4;] |> List.map string)
+    let mRatesPara =     (ParamKeys.paraRateKey, [0.4; 0.6] |> List.map string)
+    let mRateSelfSym =  (ParamKeys.selfSymRateKey, [2.001; ] |> List.map string)
+    let mRatesSelfSym =  (ParamKeys.selfSymRateKey, [1.5; 2.001; ] |> List.map string)
 
 
 
     // SeedModificationRates
 
     let seedModificationRate02 =
-            (runParameters.seedModificationRateKey, [0.02] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.02] |> List.map string)
     let seedModificationRate03 =
-            (runParameters.seedModificationRateKey, [0.03] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.03] |> List.map string)
     let seedModificationRate06 =
-            (runParameters.seedModificationRateKey, [0.06] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.06] |> List.map string)
     let seedModificationRate12 =
-            (runParameters.seedModificationRateKey, [0.12] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.12] |> List.map string)
     
     let seedModificationRateR2 =
-            (runParameters.seedModificationRateKey, [0.03; 0.06] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.03; 0.06] |> List.map string)
 
     let seedModificationRate10 =
-            (runParameters.seedModificationRateKey, [0.10] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.10] |> List.map string)
 
     let seedModificationRates =
-            (runParameters.seedModificationRateKey, [0.02; 0.03;] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.02; 0.03;] |> List.map string)
 
     let seedModificationRates2 =
-            (runParameters.seedModificationRateKey, [0.10; 0.14] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.10; 0.14] |> List.map string)
 
 
 
     // ModificationRates
 
     let modificationRatesStageR =
-            (runParameters.modificationRateKey, [ 0.08; 0.09; 0.10; 0.11; 0.12; 0.13; 0.14; 0.15;] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.08; 0.09; 0.10; 0.11; 0.12; 0.13; 0.14; 0.15;] |> List.map string)
 
     let modificationRatesStageRR =
-            (runParameters.modificationRateKey, [ 0.02; 0.03; 0.04; 0.05; 0.07; 0.08; 0.09; 0.10;] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.02; 0.03; 0.04; 0.05; 0.07; 0.08; 0.09; 0.10;] |> List.map string)
             
     let modificationRate03 =
-            (runParameters.modificationRateKey, [ 0.03; ] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.03; ] |> List.map string)
 
     let modificationRate90 =
-            (runParameters.modificationRateKey, [ 0.90; ] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.90; ] |> List.map string)
 
 
     let modificationRatesMsce =
-        (runParameters.modificationRateKey, [ 0.02; 0.035; 0.045; 0.05; 0.055; 0.065; 0.08 ] |> List.map string)
+        (ParamKeys.modificationRateKey, [ 0.02; 0.035; 0.045; 0.05; 0.055; 0.065; 0.08 ] |> List.map string)
 
     let modificationRatesMsuf4 =
-            (runParameters.modificationRateKey, [0.015; 0.02; 0.025; 0.03] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.015; 0.02; 0.025; 0.03] |> List.map string)
 
     let modificationRatesMsuf4center =
-            (runParameters.modificationRateKey, [0.015; 0.0175; 0.02; 0.0225; 0.025; 0.0275; 0.03; 0.0325;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.015; 0.0175; 0.02; 0.0225; 0.025; 0.0275; 0.03; 0.0325;] |> List.map string)
 
     let modificationRatesStage =
-            (runParameters.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.04; 0.08; 0.16; 0.24;] |> List.map string)
 
     let modificationRates15 =
-            (runParameters.modificationRateKey, [ 0.15;] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.15;] |> List.map string)
 
     let modificationRatesStage2 =
-            (runParameters.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
+            (ParamKeys.modificationRateKey, [ 0.17; 0.21; 0.25; 0.29;] |> List.map string)
             
     let modificationRatep01 =
-            (runParameters.modificationRateKey, [0.01;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.01;] |> List.map string)
 
     let modificationRatep04 =
-            (runParameters.modificationRateKey, [0.04;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.04;] |> List.map string)
 
     let modificationRatep06 =
-            (runParameters.modificationRateKey, [0.06;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.06;] |> List.map string)
 
     let modificationRatesMsceCenter =
-            (runParameters.modificationRateKey, [0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.07; 0.08;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.07; 0.08;] |> List.map string)
 
 
 
     // prioritizeNewMutants
 
     let prioritizeNewMutantsBoth = 
-            (runParameters.prioritizeNewMutantsKey, 
+            (ParamKeys.prioritizeNewMutantsKey, 
             [ true; false ] |> List.map string)
 
 
     let prioritizeNewMutantsTrue = 
-            (runParameters.prioritizeNewMutantsKey, 
+            (ParamKeys.prioritizeNewMutantsKey, 
             [ true; ] |> List.map string)
 
     let prioritizeNewMutantsFalse = 
-            (runParameters.prioritizeNewMutantsKey, 
+            (ParamKeys.prioritizeNewMutantsKey, 
             [ false ] |> List.map string)
 
 
 
     // distinctSorterHashes
     let distinctSorterHashesBoth = 
-            (runParameters.distinctSorterHashesKey, [true; false] |> List.map string)
+            (ParamKeys.distinctSorterHashesKey, [true; false] |> List.map string)
 
     let distinctSorterHashesTrue = 
-            (runParameters.distinctSorterHashesKey, [true] |> List.map string)
+            (ParamKeys.distinctSorterHashesKey, [true] |> List.map string)
 
     let distinctSorterHashesFalse = 
-            (runParameters.distinctSorterHashesKey, [false] |> List.map string)
+            (ParamKeys.distinctSorterHashesKey, [false] |> List.map string)
 
 
 
@@ -371,31 +371,31 @@ module CommonParams =
     let _prefixLib_Prefix24_4a = 
             prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
     let prefixLib_Prefix24_4a = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_4a] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix24_4a] |> List.map PrefixLibId.toString)
 
     let _prefixLib_Prefix24_4b = 
             prefixLibId.create (24<sortingWidth>) (4<stageLength>)  prefixLibVariant.PrefixB
     let prefixLib_Prefix24_4b = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_4b] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix24_4b] |> List.map PrefixLibId.toString)
 
     let _prefixLib_Prefix24_3a = 
             prefixLibId.create (24<sortingWidth>) (3<stageLength>) prefixLibVariant.PrefixA
     let prefixLib_Prefix24_3a = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_3a] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix24_3a] |> List.map PrefixLibId.toString)
 
     let _prefixLib_Prefix24_3b = 
             prefixLibId.create (24<sortingWidth>) (3<stageLength>) prefixLibVariant.PrefixB
     let prefixLib_Prefix24_3b = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix24_3b] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix24_3b] |> List.map PrefixLibId.toString)
 
     let prefixLib_Prefix24_3s = 
-            (runParameters.prefixLibIdKey, 
+            (ParamKeys.prefixLibIdKey, 
             [_prefixLib_Prefix24_3a; 
              _prefixLib_Prefix24_3b
             ] |> List.map PrefixLibId.toString)
 
     let prefixLib_Prefix24s = 
-            (runParameters.prefixLibIdKey, 
+            (ParamKeys.prefixLibIdKey, 
             [   _prefixLib_Prefix24_4a
                 _prefixLib_Prefix24_4b
                 _prefixLib_Prefix24_3a
@@ -405,13 +405,13 @@ module CommonParams =
     let _prefixLib_Prefix28_4a = 
             prefixLibId.create (28<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
     let prefixLib_Prefix28_4 = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix28_4a] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix28_4a] |> List.map PrefixLibId.toString)
 
 
     let _prefixLib_Prefix32_4a = 
             prefixLibId.create (32<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixA
     let prefixLib_Prefix32_4 = 
-            (runParameters.prefixLibIdKey, [_prefixLib_Prefix32_4a] |> List.map PrefixLibId.toString)
+            (ParamKeys.prefixLibIdKey, [_prefixLib_Prefix32_4a] |> List.map PrefixLibId.toString)
 
 
 
@@ -444,18 +444,18 @@ module CommonParams =
 
 
     let mergeLib_Merge16_2a = 
-            (runParameters.mergeLibIdKey, 
+            (ParamKeys.mergeLibIdKey, 
             [   _mergeLib_Merge16_2a
             ] |> List.map MergeLibId.toString)
 
 
     let mergeLib_Merge32_2a = 
-            (runParameters.mergeLibIdKey, 
+            (ParamKeys.mergeLibIdKey, 
             [   _mergeLib_Merge32_2a
             ] |> List.map MergeLibId.toString)
 
     let mergeLib_Merge32s = 
-            (runParameters.mergeLibIdKey, 
+            (ParamKeys.mergeLibIdKey, 
             [   _mergeLib_Merge32_2a
                 _mergeLib_Merge32_2b
                 _mergeLib_Merge32_4a
@@ -463,25 +463,25 @@ module CommonParams =
             ] |> List.map MergeLibId.toString)
 
     let mergeLib_Merge64_4a =
-            (runParameters.mergeLibIdKey, 
+            (ParamKeys.mergeLibIdKey, 
             [   _mergeLib_Merge64_4a
             ] |> List.map MergeLibId.toString)
 
     // Sorted Fractions
     let sortedFractions = 
-            (runParameters.sortedFractionKey, [0.65; 0.75; 0.85; 0.90; 0.95; 0.98; 0.99; 0.995] |> List.map string)
+            (ParamKeys.sortedFractionKey, [0.65; 0.75; 0.85; 0.90; 0.95; 0.98; 0.99; 0.995] |> List.map string)
 
     let sortedFractionsHi = 
-            (runParameters.sortedFractionKey, [0.99; 0.995] |> List.map string)
+            (ParamKeys.sortedFractionKey, [0.99; 0.995] |> List.map string)
 
     let sortedFraction90 = 
-            (runParameters.sortedFractionKey, [0.90] |> List.map string)
+            (ParamKeys.sortedFractionKey, [0.90] |> List.map string)
 
     let sortedFraction95 = 
-            (runParameters.sortedFractionKey, [0.95] |> List.map string)
+            (ParamKeys.sortedFractionKey, [0.95] |> List.map string)
 
     let sortedFraction99 = 
-            (runParameters.sortedFractionKey, [0.99] |> List.map string)
+            (ParamKeys.sortedFractionKey, [0.99] |> List.map string)
 
 
 
@@ -523,24 +523,24 @@ module CommonParams =
 
 
     let sorterEvalMeasureInitial_CestM_noScw =
-            (runParameters.sorterEvalMeasureInitialKey, 
+            (ParamKeys.sorterEvalMeasureInitialKey, 
             [ SorterEvalMeasure.stageBiasedFilterUnsorted;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasureInitial_CestM_Scw =
-            (runParameters.sorterEvalMeasureInitialKey, 
+            (ParamKeys.sorterEvalMeasureInitialKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
 
 
 
     let sorterEvalMeasure_CestM_noScw =
-            (runParameters.sorterEvalMeasureKey, 
+            (ParamKeys.sorterEvalMeasureKey, 
             [ SorterEvalMeasure.stageBiasedFilterUnsorted;] |> List.map SorterEvalMeasure.toCompactString)
     let sorterEvalMeasure_CestM_Scw =
-            (runParameters.sorterEvalMeasureKey, 
+            (ParamKeys.sorterEvalMeasureKey, 
             [ _cestM_ScwP2;] |> List.map SorterEvalMeasure.toCompactString)
 
 
     let sorterEvalMeasure_StageCrossing_Range =
-            (runParameters.sorterEvalMeasureKey, 
+            (ParamKeys.sorterEvalMeasureKey, 
             [ SorterEvalMeasure.stageBiasedFilterUnsorted; _cestM_ScwP2; _cestM_ScwP1; _cestM_ScwN1; _cestM_ScwP3; ] 
             |> List.map SorterEvalMeasure.toCompactString)
 
@@ -549,16 +549,16 @@ module CommonParams =
     // SorterPoolMeasures
 
     let sorterPoolMeasure_zp4_noScw =
-            (runParameters.sorterPoolMeasureKey, 
+            (ParamKeys.sorterPoolMeasureKey, 
             [ SorterPoolMeasure.noStdev;] |> List.map SorterPoolMeasure.toCompactString)
 
 
     let sorterPoolMeasure_z_noScw =
-            (runParameters.sorterPoolMeasureKey, 
+            (ParamKeys.sorterPoolMeasureKey, 
             [ SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
 
     let sorterPoolMeasures =
-            (runParameters.sorterPoolMeasureKey, 
+            (ParamKeys.sorterPoolMeasureKey, 
             [ SorterPoolMeasure.noStdev; SorterPoolMeasure.stdev;] |> List.map SorterPoolMeasure.toCompactString)
 
 
@@ -566,46 +566,46 @@ module CommonParams =
     // MutationMods
 
     let mutationMod1 =
-            (runParameters.mutationModKey, [1;] |> List.map string)
+            (ParamKeys.mutationModKey, [1;] |> List.map string)
 
     let mutationMod2 =
-            (runParameters.mutationModKey, [2;] |> List.map string)
+            (ParamKeys.mutationModKey, [2;] |> List.map string)
 
     let mutationMod3 =
-            (runParameters.mutationModKey, [3;] |> List.map string)
+            (ParamKeys.mutationModKey, [3;] |> List.map string)
 
     let mutationMod4 =
-            (runParameters.mutationModKey, [4;] |> List.map string)
+            (ParamKeys.mutationModKey, [4;] |> List.map string)
 
 
     let mutationMods4a =
-            (runParameters.mutationModKey, [1; 2; 3; 4] |> List.map string)
+            (ParamKeys.mutationModKey, [1; 2; 3; 4] |> List.map string)
 
     let mutationMods4b =
-            (runParameters.mutationModKey, [5; 6; 7; 8] |> List.map string)
+            (ParamKeys.mutationModKey, [5; 6; 7; 8] |> List.map string)
 
     let mutationMods64 =
-            (runParameters.mutationModKey, [0 .. 63] |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 63] |> List.map string)
 
     let mutationMods128 =
-            (runParameters.mutationModKey, [0 .. 127] |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 127] |> List.map string)
 
     // SorterPoolExpansionRates
 
     let sorterPoolExpansionRate1 =
-            (runParameters.sorterPoolExpansionRateKey, [1.0;] |> List.map string)
+            (ParamKeys.sorterPoolExpansionRateKey, [1.0;] |> List.map string)
 
     let sorterPoolExpansionRate2 =
-            (runParameters.sorterPoolExpansionRateKey, [2.0;] |> List.map string)
+            (ParamKeys.sorterPoolExpansionRateKey, [2.0;] |> List.map string)
 
     let sorterPoolExpansionRate4 =
-            (runParameters.sorterPoolExpansionRateKey, [4.0;] |> List.map string)
-            
+            (ParamKeys.sorterPoolExpansionRateKey, [4.0;] |> List.map string)
+
     let sorterPoolExpansionRate8 =
-            (runParameters.sorterPoolExpansionRateKey, [8.0;] |> List.map string)
+            (ParamKeys.sorterPoolExpansionRateKey, [8.0;] |> List.map string)
 
     let sorterPoolExpansionRates =
-            (runParameters.sorterPoolExpansionRateKey, [1.0; 2.0; 4.0; 8.0;] |> List.map string)
+            (ParamKeys.sorterPoolExpansionRateKey, [1.0; 2.0; 4.0; 8.0;] |> List.map string)
 
 
     let getStageLength = SeedSorterModelGeneration.getStageLength

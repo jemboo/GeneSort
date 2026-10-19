@@ -80,15 +80,15 @@ module QueryProperties =
                 failwith "Standard sortable test type is not supported."
 
             | qpSortableTestsType.Merge restriction ->
-                let keys = [ runParameters.sortingWidthKey; 
-                             runParameters.mergeDimensionKey; 
-                             runParameters.mergeSuffixTypeKey; 
-                             runParameters.sortableDataFormatKey ]
+                let keys = [ ParamKeys.sortingWidthKey; 
+                             ParamKeys.mergeDimensionKey; 
+                             ParamKeys.mergeSuffixTypeKey; 
+                             ParamKeys.sortableDataFormatKey ]
                 tryExtractKeys keys props
 
             | qpSortableTestsType.Prefix restriction ->
-                let keys = [ runParameters.sorterLibIdKey; 
-                             runParameters.sortableDataFormatKey ]
+                let keys = [ ParamKeys.sorterLibIdKey; 
+                             ParamKeys.sortableDataFormatKey ]
                 tryExtractKeys keys props
 
         | SorterEval se -> 
@@ -100,10 +100,10 @@ module QueryProperties =
                     | qpSortableTestsType.Standard r ->
                         match r with
                         | NoRestriction ->
-                            let keys = [ runParameters.rngTypeKey; 
-                                         runParameters.sorterEvalTypeKey; 
-                                         runParameters.simpleSorterModelTypeKey;
-                                         runParameters.sortingWidthKey;]
+                            let keys = [ ParamKeys.rngTypeKey; 
+                                         ParamKeys.sorterEvalTypeKey; 
+                                         ParamKeys.simpleSorterModelTypeKey;
+                                         ParamKeys.sortingWidthKey;]
                             tryExtractKeys keys props
                         | Split ->
                             failwith "Standard sortable test type with Split restriction is not supported."
@@ -111,11 +111,11 @@ module QueryProperties =
                     | qpSortableTestsType.Merge r ->
                         match r with
                         | NoRestriction ->
-                            let keys = [ runParameters.rngTypeKey;
-                                         runParameters.sorterEvalTypeKey; 
-                                         runParameters.simpleSorterModelTypeKey;
-                                         runParameters.sortableDataFormatKey; 
-                                         runParameters.mergeLibIdKey ]
+                            let keys = [ ParamKeys.rngTypeKey;
+                                         ParamKeys.sorterEvalTypeKey; 
+                                         ParamKeys.simpleSorterModelTypeKey;
+                                         ParamKeys.sortableDataFormatKey; 
+                                         ParamKeys.mergeLibIdKey ]
                             tryExtractKeys keys props
                         | Split ->
                             failwith "Merge sortable test type with Split restriction is not supported."
@@ -123,11 +123,11 @@ module QueryProperties =
                     | qpSortableTestsType.Prefix r ->
                         match r with
                         | NoRestriction ->
-                            let keys = [ runParameters.rngTypeKey;
-                                         runParameters.sorterEvalTypeKey; 
-                                         runParameters.simpleSorterModelTypeKey;
-                                         runParameters.sortableDataFormatKey; 
-                                         runParameters.prefixLibIdKey ]
+                            let keys = [ ParamKeys.rngTypeKey;
+                                         ParamKeys.sorterEvalTypeKey; 
+                                         ParamKeys.simpleSorterModelTypeKey;
+                                         ParamKeys.sortableDataFormatKey; 
+                                         ParamKeys.prefixLibIdKey ]
                             tryExtractKeys keys props
                         | Split ->
                             failwith "Prefix sortable test type with Split restriction is not supported."
@@ -146,12 +146,12 @@ module QueryProperties =
                         | qpSortableTestsType.Standard r ->
                             match r with
                             | NoRestriction ->
-                                let keys = [ runParameters.rngTypeKey;
-                                             runParameters.mutatorParamsKey;
-                                             runParameters.sorterEvalTypeKey; 
-                                             runParameters.seedSorterPoolSelectionTypeKey;
-                                             runParameters.simpleSorterModelTypeKey;
-                                             runParameters.sortingWidthKey;]
+                                let keys = [ ParamKeys.rngTypeKey;
+                                             ParamKeys.mutatorParamsKey;
+                                             ParamKeys.sorterEvalTypeKey; 
+                                             ParamKeys.seedSorterPoolSelectionTypeKey;
+                                             ParamKeys.simpleSorterModelTypeKey;
+                                             ParamKeys.sortingWidthKey;]
                                 tryExtractKeys keys props
                             | Split ->
                                 failwith "Standard sortable test type with Split restriction is not supported."
@@ -159,13 +159,13 @@ module QueryProperties =
                         | qpSortableTestsType.Merge r ->
                             match r with
                             | NoRestriction ->
-                                let keys = [ runParameters.rngTypeKey;
-                                             runParameters.mutatorParamsKey;
-                                             runParameters.sorterEvalTypeKey;
-                                             runParameters.seedSorterPoolSelectionTypeKey;
-                                             runParameters.simpleSorterModelTypeKey;
-                                             runParameters.sortableDataFormatKey; 
-                                             runParameters.mergeLibIdKey ]
+                                let keys = [ ParamKeys.rngTypeKey;
+                                             ParamKeys.mutatorParamsKey;
+                                             ParamKeys.sorterEvalTypeKey;
+                                             ParamKeys.seedSorterPoolSelectionTypeKey;
+                                             ParamKeys.simpleSorterModelTypeKey;
+                                             ParamKeys.sortableDataFormatKey; 
+                                             ParamKeys.mergeLibIdKey ]
                                 tryExtractKeys keys props
                             | Split ->
                                 failwith "Merge sortable test type with Split restriction is not supported."
@@ -173,13 +173,13 @@ module QueryProperties =
                         | qpSortableTestsType.Prefix r ->
                             match r with
                             | NoRestriction ->
-                                let keys = [ runParameters.rngTypeKey;
-                                             runParameters.mutatorParamsKey;
-                                             runParameters.sorterEvalTypeKey; 
-                                             runParameters.seedSorterPoolSelectionTypeKey;
-                                             runParameters.simpleSorterModelTypeKey;
-                                             runParameters.sortableDataFormatKey; 
-                                             runParameters.prefixLibIdKey ]
+                                let keys = [ ParamKeys.rngTypeKey;
+                                             ParamKeys.mutatorParamsKey;
+                                             ParamKeys.sorterEvalTypeKey; 
+                                             ParamKeys.seedSorterPoolSelectionTypeKey;
+                                             ParamKeys.simpleSorterModelTypeKey;
+                                             ParamKeys.sortableDataFormatKey; 
+                                             ParamKeys.prefixLibIdKey ]
                                 tryExtractKeys keys props
                             | Split ->
                                 failwith "Prefix sortable test type with Split restriction is not supported."

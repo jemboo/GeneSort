@@ -10,12 +10,12 @@ open GeneSort.Project.V1.Parameters
 module private ParameterGeneration =
 
     let make
-                (minReplica: int<replNumber>)
-                (maxReplica: int<replNumber>)
-                (parameterSpans: (string * string list) list)
-                (paramRefiner: parameterSet<'kind> seq -> parameterSet<'kind> seq) : parameterSet<'kind> [] =
+            (minReplica: int<replNumber>)
+            (maxReplica: int<replNumber>)
+            (parameterSpans: (string * string list) list)
+            (paramRefiner: parameterSet<'kind> seq -> parameterSet<'kind> seq) : parameterSet<'kind> [] =
 
-        let replicateSpan = [ parameterSet<'kind>.replKey, [%minReplica .. %maxReplica - 1] |> List.map string ]
+        let replicateSpan = [ ParamKeys.replKey, [%minReplica .. %maxReplica - 1] |> List.map string ]
 
         let fullSpans = replicateSpan @ parameterSpans
         let parametersArray =

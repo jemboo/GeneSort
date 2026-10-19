@@ -50,13 +50,13 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
         Execution = {
             FunctionName = executeName
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNames.sorterSgdMsufStandard
+            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
             EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
         }
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNames.sorterSgdMsufStandard
+            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             OutputTypes = []
         }
@@ -79,13 +79,13 @@ let private makeSimpleRun executeName =
         Execution = {
             FunctionName = executeName
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+            QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
             EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
         }
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNames.sorterEvalStandard
+            QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             OutputTypes = []
         }
@@ -135,9 +135,9 @@ let ``setup output types preserve every DU case and its value through run serial
 let ``host generates independent setup and run combinations using their own query catalogs`` () =
     let runQuery = "tests.run-query." + Guid.NewGuid().ToString("N")
     let setupQuery = "tests.setup-query." + Guid.NewGuid().ToString("N")
-    QueryParamsCatalog.register runQuery (fun project database rp dataType ->
+    QueryParamsCatalogRun.register runQuery (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [|"Phase", "run"|]))
-    QueryParamsCatalog.registerForSetup setupQuery (fun project database sp dataType ->
+    QueryParamsCatalogRun.registerForSetup setupQuery (fun project database sp dataType ->
         Some (queryParams.create database project (sp.GetRepl()) None dataType [|"Phase", "setup"|]))
     let setupEnhancerName = "tests.setup-enhancer." + Guid.NewGuid().ToString("N")
     SetupEnhancerCatalog.register setupEnhancerName (fun context sp ->
@@ -155,7 +155,7 @@ let ``host generates independent setup and run combinations using their own quer
     let host = runHost.Create configured 1
     let runParameters = host.MakeRunParameters 0<replNumber> 2<replNumber>
     let setupParameters = host.MakeSetupParameters 0<replNumber> 2<replNumber>
-    Assert.Equal(6, runParameters.Length)
+    Assert.Equal(12, runParameters.Length)
     Assert.Equal(4, setupParameters.Length)
     for rp in runParameters do
         Assert.False(rp.ParamMap.ContainsKey "SetupOnly")
@@ -468,7 +468,7 @@ let ``workflows reject incompatible seeds before evaluating or saving`` (sossWor
 let ``project catalogs initialize together without dispatch dependencies`` () =
     ProjectCatalogs.registerAll ()
     ProjectCatalogs.registerAll ()
-    QueryParamsCatalog.get QueryCatalogNames.sortableTestMerge |> ignore
+    QueryParamsCatalogRun.get QueryCatalogNamesRun.sortableTestMerge |> ignore
     MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel |> ignore
     let assembly = typeof<evolutionSetupSources>.Assembly
     Assert.Equal("GeneSort.Project.V1", assembly.GetName().Name)

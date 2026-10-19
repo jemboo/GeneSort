@@ -228,14 +228,14 @@ module OutputUnionTests =
                 .WithSeedSoss(Some (UMX.tag 1234UL))
                 .WithPartitionCount(Some 4<GeneSort.Sorting.partitionCount>)
                 .WithGenerationsPerSubset(Some 100<generationsPerSubset>)
-        QueryParamsBuilders.registerAll ()
-        let builder = QueryParamsCatalog.get QueryCatalogNames.sorterSgdMsufSoss (UMX.tag "Test") (UMX.tag "Soss")
+        QueryParamsBuildersRun.registerAll ()
+        let builder = QueryParamsCatalogRun.get QueryCatalogNamesRun.sorterSgdMsufSoss (UMX.tag "Test") (UMX.tag "Soss")
         let query duration =
             builder (parameters.WithGenerationsPerMergedSet(Some duration)) (geneSortDataType.SorterPoolSet "")
             |> Option.get
         let shortQuery = query 25<generationsPerSubset>
         let longQuery = query 250<generationsPerSubset>
-        Assert.Equal("25", shortQuery.Properties.[runParameters.generationsPerMergedSetKey])
+        Assert.Equal("25", shortQuery.Properties.[ParamKeys.generationsPerMergedSetKey])
         Assert.NotEqual(shortQuery.Id, longQuery.Id)
         Assert.True((builder parameters (geneSortDataType.SorterPoolSet "")).IsNone)
 
@@ -711,7 +711,7 @@ module OutputUnionTests =
     let ``data modes isolate result files and database lookups`` () =
         MessagePackSetup.configure()
         Fixtures.withFolder (fun folder ->
-            let db = GeneSortDbMp(folder, QueryCatalogNames.sorterSgdMsufSoss) :> IGeneSortDb
+            let db = GeneSortDbMp(folder, QueryCatalogNamesRun.sorterSgdMsufSoss) :> IGeneSortDb
             let dataType, original = Fixtures.outputs.[0]
             let qp = Fixtures.query dataType
             for mode in [geneSortDataMode.Project; geneSortDataMode.Setup; geneSortDataMode.Results] do
@@ -738,7 +738,7 @@ module OutputUnionTests =
                 Assert.Equal(Path.Combine(%folder, "Project", "Run", "TestRun", "Run_TestRun.msgpack"), runPath)
                 let paramPath = OutputDataFile.getFullOutputDataFilePath folder mode paramQuery |> UMX.untag
                 Assert.Equal(Path.Combine(%folder, "Project", "Run", "RunParameters_TestRun", "0", string %paramQuery.Id + ".msgpack"), paramPath)
-            let parameters = runParameters.create (Map.ofList [runParameters.replKey, "0"])
+            let parameters = runParameters.create (Map.ofList [ParamKeys.replKey, "0"])
             OutputDataFile.saveToFileAsync folder geneSortDataMode.Results paramQuery (outputData.RunParameters parameters) (UMX.tag false)
             |> Async.RunSynchronously |> Fixtures.unwrap
             let loaded = OutputDataFile.getRunParameters folder runName (Some 0<replNumber>) (Some 1<replNumber>) None None

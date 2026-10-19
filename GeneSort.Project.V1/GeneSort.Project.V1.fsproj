@@ -6,16 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+
     <Compile Include="ProjectTypes.fs" />
     <Compile Include="GeneSortDataType.fs" />
     <Compile Include="ParamBundles\MutatorParams.fs" />
     <Compile Include="ParamBundles\SorterTestsCycleProfile.fs" />
+    <Compile Include="Parameters\ParamKeys.fs" />
     <Compile Include="Parameters\ParameterSet.fs" />
     <Compile Include="Parameters\RunParameters.fs" />
     <Compile Include="Parameters\SetupParameters.fs" />
+    <Compile Include="Parameters\SetupFileReferences.fs" />
     <Compile Include="Parameters\QueryParams.fs" />
-    <Compile Include="Catalogs\Queries\QueryParamsCatalog.fs" />
-    <Compile Include="Catalogs\Queries\QueryParamsBuilders.fs" />
+    <Compile Include="Catalogs\Queries\Common.fs" />
+	<Compile Include="Catalogs\Queries\QueryParamsCatalogSetup.fs" />
+	<Compile Include="Catalogs\Queries\QueryParamsBuildersSetup.fs" />
+    <Compile Include="Catalogs\Queries\QueryParamsCatalogRun.fs" />
+    <Compile Include="Catalogs\Queries\QueryParamsBuildersRun.fs" />
     <Compile Include="QueryProperties.fs" />
     <Compile Include="Catalogs\Evolution\EvolutionMakerNames.fs" />
     <Compile Include="Catalogs\Evolution\ExecuteFunctionNames.fs" />
@@ -37,6 +43,7 @@
     <Compile Include="Catalogs\Setup\SetupCatalog.fs" />
     <Compile Include="Catalogs\ProjectCatalogs.fs" />
     <Compile Include="SetupOutputs.fs" />
+    <Compile Include="RunParameterGeneration.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

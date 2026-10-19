@@ -15,7 +15,7 @@ module SetupFunctions =
     let fromCatalogs modelSetName testsName : setupBuilder =
         fun context ->
             runBoth (SorterModelSetCatalog.get modelSetName context)
-                (SortableTestsWithPrefixCatalog.get testsName context)
+                    (SortableTestsWithPrefixCatalog.get testsName context)
 
 module SetupCatalog =
     let private registry =

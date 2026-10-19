@@ -38,13 +38,13 @@ module SorterEvalSpecsTestPrefix =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterEval
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -72,13 +72,13 @@ module SorterEvalSpecsTestPrefix =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterEval
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterEvalPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

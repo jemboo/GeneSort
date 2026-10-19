@@ -20,7 +20,7 @@ let private parameters = runParameters.create Map.empty
 
 let private makeRun queryCatalog setupCatalog =
     let executeName =
-        if queryCatalog = QueryCatalogNames.sorterMutateStandard || queryCatalog = QueryCatalogNames.sorterMutateMerge || queryCatalog = QueryCatalogNames.sorterMutatePrefix then
+        if queryCatalog = QueryCatalogNamesRun.sorterMutateStandard || queryCatalog = QueryCatalogNamesRun.sorterMutateMerge || queryCatalog = QueryCatalogNamesRun.sorterMutatePrefix then
             GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterMutate
         else GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval
     SimpleRun.create {
@@ -44,7 +44,7 @@ let private makeRun queryCatalog setupCatalog =
         }
     } |> run.SimpleRun
 
-let private makeHost () = runHost.Create (makeRun QueryCatalogNames.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
+let private makeHost () = runHost.Create (makeRun QueryCatalogNamesRun.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 
 let private context (step: string -> setupFunction) : setupContext =
     setupContext.create
@@ -135,7 +135,7 @@ let ``explicit setup function name survives serialization`` queryCatalog expecte
 [<Fact>]
 let ``saved runs must specify a setup function name`` () =
     MessagePackSetup.configure ()
-    let dto = makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.prefix |> RunDto.fromDomain
+    let dto = makeRun QueryCatalogNamesRun.sorterEvalStandard SetupCatalogNames.prefix |> RunDto.fromDomain
     let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
     json.AsObject().Remove("SetupFunctionName") |> ignore
     let legacyDto = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto>
@@ -146,7 +146,7 @@ let ``host setup honors the run setup function and custom names round trip`` () 
     MessagePackSetup.configure ()
     let customName = string (Guid.NewGuid())
     SetupCatalog.register customName (SetupFunctions.fromCatalogs SorterModelSetCatalogNames.mutantMerge SortableTestsWithPrefixCatalogNames.prefix)
-    let configured = makeRun QueryCatalogNames.sorterMutateStandard customName
+    let configured = makeRun QueryCatalogNamesRun.sorterMutateStandard customName
     let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(customName, restored.SetupFunctionName)
     let calls = ResizeArray<string>()
@@ -204,7 +204,7 @@ let ``custom catalog entries can be composed and reject invalid registrations`` 
 let ``evaluation setup phase creates setup without completing the run`` catalog testStep =
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
-    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard catalog) 1).WithSetupContext(bindings)
+    let host = (runHost.Create (makeRun QueryCatalogNamesRun.sorterEvalStandard catalog) 1).WithSetupContext(bindings)
     use cts = new System.Threading.CancellationTokenSource()
     let result = SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously
     match result with
@@ -223,7 +223,7 @@ let ``evaluation setup phase stops on failure`` failingStep =
         calls.Add label
         return if label = failingStep then Error "setup failed" else Ok ()
     })
-    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
+    let host = (runHost.Create (makeRun QueryCatalogNamesRun.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
     use cts = new System.Threading.CancellationTokenSource()
     Assert.Equal(Error "setup failed", SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously)
     Assert.Equal<string list>((if failingStep = "models" then ["models"] else ["models"; "standard"]), List.ofSeq calls)
@@ -237,9 +237,9 @@ let ``evaluation run phase never invokes setup`` variant =
     let bindings = context (fun label _ -> async { calls.Add label; return Error "Setup must not run" })
     let queryCatalog, setupCatalog =
         match variant with
-        | "standard" -> QueryCatalogNames.sorterEvalStandard, SetupCatalogNames.standard
-        | "merge" -> QueryCatalogNames.sorterEvalMerge, SetupCatalogNames.merge
-        | _ -> QueryCatalogNames.sorterEvalPrefix, SetupCatalogNames.prefix
+        | "standard" -> QueryCatalogNamesRun.sorterEvalStandard, SetupCatalogNames.standard
+        | "merge" -> QueryCatalogNamesRun.sorterEvalMerge, SetupCatalogNames.merge
+        | _ -> QueryCatalogNamesRun.sorterEvalPrefix, SetupCatalogNames.prefix
     let host = (runHost.Create (makeRun queryCatalog setupCatalog) 1).WithSetupContext(bindings)
     use cts = new System.Threading.CancellationTokenSource()
     // Missing query parameters stop evaluation before disk access, after the old setup call site.
@@ -251,7 +251,7 @@ let ``evaluation run phase never invokes setup`` variant =
 let ``cancelled evaluation setup does not invoke makers`` () =
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
-    let host = (runHost.Create (makeRun QueryCatalogNames.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
+    let host = (runHost.Create (makeRun QueryCatalogNamesRun.sorterEvalStandard SetupCatalogNames.standard) 1).WithSetupContext(bindings)
     use cts = new System.Threading.CancellationTokenSource()
     cts.Cancel()
     let result = SorterEvalExecutor._makeSetup host parameters cts None |> Async.RunSynchronously

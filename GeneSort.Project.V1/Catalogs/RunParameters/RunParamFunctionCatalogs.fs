@@ -14,21 +14,27 @@ open GeneSort.Project.V1.Parameters
 /// Context available to a run parameter enhancer without depending on dispatch infrastructure.
 type runParamEnhancerContext =
     private {
-        queryParamsFromRunParams: queryParamsBuilder
+        queryParamsFromRunParams: runQueryParamsBuilder
         run: run
+        setupParameters: setupParameters option
     }
 
     static member create
-            (queryParamsFromRunParams: queryParamsBuilder)
+            (queryParamsFromRunParams: runQueryParamsBuilder)
             (run: run)
             : runParamEnhancerContext =
         {
             queryParamsFromRunParams = queryParamsFromRunParams
             run = run
+            setupParameters = None
         }
+
+    static member createForSetup query run setup =
+        { queryParamsFromRunParams = query; run = run; setupParameters = Some setup }
 
     member this.QueryParamsFromRunParams with get() = this.queryParamsFromRunParams
     member this.Run with get() = this.run
+    member this.SetupParameters = this.setupParameters
 
 
 type runParamEnhancerBuilder = runParamEnhancerContext -> runParameters -> runParameters

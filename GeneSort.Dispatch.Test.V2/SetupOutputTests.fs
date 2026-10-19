@@ -41,7 +41,7 @@ let ``IDs use every enhanced setup combination for exactly the requested replica
         Assert.Equal("Run", %context.Run.RunName)
         enhanced <- enhanced + 1
         sp.WithGenerationCurrent(Some (UMX.tag 12)))
-    QueryParamsCatalog.registerForSetup name (fun project database sp outputType ->
+    QueryParamsCatalogRun.registerForSetup name (fun project database sp outputType ->
         Assert.False(sp.ParamMap.ContainsKey "RunOnly")
         Some (queryParams.create database project (sp.GetRepl()) (sp.GetGenerationCurrent()) outputType
             [|"A", sp.ParamMap.["A"]; "B", sp.ParamMap.["B"]|]))
@@ -59,7 +59,7 @@ let ``IDs use every enhanced setup combination for exactly the requested replica
 [<Fact>]
 let ``duplicate IDs are preserved for different parameter combinations`` () =
     let name = Guid.NewGuid().ToString("N")
-    QueryParamsCatalog.registerForSetup name (fun project database sp outputType ->
+    QueryParamsCatalogRun.registerForSetup name (fun project database sp outputType ->
         Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
     let configured = makeRun ["IgnoredByQuery", ["a"; "b"]] name SetupEnhancerFunctionNames.noOp
     let ids = SetupOutputs.getIds configured 0<replNumber> (geneSortDataType.SortableTests "") |> unwrap
@@ -69,7 +69,7 @@ let ``duplicate IDs are preserved for different parameter combinations`` () =
 [<Fact>]
 let ``missing query returns an error instead of silently dropping a combination`` () =
     let name = Guid.NewGuid().ToString("N")
-    QueryParamsCatalog.registerForSetup name (fun project database sp outputType ->
+    QueryParamsCatalogRun.registerForSetup name (fun project database sp outputType ->
         if sp.ParamMap.["A"] = "missing" then None
         else Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
     let configured = makeRun ["A", ["ok"; "missing"]] name SetupEnhancerFunctionNames.noOp
@@ -83,7 +83,7 @@ let ``missing query returns an error instead of silently dropping a combination`
 [<Fact>]
 let ``empty spans produce one ID while an empty span produces none`` () =
     let name = Guid.NewGuid().ToString("N")
-    QueryParamsCatalog.registerForSetup name (fun project database sp outputType ->
+    QueryParamsCatalogRun.registerForSetup name (fun project database sp outputType ->
         Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
     let outputType = geneSortDataType.SortableTests ""
     let ids = SetupOutputs.getIds (makeRun [] name SetupEnhancerFunctionNames.noOp) 0<replNumber> outputType |> unwrap

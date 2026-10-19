@@ -21,7 +21,7 @@ open GeneSort.Project.V1.Parameters
 module MutateSpecsRp = 
 
     let seedSorterPoolSelectionType = 
-            (runParameters.seedSorterPoolSelectionTypeKey, 
+            (ParamKeys.seedSorterPoolSelectionTypeKey, 
             [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
 
     module Specs =
@@ -51,13 +51,13 @@ module MutateSpecsRp =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterMutate
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantPrefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -90,13 +90,13 @@ module MutateSpecsRp =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterMutate
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantPrefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -129,13 +129,13 @@ module MutateSpecsRp =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterMutate
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantPrefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -167,13 +167,13 @@ module MutateSpecsRp =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterMutate
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantPrefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sorterMutatePrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

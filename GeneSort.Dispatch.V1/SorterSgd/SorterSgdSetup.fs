@@ -34,7 +34,7 @@ module SorterSgdSetup =
                     let! project = rp.GetSourceProjectName() |> Result.ofOption "Missing SourceProjectName."
                     let! database = rp.GetSourceDbName() |> Result.ofOption "Missing SourceDbName."
                     let root = System.IO.Path.Combine(RunHost.projectsRoot (), %project, %database, "Data") |> UMX.tag<pathToRootFolder>
-                    let source = new GeneSortDbMp(root, QueryCatalogNames.sorterSgdMsufSoss)
+                    let source = new GeneSortDbMp(root, QueryCatalogNamesSetup.sorterSgdMsufSoss)
                     return! SossAppendSetup.prepare source host rp allowOverwrite cts progress
                 } }
         | ExecuteFunctionNames.standard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard

@@ -31,13 +31,13 @@ module SortableTestsSpecsPrefix =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sortableTests
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }
@@ -62,13 +62,13 @@ module SortableTestsSpecsPrefix =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sortableTests
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }
@@ -91,13 +91,13 @@ module SortableTestsSpecsPrefix =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sortableTests
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestPrefix
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }

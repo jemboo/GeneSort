@@ -15,7 +15,7 @@ open GeneSort.Project.V1.Parameters
 let private createHostWithSaveResult saveResult finished execute =
     let name = Guid.NewGuid().ToString()
     ExecuteFunctionCatalog.register name execute
-    QueryParamsCatalog.register name (fun project database rp dataType ->
+    QueryParamsCatalogRun.register name (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
     let configured =
         SimpleRun.create {

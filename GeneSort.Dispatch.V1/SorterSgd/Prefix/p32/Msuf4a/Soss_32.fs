@@ -30,21 +30,21 @@ let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 let Pool_4_Debug ()  : run =
     let parameterSpans =
         [
-            (runParameters.sorterCountPerPoolKey, [4] |>  List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [32] |> List.map string)
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [2;] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [10] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [20;] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [1] |> List.map string)
-            (runParameters.paraRateKey,    [1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0;] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-            (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            (ParamKeys.sorterCountPerPoolKey, [4] |>  List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [2;] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [20;] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [1] |> List.map string)
+            (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0;] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -56,13 +56,13 @@ let Pool_4_Debug ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -77,21 +77,21 @@ let Pool_4_Debug ()  : run =
 let Pool_32_Gens15 ()  : run =
     let parameterSpans =
         [
-            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [256] |> List.map string)
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [3; 9] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [15;] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [15;] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [14] |> List.map string)
-            (runParameters.paraRateKey,    [1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0 .. 3] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-            (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [3; 9] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [15;] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [15;] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [14] |> List.map string)
+            (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -103,13 +103,13 @@ let Pool_32_Gens15 ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -125,21 +125,21 @@ let Pool_32_Gens15 ()  : run =
 let Pool_32_Test_null ()  : run =
     let parameterSpans =
         [
-            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [1] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [99] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [99;] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [10] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [13] |> List.map string)
-            (runParameters.paraRateKey,    [1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0 .. 7] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-            (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [1] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [99] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [99;] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [13] |> List.map string)
+            (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -151,13 +151,13 @@ let Pool_32_Test_null ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -175,21 +175,21 @@ let Pool_32_Test_null ()  : run =
 let Pool_128_Test ()  : run =
     let parameterSpans =
         [
-            (runParameters.sorterCountPerPoolKey, [128] |>  List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [128] |> List.map string)
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [4] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [100] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [100] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [0] |> List.map string)
-            (runParameters.paraRateKey,    [1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0 .. 7] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020;] |> List.map string)
-            (runParameters.modificationRateKey, [0.035;]  |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            (ParamKeys.sorterCountPerPoolKey, [128] |>  List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [4] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [100] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [100] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+            (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -201,13 +201,13 @@ let Pool_128_Test ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -225,21 +225,21 @@ let Pool_128_Test ()  : run =
 let Pool_32_V1 ()  : run =
     let parameterSpans =
         [
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [4] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [100] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [100] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [3] |> List.map string)
-            (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-            (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-            (runParameters.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [4] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [100] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [100] |> List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
+            (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
+            (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -251,13 +251,13 @@ let Pool_32_V1 ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
@@ -271,21 +271,21 @@ let Pool_32_V1 ()  : run =
 let Pool_512_V2a ()  : run =
     let parameterSpans =
         [
-            (runParameters.seedSossKey, [1234UL] |> List.map string)
-            (runParameters.partitionCountKey, [4] |> List.map string)
-            (runParameters.generationsPerSubsetKey, [100] |> List.map string)
-            (runParameters.generationsPerMergedSetKey, [100] |> List.map string)
-            (runParameters.adjustCeLengthFrequencyKey, [100] |> List.map string)
-            (runParameters.sorterCountPerPoolSetKey, [512] |> List.map string)
-            (runParameters.codeModKey, ["NoMods"] |> List.map string)
-            (runParameters.generationIntervalLastKey, [3] |> List.map string)
-            (runParameters.sorterCountPerPoolKey, [512] |>  List.map string)
-            (runParameters.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-            (runParameters.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-            (runParameters.mutationModKey, [0] |> List.map string)
-            (runParameters.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
-            (runParameters.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
-            (runParameters.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
+            (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+            (ParamKeys.partitionCountKey, [4] |> List.map string)
+            (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
+            (ParamKeys.generationsPerMergedSetKey, [100] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [100] |> List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+            (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
+            (ParamKeys.sorterCountPerPoolKey, [512] |>  List.map string)
+            (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
+            (ParamKeys.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
+            (ParamKeys.mutationModKey, [0] |> List.map string)
+            (ParamKeys.seedModificationRateKey, [0.015; 0.02; 0.025;] |> List.map string)
+            (ParamKeys.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
+            (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
         ]
     run.SgdRun (
         SgdRun.create {
@@ -297,13 +297,13 @@ let Pool_512_V2a ()  : run =
             Execution = {
                 FunctionName = ExecuteFunctionNames.soss
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNames.sorterSgdMsufSoss
+                QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                 OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }

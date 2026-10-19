@@ -31,13 +31,13 @@ module SortableTestsSpecsMerge =
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sortableTests
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestMerge
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.merge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNames.sortableTestMerge
+                        QueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
                         OutputTypes = []
                     }

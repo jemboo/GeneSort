@@ -22,12 +22,12 @@ module SortableTestsDbs =
 
 
         let makeMergeQueryParams repl mergeLibId sortableDataFormat outputDataType =
-            QueryParamsBuilders.SortableTests.Merge.makeQueryParams projectName dbName repl mergeLibId sortableDataFormat outputDataType
+            QueryParamsBuildersRun.SortableTests.Merge.makeQueryParams projectName dbName repl mergeLibId sortableDataFormat outputDataType
 
         let makeMergeQueryParamsFromRunParams rp odt =
-            QueryParamsBuilders.SortableTests.Merge.queryParamsFromRunParams projectName dbName rp odt
+            QueryParamsBuildersRun.SortableTests.Merge.queryParamsFromRunParams projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sortableTestMerge)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestMerge)
 
 
         let getMergeSortableTests
@@ -53,12 +53,12 @@ module SortableTestsDbs =
 
 
         let makePrefixQueryParams repl prefixLibId sortableDataFormat outputDataType =
-            QueryParamsBuilders.SortableTests.Prefix.makeQueryParams projectName dbName repl prefixLibId sortableDataFormat outputDataType
+            QueryParamsBuildersRun.SortableTests.Prefix.makeQueryParams projectName dbName repl prefixLibId sortableDataFormat outputDataType
 
         let makePrefixQueryParamsFromRunParams rp odt =
-            QueryParamsBuilders.SortableTests.Prefix.queryParamsFromRunParams projectName dbName rp odt
+            QueryParamsBuildersRun.SortableTests.Prefix.queryParamsFromRunParams projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sortableTestPrefix)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestPrefix)
 
 
 

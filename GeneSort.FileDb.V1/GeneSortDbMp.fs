@@ -25,7 +25,7 @@ type GeneSortDbMp(
     let catalogName = defaultArg queryCatalogName (
         if isNull databaseFolder || isNull projectFolder then
             invalidArg (nameof rootFolder) "The data folder must be nested under a project and database folder."
-        QueryParamsCatalog.nameForDatabase projectFolder.Name databaseFolder.Name)
+        QueryParamsCatalogRun.nameForDatabase projectFolder.Name databaseFolder.Name)
 
     let mailbox = MailboxProcessor.Start(fun inbox ->
         let rec loop () =
@@ -55,7 +55,7 @@ type GeneSortDbMp(
         member _.makeQueryParamsFromRunParams rp odt =
             let projectName = projectFolder.Name |> UMX.tag<projectName>
             let databaseName = databaseFolder.Name |> UMX.tag<databaseName>
-            (QueryParamsCatalog.get catalogName projectName databaseName) rp odt
+            (QueryParamsCatalogRun.get catalogName projectName databaseName) rp odt
 
         member _.saveAsync dataMode (queryParams: queryParams) (data: outputData) (allowOverwrite: bool<allowOverwrite>) =
             mailbox.PostAndAsyncReply(fun channel -> Save(rootFolder, dataMode, queryParams, data, allowOverwrite, channel))

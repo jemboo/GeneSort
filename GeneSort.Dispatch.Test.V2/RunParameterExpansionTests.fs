@@ -1,0 +1,114 @@
+module GeneSort.Dispatch.Test.V2.RunParameterExpansionTests
+
+open System
+open FSharp.UMX
+open Xunit
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Dispatch.V1
+open GeneSort.Db.V1
+
+let private configure runValues setupValues outputTypes setupQuery =
+    let name = Guid.NewGuid().ToString("N")
+    let setupCalls = ref 0
+    SetupEnhancerCatalog.register name (fun _ sp ->
+        setupCalls.Value <- setupCalls.Value + 1
+        sp.WithGenerationCurrent(Some (UMX.tag 12)))
+    QueryParamsCatalogRun.registerForSetup name setupQuery
+    QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
+        Some (queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]))
+    RunParamEnhancerBuilders.register name (fun context rp ->
+        let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
+        Assert.Equal(setup.GetRepl(), rp.GetRepl())
+        Assert.True(rp.GetSetupParametersId().IsSome)
+        rp.ParamMap |> Map.add "SeenSetup" setup.ParamMap.["S"] |> runParameters.create) |> ignore
+    let configured =
+        SimpleRun.create {
+            DatabaseName = UMX.tag "db"
+            ProjectName = UMX.tag "project"
+            RunName = UMX.tag "run"
+            Description = "Expansion test"
+            AllowOverwrite = false
+            Execution = {
+                FunctionName = "unused"
+                ParameterSpans = ["R", runValues]
+                QueryCatalogName = name + ".run"
+                EnhancerFunctionName = name
+            }
+            Setup = {
+                FunctionName = "unused"
+                ParameterSpans = ["S", setupValues]
+                QueryCatalogName = name
+                EnhancerFunctionName = name
+                OutputTypes = outputTypes
+            }
+        } |> run.SimpleRun
+    configured, setupCalls
+
+let private query project database (sp: setupParameters) outputType =
+    Some (queryParams.create database project (sp.GetRepl()) (sp.GetGenerationCurrent()) outputType [|"S", sp.ParamMap.["S"]|])
+
+[<Fact>]
+let ``Cartesian expansion links every output to the matching enhanced setup within each replica`` () =
+    let outputs = [geneSortDataType.SorterModelSet "models"; geneSortDataType.SortableTestsWithPrefix "tests"]
+    let configured, calls = configure ["a"; "b"; "c"] ["one"; "two"] outputs query
+    let generated = RunParameterGeneration.generate configured 2<replNumber> 4<replNumber>
+    Assert.Equal(12, generated.Length)
+    Assert.Equal(4, calls.Value)
+    Assert.Equal(12, generated |> Array.map (fun rp -> rp.GetId().Value) |> Array.distinct |> Array.length)
+    for rp in generated do
+        let sp = (setupParameters.create (Map.ofList ["S", rp.ParamMap.["SeenSetup"]])).WithRepl(rp.GetRepl()).WithGenerationCurrent(Some (UMX.tag 12))
+        let expected outputType = query configured.ProjectName configured.DatabaseName sp outputType |> Option.get |> fun q -> q.Id
+        Assert.Equal(Some (expected outputs.[0]), rp.GetSetupSorterModelSetId())
+        Assert.Equal(Some (expected outputs.[1]), rp.GetSetupSortableTestsWithPrefixId())
+        Assert.False(rp.ParamMap.ContainsKey "S")
+    for _, group in generated |> Array.groupBy (fun rp -> rp.GetRepl(), rp.ParamMap.["SeenSetup"]) do
+        Assert.Equal<string>([|"a"; "b"; "c"|], group |> Array.map (fun rp -> rp.ParamMap.["R"]))
+        Assert.Single(group |> Array.map (fun rp -> rp.GetSetupParametersId()) |> Array.distinct) |> ignore
+    let builder = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+    let savedIds = generated |> Array.map (fun rp -> (builder rp (geneSortDataType.RunParameters configured.RunName) |> Option.get).Id)
+    Assert.Equal(12, savedIds |> Array.distinct |> Array.length)
+
+[<Fact>]
+let ``setup association keeps runs distinct even when there are no output files`` () =
+    let configured, _ = configure ["a"] ["one"; "two"] [] (fun _ _ _ _ -> failwith "No output queries expected")
+    let generated = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
+    Assert.Equal(2, generated.Length)
+    Assert.NotEqual(generated.[0].GetId(), generated.[1].GetId())
+    Assert.All(generated, fun rp -> Assert.True(rp.GetSetupSorterModelSetId().IsNone))
+
+[<Fact>]
+let ``an empty span produces an empty product`` () =
+    for runs, setups in [[], ["one"]; ["a"], []] do
+        let configured, _ = configure runs setups [] query
+        Assert.Empty(RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>)
+
+[<Fact>]
+let ``missing setup queries and conflicting output keys fail explicitly`` () =
+    let configured, _ = configure ["a"] ["one"] [geneSortDataType.SorterModelSet ""] (fun _ _ _ _ -> None)
+    Assert.Throws<InvalidOperationException>(fun () -> RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> ignore) |> ignore
+    let conflicting, _ = configure ["a"] ["one"] [geneSortDataType.SorterModelSet "a"; geneSortDataType.SorterModelSet "b"] query
+    Assert.Throws<ArgumentException>(fun () -> RunParameterGeneration.generate conflicting 0<replNumber> 1<replNumber> |> ignore) |> ignore
+
+[<Fact>]
+let ``initialization persists the entire expanded product with distinct file queries`` () =
+    let configured, _ = configure ["a"; "b"; "c"] ["one"; "two"] [geneSortDataType.SorterModelSet ""] query
+    let writes = System.Collections.Concurrent.ConcurrentBag<queryParams * runParameters>()
+    let db = { new IGeneSortDb with
+        member _.databaseName = configured.DatabaseName
+        member _.saveAsync _ qp data _ = async {
+            match data with outputData.RunParameters rp -> writes.Add(qp, rp) | _ -> ()
+            return Ok () }
+        member _.loadAsync _ _ = failwith "Unexpected read"
+        member _.loadIfFoundAsync _ _ = failwith "Unexpected read"
+        member _.doesOutPutDataExist _ _ = failwith "Unexpected read"
+        member _.getRunParameters _ _ _ _ _ = failwith "Unexpected read"
+        member _.makeQueryParamsFromRunParams _ _ = failwith "Unexpected query" }
+    let result = ParamOps.initRunAndParamFiles db None configured 0<replNumber> 1<replNumber> (UMX.tag false)
+                     (RunParameterGeneration.generate configured) |> Async.RunSynchronously
+    Assert.Equal(Ok (), result)
+    Assert.Equal(6, writes.Count)
+    Assert.Equal(6, writes |> Seq.map (fun (q, _) -> q.Id) |> Seq.distinct |> Seq.length)

@@ -5,12 +5,9 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 
 /// A normalized adapter for turning run parameters into the storage path metadata.
-type queryParamsBuilder = runParameters -> geneSortDataType -> queryParams option
-type queryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> queryParamsBuilder
-type setupQueryParamsBuilder = setupParameters -> geneSortDataType -> queryParams option
-type setupQueryParamsCatalogBuilder = string<projectName> -> string<databaseName> -> setupQueryParamsBuilder
 
-module QueryCatalogNames =
+
+module QueryCatalogNamesRun =
     [<Literal>]
     let sorterSgdUf6MutationRate = "sorter-sgd.uf6-mutation-rate"
     [<Literal>]
@@ -45,15 +42,15 @@ module QueryCatalogNames =
     let sorterMutatePrefix = "sorter-mutate.prefix"
 
 /// Process-wide catalog of query parameter builders, addressed by stable names stored in runs.
-module QueryParamsCatalog =
+module QueryParamsCatalogRun =
 
     let private syncRoot = obj ()
-    let mutable private builders: Map<string, queryParamsCatalogBuilder> = Map.empty
+    let mutable private builders: Map<string, runQueryParamsCatalogBuilder> = Map.empty
 
     let nameForDatabase (projectName: string) (databaseName: string) =
         sprintf "%s.%s" projectName databaseName
 
-    let register (name: string) (builder: queryParamsCatalogBuilder) =
+    let register (name: string) (builder: runQueryParamsCatalogBuilder) =
         if System.String.IsNullOrWhiteSpace name then
             invalidArg (nameof name) "A query parameter catalog name cannot be empty."
 
@@ -62,11 +59,23 @@ module QueryParamsCatalog =
                 invalidOp (sprintf "A query parameter builder named '%s' is already registered." name)
             builders <- Map.add name builder builders)
 
-    let get (name: string) : queryParamsCatalogBuilder =
+    let private lookup (name: string) : runQueryParamsCatalogBuilder =
         lock syncRoot (fun () ->
             match Map.tryFind name builders with
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
+
+    /// Setup linkage is part of every run query's identity, even for builders that select only a subset of keys.
+    let get name : runQueryParamsCatalogBuilder =
+        let builder = lookup name
+        fun project database parameters outputType ->
+            builder project database parameters outputType
+            |> Option.map (fun query ->
+                let references = SetupFileReferences.fromRunParameters parameters
+                if List.isEmpty references then query
+                else
+                    let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties
+                    queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))
 
     /// Setup and run builders share the named catalog and the same parameter keys.
     let registerForSetup name (builder: setupQueryParamsCatalogBuilder) =
@@ -74,5 +83,5 @@ module QueryParamsCatalog =
             builder project database (setupParameters.create rp.ParamMap) dataType)
 
     let getForSetup name project database : setupQueryParamsBuilder =
-        let builder = get name project database
+        let builder = lookup name project database
         fun parameters dataType -> builder (runParameters.create parameters.ParamMap) dataType

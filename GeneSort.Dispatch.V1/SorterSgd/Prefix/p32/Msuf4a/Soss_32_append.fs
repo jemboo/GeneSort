@@ -13,19 +13,19 @@ let projName = "SorterSgd.Soss.32p4a.Msuf.Append" |> UMX.tag<projectName>
 /// Inherit source parameter combinations; append evolution through a later interval.
 /// Both interval arguments are zero-based save-interval indices, not generation numbers.
 let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
-    if source.ExecuteFunctionName <> ExecuteFunctionNames.soss || source.RunQueryCatalogName <> QueryCatalogNames.sorterSgdMsufSoss then
+    if source.ExecuteFunctionName <> ExecuteFunctionNames.soss || source.RunQueryCatalogName <> QueryCatalogNamesRun.sorterSgdMsufSoss then
         invalidArg (nameof source) "Expected a Soss_32 source run."
     if sourceInterval < 0 || lastInterval <= sourceInterval then
         invalidArg (nameof lastInterval) "The final interval must follow the nonnegative source interval."
     let spans =
         source.RunParameterSpans
-        |> List.filter (fun (key, _) -> key <> runParameters.generationIntervalLastKey)
+        |> List.filter (fun (key, _) -> key <> ParamKeys.generationIntervalLastKey)
         |> fun inherited -> inherited @ [
-            runParameters.sourceProjectNameKey, [%source.ProjectName]
-            runParameters.sourceDbNameKey, [%source.DatabaseName]
-            runParameters.sourceRunNameKey, [%source.RunName]
-            runParameters.sourceGenerationIntervalKey, [string sourceInterval]
-            runParameters.generationIntervalLastKey, [string lastInterval]
+            ParamKeys.sourceProjectNameKey, [%source.ProjectName]
+            ParamKeys.sourceDbNameKey, [%source.DatabaseName]
+            ParamKeys.sourceRunNameKey, [%source.RunName]
+            ParamKeys.sourceGenerationIntervalKey, [string sourceInterval]
+            ParamKeys.generationIntervalLastKey, [string lastInterval]
         ]
     SgdRun.create {
         DatabaseName = source.DatabaseName
@@ -36,13 +36,13 @@ let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
         Execution = {
             FunctionName = ExecuteFunctionNames.soss
             ParameterSpans = spans
-            QueryCatalogName = QueryCatalogNames.sorterSgdMsufSossAppend
+            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
             EnhancerFunctionName = source.RunEnhancerFunctionName
         }
         Setup = {
             FunctionName = SetupCatalogNames.sossAppend
             ParameterSpans = spans
-            QueryCatalogName = QueryCatalogNames.sorterSgdMsufSossAppend
+            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSossAppend
             EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
             OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
         }

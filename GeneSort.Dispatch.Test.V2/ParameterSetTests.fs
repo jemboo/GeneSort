@@ -17,22 +17,13 @@ let ``Setup updates preserve their type and leave the original unchanged`` () =
     Assert.True(original.ParamMap.IsEmpty)
     Assert.True(updated.WithSourceGenerationInterval(None).GetSourceGenerationInterval().IsNone)
 
-[<Fact>]
-let ``Setup and run parameters are distinct types with the same keys and parsing`` () =
-    Assert.NotEqual(typeof<runParameters>, typeof<setupParameters>)
-    Assert.Equal(runParameters.sourceGenerationIntervalKey, setupParameters.sourceGenerationIntervalKey)
-    let values = Map.ofList [setupParameters.sourceGenerationIntervalKey, "14"; setupParameters.runFinishedKey, "invalid"]
-    let setup = setupParameters.create values
-    let run: runParameters = (runParameters.create values).WithRunFinished(None)
-    Assert.Equal(run.GetSourceGenerationInterval(), setup.GetSourceGenerationInterval())
-    Assert.True(setup.GetRunFinished().IsNone)
 
 [<Fact>]
 let ``Setup parameters round trip through MessagePack including custom keys`` () =
     let options =
         MessagePackSerializerOptions.Standard.WithResolver(
             CompositeResolver.Create(FSharpResolver.Instance, ContractlessStandardResolver.Instance))
-    for values in [Map.empty; Map.ofList [setupParameters.sourceGenerationIntervalKey, "14"; "Custom", "value\nwith Unicode: λ"]] do
+    for values in [Map.empty; Map.ofList [ParamKeys.sourceGenerationIntervalKey, "14"; "Custom", "value\nwith Unicode: λ"]] do
         let original = setupParameters.create values
         let bytes = MessagePackSerializer.Serialize(SetupParametersDto.fromDomain original, options)
         let restored = MessagePackSerializer.Deserialize<setupParametersDto>(System.ReadOnlyMemory<byte>(bytes), options) |> SetupParametersDto.toDomain
@@ -61,15 +52,15 @@ let ``Setup tables include all keys and placeholders for missing values`` () =
 [<Fact>]
 let ``each setup output case has an independent typed file ID parameter`` () =
     let accessors = [|
-        "SortableTests", setupParameters.setupSortableTestsIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsId(id))
-        "SortableTestsWithPrefix", setupParameters.setupSortableTestsWithPrefixIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsWithPrefixId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsWithPrefixId(id))
-        "SorterPoolSet", setupParameters.setupSorterPoolSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetId(id))
-        "SorterPoolSetSummarySet", setupParameters.setupSorterPoolSetSummarySetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetSummarySetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetSummarySetId(id))
-        "SorterSet", setupParameters.setupSorterSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetId(id))
-        "SorterModelSet", setupParameters.setupSorterModelSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterModelSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterModelSetId(id))
-        "SorterSetEval", setupParameters.setupSorterSetEvalIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetEvalId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetEvalId(id))
-        "SorterPoolBinsSetSeries", setupParameters.setupSorterPoolBinsSetSeriesIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolBinsSetSeriesId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolBinsSetSeriesId(id))
-        "SorterPoolSetHistory", setupParameters.setupSorterPoolSetHistoryIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetHistoryId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetHistoryId(id))
+        "SortableTests", ParamKeys.setupSortableTestsIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsId(id))
+        "SortableTestsWithPrefix", ParamKeys.setupSortableTestsWithPrefixIdKey, (fun (p: setupParameters) -> p.GetSetupSortableTestsWithPrefixId()), (fun id (p: setupParameters) -> p.WithSetupSortableTestsWithPrefixId(id))
+        "SorterPoolSet", ParamKeys.setupSorterPoolSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetId(id))
+        "SorterPoolSetSummarySet", ParamKeys.setupSorterPoolSetSummarySetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetSummarySetId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetSummarySetId(id))
+        "SorterSet", ParamKeys.setupSorterSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetId(id))
+        "SorterModelSet", ParamKeys.setupSorterModelSetIdKey, (fun (p: setupParameters) -> p.GetSetupSorterModelSetId()), (fun id (p: setupParameters) -> p.WithSetupSorterModelSetId(id))
+        "SorterSetEval", ParamKeys.setupSorterSetEvalIdKey, (fun (p: setupParameters) -> p.GetSetupSorterSetEvalId()), (fun id (p: setupParameters) -> p.WithSetupSorterSetEvalId(id))
+        "SorterPoolBinsSetSeries", ParamKeys.setupSorterPoolBinsSetSeriesIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolBinsSetSeriesId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolBinsSetSeriesId(id))
+        "SorterPoolSetHistory", ParamKeys.setupSorterPoolSetHistoryIdKey, (fun (p: setupParameters) -> p.GetSetupSorterPoolSetHistoryId()), (fun id (p: setupParameters) -> p.WithSetupSorterPoolSetHistoryId(id))
     |]
     let caseNames = Microsoft.FSharp.Reflection.FSharpType.GetUnionCases(typeof<GeneSort.Project.V1.outputData>) |> Array.map (fun c -> c.Name) |> Array.filter (fun name -> not (List.contains name ["Run"; "RunParameters"; "TextReport"])) |> Set.ofArray
     Assert.True((caseNames = (accessors |> Array.map (fun (name, _, _, _) -> name) |> Set.ofArray)))

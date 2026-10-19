@@ -25,9 +25,9 @@ module SorterEvalDbs =
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
 
-        let makeQueryParams = QueryParamsBuilders.SorterEval.Standard.makeQueryParams projectName dbName
-        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Standard.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalStandard)
+        let makeQueryParams = QueryParamsBuildersRun.SorterEval.Standard.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Standard.queryParamsFromRunParams projectName dbName
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalStandard)
 
 
 
@@ -37,9 +37,9 @@ module SorterEvalDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams = QueryParamsBuilders.SorterEval.Merge.makeQueryParams projectName dbName
-        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Merge.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalMerge)
+        let makeQueryParams = QueryParamsBuildersRun.SorterEval.Merge.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Merge.queryParamsFromRunParams projectName dbName
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalMerge)
 
 
 
@@ -49,9 +49,9 @@ module SorterEvalDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams = QueryParamsBuilders.SorterEval.Prefix.makeQueryParams projectName dbName
-        let queryParamsFromRunParams = QueryParamsBuilders.SorterEval.Prefix.queryParamsFromRunParams projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNames.sorterEvalPrefix)
+        let makeQueryParams = QueryParamsBuildersRun.SorterEval.Prefix.makeQueryParams projectName dbName
+        let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Prefix.queryParamsFromRunParams projectName dbName
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalPrefix)
 
 
 

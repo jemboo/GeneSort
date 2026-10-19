@@ -28,14 +28,14 @@ module Specs64 =
     let NoMods ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [1] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [0.5; 1.01; 1.5; 2.01] |> List.map string)
-                (runParameters.modificationRateKey, [ 0.09; 0.11; ] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [1] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.5; 1.01; 1.5; 2.01] |> List.map string)
+                (ParamKeys.modificationRateKey, [ 0.09; 0.11; ] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -47,13 +47,13 @@ module Specs64 =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
@@ -68,14 +68,14 @@ module Specs64 =
     let SymForceDiff1 ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["SymForce_Diff1"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [0.5; 1.01;] |> List.map string)
-                (runParameters.modificationRateKey, [ 0.20; 0.25; 0.30; ] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (ParamKeys.codeModKey, ["SymForce_Diff1"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.5; 1.01;] |> List.map string)
+                (ParamKeys.modificationRateKey, [ 0.20; 0.25; 0.30; ] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -87,13 +87,13 @@ module Specs64 =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
@@ -108,14 +108,14 @@ module Specs64 =
     let SymForce ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["SymForce"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [64] |>  List.map string)
-                (runParameters.paraRateKey, [0.5; 1.01;] |> List.map string)
-                (runParameters.modificationRateKey, [ 0.20; 0.25; 0.30; ] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [64;] |> List.map string)
+                (ParamKeys.codeModKey, ["SymForce"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.5; 1.01;] |> List.map string)
+                (ParamKeys.modificationRateKey, [ 0.20; 0.25; 0.30; ] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -127,13 +127,13 @@ module Specs64 =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
@@ -150,14 +150,14 @@ module Specs128 =
     let NoMods ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [6] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [128] |>  List.map string)
-                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
-                (runParameters.modificationRateKey, [0.09; 0.11;] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [128;] |> List.map string)
+                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [6] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [128] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
+                (ParamKeys.modificationRateKey, [0.09; 0.11;] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [128;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -169,13 +169,13 @@ module Specs128 =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMssiOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }

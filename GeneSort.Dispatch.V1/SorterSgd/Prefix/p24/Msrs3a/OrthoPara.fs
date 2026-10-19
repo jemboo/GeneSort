@@ -30,14 +30,14 @@ module Specs =
     let PickMode2_2 ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["PickMode2_2"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [5] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
-                (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (ParamKeys.codeModKey, ["PickMode2_2"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
+                (ParamKeys.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -49,13 +49,13 @@ module Specs =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
@@ -69,14 +69,14 @@ module Specs =
     let NoMods ()  : run =
         let parameterSpans =
             [
-                (runParameters.codeModKey, ["NoMods"] |> List.map string)
-                (runParameters.generationCurrentKey, [0] |> List.map string)
-                (runParameters.generationIntervalCountKey, [7] |> List.map string)
-                (runParameters.sorterCountPerPoolKey, [32] |>  List.map string)
-                (runParameters.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
-                (runParameters.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
-                (runParameters.mutationModKey, [0] |> List.map string)
-                (runParameters.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                (ParamKeys.generationCurrentKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalCountKey, [7] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
+                (ParamKeys.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
+                (ParamKeys.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -88,13 +88,13 @@ module Specs =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNames.sorterSgdMsrsOrthoPara
+                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
                     OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }

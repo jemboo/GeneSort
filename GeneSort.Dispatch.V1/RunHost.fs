@@ -32,7 +32,7 @@ module RunHost =
 type simpleRunHost = private {
     projectDb: IGeneSortDb
     run: simpleRun
-    queryParamsFromRunParams: queryParamsBuilder
+    queryParamsFromRunParams: runQueryParamsBuilder
     queryParamsFromSetupParams: setupQueryParamsBuilder
     maxParallel: int
     setup: setupFunction option
@@ -68,12 +68,17 @@ type runHost =
             { projectDb = db
               run = simple
               queryParamsFromSetupParams =
-                  QueryParamsCatalog.getForSetup run.SetupQueryCatalogName run.ProjectName run.DatabaseName
+                  QueryParamsCatalogRun.getForSetup 
+                        run.SetupQueryCatalogName 
+                        run.ProjectName 
+                        run.DatabaseName
+
               queryParamsFromRunParams =
-                  QueryParamsCatalog.get
+                  QueryParamsCatalogRun.get
                       run.RunQueryCatalogName
                       run.ProjectName
                       run.DatabaseName
+
               maxParallel = maxParallel
               setup = None
               executeFunction = ExecuteFunctionCatalog.get run.ExecuteFunctionName }
@@ -185,7 +190,7 @@ type runHost =
         parameters |> Seq.map (enhancer context)
 
     member this.MakeRunParameters minReplica maxReplica =
-        SimpleRun.makeRunParameters minReplica maxReplica this.ParamMapRefiner this.Run.BaseRun
+        RunParameterGeneration.generate this.Run minReplica maxReplica
 
     member this.MakeSetupParameters minReplica maxReplica =
         SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun

@@ -12,7 +12,7 @@ module ParamOps =
 
     let saveParametersFiles
             (db: IGeneSortDb)
-            (queryParamsBuilder: queryParamsBuilder)
+            (queryParamsBuilder: runQueryParamsBuilder)
             (runParameterArray: runParameters[])
             (allowOverwrite: bool<allowOverwrite>) 
             (progress: IProgress<string> option): Async<Result<unit, string>> =
@@ -56,21 +56,20 @@ module ParamOps =
         (minReplica: int<replNumber>)
         (maxReplica: int<replNumber>)
         (allowOverwrite: bool<allowOverwrite>)
-        (paramRefiner: runParameters seq -> runParameters seq) 
-        (parameterSpans: (string * string list) list) : Async<Result<unit, string>> =
+        (makeRunParameters: int<replNumber> -> int<replNumber> -> runParameters[]) : Async<Result<unit, string>> =
         async {
             try
+                let runParametersArray = makeRunParameters minReplica maxReplica
                 report progress (sprintf "%s Saving run file: %s" (StringUtils.getTimestampString()) %run.DatabaseName)
                 let queryParams = queryParams.createForRun run.DatabaseName run.ProjectName run.RunName
                 let! saveProjRes = db.saveAsync geneSortDataMode.Project queryParams (run |> outputData.Run) (true |> UMX.tag<allowOverwrite>)
                 match saveProjRes with
                 | Error err -> return Error err
                 | Ok () ->
-                    let runParametersArray = Run.makeRunParameters minReplica maxReplica parameterSpans paramRefiner |> Seq.toArray
                     report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
                     return! saveParametersFiles 
                                 db
-                                (QueryParamsCatalog.get run.RunQueryCatalogName run.ProjectName run.DatabaseName)
+                                (QueryParamsCatalogRun.get run.RunQueryCatalogName run.ProjectName run.DatabaseName)
                                 runParametersArray 
                                 allowOverwrite progress
             with e ->
