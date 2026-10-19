@@ -4,7 +4,7 @@ open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 
-/// A normalized adapter for turning run parameters into the storage path metadata.
+/// Stable names for setup query builders, independent of the run query registry.
 module QueryCatalogNamesSetup =
     [<Literal>]
     let sorterSgdUf6MutationRate = "sorter-sgd.uf6-mutation-rate"
@@ -63,7 +63,7 @@ module QueryParamsCatalogSetup =
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
 
-    /// Setup linkage is part of every run query's identity, even for builders that select only a subset of keys.
+    /// Include references carried by setup parameters in the query identity.
     let get name : setupQueryParamsCatalogBuilder =
         let builder = lookup name
         fun project database parameters outputType ->

@@ -12,7 +12,7 @@ module RunParameterGeneration =
     let generate (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         ProjectCatalogs.registerAll ()
         let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-        let setupQuery = QueryParamsCatalogRun.getForSetup configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+        let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
         let enhanceRun = RunParamEnhancerBuilders.get configured.RunEnhancerFunctionName
         let enhanceSetup = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
         let setupContext = { Run = configured; QueryParamsFromSetupParams = setupQuery }

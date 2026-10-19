@@ -58,7 +58,7 @@ module MutateSpecsRs =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantStandard
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -97,7 +97,7 @@ module MutateSpecsRs =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantStandard
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

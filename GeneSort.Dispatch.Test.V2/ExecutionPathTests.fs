@@ -17,6 +17,8 @@ let private createHostWithSaveResult saveResult finished execute =
     ExecuteFunctionCatalog.register name execute
     QueryParamsCatalogRun.register name (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
+    QueryParamsCatalogSetup.register name (fun project database sp dataType ->
+        Some (queryParams.create database project (sp.GetRepl()) None dataType [||]))
     let configured =
         SimpleRun.create {
             DatabaseName = (UMX.tag "Tests")

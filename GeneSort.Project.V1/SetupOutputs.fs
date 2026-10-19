@@ -34,7 +34,7 @@ module SetupOutputs =
             ProjectCatalogs.registerAll ()
             let configured = run.SimpleRun simple
             let query =
-                QueryParamsCatalogRun.getForSetup configured.SetupQueryCatalogName
+                QueryParamsCatalogSetup.get configured.SetupQueryCatalogName
                     configured.ProjectName configured.DatabaseName
             let enhance = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
             let context = { Run = configured; QueryParamsFromSetupParams = query }

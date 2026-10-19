@@ -68,7 +68,7 @@ type runHost =
             { projectDb = db
               run = simple
               queryParamsFromSetupParams =
-                  QueryParamsCatalogRun.getForSetup 
+                  QueryParamsCatalogSetup.get
                         run.SetupQueryCatalogName 
                         run.ProjectName 
                         run.DatabaseName

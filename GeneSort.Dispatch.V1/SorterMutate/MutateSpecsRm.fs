@@ -57,7 +57,7 @@ module MutateSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantMerge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -96,7 +96,7 @@ module MutateSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantMerge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -135,7 +135,7 @@ module MutateSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantMerge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
@@ -173,7 +173,7 @@ module MutateSpecsRm =
                     Setup = {
                         FunctionName = SetupCatalogNames.mutantMerge
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
+                        QueryCatalogName = QueryCatalogNamesSetup.sorterMutateMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }

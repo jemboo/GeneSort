@@ -43,7 +43,7 @@ let private configure runValues setupValues outputTypes setupQuery =
     SetupEnhancerCatalog.register name (fun _ sp ->
         setupCalls.Value <- setupCalls.Value + 1
         sp.WithGenerationCurrent(Some (UMX.tag 12)))
-    QueryParamsCatalogRun.registerForSetup name setupQuery
+    QueryParamsCatalogSetup.register name setupQuery
     QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
         Some (queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]))
     RunParamEnhancerBuilders.register name (fun context rp ->

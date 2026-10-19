@@ -80,12 +80,3 @@ module QueryParamsCatalogRun =
                 else
                     let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties
                     queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))
-
-    /// Setup and run builders share the named catalog and the same parameter keys.
-    let registerForSetup name (builder: setupQueryParamsCatalogBuilder) =
-        register name (fun project database rp dataType ->
-            builder project database (setupParameters.create rp.ParamMap) dataType)
-
-    let getForSetup name project database : setupQueryParamsBuilder =
-        let builder = lookup name project database
-        fun parameters dataType -> builder (runParameters.create parameters.ParamMap) dataType

@@ -56,7 +56,7 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             OutputTypes = []
         }
@@ -85,7 +85,7 @@ let private makeSimpleRun executeName =
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
-            QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
+            QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             OutputTypes = []
         }
@@ -137,7 +137,7 @@ let ``host generates independent setup and run combinations using their own quer
     let setupQuery = "tests.setup-query." + Guid.NewGuid().ToString("N")
     QueryParamsCatalogRun.register runQuery (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [|"Phase", "run"|]))
-    QueryParamsCatalogRun.registerForSetup setupQuery (fun project database sp dataType ->
+    QueryParamsCatalogSetup.register setupQuery (fun project database sp dataType ->
         Some (queryParams.create database project (sp.GetRepl()) None dataType [|"Phase", "setup"|]))
     let setupEnhancerName = "tests.setup-enhancer." + Guid.NewGuid().ToString("N")
     SetupEnhancerCatalog.register setupEnhancerName (fun context sp ->
