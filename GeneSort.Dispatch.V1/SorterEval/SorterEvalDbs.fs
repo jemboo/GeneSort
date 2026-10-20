@@ -49,7 +49,9 @@ module SorterEvalDbs =
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
-        let makeQueryParams = QueryParamsBuildersRun.SorterEval.Prefix.makeQueryParams projectName dbName
+        let makeQueryParams repl rng prefixLib model dataFormat sorterCount evalType outputType =
+            QueryParamsBuildersRun.SorterEval.Prefix.makeQueryParams
+                projectName dbName repl rng prefixLib model dataFormat sorterCount evalType outputType
         let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Prefix.queryParamsFromRunParams projectName dbName
         let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalPrefix)
 
@@ -121,6 +123,8 @@ module SorterEvalDbs =
                         pfxLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512
+                        // The prefix evaluation source specs use largeSorterCount.
+                        (snd largeSorterCount |> List.exactlyOne |> int |> UMX.tag<sorterCount>)
                         sorterEvalType.V2
                         (geneSortDataType.SorterSetEval "")
         async {

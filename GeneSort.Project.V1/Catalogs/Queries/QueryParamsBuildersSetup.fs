@@ -371,13 +371,13 @@ module QueryParamsBuildersSetup =
                 }
 
         module Prefix =
-            let makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt =
+            let makeQueryParams projectName dbName repl rng prefixLibId model dataFormat (sorterCount: int<sorterCount>) odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
                         (ParamKeys.rngTypeKey, rng |> RngType.toString)
                         (ParamKeys.prefixLibIdKey, PrefixLibId.toString prefixLibId)
                         (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
-                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
+                        (ParamKeys.sorterCountKey, string (int sorterCount))
                         (ParamKeys.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
                     |]
             let queryParamsFromSetupParams projectName dbName (rp: setupParameters) odt =
@@ -386,9 +386,9 @@ module QueryParamsBuildersSetup =
                     let! prefixLibId = rp.GetPrefixLibId()
                     let! model = rp.GetSimpleSorterModelType()
                     let! dataFormat = rp.GetSortableDataFormat()
-                    let! evalType = rp.GetSorterEvalType()
+                    let! sorterCount = rp.GetSorterCount()
                     let! repl = rp.GetRepl()
-                    return makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt
+                    return makeQueryParams projectName dbName repl rng prefixLibId model dataFormat sorterCount odt
                 }
 
     module SorterMutate =

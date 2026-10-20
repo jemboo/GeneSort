@@ -35,6 +35,10 @@ module SetupFileReferences =
     let fromSetupParameters (setupParams: setupParameters) : (string * string) list =
         keys |> List.choose (fun key -> setupParams.ParamMap.TryFind key |> Option.map (fun value -> key, value))
 
+    /// Source file references are metadata on setup parameters, not part of setup identities.
+    let withoutReferences (parameters: setupParameters) =
+        keys |> List.fold (fun map key -> Map.remove key map) parameters.ParamMap |> setupParameters.create
+
     /// Replace links as a unit so stale links cannot survive pairing with a new setup.
     let attach references (parameters: runParameters) =
         let cleared = keys |> List.fold (fun map key -> Map.remove key map) parameters.ParamMap

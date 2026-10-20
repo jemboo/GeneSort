@@ -37,7 +37,6 @@ let private createHostWithSaveResult saveResult finished execute =
                 ParameterSpans = []
                 QueryCatalogName = name
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
-                OutputTypes = []
             }
         }
         |> run.SimpleRun

@@ -63,14 +63,8 @@ module QueryParamsCatalogSetup =
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
 
-    /// Include references carried by setup parameters in the query identity.
+    /// Setup identities depend on setup settings, excluding source file references.
     let get name : setupQueryParamsCatalogBuilder =
         let builder = lookup name
         fun project database parameters outputType ->
-            builder project database parameters outputType
-            |> Option.map (fun query ->
-                let references = SetupFileReferences.fromSetupParameters parameters
-                if List.isEmpty references then query
-                else
-                    let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties
-                    queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))
+            builder project database (SetupFileReferences.withoutReferences parameters) outputType

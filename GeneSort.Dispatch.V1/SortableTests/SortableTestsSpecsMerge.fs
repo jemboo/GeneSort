@@ -39,7 +39,6 @@ module SortableTestsSpecsMerge =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sortableTestMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-                        OutputTypes = []
                     }
                 }
             )

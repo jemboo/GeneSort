@@ -39,7 +39,6 @@ module SortableTestsSpecsPrefix =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-                        OutputTypes = []
                     }
                 }
             )
@@ -70,7 +69,6 @@ module SortableTestsSpecsPrefix =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-                        OutputTypes = []
                     }
                 }
             )
@@ -99,7 +97,6 @@ module SortableTestsSpecsPrefix =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-                        OutputTypes = []
                     }
                 }
             )

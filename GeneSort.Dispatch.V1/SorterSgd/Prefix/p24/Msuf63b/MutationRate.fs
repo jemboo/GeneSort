@@ -71,7 +71,6 @@ module VarModR_32 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -114,7 +113,6 @@ module VarModR_32 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

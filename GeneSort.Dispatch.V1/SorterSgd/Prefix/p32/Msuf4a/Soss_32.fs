@@ -64,7 +64,6 @@ let Pool_4_Debug ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix
@@ -111,7 +110,6 @@ let Pool_32_Gens15 ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix
@@ -159,7 +157,6 @@ let Pool_32_Test_null ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix
@@ -209,7 +206,6 @@ let Pool_128_Test ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix
@@ -259,7 +255,6 @@ let Pool_32_V1 ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix
@@ -305,7 +300,6 @@ let Pool_512_V2a ()  : run =
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSoss
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
             }
         } {
             MakerNames = EvolutionMakerNames.sossPrefix

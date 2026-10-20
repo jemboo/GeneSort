@@ -55,7 +55,6 @@ module Specs64 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -95,7 +94,6 @@ module Specs64 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -135,7 +133,6 @@ module Specs64 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -177,7 +174,6 @@ module Specs128 =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

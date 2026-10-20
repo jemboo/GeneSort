@@ -19,15 +19,18 @@ module SorterEvalSpecsTestPrefix =
     module Specs =
 
         let Prefix_24s () : run =
-            let parameterSpans =
-                [
-                    rngTypeLcg
-                    prefixLib_Prefix24s
-                    withMsuf6
-                    dataFomatBitv512
-                    sorterEvalTypeV2
-                    largeSorterCount
-                ]
+            let parameterSpansSetup =
+                    [
+                        rngTypeLcg
+                        prefixLib_Prefix32_4
+                        withMsuf4
+                        dataFomatBitv512
+                        largeSorterCount
+                    ]
+            let parameterSpansRun =
+                    [
+                        sorterEvalTypeV2
+                    ]
             run.SimpleRun (
                 SimpleRun.create {
                     DatabaseName = SorterEvalDbs.Prefix.dbName
@@ -35,18 +38,17 @@ module SorterEvalSpecsTestPrefix =
                     RunName = (sprintf @"Prefix_24s_%s" "GenPrefix" |> UMX.tag)
                     Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
                     AllowOverwrite = false
-                    Execution = {
-                        FunctionName = ExecuteFunctionNames.sorterEval
-                        ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
-                    }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = parameterSpansSetup
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+                    }
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterEval
+                        ParameterSpans = parameterSpansRun
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     }
                 }
             )
@@ -55,19 +57,15 @@ module SorterEvalSpecsTestPrefix =
         let Prefix_32 () : run =
             let parameterSpansSetup =
                     [
-                        prefixLib_Prefix32_4
-                        dataFomatBitv512
-                        sorterEvalTypeV2
-                        largeSorterCount
-                    ]
-            let parameterSpansRun =
-                    [
                         rngTypeLcg
                         prefixLib_Prefix32_4
                         withMsuf4
                         dataFomatBitv512
-                        sorterEvalTypeV2
                         largeSorterCount
+                    ]
+            let parameterSpansRun =
+                    [
+                        sorterEvalTypeV2
                     ]
             run.SimpleRun (
                 SimpleRun.create {
@@ -76,18 +74,17 @@ module SorterEvalSpecsTestPrefix =
                     RunName = (sprintf @"Prefix_32_%s" "GenPrefix" |> UMX.tag)
                     Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
-                    Execution = {
-                        FunctionName = ExecuteFunctionNames.sorterEval
-                        ParameterSpans = parameterSpansSetup
-                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
-                    }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
-                        ParameterSpans = parameterSpansRun
+                        ParameterSpans = parameterSpansSetup
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+                    }
+                    Execution = {
+                        FunctionName = ExecuteFunctionNames.sorterEval
+                        ParameterSpans = parameterSpansRun
+                        QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     }
                 }
             )

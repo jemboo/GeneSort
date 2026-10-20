@@ -11,6 +11,54 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Dispatch.V1
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1.SortableTests
+open GeneSort.Sorting
+open GeneSort.SortingOps
+open GeneSort.Core
+open GeneSort.Dispatch.V1.SorterEval
+
+[<Fact>]
+let ``prefix evaluation combines split spans without setup ID linkage`` () =
+    for configured in [SorterEvalSpecsTestPrefix.Specs.Prefix_24s (); SorterEvalSpecsTestPrefix.Specs.Prefix_32 ()] do
+        let host = runHost.Create configured 1
+        let setups = host.MakeSetupParameters 0<replNumber> 1<replNumber>
+        let runs = host.MakeRunParameters 0<replNumber> 1<replNumber>
+        Assert.NotEmpty(setups)
+        Assert.Equal(setups.Length, runs.Length)
+        for setup, parameters in Array.zip setups runs do
+            Assert.True(setup.GetSorterEvalType().IsNone)
+            Assert.Equal(Some sorterEvalType.V2, parameters.GetSorterEvalType())
+            for key in [ParamKeys.rngTypeKey; ParamKeys.prefixLibIdKey; ParamKeys.simpleSorterModelTypeKey;
+                        ParamKeys.sortableDataFormatKey; ParamKeys.sorterCountKey] do
+                Assert.Equal(setup.ParamMap.[key], parameters.ParamMap.[key])
+            Assert.Equal(Some (setup.GetPrefixLibId().Value.SortingWidth), parameters.GetSortingWidth())
+            Assert.Empty(SetupFileReferences.fromSetupParameters setup)
+            Assert.Empty(SetupFileReferences.fromRunParameters parameters)
+            for outputType in [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""] do
+                let prepared = host.QueryParamsFromSetupParams setup outputType |> Option.get
+                let loaded = host.QueryParamsFromRunParams parameters outputType |> Option.get
+                let alternate = host.QueryParamsFromRunParams (parameters.WithSorterEvalType(Some sorterEvalType.V1)) outputType |> Option.get
+                Assert.Equal(prepared.Id, loaded.Id)
+                Assert.Equal(loaded.Id, alternate.Id)
+                Assert.False(loaded.Properties.ContainsKey ParamKeys.sorterEvalTypeKey)
+
+[<Fact>]
+let ``prefix evaluation identities include count and evaluation method but exclude file IDs`` () =
+    let host = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_24s ()) 1
+    let parameters = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
+    let outputType = geneSortDataType.SorterSetEval ""
+    let query rp = host.QueryParamsFromRunParams rp outputType |> Option.get
+    let baseline = query parameters
+    Assert.NotEqual(baseline.Id, (query (parameters.WithSorterCount(Some 1<sorterCount>))).Id)
+    Assert.NotEqual(baseline.Id, (query (parameters.WithSorterEvalType(Some sorterEvalType.V1))).Id)
+    let linked = parameters.WithSetupSorterModelSetId(Some (UMX.tag (Guid.NewGuid())))
+                           .WithSetupParametersId(Some (UMX.tag (Guid.NewGuid())))
+    Assert.Equal(baseline.Id, (query linked).Id)
+    let sourceQuery =
+        SorterEvalDbs.Prefix.makeQueryParams (parameters.GetRepl().Value) (parameters.GetRngType().Value)
+            (parameters.GetPrefixLibId().Value) (parameters.GetSimpleSorterModelType().Value)
+            (parameters.GetSortableDataFormat().Value) (parameters.GetSorterCount().Value)
+            (parameters.GetSorterEvalType().Value) outputType
+    Assert.Equal(baseline.Id, sourceQuery.Id)
 
 [<Theory>]
 [<InlineData(false)>]
@@ -40,9 +88,10 @@ let ``standalone test Results use the same identity for generation and downstrea
 let private configure runValues setupValues outputTypes setupQuery =
     let name = Guid.NewGuid().ToString("N")
     let setupCalls = ref 0
-    SetupEnhancerCatalog.register name (fun _ sp ->
+    SetupEnhancerCatalog.register name (fun context sp ->
         setupCalls.Value <- setupCalls.Value + 1
-        sp.WithGenerationCurrent(Some (UMX.tag 12)))
+        sp.WithGenerationCurrent(Some (UMX.tag 12))
+        |> SetupEnhancerCatalog.withFileReferences outputTypes context)
     QueryParamsCatalogSetup.register name setupQuery
     QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
         Some (queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]))
@@ -69,7 +118,6 @@ let private configure runValues setupValues outputTypes setupQuery =
                 ParameterSpans = ["S", setupValues]
                 QueryCatalogName = name
                 EnhancerFunctionName = name
-                OutputTypes = outputTypes
             }
         } |> run.SimpleRun
     configured, setupCalls
@@ -118,6 +166,47 @@ let ``missing setup queries and conflicting output keys fail explicitly`` () =
     Assert.Throws<InvalidOperationException>(fun () -> RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> ignore) |> ignore
     let conflicting, _ = configure ["a"] ["one"] [geneSortDataType.SorterModelSet "a"; geneSortDataType.SorterModelSet "b"] query
     Assert.Throws<ArgumentException>(fun () -> RunParameterGeneration.generate conflicting 0<replNumber> 1<replNumber> |> ignore) |> ignore
+
+[<Fact>]
+let ``source file IDs affect run identities but not setup identities`` () =
+    let configured, _ = configure ["a"] ["one"] [] (fun project database sp outputType ->
+        Some (queryParams.create database project (sp.GetRepl()) None outputType (Map.toArray sp.ParamMap)))
+    let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+    let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+    let first = Guid.NewGuid() |> UMX.tag<queryParamsId>
+    let second = Guid.NewGuid() |> UMX.tag<queryParamsId>
+    let input = (setupParameters.create (Map.ofList ["S", "one"])).WithRepl(Some 0<replNumber>)
+    let outputType = geneSortDataType.SorterModelSet ""
+    let baseline = setupQuery input outputType |> Option.get
+    for source in [first; second] do
+        let linked = input.WithSetupSorterModelSetId(Some source)
+        let actual = setupQuery linked outputType |> Option.get
+        Assert.Equal(baseline.Id, actual.Id)
+        Assert.False(actual.Properties.ContainsKey ParamKeys.setupSorterModelSetIdKey)
+        Assert.Equal(Some source, linked.GetSetupSorterModelSetId())
+    let generate source =
+        RunParameterGeneration.generateWithBindings runQuery setupQuery (fun _ rp -> rp)
+            (fun _ sp -> sp.WithSetupSorterModelSetId(Some source)) configured 0<replNumber> 1<replNumber>
+        |> Array.exactlyOne
+    let a, b = generate first, generate second
+    Assert.Equal(a.GetSetupParametersId(), b.GetSetupParametersId())
+    Assert.Equal(Some first, a.GetSetupSorterModelSetId())
+    Assert.Equal(Some second, b.GetSetupSorterModelSetId())
+    Assert.NotEqual(a.GetId(), b.GetId())
+
+[<Fact>]
+let ``built-in setup enhancers populate their required file IDs`` () =
+    let configured, _ = configure ["a"] ["one"] [] query
+    let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+    let context = { Run = configured; QueryParamsFromSetupParams = setupQuery }
+    let input = (setupParameters.create (Map.ofList ["S", "one"])).WithRepl(Some 0<replNumber>)
+    for enhancer, pool in [SetupEnhancerCatalog.sorterEval, false; SetupEnhancerCatalog.sorterMutate, false; SetupEnhancerCatalog.sorterSgd, true] do
+        let enhanced = enhancer context input
+        let expected outputType = setupQuery enhanced outputType |> Option.get |> fun q -> Some q.Id
+        Assert.Equal(expected (geneSortDataType.SortableTestsWithPrefix ""), enhanced.GetSetupSortableTestsWithPrefixId())
+        if pool then Assert.Equal(expected (geneSortDataType.SorterPoolSet ""), enhanced.GetSetupSorterPoolSetId())
+        else Assert.Equal(expected (geneSortDataType.SorterModelSet ""), enhanced.GetSetupSorterModelSetId())
+        Assert.Equal<Map<string, string>>(input.ParamMap, (SetupFileReferences.withoutReferences enhanced).ParamMap)
 
 [<Fact>]
 let ``initialization persists the entire expanded product with distinct file queries`` () =

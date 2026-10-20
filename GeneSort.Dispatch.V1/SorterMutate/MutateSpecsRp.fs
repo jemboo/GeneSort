@@ -59,7 +59,6 @@ module MutateSpecsRp =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -98,7 +97,6 @@ module MutateSpecsRp =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -137,7 +135,6 @@ module MutateSpecsRp =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -175,7 +172,6 @@ module MutateSpecsRp =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )

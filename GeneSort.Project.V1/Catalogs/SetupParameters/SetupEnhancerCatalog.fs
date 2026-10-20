@@ -19,17 +19,36 @@ module SetupEnhancerFunctionNames =
     [<Literal>]
     let sorterEval = "setup-enhancer.sorter-eval"
     [<Literal>]
+    let sorterEvalPrefix = "setup-enhancer.sorter-eval-prefix"
+    [<Literal>]
     let sorterMutate = "setup-enhancer.sorter-mutate"
     [<Literal>]
     let sorterSgd = "setup-enhancer.sorter-sgd"
 
-/// Setup enhancers are independent of run enhancers. Built-ins currently preserve all parameters.
+/// Setup enhancers supply file references for the associated run parameters.
 module SetupEnhancerCatalog =
+    /// Resolve required source files after applying setup settings.
+    let withFileReferences outputTypes (context: setupEnhancerContext) (parameters: setupParameters) =
+        let outputs = outputTypes |> List.map (fun outputType -> SetupFileReferences.keyForOutputType outputType, outputType)
+        match outputs |> List.countBy fst |> List.tryFind (fun (_, count) -> count > 1) with
+        | Some (key, _) -> invalidArg "outputTypes" (sprintf "Multiple source files use '%s'; only one file per ID key can be linked." key)
+        | None -> ()
+        let references = outputs |> List.map (fun (key, outputType) ->
+            match context.QueryParamsFromSetupParams parameters outputType with
+            | Some query -> key, string query.Id
+            | None -> invalidOp (sprintf "Setup query '%s' could not build %A for run '%s'.\n%s"
+                                    context.Run.SetupQueryCatalogName outputType (string context.Run.RunName)
+                                    (SetupParameters.reportKvps parameters)))
+        references |> List.fold (fun map (key, value) -> Map.add key value map) parameters.ParamMap |> setupParameters.create
+
     let noOp : setupEnhancerFunction = fun _ parameters -> parameters
     let sortableTests : setupEnhancerFunction = noOp
-    let sorterEval : setupEnhancerFunction = noOp
-    let sorterMutate : setupEnhancerFunction = noOp
-    let sorterSgd : setupEnhancerFunction = noOp
+    let sorterEvalPrefix : setupEnhancerFunction = noOp
+    let sorterEval : setupEnhancerFunction =
+        withFileReferences [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+    let sorterMutate : setupEnhancerFunction = sorterEval
+    let sorterSgd : setupEnhancerFunction =
+        withFileReferences [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
 
     let private syncRoot = obj ()
     let mutable private functions =
@@ -37,6 +56,7 @@ module SetupEnhancerCatalog =
             SetupEnhancerFunctionNames.noOp, noOp
             SetupEnhancerFunctionNames.sortableTests, sortableTests
             SetupEnhancerFunctionNames.sorterEval, sorterEval
+            SetupEnhancerFunctionNames.sorterEvalPrefix, sorterEvalPrefix
             SetupEnhancerFunctionNames.sorterMutate, sorterMutate
             SetupEnhancerFunctionNames.sorterSgd, sorterSgd
         ]

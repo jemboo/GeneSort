@@ -22,7 +22,9 @@ module RunParameterGeneration =
                let runs = SimpleRun.makeRunParameters repl next id configured.BaseRun
                let setups = SimpleRun.makeSetupParameters repl next (Seq.map (enhanceSetup setupContext)) configured.BaseRun
                for setup in setups do
-                   let references = SetupOutputs.referencesFor configured setupQuery setup
+                   let references =
+                       if configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix then []
+                       else SetupOutputs.referencesFor configured setup
                    let context = runParamEnhancerContext.createForSetup runQuery configured setup
                    for parameters in runs do
                        let enhanced =

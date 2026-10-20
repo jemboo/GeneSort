@@ -44,7 +44,6 @@ let fromSource (source: run) (sourceInterval: int) (lastInterval: int) : run =
             ParameterSpans = spans
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufSossAppend
             EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-            OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
         }
     } {
         MakerNames = source.MakerNames.Value

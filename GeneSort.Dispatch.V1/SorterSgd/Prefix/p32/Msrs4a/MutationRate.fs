@@ -68,7 +68,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -110,7 +109,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -153,7 +151,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -198,7 +195,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -239,7 +235,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -281,7 +276,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -327,7 +321,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -372,7 +365,6 @@ module MutationRate =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                        OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix

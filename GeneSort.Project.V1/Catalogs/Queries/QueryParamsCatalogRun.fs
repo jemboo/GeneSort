@@ -65,7 +65,7 @@ module QueryParamsCatalogRun =
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
 
-    /// Include setup linkage in run identities, except standalone test results with no setup inputs.
+    /// Include setup linkage unless the workflow identifies its inputs directly by settings.
     let get name : runQueryParamsCatalogBuilder =
         let builder = lookup name
         fun project database parameters outputType ->
@@ -73,6 +73,7 @@ module QueryParamsCatalogRun =
             |> Option.map (fun query ->
                 let references =
                     match name, outputType with
+                    | QueryCatalogNamesRun.sorterEvalPrefix, _ -> []
                     | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _
                     | QueryCatalogNamesRun.sortableTestPrefix, geneSortDataType.SortableTests _ -> []
                     | _ -> SetupFileReferences.fromRunParameters parameters

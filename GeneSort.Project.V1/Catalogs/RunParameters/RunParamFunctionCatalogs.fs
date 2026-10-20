@@ -110,6 +110,18 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     let sorterEvalPrefix (context: runParamEnhancerContext) (rp: runParameters) =
+        let rp =
+            match context.SetupParameters with
+            | None -> rp
+            | Some setup ->
+                let keys = [ParamKeys.rngTypeKey; ParamKeys.prefixLibIdKey; ParamKeys.simpleSorterModelTypeKey;
+                            ParamKeys.sortableDataFormatKey; ParamKeys.sorterCountKey]
+                keys
+                |> List.fold (fun map key ->
+                    let value = setup.ParamMap.TryFind key
+                                |> Option.defaultWith (fun () -> invalidOp (sprintf "Prefix evaluation setup is missing '%s'." key))
+                    Map.add key value map) rp.ParamMap
+                |> runParameters.create
         let qp = queryParamsForRun context rp
         let prefixLibId = rp.GetPrefixLibId().Value
         rp.WithDatabaseName(Some context.Run.DatabaseName)

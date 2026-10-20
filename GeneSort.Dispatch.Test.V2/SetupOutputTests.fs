@@ -27,7 +27,6 @@ let private makeRun spans query enhancer =
             ParameterSpans = spans
             QueryCatalogName = query
             EnhancerFunctionName = enhancer
-            OutputTypes = []
         }
     }
 

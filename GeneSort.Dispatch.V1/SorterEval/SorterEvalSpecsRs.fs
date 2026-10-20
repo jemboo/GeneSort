@@ -46,7 +46,6 @@ module SorterEvalSpecsRs =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -78,7 +77,6 @@ module SorterEvalSpecsRs =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -110,7 +108,6 @@ module SorterEvalSpecsRs =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )

@@ -27,7 +27,6 @@ type runDto =
         SetupQueryCatalogName: string
         RunEnhancerFunctionName: string
         SetupEnhancerFunctionName: string
-        SetupOutputTypes: outputDataTypeDto []
         AllowOverwrite: bool
         SortableTestsMakerName: string
         SeedPoolSetMakerName: string
@@ -58,7 +57,6 @@ module RunDto =
             ExecuteFunctionName = project.ExecuteFunctionName
             RunEnhancerFunctionName = project.RunEnhancerFunctionName
             SetupEnhancerFunctionName = project.SetupEnhancerFunctionName
-            SetupOutputTypes = project.SetupOutputTypes |> List.map OutputDataTypeDto.fromDomain |> List.toArray
             AllowOverwrite = project.AllowOverwrite
             SortableTestsMakerName = project.MakerNames |> Option.map (fun names -> names.SortableTests) |> Option.toObj
             SeedPoolSetMakerName = project.MakerNames |> Option.map (fun names -> names.SeedPoolSet) |> Option.toObj
@@ -73,7 +71,6 @@ module RunDto =
         let databaseName = dto.DataBaseName |> UMX.tag<databaseName>
         let projectName = dto.ProjectName |> UMX.tag<projectName>
         let runName = dto.RunName |> UMX.tag<runName>
-        let setupOutputTypes = dto.SetupOutputTypes |> Array.map OutputDataTypeDto.toDomain |> Array.toList
         let setupParameterSpans =
             dto.SetupParameterSpans
             |> Array.map (fun span -> span.Key, Array.toList span.Values)
@@ -109,7 +106,6 @@ module RunDto =
                 ParameterSpans = setupParameterSpans
                 QueryCatalogName = dto.SetupQueryCatalogName
                 EnhancerFunctionName = dto.SetupEnhancerFunctionName
-                OutputTypes = setupOutputTypes
             }
         }
         match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with

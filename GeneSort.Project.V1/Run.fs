@@ -50,7 +50,6 @@ type setupConfig = {
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
     EnhancerFunctionName: string
-    OutputTypes: geneSortDataType list
 }
 
 /// Complete configuration validated by SimpleRun.create.
@@ -85,7 +84,6 @@ type simpleRun =
           setupFunctionName: string
           runEnhancerFunctionName: string
           setupEnhancerFunctionName: string
-          setupOutputTypes: geneSortDataType list
           allowOverwrite: bool
           executeFunctionName: string
         }
@@ -111,7 +109,6 @@ module SimpleRun =
         let setupParameterSpans = config.Setup.ParameterSpans
         let setupQueryCatalogName = config.Setup.QueryCatalogName
         let setupEnhancerFunctionName = config.Setup.EnhancerFunctionName
-        let setupOutputTypes = config.Setup.OutputTypes
         if String.IsNullOrWhiteSpace executeFunctionName then
             invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace runQueryCatalogName then
@@ -135,7 +132,6 @@ module SimpleRun =
           setupFunctionName = setupFunctionName
           runEnhancerFunctionName = runEnhancerFunctionName
           setupEnhancerFunctionName = setupEnhancerFunctionName
-          setupOutputTypes = setupOutputTypes
           allowOverwrite = allowOverwrite
           executeFunctionName = executeFunctionName
         }
@@ -151,7 +147,6 @@ module SimpleRun =
     let setupFunctionName (run: simpleRun) = run.setupFunctionName
     let runEnhancerFunctionName (run: simpleRun) = run.runEnhancerFunctionName
     let setupEnhancerFunctionName (run: simpleRun) = run.setupEnhancerFunctionName
-    let setupOutputTypes (run: simpleRun) = run.setupOutputTypes
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
     let executeFunctionName (run: simpleRun) = run.executeFunctionName
 
@@ -202,7 +197,6 @@ type run =
     member this.SetupFunctionName with get() = SimpleRun.setupFunctionName this.BaseRun
     member this.RunEnhancerFunctionName = SimpleRun.runEnhancerFunctionName this.BaseRun
     member this.SetupEnhancerFunctionName = SimpleRun.setupEnhancerFunctionName this.BaseRun
-    member this.SetupOutputTypes = SimpleRun.setupOutputTypes this.BaseRun
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
     member this.GenSaveIntervalsName =
         match this with

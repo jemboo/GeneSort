@@ -21,6 +21,20 @@ Run parameter combinations pass directly to the selected enhancer. Specify the
 desired combinations in the run's parameter spans; refinement retains every
 combination.
 
+Setup enhancers place required source file IDs on `setupParameters`. Use
+`SetupEnhancerCatalog.withFileReferences` to resolve IDs from the setup query
+builder, or set the IDs directly for external sources. Run generation copies
+these references into each paired `runParameters`. Setup queries exclude the
+references from identity; run queries include them. Keep source ID metadata out
+of setup identity calculations when adding new query entry points.
+
+Prefix evaluation uses settings directly instead of setup reference IDs. Its
+setup enhancer preserves the setup settings; its run enhancer copies RNG type,
+prefix library, model type, data format, and sorter count from the paired setup.
+Run generation omits setup linkage for the prefix evaluation query catalog.
+Setup file queries exclude the evaluation method, while result queries include
+it. Both include sorter count, so changing the input count changes identity.
+
 ## Evolution makers
 
 `EvolutionTestMakers`, `SeedPoolSetMakers`, and `MutatorMakers` contain the built-in

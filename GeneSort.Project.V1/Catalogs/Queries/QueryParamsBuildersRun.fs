@@ -371,24 +371,28 @@ module QueryParamsBuildersRun =
                 }
 
         module Prefix =
-            let makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt =
-                queryParams.create dbName projectName (Some repl) None odt
-                    [|
-                        (ParamKeys.rngTypeKey, rng |> RngType.toString)
-                        (ParamKeys.prefixLibIdKey, PrefixLibId.toString prefixLibId)
-                        (ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString)
-                        (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
-                        (ParamKeys.sortableDataFormatKey, dataFormat |> SortableDataFormat.toString)
-                    |]
+            let makeQueryParams projectName dbName repl rng prefixLibId model dataFormat sorterCount evalType odt =
+                let setupQuery =
+                    QueryParamsBuildersSetup.SorterEval.Prefix.makeQueryParams
+                        projectName dbName repl rng prefixLibId model dataFormat sorterCount odt
+                match odt with
+                | geneSortDataType.SorterModelSet _
+                | geneSortDataType.SortableTestsWithPrefix _ -> setupQuery
+                | _ ->
+                    setupQuery.Properties
+                    |> Map.add ParamKeys.sorterEvalTypeKey (SorterEvalType.toString evalType)
+                    |> Map.toArray
+                    |> queryParams.create dbName projectName (Some repl) None odt
             let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
                 maybe {
                     let! rng = rp.GetRngType()
                     let! prefixLibId = rp.GetPrefixLibId()
                     let! model = rp.GetSimpleSorterModelType()
                     let! dataFormat = rp.GetSortableDataFormat()
+                    let! sorterCount = rp.GetSorterCount()
                     let! evalType = rp.GetSorterEvalType()
                     let! repl = rp.GetRepl()
-                    return makeQueryParams projectName dbName repl rng prefixLibId model dataFormat evalType odt
+                    return makeQueryParams projectName dbName repl rng prefixLibId model dataFormat sorterCount evalType odt
                 }
 
     module SorterMutate =

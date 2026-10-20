@@ -60,7 +60,6 @@ module MutateSpecsRs =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -99,7 +98,6 @@ module MutateSpecsRs =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )

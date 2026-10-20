@@ -54,7 +54,6 @@ module Specs =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
-                    OutputTypes = [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

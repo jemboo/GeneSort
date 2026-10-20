@@ -58,7 +58,6 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
-            OutputTypes = []
         }
     } {
         MakerNames = names
@@ -87,7 +86,6 @@ let private makeSimpleRun executeName =
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
-            OutputTypes = []
         }
     }
     |> run.SimpleRun
@@ -105,31 +103,6 @@ let ``setup spans and query catalogs survive serialization for simple and SGD ru
         Assert.Equal(original.RunQueryCatalogName, restored.RunQueryCatalogName)
         Assert.Equal(original.RunEnhancerFunctionName, restored.RunEnhancerFunctionName)
         Assert.Equal(original.SetupEnhancerFunctionName, restored.SetupEnhancerFunctionName)
-
-[<Fact>]
-let ``setup output types preserve every DU case and its value through run serialization`` () =
-    MessagePackSetup.configure ()
-    let outputTypes = [
-        geneSortDataType.Run (UMX.tag "run")
-        geneSortDataType.RunParameters (UMX.tag "parameters")
-        geneSortDataType.SorterPoolSet "seed"
-        geneSortDataType.SorterPoolSetSummarySet "summary"
-        geneSortDataType.SorterSet "sorters"
-        geneSortDataType.SorterModelSet "models"
-        geneSortDataType.SortableTests "tests"
-        geneSortDataType.SortableTestsWithPrefix "prefix"
-        geneSortDataType.SorterSetEval "evaluations"
-        geneSortDataType.SorterPoolBinsSetSeries "bins"
-        geneSortDataType.SorterPoolSetHistory "history"
-        geneSortDataType.TextReport (UMX.tag "report")
-    ]
-    for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
-        for expected in [[]; outputTypes] do
-            let dto = RunDto.fromDomain original
-            let configured = RunDto.toDomain { dto with SetupOutputTypes = expected |> List.map OutputDataTypeDto.fromDomain |> List.toArray }
-            let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-            Assert.Equal<geneSortDataType list>(expected, restored.SetupOutputTypes)
-            Assert.Equal<geneSortDataType list>(expected, SimpleRun.setupOutputTypes restored.BaseRun)
 
 [<Fact>]
 let ``host generates independent setup and run combinations using their own query catalogs`` () =
@@ -226,11 +199,9 @@ let ``hosts retain resolved enhancers for refinement and generation`` () =
         Assert.Equal(2, setupCalls)
 
 [<Fact>]
-let ``built-in setup enhancers preserve parameters without invoking the run enhancer`` () =
+let ``no-op setup enhancers preserve parameters without invoking the run enhancer`` () =
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
-    for name in [SetupEnhancerFunctionNames.noOp; SetupEnhancerFunctionNames.sortableTests;
-                 SetupEnhancerFunctionNames.sorterEval; SetupEnhancerFunctionNames.sorterMutate;
-                 SetupEnhancerFunctionNames.sorterSgd] do
+    for name in [SetupEnhancerFunctionNames.noOp; SetupEnhancerFunctionNames.sortableTests] do
         let configured = RunDto.toDomain { dto with SetupEnhancerFunctionName = name }
         let host = runHost.Create configured 1
         let input = setupParameters.create (Map.ofList ["custom", "preserved"])

@@ -40,7 +40,6 @@ let private makeRun queryCatalog setupCatalog =
             ParameterSpans = []
             QueryCatalogName = queryCatalog
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
-            OutputTypes = []
         }
     } |> run.SimpleRun
 

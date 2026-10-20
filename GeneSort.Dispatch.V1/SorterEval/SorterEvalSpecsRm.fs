@@ -47,7 +47,6 @@ module SorterEvalSpecsRm =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -83,7 +82,6 @@ module SorterEvalSpecsRm =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -119,7 +117,6 @@ module SorterEvalSpecsRm =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -155,7 +152,6 @@ module SorterEvalSpecsRm =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
@@ -191,7 +187,6 @@ module SorterEvalSpecsRm =
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                        OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
                     }
                 }
             )
