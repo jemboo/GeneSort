@@ -186,6 +186,46 @@ let ``parameter refinement enhances every parameter combination`` () =
         Assert.Equal(Some false, result.GetRunFinished())) inputs results
 
 [<Fact>]
+let ``hosts reject unknown enhancers at creation`` () =
+    for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
+        let dto = RunDto.fromDomain original
+        let unknown = "tests.unknown-enhancer." + Guid.NewGuid().ToString("N")
+        for configured in [ { dto with RunEnhancerFunctionName = unknown }; { dto with SetupEnhancerFunctionName = unknown } ] do
+            let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create (RunDto.toDomain configured) 1 |> ignore)
+            Assert.Contains(unknown, error.Message)
+
+[<Fact>]
+let ``hosts retain resolved enhancers for refinement and generation`` () =
+    for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
+        let name = "tests.stored-enhancer." + Guid.NewGuid().ToString("N")
+        let mutable runCalls = 0
+        let mutable setupCalls = 0
+        let enhanceRun : runParamEnhancerBuilder = fun _ rp ->
+            runCalls <- runCalls + 1
+            rp.WithRunFinished(Some false)
+        let enhanceSetup : setupEnhancerFunction = fun _ sp ->
+            setupCalls <- setupCalls + 1
+            sp
+        RunParamEnhancerBuilders.register name enhanceRun |> ignore
+        SetupEnhancerCatalog.register name enhanceSetup
+        QueryParamsCatalogRun.register name (fun project database rp dataType ->
+            Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
+        let dto = RunDto.fromDomain original
+        let configured = RunDto.toDomain { dto with RunEnhancerFunctionName = name; SetupEnhancerFunctionName = name; RunQueryCatalogName = name }
+        let host = runHost.Create configured 1
+        Assert.Same(enhanceRun, host.RunEnhancer)
+        Assert.Same(enhanceSetup, host.SetupEnhancer)
+        RunParamEnhancerBuilders.register name (fun _ _ -> failwith "Host looked up the run enhancer again.") |> ignore
+        let refined = host.ParamMapRefiner [emptyParameters] |> Seq.exactlyOne
+        Assert.Equal(Some false, refined.GetRunFinished())
+        host.MakeSetupParameters 0<replNumber> 1<replNumber> |> ignore
+        let generated = host.MakeRunParameters 0<replNumber> 1<replNumber>
+        Assert.Single(generated) |> ignore
+        Assert.Equal(Some false, generated.[0].GetRunFinished())
+        Assert.Equal(2, runCalls)
+        Assert.Equal(2, setupCalls)
+
+[<Fact>]
 let ``built-in setup enhancers preserve parameters without invoking the run enhancer`` () =
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
     for name in [SetupEnhancerFunctionNames.noOp; SetupEnhancerFunctionNames.sortableTests;

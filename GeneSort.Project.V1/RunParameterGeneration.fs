@@ -9,12 +9,12 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 
 module RunParameterGeneration =
     /// Pair every run span combination with every enhanced setup combination within the same replica.
-    let generate (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
-        ProjectCatalogs.registerAll ()
-        let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-        let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
-        let enhanceRun = RunParamEnhancerBuilders.get configured.RunEnhancerFunctionName
-        let enhanceSetup = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
+    let generateWithBindings
+            (runQuery: runQueryParamsBuilder)
+            (setupQuery: setupQueryParamsBuilder)
+            (enhanceRun: runParamEnhancerBuilder)
+            (enhanceSetup: setupEnhancerFunction)
+            (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         let setupContext = { Run = configured; QueryParamsFromSetupParams = setupQuery }
         [| for replica in int minReplica .. int maxReplica - 1 do
                let repl = UMX.tag<replNumber> replica
@@ -35,3 +35,12 @@ module RunParameterGeneration =
                            |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"
                                                                            configured.RunQueryCatalogName (RunParameters.reportKvps enhanced)))
                        yield enhanced.WithId(Some query.Id) |]
+
+    /// Resolve catalog functions for callers that do not have a run host.
+    let generate (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
+        ProjectCatalogs.registerAll ()
+        let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+        let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+        let enhanceRun = RunParamEnhancerBuilders.get configured.RunEnhancerFunctionName
+        let enhanceSetup = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
+        generateWithBindings runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica

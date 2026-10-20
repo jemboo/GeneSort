@@ -53,15 +53,22 @@ module SorterEvalSpecsTestPrefix =
 
 
         let Prefix_32 () : run =
-            let parameterSpans =
-                [
-                    rngTypeLcg
-                    prefixLib_Prefix32_4
-                    withMsuf4
-                    dataFomatBitv512
-                    sorterEvalTypeV2
-                    largeSorterCount
-                ]
+            let parameterSpansSetup =
+                    [
+                        prefixLib_Prefix32_4
+                        dataFomatBitv512
+                        sorterEvalTypeV2
+                        largeSorterCount
+                    ]
+            let parameterSpansRun =
+                    [
+                        rngTypeLcg
+                        prefixLib_Prefix32_4
+                        withMsuf4
+                        dataFomatBitv512
+                        sorterEvalTypeV2
+                        largeSorterCount
+                    ]
             run.SimpleRun (
                 SimpleRun.create {
                     DatabaseName = SorterEvalDbs.Prefix.dbName
@@ -71,13 +78,13 @@ module SorterEvalSpecsTestPrefix =
                     AllowOverwrite = false
                     Execution = {
                         FunctionName = ExecuteFunctionNames.sorterEval
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = parameterSpansSetup
                         QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
                     }
                     Setup = {
                         FunctionName = SetupCatalogNames.prefix
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = parameterSpansRun
                         QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                         OutputTypes = [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]

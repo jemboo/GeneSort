@@ -37,6 +37,8 @@ type simpleRunHost = private {
     maxParallel: int
     setup: setupFunction option
     executeFunction: executeFunction
+    runEnhancer: runParamEnhancerBuilder
+    setupEnhancer: setupEnhancerFunction
 }
 
 type sgdRunHost = private {
@@ -81,7 +83,9 @@ type runHost =
 
               maxParallel = maxParallel
               setup = None
-              executeFunction = ExecuteFunctionCatalog.get run.ExecuteFunctionName }
+              executeFunction = ExecuteFunctionCatalog.get run.ExecuteFunctionName
+              runEnhancer = RunParamEnhancerBuilders.get run.RunEnhancerFunctionName
+              setupEnhancer = SetupEnhancerCatalog.get run.SetupEnhancerFunctionName }
 
         let lookupInterval name =
             match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
@@ -178,19 +182,29 @@ type runHost =
         | SimpleRunHost host -> host.maxParallel
         | SgdRunHost host -> host.simpleHost.maxParallel
 
+    member this.RunEnhancer : runParamEnhancerBuilder =
+        match this with
+        | SimpleRunHost host -> host.runEnhancer
+        | SgdRunHost host -> host.simpleHost.runEnhancer
+
+    member this.SetupEnhancer : setupEnhancerFunction =
+        match this with
+        | SimpleRunHost host -> host.setupEnhancer
+        | SgdRunHost host -> host.simpleHost.setupEnhancer
+
     member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
-        let enhancer = RunParamEnhancerBuilders.get this.Run.RunEnhancerFunctionName
         let context = runParamEnhancerContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
-        |> Seq.map (enhancer context)
+        |> Seq.map (this.RunEnhancer context)
 
     member this.SetupParamMapRefiner (parameters: setupParameters seq) : setupParameters seq =
-        let enhancer = SetupEnhancerCatalog.get this.Run.SetupEnhancerFunctionName
         let context = { Run = this.Run; QueryParamsFromSetupParams = this.QueryParamsFromSetupParams }
-        parameters |> Seq.map (enhancer context)
+        parameters |> Seq.map (this.SetupEnhancer context)
 
     member this.MakeRunParameters minReplica maxReplica =
-        RunParameterGeneration.generate this.Run minReplica maxReplica
+        RunParameterGeneration.generateWithBindings
+            this.QueryParamsFromRunParams this.QueryParamsFromSetupParams
+            this.RunEnhancer this.SetupEnhancer this.Run minReplica maxReplica
 
     member this.MakeSetupParameters minReplica maxReplica =
         SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun
