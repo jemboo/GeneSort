@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -21,6 +21,7 @@
     <Compile Include="ParamOps.fs" />
     <Compile Include="CommonParams.fs" />
     <Compile Include="SorterSgd\Utils.fs" />
+    <Compile Include="SorterSgd\EvoAppendPools.fs" />
     <Compile Include="SorterSgd\Standard\EvoOrch_Standard.fs" />
     <Compile Include="SorterSgd\Standard\SgdEx_Standard.fs" />
     <Compile Include="SorterSgd\Soss\EvoOrch_Soss.fs" />
@@ -54,16 +55,18 @@
     <Compile Include="SorterMutate\SorterMutateExecutor.fs" />
     <Compile Include="SorterSgd\FileEvolutionSetupSources.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
-    <Compile Include="SorterSgd\SossAppendSetup.fs" />
+    <Compile Include="SorterSgd\EvoAppendSetup.fs" />
+    <Compile Include="SorterSgd\EvoAppend.fs" />
     <Compile Include="SorterSgd\SorterSgdSetup.fs" />
     <Compile Include="SetupExecutorCatalog.fs" />
     <Compile Include="ProjectOps.fs" />
     <Compile Include="ReportOps.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Common.fs" />
-    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\VarModR_32.fs" />
+    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Standard.fs" />
+    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Standard_append.fs" />
+    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Standard_condense.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Soss_32.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Soss_32_append.fs" />
-    <Compile Include="SorterSgd\Prefix\p32\Msuf4a\Soss_32_append2.fs" />
     <Compile Include="SorterSgd\Prefix\p24\Msuf63b\Common.fs" />
     <Compile Include="SorterSgd\Prefix\p24\Msuf63b\MutationRate.fs" />
     <Compile Include="SorterSgd\Prefix\p32\Msrs4a\Common.fs" />

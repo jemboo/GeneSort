@@ -33,11 +33,13 @@ type runDto =
         MutatorMakerName: string
         SetupFunctionName: string
         ExecuteFunctionName: string
+        ParameterSource: runDto option
+        SourceParameterSpans: parameterSpanDto []
     }
 
 module RunDto =
 
-    let fromDomain (project: run) : runDto =
+    let rec fromDomain (project: run) : runDto =
         let saveIntervalsName = project.GenSaveIntervalsName |> Option.toObj
         let saveSubIntervalsName = project.GenSaveSubIntervalsName |> Option.toObj
         {
@@ -55,6 +57,10 @@ module RunDto =
                 |> List.toArray
             SetupFunctionName = project.SetupFunctionName
             ExecuteFunctionName = project.ExecuteFunctionName
+            ParameterSource = project.ParameterSource |> Option.map (fst >> fromDomain)
+            SourceParameterSpans =
+                project.ParameterSource |> Option.map snd |> Option.defaultValue []
+                |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values }) |> List.toArray
             RunEnhancerFunctionName = project.RunEnhancerFunctionName
             SetupEnhancerFunctionName = project.SetupEnhancerFunctionName
             AllowOverwrite = project.AllowOverwrite
@@ -67,7 +73,7 @@ module RunDto =
                 |> List.toArray
         }
 
-    let toDomain (dto: runDto) : run =
+    let rec toDomain (dto: runDto) : run =
         let databaseName = dto.DataBaseName |> UMX.tag<databaseName>
         let projectName = dto.ProjectName |> UMX.tag<projectName>
         let runName = dto.RunName |> UMX.tag<runName>
@@ -108,11 +114,12 @@ module RunDto =
                 EnhancerFunctionName = dto.SetupEnhancerFunctionName
             }
         }
-        match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
-        | None, None ->
+        let configured =
+          match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
+          | None, None ->
             SimpleRun (
                 SimpleRun.create config)
-        | saveIntervals, saveSubIntervals ->
+          | saveIntervals, saveSubIntervals ->
             let requireMakerName field value =
                 if System.String.IsNullOrWhiteSpace value then
                     invalidArg "dto" (sprintf "An SGD run must specify an explicit %s." field)
@@ -129,3 +136,10 @@ module RunDto =
                     GenSaveSubIntervalsName = (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
                 }
             )
+        match dto.ParameterSource with
+        | None -> configured
+        | Some source ->
+            let spans =
+                dto.SourceParameterSpans |> Option.ofObj |> Option.defaultValue [||]
+                |> Array.map (fun span -> span.Key, Array.toList span.Values) |> Array.toList
+            configured |> Run.withParameterSource (toDomain source) spans

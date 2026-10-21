@@ -9,7 +9,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 
 module RunParameterGeneration =
     /// Pair every run span combination with every enhanced setup combination within the same replica.
-    let generateWithBindings
+    let rec generateWithBindings
             (runQuery: runQueryParamsBuilder)
             (setupQuery: setupQueryParamsBuilder)
             (enhanceRun: runParamEnhancerBuilder)
@@ -20,10 +20,32 @@ module RunParameterGeneration =
                let repl = UMX.tag<replNumber> replica
                let next = UMX.tag<replNumber> (replica + 1)
                let runs = SimpleRun.makeRunParameters repl next id configured.BaseRun
-               let setups = SimpleRun.makeSetupParameters repl next (Seq.map (enhanceSetup setupContext)) configured.BaseRun
+               let setups =
+                   match configured.ParameterSource with
+                   | None -> SimpleRun.makeSetupParameters repl next (Seq.map (enhanceSetup setupContext)) configured.BaseRun
+                   | Some (source, spans) ->
+                       let selected =
+                           generate source repl next
+                           |> Array.filter (fun parameters ->
+                               spans |> List.forall (fun (key, values) ->
+                                   Map.tryFind key parameters.ParamMap |> Option.exists (fun value -> List.contains value values)))
+                       if Array.isEmpty selected then invalidOp "No source executions match Source.ParameterSpans."
+                       selected |> Array.map (fun parameters ->
+                           let excluded =
+                               [ParamKeys.idKey; ParamKeys.sourceExecutionIdKey
+                                ParamKeys.sourcePoolFileIdKey; ParamKeys.sourceTestsFileIdKey
+                                ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey
+                                ParamKeys.sourceGenerationIntervalKey; ParamKeys.generationFirstKey]
+                               @ SetupFileReferences.keys
+                           let inherited =
+                               parameters.ParamMap
+                               |> fun map -> List.fold (fun map key -> Map.remove key map) map excluded
+                               |> Map.add ParamKeys.sourceExecutionIdKey (string %(parameters.GetId().Value))
+                           setupParameters.create inherited)
                for setup in setups do
                    let references =
-                       if configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                       if configured.ParameterSource.IsSome
+                          || configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                           || configured.RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32 then []
                        else SetupOutputs.referencesFor configured setup
                    let context = runParamEnhancerContext.createForSetup runQuery configured setup
@@ -40,7 +62,7 @@ module RunParameterGeneration =
                        yield enhanced.WithId(Some query.Id) |]
 
     /// Resolve catalog functions for callers that do not have a run host.
-    let generate (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
+    and generate (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         ProjectCatalogs.registerAll ()
         let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
         let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName

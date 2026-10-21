@@ -1,5 +1,5 @@
-module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard
 
+module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
@@ -18,7 +18,7 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
-let projName = "SorterSgd.Prefix.32p4a.Msuf" |> UMX.tag<projectName>
+let projName = "SorterSgd.Standard.32p4a.Msuf" |> UMX.tag<projectName>
 
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
@@ -30,7 +30,8 @@ let Pool_128_Test ()  : run =
             (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
             (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
             (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-            (ParamKeys.generationIntervalLastKey, [2] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [1] |> List.map string)
             (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
             (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
             (ParamKeys.mutationModKey, [0;] |> List.map string)
@@ -49,13 +50,13 @@ let Pool_128_Test ()  : run =
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
             }
             Execution = {
                 FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
+                ParameterSpans = []
                 QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
             }
         } {
             MakerNames = EvolutionMakerNames.prefix
@@ -70,6 +71,7 @@ let Pool_512_V1 ()  : run =
             (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
             (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
             (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
             (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
             (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
             (ParamKeys.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
@@ -89,13 +91,13 @@ let Pool_512_V1 ()  : run =
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
             }
             Execution = {
                 FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
+                ParameterSpans = []
                 QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
             }
         } {
             MakerNames = EvolutionMakerNames.prefix
@@ -109,6 +111,7 @@ let Pool_512_V2a ()  : run =
         [
             (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
             (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+            (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
             (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
             (ParamKeys.sorterCountPerPoolKey, [512] |>  List.map string)
             (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
@@ -129,13 +132,13 @@ let Pool_512_V2a ()  : run =
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
             }
             Execution = {
                 FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
+                ParameterSpans = []
                 QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
             }
         } {
             MakerNames = EvolutionMakerNames.prefix

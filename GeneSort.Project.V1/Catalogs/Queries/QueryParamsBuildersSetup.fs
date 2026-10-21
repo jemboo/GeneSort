@@ -223,23 +223,6 @@ module QueryParamsBuildersSetup =
                         return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                     }
 
-        module SossAppend =
-            let queryParamsFromSetupParams projectName dbName (rp: setupParameters) odt =
-                maybe {
-                    let! query = Msuf.Soss.queryParamsFromSetupParams projectName dbName rp odt
-                    let! sourceProject = rp.GetSourceProjectName()
-                    let! sourceDb = rp.GetSourceDbName()
-                    let! sourceRun = rp.GetSourceRunName()
-                    let! sourceInterval = rp.GetSourceGenerationInterval()
-                    let properties =
-                        query.Properties
-                        |> Map.add ParamKeys.sourceProjectNameKey %sourceProject
-                        |> Map.add ParamKeys.sourceDbNameKey %sourceDb
-                        |> Map.add ParamKeys.sourceRunNameKey %sourceRun
-                        |> Map.add ParamKeys.sourceGenerationIntervalKey (string sourceInterval)
-                    return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
-                }
-
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =
                 queryParams.create dbName projectName (Some repl) (Some genCurrent) outDt
@@ -494,7 +477,6 @@ module QueryParamsBuildersSetup =
                     QueryCatalogNamesSetup.sossMsuf32Seed, (fun project database parameters outputType ->
                         Some (queryParams.create database project (parameters.GetRepl()) (parameters.GetGenerationCurrent())
                             outputType (Map.toArray parameters.ParamMap)))
-                    QueryCatalogNamesSetup.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sortableTestMerge, SortableTests.Merge.queryParamsFromSetupParams

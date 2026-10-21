@@ -112,10 +112,11 @@ module EvoOrch_Standard =
                         // Cooperative cancellation evaluation at top of loop
                         if cts.IsCancellationRequested then
                             return! Error "runEvolutionAsync execution was cancelled."
-                        elif remainingSteps < 0 then
+                        elif remainingSteps <= 0 then
                             return currentSorterPoolSet
                         else
-                            let currentGen = totalGen - %remainingSteps
+                            // Label each checkpoint with the generation produced by this step.
+                            let currentGen = currentSorterPoolSet.GenerationNumber + 1<generationNumber>
 
                             // Dynamic Periodic Variation for sorterCountPerPool
                             let currentSorterCountPerPool : int<sorterCountPerPool> =

@@ -86,6 +86,7 @@ type simpleRun =
           setupEnhancerFunctionName: string
           allowOverwrite: bool
           executeFunctionName: string
+          parameterSource: (simpleRun * (string * string list) list) option
         }
 
 module SimpleRun =
@@ -134,6 +135,7 @@ module SimpleRun =
           setupEnhancerFunctionName = setupEnhancerFunctionName
           allowOverwrite = allowOverwrite
           executeFunctionName = executeFunctionName
+          parameterSource = None
         }
 
     let databaseName (run: simpleRun) = run.dataBaseName
@@ -149,6 +151,9 @@ module SimpleRun =
     let setupEnhancerFunctionName (run: simpleRun) = run.setupEnhancerFunctionName
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
     let executeFunctionName (run: simpleRun) = run.executeFunctionName
+    let parameterSource (run: simpleRun) = run.parameterSource
+    let withParameterSource source spans (run: simpleRun) =
+        { run with parameterSource = Some (source, spans) }
 
 type sgdRun =
     private
@@ -174,6 +179,8 @@ module SgdRun =
         }
 
     let baseRun (run: sgdRun) = run.baseRun
+    let withParameterSource source spans (run: sgdRun) =
+        { run with baseRun = SimpleRun.withParameterSource source spans run.baseRun }
     let makerNames (run: sgdRun) = run.makerNames
     let executeFunctionName (run: sgdRun) = SimpleRun.executeFunctionName run.baseRun
     let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
@@ -186,6 +193,10 @@ type run =
         match this with
         | SimpleRun value -> value
         | SgdRun value -> SgdRun.baseRun value
+    /// Only the source's parameter-generation configuration is needed here.
+    member this.ParameterSource =
+        SimpleRun.parameterSource this.BaseRun
+        |> Option.map (fun (source, spans) -> SimpleRun source, spans)
     member this.DatabaseName = SimpleRun.databaseName this.BaseRun
     member this.ProjectName = SimpleRun.projectName this.BaseRun
     member this.RunName = SimpleRun.runName this.BaseRun
@@ -216,6 +227,10 @@ type run =
 
 
 module Run =
+    let withParameterSource (source: run) spans = function
+        | SimpleRun value -> SimpleRun (SimpleRun.withParameterSource source.BaseRun spans value)
+        | SgdRun value -> SgdRun (SgdRun.withParameterSource source.BaseRun spans value)
+
     let makeRunParameters minReplica maxReplica spans (refiner: runParameters seq -> runParameters seq) =
         ParameterGeneration.make minReplica maxReplica spans refiner
 

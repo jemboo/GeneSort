@@ -143,6 +143,7 @@ module SgdEx_Standard =
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! setupData = Utils.loadSetupOutputData genDb initRp (geneSortDataType.SorterPoolSet "")
                             let! seedSet = OutputData.asSorterPoolSetStandard setupData
+                            let! seedSet = EvoAppendPools.prepareStandard rp seedSet
                             log "Loaded initial Setup sorterPoolSet. Beginning evolution."
                             return seedSet, initRp.WithGenerationCurrent(Some seedSet.GenerationNumber)
                         }

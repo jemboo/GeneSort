@@ -21,6 +21,8 @@ module QueryCatalogNamesRun =
     [<Literal>]
     let sorterSgdMsufSossAppend = "sorter-sgd.msuf-soss-append"
     [<Literal>]
+    let sorterSgdMsufStandardAppend = "sorter-sgd.msuf-standard-append"
+    [<Literal>]
     let sorterSgdMsrs32MutationRate = "sorter-sgd.msrs32-mutation-rate"
     [<Literal>]
     let sorterSgdMsrsPoolModComp = "sorter-sgd.msrs-pool-mod-comp"
@@ -74,6 +76,8 @@ module QueryParamsCatalogRun =
                 let references =
                     match name, outputType with
                     | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.Run _
+                    | QueryCatalogNamesRun.sorterSgdMsufStandardAppend, geneSortDataType.Run _
+                    | QueryCatalogNamesRun.sorterSgdMsufStandardAppend, geneSortDataType.RunParameters _
                     | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.RunParameters _ -> []
                     | QueryCatalogNamesRun.sorterEvalPrefix, _ -> []
                     | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _

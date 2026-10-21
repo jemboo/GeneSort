@@ -54,72 +54,82 @@ When moving an in-progress job, also copy its Results folder and current Project
 
 These commands separate phases but do not upload files or provision cloud resources.
 
-## Continuing a Soss_32 run in another project
+## Continuing an evolution run
 
-Select an append spec when creating the dispatch host, for example:
+Select the append spec when creating the dispatch host:
 
 ```fsharp
-let host = runHost.Create (Soss_32_append.fromSource (Soss_32.Pool_32_Gens15 ()) 14 20) 8
+let host = runHost.Create (Soss_32_append.Pool_4_Debug ()) 8
 ```
 
 The module is `GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32_append`.
-Its `Pool_4_Debug()` and `Pool_32_Gens15()` helpers provide examples. The default
-dispatcher is unchanged; select the desired append spec there before running setup.
+It uses `EvoAppend.create` with separate `Source.ParameterSpans` and
+`ExecutionParameterSpans`. Source spans filter configured source executions;
+omitted source keys select all their configured values. Execution spans form a
+Cartesian product for each selected source. Unspecified execution parameters
+inherit that source execution's settings.
 
-The two numbers are the source save-interval index and destination final interval
-index, respectively. They are not generation numbers. The destination uses project
-`SorterSgd.Soss.32p4a.Msuf.Append` and inherits the source database name, parameter
-combinations, replica selection, and generation interval configuration.
+The current debug preset selects three source mutation modifiers and branches
+each into three modifiers and sorter counts 32 and 64: **18 runs per replica**.
+With four sorters per pool, these sizes correspond to eight and sixteen pools.
+Its destination project is `SorterSgd.Soss_append.32p4a.Msuf`.
 
-Append parameters include `SourceProjectName`, `SourceDbName`, `SourceRunName`, and
-`SourceGenerationInterval`. Setup reads the saved source run and its persisted
-execution parameters to resolve its query catalog and save interval configuration,
-then loads the matching Soss pool from
-Results for each parameter combination and replica. It also copies that source's
-Setup tests and prefix. Missing or invalid source inputs fail setup; no new seed is
-generated. Source files are only read. Source and destination roots both use
-`GENESORT_PROJECTS_ROOT` during local setup.
+`Source.GenerationInterval` and `GenerationIntervalLast` are zero-based save-interval
+indices, not generation numbers. Each branch carries one immediate
+`SourceExecutionId`, resolved against persisted source parameters during setup.
+The source parameter-generation configuration is stored with the run, so reloading
+or chaining append specs preserves branch identities. Source selection requires
+no JSON overrides or source-of-source parameter keys.
+
+Setup reads the saved source run, execution parameters, Results checkpoint, and
+Setup tests/prefix. Source and destination roots use `GENESORT_PROJECTS_ROOT`.
+Source files are only read. Missing or invalid inputs fail setup without generating
+replacement seeds. A checkpoint from the earlier evolution save convention may contain
+generation N+1 under label N; setup preserves its actual generation. Other generation
+mismatches are rejected.
 
 Each imported Setup file is identified by `hash(destinationProjectName, sourceFileId)`.
-The source ID is the actual checkpoint or tests file being imported, including when
-it belongs to another append. Setup copies the pool unchanged and reuses the copy
-across execution branches. The imported generation remains in the pool contents.
-Earlier Soss checkpoints labeled generation N could contain a pool at N+1 because
-the loop saved after advancing. Append setup recognizes that specific offset,
-logs it, and preserves N+1. Other generation mismatches are rejected with the
-expected and actual values. Newly generated Soss checkpoints use matching file
-and pool generations and stop exactly at the configured final generation.
-`GenerationFirst` and `GenerationCurrent` are saved in the destination Project
-parameters with that generation. Imported Setup queries retain the replica folder
-(`0`, `1`, etc.), but replica and generation are not separately hashed into their IDs:
-those distinctions are already captured by the source file ID. Earlier imported
-files in `None` folders remain readable.
-Execution first resumes any destination Results checkpoint; otherwise it loads the
-imported Setup pool. Results and reports start after the imported generation.
+It is stored under its replica folder (`0`, `1`, etc.) and shared across execution
+branches. Destination parameters record `SourcePoolFileId`, `SourceTestsFileId`,
+and their destination Setup references. Results identities use those references
+plus execution settings. The imported generation is saved as `GenerationFirst`
+and `GenerationCurrent`.
 
-The saved destination parameters record `SourcePoolFileId`, `SourceTestsFileId`, and
-their destination Setup file references. Results use those references plus execution
-settings; source ancestry is not reconstructed or included as additional parameters.
+Imported Setup data stays unchanged. At execution startup, shrinking takes whole
+pools in ascending ID order; growing cycles over source pools, giving additional
+pools and members fresh identities. New members start at mutation index zero.
+Changing the mutation modifier also gives affected pools/members new identities.
+Pool positions and the one-dimensional lattice size are updated. The per-pool
+capacity must stay unchanged, and the target total must be positive and divisible
+by that capacity. Source pools may be underfilled after pruning.
 
-`Soss_32_append2.fromSource source sourceInterval lastInterval sourceMutationMod mutationMods`
-selects one source modifier and creates execution branches for `mutationMods`.
-The `Pool_4_Debug` and `Pool_32_Gens15` presets use `fromAllMutationMods`, which
-crosses every configured source mutation modifier with every execution modifier.
-Three source modifiers and sixteen execution modifiers therefore create 48 runs
-per replica, sharing one pool/tests copy per source. `fromSourceModifiers` accepts
-an explicit list of source modifiers when only a subset is wanted.
-It stores the source selection in the generic `SourceParameterOverrides` field
-(a JSON array of key/value pairs). Other changed settings can use the same field;
-there is no need for source-of-source parameter keys. Source matching must identify
-exactly one persisted execution for each replica, or setup fails before copying.
+Results checkpoint resumes bypass resizing and modifier reassignment. Transfer the
+destination Project and Setup folders after successful setup; cloud execution does
+not need the source project. Retain Project and Results when resuming. Constructing
+the spec alone does not copy source data.
 
-Execution applies a changed mutation modifier to the imported pool in memory,
-giving changed pools/members new identities and resetting their mutation indices.
-This happens only when starting from Setup. Resuming Results preserves the saved
-pool and indices. Existing append files remain readable through their legacy query
-path; rerun setup for newly configured appends to obtain the shared Setup references.
+### Standard append presets
 
-Transfer the destination Project and Setup folders after successful setup; cloud
-execution does not need the source project. As with other workflows, retain Project
-and Results when resuming. Copying actual source results is performed by setup, not
-by merely constructing the spec.
+`Standard_append` uses the same `EvoAppend.create` API as `Soss_32_append`.
+The source determines the execution family, makers, and save schedule. Standard
+checkpoints remain Standard pools; Soss checkpoints remain Soss pools.
+
+```fsharp
+let host = runHost.Create (Standard_append.Pool_128_Test ()) 8
+```
+
+`Pool_128_Test` imports `Standard.Pool_128_Test` at interval 2 and continues through
+interval 3. It branches modifier 0 into modifiers 0, 1, and 2, each with total sorter
+capacities 128 and 256: six runs per replica, keeping 32 sorters per pool.
+`Pool_512_V1` and `Pool_512_V2a` import all their matching Standard source combinations
+at interval 3 and continue through interval 4 without changing their settings.
+Each preset uses its source database name within the separate
+`SorterSgd.Standard_append.32p4a.Msuf` project.
+
+The Standard source presets apply the Msuf setup defaults before building setup
+queries. Their parameter spans occur once in setup and are inherited by execution,
+so each source combination produces one run. They explicitly set
+`AdjustCeLengthFrequency` to 10; appended runs inherit it unless overridden.
+New Standard checkpoints use the produced generation as their file label and stop
+exactly at the requested final generation. Setup can still read the earlier
+N-labeled checkpoints containing generation N+1.

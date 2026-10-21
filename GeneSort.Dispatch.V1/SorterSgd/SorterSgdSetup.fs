@@ -28,14 +28,15 @@ module SorterSgdSetup =
 
     let getSetupExecutor (host: runHost) =
         match host.Run.ExecuteFunctionName with
-        | ExecuteFunctionNames.soss when host.Run.SetupFunctionName = SetupCatalogNames.sossAppend ->
+        | (ExecuteFunctionNames.soss | ExecuteFunctionNames.standard)
+            when host.Run.SetupFunctionName = SetupCatalogNames.evoAppend || host.Run.SetupFunctionName = SetupCatalogNames.sossAppend ->
             { new IRunParamsExecutor with
                 member _.Execute host rp allowOverwrite cts progress = asyncResult {
                     let! project = rp.GetSourceProjectName() |> Result.ofOption "Missing SourceProjectName."
                     let! database = rp.GetSourceDbName() |> Result.ofOption "Missing SourceDbName."
                     let root = System.IO.Path.Combine(RunHost.projectsRoot (), %project, %database, "Data") |> UMX.tag<pathToRootFolder>
-                    let source = new GeneSortDbMp(root, QueryCatalogNamesSetup.sorterSgdMsufSoss)
-                    return! SossAppendSetup.prepare source host rp allowOverwrite cts progress
+                    let source = new GeneSortDbMp(root, host.Run.RunQueryCatalogName)
+                    return! EvoAppendSetup.prepare source host rp allowOverwrite cts progress
                 } }
         | ExecuteFunctionNames.standard -> setupExecutor SgdEx_Standard.setupEvolutionRunStandard
         | ExecuteFunctionNames.soss -> setupExecutor SgdEx_Soss.setupEvolutionRunSoss

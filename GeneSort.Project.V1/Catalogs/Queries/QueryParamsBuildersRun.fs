@@ -223,42 +223,33 @@ module QueryParamsBuildersRun =
                         return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                     }
 
-        module SossAppend =
-            let private legacyQuery projectName dbName (rp: runParameters) odt =
+        module EvoAppend =
+            let private metadataQuery (baseQuery: runQueryParamsCatalogBuilder) projectName dbName (rp: runParameters) odt =
                 maybe {
-                    let! query = Msuf.Soss.queryParamsFromRunParams projectName dbName rp odt
+                    let! query = baseQuery projectName dbName rp odt
                     let! sourceProject = rp.GetSourceProjectName()
                     let! sourceDb = rp.GetSourceDbName()
                     let! sourceRun = rp.GetSourceRunName()
                     let! sourceInterval = rp.GetSourceGenerationInterval()
+                    let! sourceExecutionId = Map.tryFind ParamKeys.sourceExecutionIdKey rp.ParamMap
                     let properties =
                         query.Properties
                         |> Map.add ParamKeys.sourceProjectNameKey %sourceProject
                         |> Map.add ParamKeys.sourceDbNameKey %sourceDb
                         |> Map.add ParamKeys.sourceRunNameKey %sourceRun
                         |> Map.add ParamKeys.sourceGenerationIntervalKey (string sourceInterval)
-                        |> fun properties ->
-                            match Map.tryFind ParamKeys.sourceMutationModKey rp.ParamMap with
-                            | Some value -> Map.add ParamKeys.sourceMutationModKey value properties
-                            | None -> properties
+                        |> Map.add ParamKeys.sourceExecutionIdKey sourceExecutionId
                     return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                 }
 
-            let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+            let queryParamsFromRunParams baseQuery projectName dbName (rp: runParameters) odt =
                 match odt with
                 | geneSortDataType.Run _
                 | geneSortDataType.RunParameters _ ->
-                    legacyQuery projectName dbName rp odt
-                    |> Option.map (fun query ->
-                        match Map.tryFind ParamKeys.sourceParameterOverridesKey rp.ParamMap with
-                        | None -> query
-                        | Some value ->
-                            queryParams.createFromMap query.DbName query.ProjectName query.Repl query.Generation odt
-                                (Map.add ParamKeys.sourceParameterOverridesKey value query.Properties))
-                | _ when Map.containsKey ParamKeys.sourcePoolFileIdKey rp.ParamMap ->
+                    metadataQuery baseQuery projectName dbName rp odt
+                | _ ->
                     // Setup links are attached by the catalog; ancestry is not part of result identity.
-                    Msuf.Soss.queryParamsFromRunParams projectName dbName rp odt
-                | _ -> legacyQuery projectName dbName rp odt
+                    baseQuery projectName dbName rp odt
 
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =
@@ -515,7 +506,8 @@ module QueryParamsBuildersRun =
                     QueryCatalogNamesRun.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromRunParams
                     QueryCatalogNamesRun.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromRunParams
                     QueryCatalogNamesRun.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromRunParams
-                    QueryCatalogNamesRun.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsufSossAppend, SorterSgd.EvoAppend.queryParamsFromRunParams SorterSgd.Msuf.Soss.queryParamsFromRunParams
+                    QueryCatalogNamesRun.sorterSgdMsufStandardAppend, SorterSgd.EvoAppend.queryParamsFromRunParams SorterSgd.Msuf.Standard.queryParamsFromRunParams
                     QueryCatalogNamesRun.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromRunParams
                     QueryCatalogNamesRun.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromRunParams
                     QueryCatalogNamesRun.sortableTestMerge, SortableTests.Merge.queryParamsFromRunParams

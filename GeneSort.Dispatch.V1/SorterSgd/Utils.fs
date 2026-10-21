@@ -16,20 +16,6 @@ open GeneSort.Project.V1.Parameters
 
 module Utils =
 
-    /// Prefer replica folders, while retaining read access to earlier imports under None.
-    let loadSetupQuery (genDb: IGeneSortDb) (query: queryParams) =
-        asyncResult {
-            match Map.tryFind "SourceFileId" query.Properties, query.Repl with
-            | Some sourceId, Some _ ->
-                let! exists = genDb.doesOutPutDataExist geneSortDataMode.Setup query
-                if exists then return! genDb.loadAsync geneSortDataMode.Setup query
-                else
-                    let legacy = queryParams.createForImportedFile query.DbName query.ProjectName None query.OutputDataType
-                                     (System.Guid.Parse sourceId |> UMX.tag)
-                    return! genDb.loadAsync geneSortDataMode.Setup legacy
-            | _ -> return! genDb.loadAsync geneSortDataMode.Setup query
-        }
-
     /// Initial pools may start at an imported generation; test inputs are stored at zero.
     let loadSetupOutputData (genDb: IGeneSortDb) (rp: runParameters) dataType =
         asyncResult {
@@ -41,7 +27,7 @@ module Utils =
             let! query =
                 genDb.makeQueryParamsFromRunParams setupRp dataType
                 |> Result.ofOption "Failed to create QueryParams for evolution Setup."
-            return! loadSetupQuery genDb (QueryParams.forSetup rp query)
+            return! genDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp query)
         }
 
     let loadSortableTestsWithPrefix genDb rp =

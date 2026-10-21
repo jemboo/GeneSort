@@ -33,6 +33,8 @@ module SetupEnhancerFunctionNames =
     let sorterSgd = "setup-enhancer.sorter-sgd"
     [<Literal>]
     let sossMsuf32 = "setup-enhancer.soss-msuf32"
+    [<Literal>]
+    let standardMsuf32 = "setup-enhancer.standard-msuf32"
 
 /// Setup enhancers supply file references for the associated run parameters.
 module SetupEnhancerCatalog =
@@ -80,6 +82,10 @@ module SetupEnhancerCatalog =
                   .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
                   .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
 
+    /// Standard seed queries include the full parameter settings and their setup references.
+    let standardMsuf32 : setupEnhancerFunction = fun context parameters ->
+        sossMsuf32 context parameters |> sorterSgd context
+
     let private syncRoot = obj ()
     let mutable private functions =
         Map.ofList [
@@ -90,6 +96,7 @@ module SetupEnhancerCatalog =
             SetupEnhancerFunctionNames.sorterMutate, sorterMutate
             SetupEnhancerFunctionNames.sorterSgd, sorterSgd
             SetupEnhancerFunctionNames.sossMsuf32, sossMsuf32
+            SetupEnhancerFunctionNames.standardMsuf32, standardMsuf32
         ]
 
     let register name (enhancer: setupEnhancerFunction) =
