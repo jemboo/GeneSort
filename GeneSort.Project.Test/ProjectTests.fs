@@ -1,58 +1,36 @@
 ﻿namespace GeneSort.Project.Test
 
-open System
+open Xunit
 open FSharp.UMX
-
-open MessagePack.Resolvers
-open MessagePack
-open MessagePack.FSharp
-open System.IO
-open System.Threading
-open GeneSort.Runs
+open GeneSort.Project.V1
 
 type ProjectTests() =
-
-    let resolver = CompositeResolver.Create(FSharpResolver.Instance, StandardResolver.Instance)
-    let options = MessagePackSerializerOptions.Standard.WithResolver(resolver)
-
-    // Helper to create a temporary directory for tests
-    let createTempDir () =
-        let tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())
-        Directory.CreateDirectory tempPath |> ignore
-        tempPath
-
-    // Helper to clean up temporary directory with retries
-    let cleanupTempDir (path: string) =
-        if Directory.Exists path then
-            let maxRetries = 5
-            let retryDelayMs = 100
-            let rec tryDelete retries =
-                try
-                    Directory.Delete(path, true)
-                with
-                | :? IOException when retries > 0 ->
-                    Thread.Sleep retryDelayMs
-                    tryDelete (retries - 1)
-                | ex when retries = 0 ->
-                    printfn "Failed to delete directory %s after %d retries: %s" path maxRetries ex.Message
-            tryDelete maxRetries
-
-    let paramMapRefiner (runParametersSet: runParameters seq) = 
-        runParametersSet
-
-
-    // Helper to create a sample project
-    let createProject (parameterSpans: list<string * list<string>>) =
-
-        let outputDataTypes = 
-            [|
-                outputDataType.TextReport ("Bins" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Profiles" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report3" |> UMX.tag<textReportName>); 
-                outputDataType.TextReport ("Report4" |> UMX.tag<textReportName>);
-            |]
-
-        project.create
-            ("TestProject"  |> UMX.tag<projectName>)
-            "Test Description"
-            outputDataTypes
+    [<Fact>]
+    member _.``Run parameters expand execution spans across replicas`` () =
+        let configured = SimpleRun.create {
+            ProjectName = UMX.tag "TestProject"
+            DatabaseName = UMX.tag "TestDatabase"
+            RunName = UMX.tag "TestRun"
+            Description = "Fixed parameter expansion fixture"
+            AllowOverwrite = false
+            Setup = {
+                FunctionName = "setup"
+                ParameterSpans = ["SetupValue", ["seed"]]
+                QueryCatalogName = "setup-query"
+                EnhancerFunctionName = "setup-enhancer"
+            }
+            Execution = {
+                FunctionName = "execute"
+                ParameterSpans = ["A", ["1"; "2"]; "B", ["x"; "y"]]
+                QueryCatalogName = "run-query"
+                EnhancerFunctionName = "run-enhancer"
+            }
+        }
+        let parameters = SimpleRun.makeRunParameters 0<replNumber> 2<replNumber> id configured
+        Assert.Equal(8, parameters.Length)
+        let combinations = parameters |> Array.map (fun rp -> rp.GetRepl().Value, rp.ParamMap.["A"], rp.ParamMap.["B"]) |> Set.ofArray
+        let expected = set [for replica in [0<replNumber>; 1<replNumber>] do
+                               for a in ["1"; "2"] do
+                                   for b in ["x"; "y"] do yield replica, a, b]
+        Assert.Equal<Set<int<replNumber> * string * string>>(expected, combinations)
+        Assert.All(parameters, fun rp -> Assert.False(rp.ParamMap.ContainsKey "SetupValue"))

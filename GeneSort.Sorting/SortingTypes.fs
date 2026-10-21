@@ -62,6 +62,7 @@ module SortableDataFormat =
         | Int8Vector256 -> "Int8Vector256"
         | Int8Vector512 -> "Int8Vector512"
         | IntArray -> "Ints"
+        | PackedIntArray -> "PackedInts"
         | BoolArray -> "Bools"
 
     let fromString (s:string) : sortableDataFormat =
@@ -69,6 +70,7 @@ module SortableDataFormat =
         | "BitVector256" -> BitVector256
         | "BitVector512" -> BitVector512
         | "Ints" -> IntArray
+        | "PackedInts" -> PackedIntArray
         | "Bools" -> BoolArray
         | "Int8Vector256" -> Int8Vector256
         | "Int8Vector512" -> Int8Vector512

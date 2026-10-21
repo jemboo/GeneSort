@@ -5,8 +5,9 @@ open Xunit
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Ce
-open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Core.Rando
 
 type MsceRandGenTests() =

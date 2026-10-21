@@ -18,7 +18,7 @@ open GeneSort.Dispatch.V1.SorterEval
 
 [<Fact>]
 let ``prefix evaluation combines split spans without setup ID linkage`` () =
-    for configured in [SorterEvalSpecsTestPrefix.Specs.Prefix_24s (); SorterEvalSpecsTestPrefix.Specs.Prefix_32 ()] do
+    for configured in [WorkflowFixtures.prefixEvaluation 24; WorkflowFixtures.prefixEvaluation 32] do
         let host = runHost.Create configured 1
         let setups = host.MakeSetupParameters 0<replNumber> 1<replNumber>
         let runs = host.MakeRunParameters 0<replNumber> 1<replNumber>
@@ -43,7 +43,7 @@ let ``prefix evaluation combines split spans without setup ID linkage`` () =
 
 [<Fact>]
 let ``prefix evaluation identities include count and evaluation method but exclude file IDs`` () =
-    let host = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_24s ()) 1
+    let host = runHost.Create (WorkflowFixtures.prefixEvaluation 24) 1
     let parameters = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
     let outputType = geneSortDataType.SorterSetEval ""
     let query rp = host.QueryParamsFromRunParams rp outputType |> Option.get
@@ -65,8 +65,8 @@ let ``prefix evaluation identities include count and evaluation method but exclu
 [<InlineData(true)>]
 let ``standalone test Results use the same identity for generation and downstream reads`` prefix =
     let configured =
-        if prefix then SortableTestsSpecsPrefix.Specs.Prefix_32 ()
-        else SortableTestsSpecsMerge.Specs.Merge_Test ()
+        if prefix then WorkflowFixtures.sortableTestsRun true
+        else WorkflowFixtures.sortableTestsRun false
     let rp = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> Array.head
     Assert.True(rp.GetSetupParametersId().IsSome)
     let output = geneSortDataType.SortableTests ""

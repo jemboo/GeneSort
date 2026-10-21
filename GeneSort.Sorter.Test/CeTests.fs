@@ -4,9 +4,9 @@ open System
 open Xunit
 open FSharp.UMX
 open GeneSort.Core.Combinatorics
-open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open GeneSort.Sorting.Sortable
 open FsUnit.Xunit
 
 type CeTests() =
@@ -18,7 +18,7 @@ type CeTests() =
         let picker = indexPicker indices
         let result = Ce.generateCeCode false  width picker
         result |> should equal 0 // First index from picker
-        let maxIndex = Ce.maxIndexForWdith width
+        let maxIndex = Ce.maxIndexForWidth width
         result |> should be (lessThanOrEqualTo maxIndex)
 
     [<Fact>]

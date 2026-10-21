@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
@@ -17,9 +17,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="6.0.0-beta003" />
     <PackageReference Include="FsUnit.xUnit" Version="7.1.1" />
-    <PackageReference Include="MessagePack" Version="3.1.7" />
+    <PackageReference Include="MessagePack" Version="3.1.12" />
     <PackageReference Include="MessagePack.FSharpExtensions" Version="4.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -32,13 +32,13 @@
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core.Mp\GeneSort.Core.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Model.Mp\GeneSort.Model.Mp.fsproj" />
-    <ProjectReference Include="..\GeneSort.Model\GeneSort.Model.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.Mp.V1\GeneSort.Model.Sorting.Mp.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting\GeneSort.Sorting.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="11.0.100-preview3.26207.106" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
   </ItemGroup>
 
 </Project>

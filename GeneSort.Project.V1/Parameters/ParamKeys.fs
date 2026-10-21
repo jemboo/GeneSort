@@ -46,6 +46,8 @@ module ParamKeys =
             | _ -> None)
 
     [<Literal>]
+    let adjustCeLengthFrequencyKey = "AdjustCeLengthFrequency"
+    [<Literal>]
     let ceLengthKey = "CeLength"
     [<Literal>]
     let codeModKey = "CodeModKey"
@@ -53,20 +55,6 @@ module ParamKeys =
     let collectSortableTestsKey = "CollectSortableTests"
     [<Literal>]
     let databaseNameKey = "DatabaseName"
-    [<Literal>]
-    let sourceProjectNameKey = "SourceProjectName"
-    [<Literal>]
-    let sourceDbNameKey = "SourceDbName"
-    [<Literal>]
-    let sourceRunNameKey = "SourceRunName"
-    [<Literal>]
-    let sourceGenerationIntervalKey = "SourceGenerationInterval"
-    [<Literal>]
-    let sourceExecutionIdKey = "SourceExecutionId"
-    [<Literal>]
-    let sourcePoolFileIdKey = "SourcePoolFileId"
-    [<Literal>]
-    let sourceTestsFileIdKey = "SourceTestsFileId"
     [<Literal>]
     let deletionRateKey = "DeletionRate"
     [<Literal>]
@@ -84,35 +72,11 @@ module ParamKeys =
     [<Literal>]
     let generationIntervalLastKey = "GenerationIntervalLast"
     [<Literal>]
-    let generationsPerSubsetKey = "GenerationsPerSubset"
-    [<Literal>]
     let generationsPerMergedSetKey = "GenerationsPerMergedSet"
     [<Literal>]
-    let adjustCeLengthFrequencyKey = "AdjustCeLengthFrequency"
+    let generationsPerSubsetKey = "GenerationsPerSubset"
     [<Literal>]
     let idKey = "Id"
-
-    // Setup output file IDs (queryParamsId), distinct from IDs inside the stored payloads.
-    [<Literal>]
-    let setupParametersIdKey = "SetupParametersId"
-    [<Literal>]
-    let setupSortableTestsIdKey = "SetupSortableTestsId"
-    [<Literal>]
-    let setupSortableTestsWithPrefixIdKey = "SetupSortableTestsWithPrefixId"
-    [<Literal>]
-    let setupSorterPoolSetIdKey = "SetupSorterPoolSetId"
-    [<Literal>]
-    let setupSorterPoolSetSummarySetIdKey = "SetupSorterPoolSetSummarySetId"
-    [<Literal>]
-    let setupSorterSetIdKey = "SetupSorterSetId"
-    [<Literal>]
-    let setupSorterModelSetIdKey = "SetupSorterModelSetId"
-    [<Literal>]
-    let setupSorterSetEvalIdKey = "SetupSorterSetEvalId"
-    [<Literal>]
-    let setupSorterPoolBinsSetSeriesIdKey = "SetupSorterPoolBinsSetSeriesId"
-    [<Literal>]
-    let setupSorterPoolSetHistoryIdKey = "SetupSorterPoolSetHistoryId"
     [<Literal>]
     let insertionRateKey = "InsertionRate"
     [<Literal>]
@@ -164,13 +128,35 @@ module ParamKeys =
     [<Literal>]
     let seedModificationRateKey = "SeedModificationRate"
     [<Literal>]
-    let seedSossKey = "SeedSoss"
-    [<Literal>]
     let seedSorterPoolSelectionTypeKey = "SeedPoolSorterSelectionType"
+    [<Literal>]
+    let seedSossKey = "SeedSoss"
     [<Literal>]
     let selectedSorterCountPerPoolKey = "SelectedSorterCountPerPool"
     [<Literal>]
+    let selectedSorterPoolCountKey = "SelectedSorterPoolCount"
+    [<Literal>]
     let selfSymRateKey = "SelfSym"
+    [<Literal>]
+    let setupParametersIdKey = "SetupParametersId"
+    [<Literal>]
+    let setupSortableTestsIdKey = "SetupSortableTestsId"
+    [<Literal>]
+    let setupSortableTestsWithPrefixIdKey = "SetupSortableTestsWithPrefixId"
+    [<Literal>]
+    let setupSorterModelSetIdKey = "SetupSorterModelSetId"
+    [<Literal>]
+    let setupSorterPoolBinsSetSeriesIdKey = "SetupSorterPoolBinsSetSeriesId"
+    [<Literal>]
+    let setupSorterPoolSetHistoryIdKey = "SetupSorterPoolSetHistoryId"
+    [<Literal>]
+    let setupSorterPoolSetIdKey = "SetupSorterPoolSetId"
+    [<Literal>]
+    let setupSorterPoolSetSummarySetIdKey = "SetupSorterPoolSetSummarySetId"
+    [<Literal>]
+    let setupSorterSetEvalIdKey = "SetupSorterSetEvalId"
+    [<Literal>]
+    let setupSorterSetIdKey = "SetupSorterSetId"
     [<Literal>]
     let simpleSorterModelTypeKey = "SimpleSorterModelType"
     [<Literal>]
@@ -208,11 +194,25 @@ module ParamKeys =
     [<Literal>]
     let sorterPoolExpansionRateKey = "SorterPoolExpansionRate"
     [<Literal>]
-    let sorterPoolMeasureKey = "sorterPoolMeasure"
+    let sorterPoolMeasureKey = "SorterPoolMeasure"
     [<Literal>]
     let sorterPoolSelectionIntervalsKey = "SorterPoolSelectionIntervals"
     [<Literal>]
     let sortingWidthKey = "SortingWidth"
+    [<Literal>]
+    let sourceDbNameKey = "SourceDbName"
+    [<Literal>]
+    let sourceExecutionIdKey = "SourceExecutionId"
+    [<Literal>]
+    let sourceGenerationIntervalKey = "SourceGenerationInterval"
+    [<Literal>]
+    let sourcePoolFileIdKey = "SourcePoolFileId"
+    [<Literal>]
+    let sourceProjectNameKey = "SourceProjectName"
+    [<Literal>]
+    let sourceRunNameKey = "SourceRunName"
+    [<Literal>]
+    let sourceTestsFileIdKey = "SourceTestsFileId"
     [<Literal>]
     let stageLengthKey = "StageLength"
     [<Literal>]

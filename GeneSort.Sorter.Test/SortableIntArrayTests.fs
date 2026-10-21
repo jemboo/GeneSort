@@ -4,9 +4,9 @@ open Xunit
 open GeneSort.Core
 open FSharp.UMX
 open System
-open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
-open GeneSort.Sorter.Sortable
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
+open GeneSort.Sorting.Sortable
 
 type SortableIntArrayTests() =
 
@@ -63,7 +63,7 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let ces = [| ce.create 1 2; ce.create 0 1 |]
         let useCounter = [| 0; 0 |]
-        let sorted = arr.SortByCes ces useCounter
+        let sorted = CeSorting.sortByWithUses ces useCounter arr.Values |> fun values -> sortableIntArray.create(values, arr.SortingWidth, arr.SymbolSetSize)
         Assert.Equal<int>([| 0; 1; 2 |], sorted.Values)
         Assert.True(sorted.IsSorted)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
@@ -74,7 +74,7 @@ type SortableIntArrayTests() =
     let ``SortByCes with empty ces returns copy`` () =
         let arr = sortableIntArray.create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let useCounter = [||]
-        let sorted = arr.SortByCes [||] useCounter
+        let sorted = CeSorting.sortByWithUses [||] useCounter arr.Values |> fun values -> sortableIntArray.create(values, arr.SortingWidth, arr.SymbolSetSize)
         Assert.Equal<int>(arr.Values, sorted.Values)
         Assert.Equal(arr.SortingWidth, sorted.SortingWidth)
         Assert.Equal(arr.SymbolSetSize, sorted.SymbolSetSize)
@@ -85,7 +85,7 @@ type SortableIntArrayTests() =
         let arr = sortableIntArray.create([| 0; 2; 1 |], 3<sortingWidth>, (3 |> UMX.tag<symbolSetSize>))
         let ces = [| ce.create 1 2; ce.create 0 1 ; ce.create 0 1 |]
         let useCounter = [| 0; 0; 0 |]
-        let history = arr.SortByCesWithHistory ces useCounter
+        let history = CeSorting.sortByWithHistoryAndUses ces useCounter arr.Values |> Array.map (fun values -> sortableIntArray.create(values, arr.SortingWidth, arr.SymbolSetSize))
         Assert.Equal(4, history.Length)
         Assert.Equal<int>([| 0; 2; 1 |], history.[0].Values)
         Assert.Equal<int>([| 0; 1; 2 |], history.[1].Values)
@@ -102,11 +102,11 @@ type SortableIntArrayTests() =
         let boolArrays = arr.ToSortableBoolArrays()
         Assert.Equal(5, boolArrays.Length) 
         let expected = [|
-            sortableBoolArray.Create([| true; true; true; true |], 4<sortingWidth>) // threshold = 0
-            sortableBoolArray.Create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
-            sortableBoolArray.Create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
-            sortableBoolArray.Create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
-            sortableBoolArray.Create([| false; false; false; false |], 4<sortingWidth>) // threshold = 4
+            sortableBoolArray.create([| true; true; true; true |], 4<sortingWidth>) // threshold = 0
+            sortableBoolArray.create([| false; true; true; true |], 4<sortingWidth>) // threshold = 1
+            sortableBoolArray.create([| false; true; false; true |], 4<sortingWidth>) // threshold = 2
+            sortableBoolArray.create([| false; false; false; true |], 4<sortingWidth>) // threshold = 3
+            sortableBoolArray.create([| false; false; false; false |], 4<sortingWidth>) // threshold = 4
         |]
         Assert.Equal<sortableBoolArray[]>(expected, boolArrays)
 
@@ -158,13 +158,13 @@ type SortableIntArrayTests() =
         let sortableBoolArrays = SortableBoolArray.getMergeTestCases
                                     6<sortingWidth>
                                     3<mergeDimension>
-                                    mergeFillType.NoFill
+                                    mergeSuffixType.NoSuffix
 
 
         let sortableIntArrays = SortableIntArray.getMergeTestCases
                                     6<sortingWidth>
                                     3<mergeDimension>
-                                    mergeFillType.NoFill
+                                    mergeSuffixType.NoSuffix
 
         let boolConv = 
             sortableIntArrays 
@@ -173,8 +173,8 @@ type SortableIntArrayTests() =
             ) |> Array.concat |> SortableBoolArray.removeDuplicates
 
         let mutable report = ""
-        boolConv |> Array.iter (fun sba ->
+        boolConv |> Seq.iter (fun sba ->
             report <- report + sprintf "%A\n" sba.Values
         )
 
-        Assert.Contains("M", "ex.Message")
+        Assert.Equal<Set<bool list>>(sortableBoolArrays |> Seq.map (fun item -> Array.toList item.Values) |> Set.ofSeq, boolConv |> Seq.map (fun item -> Array.toList item.Values) |> Set.ofSeq)

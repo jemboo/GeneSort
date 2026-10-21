@@ -24,7 +24,7 @@ type PackedOffsetComparer(data: int[], sw: int) =
             
             let mutable hash = HashCode()
             // Force the conversion by defining a ReadOnlySpan binding
-            let roByteSpan : ReadOnlySpan<byte> = byteSpan
+            let roByteSpan : ReadOnlySpan<byte> = Span<byte>.op_Implicit(byteSpan)
             hash.AddBytes(roByteSpan)
             hash.ToHashCode()
 

@@ -3,11 +3,12 @@
 open System
 open FSharp.UMX
 open Xunit
-open GeneSort.Model.Sorting.Sorter.Uf4
+open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Core
-open GeneSort.Model.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple
 
 type Msuf4Tests() =
 
@@ -26,34 +27,36 @@ type Msuf4Tests() =
     let createTestGenRates (order: int) :uf4GenRates =
         Uf4GenRates.makeUniform order
 
-    // Helper function that uses mockFloatPicker to create a random TwoOrbitUnfolder4 for a given order, 
+    // Helper function that uses mockFloatPicker to create a random TwoOrbitUnfolder4 for a given order,
     // SeedType, and optional TwoOrbitType override
-    let createRandomTestTwoOrbitUf4 
-            (order: int) 
-            (topType: twoOrbitPairType) 
-            (twoOrbitPairTypeOverride: twoOrbitPairType option) 
+    let createRandomTestTwoOrbitUf4
+            (order: int)
+            (topType: twoOrbitPairType)
+            (twoOrbitPairTypeOverride: twoOrbitPairType option)
             : twoOrbitUf4  =
-        let baseGenRates : uf4GenRates = createTestGenRates order
-        let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
-        let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
-        let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
+        if order = 4 then twoOrbitUf4.create topType [||]
+        else
+            let baseGenRates : uf4GenRates = createTestGenRates order
+            let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
+            let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
+            let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
 
-        let ratesArray = 
-                match twoOrbitPairTypeOverride with
-                | Some tot -> 
-                    let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
-                    let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
-                    let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
-                    Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
-                        fun _ -> opsGenRates.create(orthoRate, paraRate, selfSyymRate))
-                | None -> baseGenRates.OpsGenRatesArray.RatesArray
+            let ratesArray =
+                    match twoOrbitPairTypeOverride with
+                    | Some tot ->
+                        let orthoRate = if topType = twoOrbitPairType.Ortho then 1.0 else 0.0
+                        let paraRate = if topType = twoOrbitPairType.Para then 1.0 else 0.0
+                        let selfSyymRate = if topType = twoOrbitPairType.SelfRefl then 1.0 else 0.0
+                        Array.init baseGenRates.OpsGenRatesArray.RatesArray.Length (
+                            fun _ -> opsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                    | None -> baseGenRates.OpsGenRatesArray.RatesArray
 
-        let genRates : uf4GenRates = uf4GenRates.create 
-                                        order
-                                        (opsGenRates.create(orthoRate, paraRate, selfSyymRate))
-                                        (opsGenRatesArray.create ratesArray)
+            let genRates : uf4GenRates = uf4GenRates.create
+                                            order
+                                            (opsGenRates.create(orthoRate, paraRate, selfSyymRate))
+                                            (opsGenRatesArray.create ratesArray)
 
-        RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
+            RandomUnfolderOps4.makeRandomTwoOrbitUf4 mockFloatPicker genRates
 
 
     [<Fact>]
@@ -100,7 +103,7 @@ type Msuf4Tests() =
         let width = 4<sortingWidth>
         let tou = createRandomTestTwoOrbitUf4 4 seedType None
         let msuf4 = msuf4.create id width [| tou |]
-        let sorter = msuf4.MakeSorter()
+        let sorter = msuf4.MakeSorter None
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
         Assert.Equal(width, sorter.SortingWidth)
         let expectedCes = [| ce.create low1 hi1; ce.create low2 hi2 |]
@@ -113,7 +116,7 @@ type Msuf4Tests() =
         let seedType = twoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType twoOrbitPairType.Para 8
         let msuf4 = msuf4.create id width [| tou |]
-        let sorter = msuf4.MakeSorter()
+        let sorter = msuf4.MakeSorter None
         let expectedCes = [| ce.create 0 6; ce.create 1 7; ce.create 2 4; ce.create 3 5 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
@@ -126,7 +129,7 @@ type Msuf4Tests() =
         let seedType = twoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType twoOrbitPairType.Ortho 8
         let msuf4 = msuf4.create id width [| tou |]
-        let sorter = msuf4.MakeSorter()
+        let sorter = msuf4.MakeSorter None
         let expectedCes = [| ce.create 0 1; ce.create 2 3; ce.create 4 5; ce.create 6 7 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
@@ -139,7 +142,7 @@ type Msuf4Tests() =
         let seedType = twoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType twoOrbitPairType.SelfRefl 8
         let msuf4 = msuf4.create id width [| tou |]
-        let sorter = msuf4.MakeSorter()
+        let sorter = msuf4.MakeSorter None
         let expectedCes = [| ce.create 0 7; ce.create 1 6; ce.create 2 5; ce.create 3 4 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)
         Assert.Equal(%id |> UMX.tag<sorterId>, sorter.SorterId)
@@ -153,7 +156,7 @@ type Msuf4Tests() =
         let seedType = twoOrbitPairType.Ortho
         let tou = TwoOrbitUnfolder4.makeTestTwoOrbitUf4 seedType twoOrbitPairType.Para order
         let msuf4 = msuf4.create id width [| tou |]
-        let sorter = msuf4.MakeSorter()
+        let sorter = msuf4.MakeSorter None
         let expectedCes = [| ce.create 0 9; ce.create 1 8; ce.create 2 11; ce.create 3 10
                              ce.create 4 13; ce.create 5 12; ce.create 6 15; ce.create 7 14 |]
         Assert.Equal<ce>(expectedCes, sorter.Ces)

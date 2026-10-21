@@ -5,73 +5,31 @@ open Xunit
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Ce
-open FsUnit.Xunit
-open GeneSort.Model.Sorting
-open GeneSort.Core.Rando
-
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple.Ce
 
 type MsceRandMutateTests() =
-    let epsilon = 1e-10 // Tolerance for floating-point comparisons
-
-    // Helper function to create a mock random number generator
-    let createMockRando (indices: int list) (floats: float list) =
-        fun _ _ -> new MockRando(floats, indices) :> IRando
-
-    let mockRngFactory floatValue indexValue _ _ = MockRando(floatValue, indexValue) :> IRando
-    let mockCeCode = 42 // Placeholder valid ceCode
-    let newCeCode = 19 // Placeholder for mutated/inserted ceCode
-    let sortingWidth = 10 |> UMX.tag<sortingWidth>
-    let baseRates = indelRates.create (0.2, 0.2, 0.2)
-    let msceId = Guid.NewGuid() |> UMX.tag<sorterModelId>
-
-    [<Fact>]
-    let ``mutate applies Mutation mode correctly`` () =
-        let arrayRates = indelRatesArray.create [| indelRates.create (1.0, 0.0, 0.0) |] // Always Mutation
-        let msce = msce.create msceId sortingWidth [| mockCeCode |]
-        let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
-        
-        let mockRando = createMockRando [newCeCode] [0.9]
-        let result = msceMutate.MakeSorterModelFromIndex 0
-        result.CeCodes |> should equal [| newCeCode |]
-        result.SortingWidth |> should equal sortingWidth
-        result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
-
-    [<Fact>]
-    let ``mutate applies Insertion mode and trims to ceCount`` () =
-        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 1.0, 0.0); indelRates.create (0.0, 1.0, 0.0) |] // Insertion; Insertion
-        let msce = msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
-        let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
-        
-        let mockRando = createMockRando [newCeCode; newCeCode] [0.9; 0.9]
-        let result = msceMutate.MakeSorterModelFromIndex 0
-        result.CeCodes |> should equal [| newCeCode; mockCeCode; |] // Two insertions, trimmed to ceCount
-        result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
-        result.SortingWidth |> should equal sortingWidth
-
-    [<Fact>]
-    let ``mutate applies Deletion mode and appends insertion`` () =
-        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 0.0, 1.0); indelRates.create (0.0, 1.0, 0.0) |] // Deletion; Insertion
-        let msce = msce.create msceId sortingWidth [| mockCeCode; mockCeCode |]
-        let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
-        
-        let mockRando = createMockRando [newCeCode] [0.9; 0.9]
-        let result = msceMutate.MakeSorterModelFromIndex 0
-        result.CeCodes |> should equal [| newCeCode; mockCeCode |] // Deletion + Insertion
-        result.CeLength |> should equal (2 |> UMX.tag<ceLength>)
-        result.SortingWidth |> should equal sortingWidth
-
-    [<Fact>]
-    let ``mutate applies NoAction mode correctly`` () =
-        let arrayRates = indelRatesArray.create [| indelRates.create (0.0, 0.0, 0.0) |] // Always NoAction
-        let msce = msce.create msceId sortingWidth [| mockCeCode |]
-        let msceMutate = msceRandMutate.create rngFactory.LcgFactory arrayRates false msce
-        
-        let mockRando = createMockRando [0] [0.9]
-        let result = msceMutate.MakeSorterModelFromIndex 0
-        result.CeCodes |> should equal [| mockCeCode |] // Unchanged
-        result.CeLength |> should equal (1 |> UMX.tag<ceLength>)
-        result.SortingWidth |> should equal sortingWidth
-
-
-
+    [<Theory>]
+    [<InlineData(1.0, 0.0, 0.0)>]
+    [<InlineData(0.0, 1.0, 0.0)>]
+    [<InlineData(0.0, 0.0, 1.0)>]
+    [<InlineData(0.0, 0.0, 0.0)>]
+    member _.``Uniform mutation modes preserve length and produce valid reproducible comparators`` mutation insertion deletion =
+        let parent = msce.create (UMX.tag (Guid.Parse "00000000-0000-0000-0000-000000000001")) 10<sortingWidth> [|42; 42; 42; 42|]
+        let mutator = msceRandMutate.create rngFactory.LcgFactory (indelRates.create (mutation, insertion, deletion)) (UMX.tag false) mutatorVariant.V1
+        let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
+        Assert.Equal(parent.SortingWidth, result.SortingWidth)
+        Assert.Equal(parent.CeLength, result.CeLength)
+        Assert.Equal(result, mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0))
+        Assert.NotEqual(parent.Id, result.Id)
+        Assert.NotEqual(result.Id, (mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 1) (UMX.tag 0)).Id)
+        Assert.All(result.CeCodes, fun code ->
+            let ce = Ce.fromIndex code
+            Assert.InRange(ce.Low, 0, 9)
+            Assert.InRange(ce.Hi, ce.Low, 9))
+        if mutation + insertion + deletion = 0.0 then Assert.Equal<int[]>(parent.CeCodes, result.CeCodes)
+        else Assert.NotEqual<int[]>(parent.CeCodes, result.CeCodes)
+        if insertion = 1.0 then
+            Assert.Equal(42, result.CeCodes.[1])
+            Assert.Equal(42, result.CeCodes.[3])

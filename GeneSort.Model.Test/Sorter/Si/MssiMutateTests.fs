@@ -1,127 +1,38 @@
 ﻿namespace GeneSort.Model.Test.Sorter.Si
 
-
 open System
 open Xunit
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
-open GeneSort.Model.Sorting
-open GeneSort.Model.Sorting.Sorter.Si
-open GeneSort.Core.Rando
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple.Si
 
 type MssiRandMutateTests() =
+    [<Theory>]
+    [<InlineData(0.0, 0.0)>]
+    [<InlineData(1.0, 0.0)>]
+    [<InlineData(0.0, 1.0)>]
+    [<InlineData(0.5, 0.5)>]
+    member _.``Mutation preserves self inversion and replays deterministically`` ortho para =
+        let parent = mssi.create (UMX.tag (Guid.Parse "00000000-0000-0000-0000-000000000001")) 4<sortingWidth>
+                        [|permSi.create [|1; 0; 3; 2|]; permSi.create [|3; 2; 1; 0|]|]
+        let mutator = mssiRandMutate.create rngFactory.LcgFactory (opActionRates.create (ortho, para)) mutatorVariant.V1
+        let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
+        Assert.Equal(parent.SortingWidth, result.SortingWidth)
+        Assert.Equal(parent.Perm_Sis.Length, result.Perm_Sis.Length)
+        Assert.All(result.Perm_Sis, fun perm -> Assert.True(Permutation.isSelfInverse perm.Permutation))
+        Assert.Equal(result, mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0))
+        Assert.NotEqual(parent.Id, result.Id)
+        Assert.NotEqual(result.Id, (mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 1) (UMX.tag 0)).Id)
+        if ortho + para = 0.0 then Assert.Equal<permSi[]>(parent.Perm_Sis, result.Perm_Sis)
+        else Assert.NotEqual<permSi[]>(parent.Perm_Sis, result.Perm_Sis)
 
-    // Helper to create a Model_Si
-    let createModelSi (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permSis: permSi array) : mssi =
-        mssi.create id width permSis
-
-    let randoGen 
-            (nextIndexValues: int list) 
-            (pickValues: float list) 
-            (rt: rngType) 
-            (id: Guid) : IRando =
-        MockRando(pickValues, nextIndexValues) :> IRando
-
-    [<Fact>]
-    let ``mutate with NoAction mode does not change permutations`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = permSi.create [|1; 0; 2; 3|] // (0 1)
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = opActionRates.create (0.0, 0.0)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 1] [0.5] // Ensures NoAction (within NoActionRate)
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        Assert.Equal<int array>(modelSi.Perm_Sis.[0].Array, result.Perm_Sis.[0].Array)
-        Assert.Equal(modelSi.SortingWidth, result.SortingWidth)
-
-    [<Fact>]
-    let ``mutate with Ortho mode applies Ortho mutation`` () = 
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = opActionRates.create (0.9, 0.0)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 2] [0.0] // Picks indices 0, 2 and Ortho mode
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        let expectedArray = [|2; 3; 0; 1|] // Expected: (0 2)(1 3)
-        Assert.Equal<int array>(expectedArray, result.Perm_Sis.[0].Array)
-        Assert.True(Permutation.isSelfInverse result.Perm_Sis.[0].Permutation)
-        Assert.Equal(modelSi.SortingWidth, result.SortingWidth)
-
-    [<Fact>]
-    let ``mutate with Para mode applies Para mutation`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = opActionRates.create (0.0, 1.0)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 2] [0.5] // Picks indices 0, 2 and Para mode
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        let expectedArray = [|3; 2; 1; 0|] // Expected: (0 3)(1 2)
-        Assert.Equal<int array>(expectedArray, result.Perm_Sis.[0].Array)
-        Assert.True(Permutation.isSelfInverse result.Perm_Sis.[0].Permutation)
-        Assert.Equal(modelSi.SortingWidth, result.SortingWidth)
-
-    [<Fact>]
-    let ``mutate preserves width and number of permutations`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi1 = permSi.create [|1; 0; 3; 2|]
-        let permSi2 = permSi.create [|3; 2; 1; 0|]
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
-        let siMutationRates = opActionRates.create (0.5, 0.5)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        Assert.Equal(UMX.tag<sortingWidth> 4, result.SortingWidth)
-        Assert.Equal(2, result.Perm_Sis.Length)
-
-    [<Fact>]
-    let ``mutate generates new unique ID`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = permSi.create [|1; 0; 2; 3|]
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = opActionRates.create (0.0, 0.0)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 1] [0.5]
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        Assert.NotEqual(%id, %result.Id)
-        Assert.NotEqual(Guid.Empty, %result.Id)
-
-    [<Fact>]
-    let ``mutate applies mutation to all permutations in array`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi1 = permSi.create [|1; 0; 3; 2|] // (0 1)(2 3)
-        let permSi2 = permSi.create [|3; 2; 1; 0|] // (0 3)(1 2)
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi1; permSi2|]
-        let siMutationRates = opActionRates.create (1.0, 0.0)
-        let arrayToMutate = opActionRatesArray.create [|siMutationRates; siMutationRates|]
-        let modelSiMutate = mssiRandMutate.create rngFactory.LcgFactory arrayToMutate modelSi
-
-        let mock = randoGen [0; 2; 0; 2] [0.0; 0.0] // Ortho mode, indices 0, 2
-        let result = modelSiMutate.MakeSorterModelFromIndex 0
-        let expectedArray1 = [|2; 3; 0; 1|] // (0 2)(1 3)
-        let expectedArray2 = [|1; 0; 3; 2|] // (0 1)(2 3)
-        Assert.Equal<int array>(expectedArray1, result.Perm_Sis.[0].Array)
-        Assert.Equal<int array>(expectedArray2, result.Perm_Sis.[1].Array)
-        Assert.True(Permutation.isSelfInverse result.Perm_Sis.[0].Permutation)
-        Assert.True(Permutation.isSelfInverse result.Perm_Sis.[1].Permutation)
-
-    [<Fact>]
-    let ``create fails when Perm_Sis length does not match arrayRates length`` () =
-        let id = UMX.tag<sorterModelId> (Guid.NewGuid())
-        let permSi = permSi.create [|1; 0; 2; 3|]
-        let modelSi = createModelSi id (UMX.tag<sortingWidth> 4) [|permSi|]
-        let siMutationRates = opActionRates.create (0.0, 0.0)
-        let array = opActionRatesArray.create [|siMutationRates; siMutationRates|] // Length 2
-        Assert.Throws<exn>(fun () -> mssiRandMutate.create rngFactory.LcgFactory array modelSi |> ignore)
+    [<Theory>]
+    [<InlineData(1)>]
+    [<InlineData(3)>]
+    member _.``Uniform mutator accepts parents with different stage counts`` count =
+        let mutator = mssiRandMutate.create rngFactory.LcgFactory (opActionRates.create (0.0, 0.0)) mutatorVariant.V1
+        let parent = mssi.create (UMX.tag Guid.Empty) 4<sortingWidth> (Array.create count (permSi.create [|1; 0; 3; 2|]))
+        let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
+        Assert.Equal<permSi[]>(parent.Perm_Sis, result.Perm_Sis)

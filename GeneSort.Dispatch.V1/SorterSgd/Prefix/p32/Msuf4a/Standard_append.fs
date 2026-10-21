@@ -12,7 +12,6 @@ let Pool_128_Test () : run =
     let sourceParameterSpans =
         [
             ParamKeys.mutationModKey, [0] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string
         ]
     let executionParameterSpans =
         [
@@ -25,7 +24,7 @@ let Pool_128_Test () : run =
         DatabaseName = Standard.dbPool32TestName
         RunName = "Standard_Pool_128-Append" |> UMX.tag<runName>
         Source = {
-            Run = Standard.Pool_128_Test ()
+            Run = Standard.Pool_32_Test ()
             GenerationInterval = 1
             ParameterSpans = sourceParameterSpans
         }
@@ -38,7 +37,6 @@ let Pool_128_Test_append () : run =
     let sourceParameterSpans =
         [
             ParamKeys.mutationModKey, [0] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string
         ]
     let executionParameterSpans =
         [

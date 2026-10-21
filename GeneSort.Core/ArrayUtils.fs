@@ -3,7 +3,6 @@
 open LanguagePrimitives
 open System
 open System.Runtime.CompilerServices
-open Microsoft.FSharp.NativeInterop
 open System.Runtime.InteropServices
 open System.Runtime.Intrinsics
 
@@ -188,19 +187,9 @@ module ArrayUtils =
         (resLhs, resRhs)
 
 
-    // You must use the 'unmanaged' constraint for NativePtr operations
+    // Retain the unmanaged copy API while using a bounds-checked span copy.
     let fastGenericCopyToBuffer0 (source: 'T[]) (dest: 'T[]) : unit when 'T : unmanaged =
-        let byteCount = uint32 (source.Length * Unsafe.SizeOf<'T>())
-        
-        // Pin the arrays
-        use pSrc = fixed source
-        use pDest = fixed dest
-        
-        // Convert nativeptr<'T> to void* 
-        let srcVoidPtr = NativePtr.toVoidPtr pSrc
-        let destVoidPtr = NativePtr.toVoidPtr pDest
-        
-        Unsafe.CopyBlock(destVoidPtr, srcVoidPtr, byteCount)
+        source.AsSpan().CopyTo(dest.AsSpan(0, source.Length))
 
 
     /// High-performance generic copy using Span logic.

@@ -22,33 +22,15 @@ open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1.Parameters
 open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SetupParameters
 
-let private sourceWithMutationMods modifiers =
-    let baseline = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss.Pool_32_Debug ()
-    SgdRun.create {
-        DatabaseName = baseline.DatabaseName
-        ProjectName = baseline.ProjectName
-        RunName = baseline.RunName
-        Description = baseline.Description
-        AllowOverwrite = false
-        Setup = {
-            FunctionName = baseline.SetupFunctionName
-            ParameterSpans = baseline.SetupParameterSpans |> List.map (fun (key, values) ->
-                if key = ParamKeys.mutationModKey then key, List.map string modifiers else key, values)
-            QueryCatalogName = baseline.SetupQueryCatalogName
-            EnhancerFunctionName = baseline.SetupEnhancerFunctionName
-        }
-        Execution = {
-            FunctionName = baseline.ExecuteFunctionName
-            ParameterSpans = baseline.RunParameterSpans
-            QueryCatalogName = baseline.RunQueryCatalogName
-            EnhancerFunctionName = baseline.RunEnhancerFunctionName
-        }
-    } {
-        MakerNames = baseline.MakerNames.Value
-        GenSaveIntervalsName = baseline.GenSaveIntervalsName.Value
-        GenSaveSubIntervalsName = baseline.GenSaveSubIntervalsName.Value
-    } |> run.SgdRun
+open GeneSort.Dispatch.Test.V2.WorkflowFixtures
+
+let private sourceWithMutationMods modifiers = sossSource modifiers
 
 let private singleSource () = sourceWithMutationMods [0]
 
@@ -312,7 +294,7 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
 [<InlineData(true)>]
 [<InlineData(false)>]
 let ``Repeated append branches share immutable setup without growing parameter history`` soss =
-    let mutable sourceRun = if soss then singleSource () else GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_128_Test ()
+    let mutable sourceRun = if soss then singleSource () else standardSource ()
     let mutable sourceHost = runHost.Create sourceRun 1
     let mutable sourceRp = sourceHost.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
     let mutable sourceMemory = MemoryDb(sourceHost.QueryParamsFromRunParams)
@@ -387,11 +369,7 @@ let ``Append source branching shares setup in replica folders`` soss =
         let sourceRun =
             if soss then sourceWithMutationMods [0; 1; 2]
             else
-                let dto = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_128_Test () |> GeneSort.Project.Mp.V1.RunDto.fromDomain
-                let spans = dto.SetupParameterSpans |> Array.map (fun span ->
-                    if span.Key = ParamKeys.mutationModKey then { span with Values = [|"0"; "1"; "2"|] } else span)
-                { dto with SetupParameterSpans = spans }
-                |> GeneSort.Project.Mp.V1.RunDto.toDomain
+                standardSource () |> withSetupSpans [ParamKeys.mutationModKey, ["0"; "1"; "2"]]
         let sourcePoolCount = if soss then 8 else 4
         let perPool = if soss then 4 else 32
         let sourceHost = runHost.Create sourceRun 1
@@ -610,7 +588,7 @@ let ``Soss append copies the selected source checkpoint and tests only after val
 [<InlineData(true)>]
 let ``standalone tests have no setup and generate Results during execution`` prefix =
     let memory = MemoryDb()
-    let spec = if prefix then SortableTestsSpecsPrefix.Specs.Prefix_Test () else SortableTestsSpecsMerge.Specs.Merge_Test ()
+    let spec = if prefix then WorkflowFixtures.sortableTestsRun true else WorkflowFixtures.sortableTestsRun false
     let host = (runHost.Create spec 1).WithRunDb(memory)
     let rp =
         let basic = (runParameters.create Map.empty).WithRepl(Some 0<replNumber>).WithSortableDataFormat(Some sortableDataFormat.BoolArray)
@@ -774,12 +752,15 @@ let ``Explicit chained appends retain each immediate source identity across seri
 
 
 [<Fact>]
-let ``Append debug preset generates 18 runs per replica`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32_append.Pool_4_Debug ()
+let ``Append combines three sources with three modifiers and two sizes`` () =
+    let configured = appendFrom (sossSource [0; 1; 2]) 1 2 [] [
+        ParamKeys.mutationModKey, ["0"; "1"; "2"]
+        ParamKeys.sorterCountPerPoolSetKey, ["32"; "64"]
+    ]
     let branches = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
     Assert.Equal(18, branches.Length)
     Assert.Equal(18, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
-    Assert.Equal("SorterSgd.Soss_append.32p4a.Msuf", string configured.ProjectName)
+    Assert.Equal("Tests.Append1", string configured.ProjectName)
 
 [<Fact>]
 let ``Saved runs without explicit source fields remain readable`` () =
@@ -801,7 +782,7 @@ let ``Saved runs without explicit source fields remain readable`` () =
 [<InlineData(1)>]
 [<InlineData(2)>]
 let ``Standard checkpoints label produced generations and stop at the target`` (startingGeneration: int) =
-    let host = runHost.Create (GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_128_Test ()) 1
+    let host = runHost.Create (standardSource ()) 1
     let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne).WithGenerationIntervalLast(Some (UMX.tag 2))
     let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
@@ -816,7 +797,10 @@ let ``Standard checkpoints label produced generations and stop at the target`` (
 
 [<Fact>]
 let ``Standard append starts from imported setup and resumes its resulting checkpoint`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_128_Test ()
+    let configured = appendFrom (standardSource ()) 1 3 [] [
+        ParamKeys.mutationModKey, ["0"; "1"; "2"]
+        ParamKeys.sorterCountPerPoolSetKey, ["128"; "256"]
+    ]
     let host = runHost.Create configured 1
     let pending = host.MakeRunParameters 0<replNumber> 1<replNumber>
     Assert.Equal(6, pending.Length)
@@ -864,10 +848,8 @@ let ``Standard append starts from imported setup and resumes its resulting check
 [<InlineData(false, 384)>]
 [<InlineData(true, 240)>]
 let ``Standard parameter sweeps append each source combination once`` v2 expected =
-    let source = if v2 then GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_512_V2a ()
-                 else GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_512_V1 ()
-    let appended = if v2 then GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_512_V2a ()
-                   else GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_512_V1 ()
+    let source = standardSweep v2
+    let appended = appendFrom source 3 4 [] []
     let original = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
     let branches = RunParameterGeneration.generate appended 0<replNumber> 1<replNumber>
     Assert.Equal(expected, original.Length)

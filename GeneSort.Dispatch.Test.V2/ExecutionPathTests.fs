@@ -146,12 +146,12 @@ let ``missing setup registration fails preparation`` () =
 [<Fact>]
 let ``built-in hosts resolve setup for every execution family`` () =
     let runs = [
-        GeneSort.Dispatch.V1.SortableTests.SortableTestsSpecsMerge.Specs.Merge_Test ()
-        GeneSort.Dispatch.V1.SortableTests.SortableTestsSpecsPrefix.Specs.Prefix_32 ()
-        GeneSort.Dispatch.V1.SorterEval.SorterEvalSpecsRs.Specs.Rand_Test ()
-        GeneSort.Dispatch.V1.SorterMutate.MutateSpecsRp.Specs.Test_Mssi ()
-        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_128_Test ()
-        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss.Pool_32_Debug ()
+        WorkflowFixtures.sortableTestsRun false
+        WorkflowFixtures.sortableTestsRun true
+        WorkflowFixtures.standardEvaluationHost ()
+        WorkflowFixtures.mutationHost ()
+        WorkflowFixtures.standardSource ()
+        WorkflowFixtures.sossSource [0]
     ]
     for run in runs do
         let host = runHost.Create run 1

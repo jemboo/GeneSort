@@ -3,144 +3,40 @@
 open System
 open Xunit
 open FSharp.UMX
-open FsUnit.Xunit
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.Sorter.Rs
-open GeneSort.Model.Sorting
-open GeneSort.Core.Rando
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple.Rs
 
 type MsrsRandMutateTests() =
+    [<Theory>]
+    [<InlineData(0.0, 0.0, 0.0)>]
+    [<InlineData(1.0, 0.0, 0.0)>]
+    [<InlineData(0.0, 1.0, 0.0)>]
+    [<InlineData(0.0, 0.0, 1.0)>]
+    [<InlineData(0.25, 0.25, 0.25)>]
+    member _.``Uniform mutation modes preserve reflection symmetry and replay deterministically`` ortho para selfSym =
+        let input = permRs.create [|1; 0; 3; 2|]
+        let parent = msrs.create (UMX.tag (Guid.Parse "00000000-0000-0000-0000-000000000001")) 4<sortingWidth> [|input; input|]
+        let mutator = msrsRandMutate.create rngFactory.LcgFactory (opsActionRates.create ortho para selfSym) mutatorVariant.V1
+        let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
+        Assert.Equal(parent.SortingWidth, result.SortingWidth)
+        Assert.Equal(parent.StageLength, result.StageLength)
+        Assert.Equal(result, mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0))
+        Assert.NotEqual(parent.Id, result.Id)
+        Assert.NotEqual(result.Id, (mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 1) (UMX.tag 0)).Id)
+        Assert.All(result.Perm_Rss, fun perm ->
+            Assert.True(PermSi.isReflectionSymmetric perm.PermSi)
+            Assert.True(perm.Array |> Array.indexed |> Array.forall (fun (i, x) -> perm.Array.[x] = i))
+            if ortho + para + selfSym = 0.0 then Assert.Equal(input, perm)
+            if para = 1.0 then Assert.Equal<int[]>([|2; 3; 0; 1|], perm.Array)
+            if selfSym = 1.0 then Assert.Equal<int[]>([|3; 2; 1; 0|], perm.Array))
 
-    // Helper function to create a Perm_Rs from an array
-    let createPermRs (arr: int array) : permRs =
-        permRs.create arr
-
-    // Helper to create a Model_Rs
-    let createModelRs (id: Guid<sorterModelId>) (width: int<sortingWidth>) (permRss: permRs array) : msrs =
-        msrs.create id width permRss
-
-    // Helper to check if a permutation is self-inverse
-    let isSelfInverse (perm: permRs) : bool =
-        let arr = perm.Array
-        arr |> Array.indexed |> Array.forall (fun (i, x) -> arr.[x] = i)
-
-    // Helper function to create a mock random number generator
-    let createMockRando (indices: int list) (floats: float list) =
-        fun _ _ -> new MockRando(floats, indices) :> IRando
-
-    [<Fact>]
-    let ``NoAction mode preserves all Perm_Rss`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 3; 2; 1; 0 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick NoAction
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<permRs array>(permRss, result.Perm_Rss)
-
-    [<Fact>]
-    let ``SelfSym mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 3; 2; 1; 0 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick SelfSym
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
-        Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
-
-    [<Fact>]
-    let ``Ortho mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let expectedPermRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (1.0, 0.0, 0.0) // OrthoRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Ortho
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
-        Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
-
-    [<Fact>]
-    let ``Para mode mutates Perm_Rss correctly`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let expectedPermRss = [| [| 2; 3; 0; 1 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Should pick Para
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
-        Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
-
-    [<Fact>]
-    let ``Mixed mutation modes with varying probabilities`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |]; [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates1 = opsActionRates.create (0.0, 0.0, 1.0) // SelfSymRate = 1.0
-        let opsActionRates2 = opsActionRates.create (0.0, 1.0, 0.0) // ParaRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates1; opsActionRates2 |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1; 0; 1 ] [ 0.1; 0.1 ] // Picks SelfSym for first, Para for second
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        let expectedPermRss = [| [| 3; 2; 1; 0 |]; [| 2; 3; 0; 1 |] |] |> Array.map createPermRs
-        Assert.Equal(width, result.SortingWidth)
-        Assert.Equal(2<stageLength>, result.StageLength)
-        Assert.Equal<permRs array>(expectedPermRss, result.Perm_Rss)
-        Assert.True(result.Perm_Rss |> Array.forall isSelfInverse)
-
-    [<Fact>]
-    let ``Throws on mismatched stage count`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs // StageLength = 1
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0)
-        let ratesArray = opsActionRatesArray.create [| opsActionRates; opsActionRates |] // Length = 2
-        Assert.ThrowsAny<exn>(fun () ->
-            msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs|> ignore
-        )
-
-    [<Fact>]
-    let ``Generates new unique ID`` () =
-        let id = Guid.NewGuid() |> UMX.tag<sorterModelId>
-        let width = 4<sortingWidth>
-        let permRss = [| [| 1; 0; 3; 2 |] |] |> Array.map createPermRs
-        let modelRs = createModelRs id width permRss
-        let opsActionRates = opsActionRates.create (0.0, 0.0, 0.0) // NoActionRate = 1.0
-        let ratesArray = opsActionRatesArray.create [| opsActionRates |]
-        let modelRsMutate = msrsRandMutate.create rngFactory.LcgFactory ratesArray modelRs
-
-        let randoGen = createMockRando [ 0; 1 ] [ 0.9 ]
-        let result = modelRsMutate.MakeSorterModelFromIndex 0
-        Assert.NotEqual(%id, %result.Id)
-        Assert.NotEqual(Guid.Empty, %result.Id)
+    [<Theory>]
+    [<InlineData(1)>]
+    [<InlineData(3)>]
+    member _.``Uniform mutator accepts parents with different stage counts`` count =
+        let mutator = msrsRandMutate.create rngFactory.LcgFactory (opsActionRates.create 0.0 0.0 0.0) mutatorVariant.V1
+        let parent = msrs.create (UMX.tag Guid.Empty) 4<sortingWidth> (Array.create count (permRs.create [|1; 0; 3; 2|]))
+        let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
+        Assert.Equal<permRs[]>(parent.Perm_Rss, result.Perm_Rss)

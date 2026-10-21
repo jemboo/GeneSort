@@ -3,8 +3,8 @@
 open System
 open Xunit
 open FSharp.UMX
-open GeneSort.Sorter
-open GeneSort.Sorter.Sorter
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 
 
 type SorterTests() =

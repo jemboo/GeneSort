@@ -29,6 +29,10 @@ type parameterSet<'kind> =
     // Getters
     // ============================================================
 
+    member this.GetAdjustCeLengthFrequency() : int<adjustCeLengthFrequency> option =
+        ParamKeys.tryGetInt ParamKeys.adjustCeLengthFrequencyKey this.paramMap
+        |> Option.map UMX.tag<adjustCeLengthFrequency>
+
     member this.GetCeLength() =
         ParamKeys.tryGetInt ParamKeys.ceLengthKey this.paramMap
         |> Option.map UMX.tag<ceLength>
@@ -44,19 +48,6 @@ type parameterSet<'kind> =
     member this.GetDatabaseName() =
         this.paramMap.TryFind ParamKeys.databaseNameKey
         |> Option.map UMX.tag<databaseName>
-
-    member this.GetSourceProjectName() =
-        this.paramMap.TryFind ParamKeys.sourceProjectNameKey |> Option.map UMX.tag<projectName>
-
-    member this.GetSourceDbName() =
-        this.paramMap.TryFind ParamKeys.sourceDbNameKey |> Option.map UMX.tag<databaseName>
-
-    member this.GetSourceRunName() =
-        this.paramMap.TryFind ParamKeys.sourceRunNameKey |> Option.map UMX.tag<runName>
-
-    /// Zero-based index in the source run's generation save interval configuration.
-    member this.GetSourceGenerationInterval() =
-        ParamKeys.tryGetInt ParamKeys.sourceGenerationIntervalKey this.paramMap
 
     member this.GetDeletionRate() =
         ParamKeys.tryGetFloat ParamKeys.deletionRateKey this.paramMap
@@ -88,6 +79,14 @@ type parameterSet<'kind> =
     member this.GetGenerationIntervalLast() =
         ParamKeys.tryGetInt ParamKeys.generationIntervalLastKey this.paramMap
         |> Option.map UMX.tag<generationIntervalLast>
+
+    member this.GetGenerationsPerMergedSet() : int<generationsPerSubset> option =
+        ParamKeys.tryGetInt ParamKeys.generationsPerMergedSetKey this.paramMap
+        |> Option.map UMX.tag<generationsPerSubset>
+
+    member this.GetGenerationsPerSubset() : int<generationsPerSubset> option =
+        ParamKeys.tryGetInt ParamKeys.generationsPerSubsetKey this.paramMap
+        |> Option.map UMX.tag<generationsPerSubset>
 
     member this.GetId() =
         ParamKeys.tryGetGuid ParamKeys.idKey this.paramMap
@@ -130,6 +129,13 @@ type parameterSet<'kind> =
         ParamKeys.tryGetFloat ParamKeys.mutationRateKey this.paramMap
         |> Option.map UMX.tag<mutationRate>
 
+    member this.GetMutatorParams() =
+        this.paramMap.TryFind ParamKeys.mutatorParamsKey
+        |> Option.bind (fun v ->
+            match MutatorParams.fromString v with
+            | Ok p -> Some p
+            | Error _ -> None)
+
     member this.GetMutatorVariant() =
         this.paramMap.TryFind ParamKeys.mutatorVariantKey
         |> Option.map MutatorVariant.fromString
@@ -145,18 +151,6 @@ type parameterSet<'kind> =
     member this.GetPartitionCount() : int<GeneSort.Sorting.partitionCount> option =
         ParamKeys.tryGetInt ParamKeys.partitionCountKey this.paramMap
         |> Option.map UMX.tag<GeneSort.Sorting.partitionCount>
-
-    member this.GetGenerationsPerSubset() : int<generationsPerSubset> option =
-        ParamKeys.tryGetInt ParamKeys.generationsPerSubsetKey this.paramMap
-        |> Option.map UMX.tag<generationsPerSubset>
-
-    member this.GetGenerationsPerMergedSet() : int<generationsPerSubset> option =
-        ParamKeys.tryGetInt ParamKeys.generationsPerMergedSetKey this.paramMap
-        |> Option.map UMX.tag<generationsPerSubset>
-
-    member this.GetAdjustCeLengthFrequency() : int<adjustCeLengthFrequency> option =
-        ParamKeys.tryGetInt ParamKeys.adjustCeLengthFrequencyKey this.paramMap
-        |> Option.map UMX.tag<adjustCeLengthFrequency>
 
     member this.GetPrefixLibId() =
         this.paramMap.TryFind ParamKeys.prefixLibIdKey
@@ -197,28 +191,65 @@ type parameterSet<'kind> =
         ParamKeys.tryGetFloat ParamKeys.seedModificationRateKey this.paramMap
         |> Option.map UMX.tag<seedModificationRate>
 
-    member this.GetSeedSoss() : uint64<randomSeed> option =
-        ParamKeys.tryGetUInt64 ParamKeys.seedSossKey this.paramMap
-        |> Option.map UMX.tag<randomSeed>
-
     member this.GetSeedSorterPoolSelectionType() =
         this.paramMap.TryFind ParamKeys.seedSorterPoolSelectionTypeKey
         |> Option.map SorterSelectionType.fromString
+
+    member this.GetSeedSoss() : uint64<randomSeed> option =
+        ParamKeys.tryGetUInt64 ParamKeys.seedSossKey this.paramMap
+        |> Option.map UMX.tag<randomSeed>
 
     member this.GetSelectedSorterCountPerPool() =
         ParamKeys.tryGetInt ParamKeys.selectedSorterCountPerPoolKey this.ParamMap
         |> Option.map UMX.tag<sorterCountPerPool>
 
+    member this.GetSelectedSorterPoolCount() : int<sorterPoolCount> option =
+        ParamKeys.tryGetInt ParamKeys.selectedSorterPoolCountKey this.paramMap
+        |> Option.map UMX.tag<sorterPoolCount>
+
     member this.GetSelfSymRate() =
         ParamKeys.tryGetFloat ParamKeys.selfSymRateKey this.paramMap
         |> Option.map UMX.tag<selfSymRate>
 
-    member this.GetMutatorParams() =
-        this.paramMap.TryFind ParamKeys.mutatorParamsKey
-        |> Option.bind (fun v ->
-            match MutatorParams.fromString v with
-            | Ok p -> Some p
-            | Error _ -> None)
+    member this.GetSetupParametersId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupParametersIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSortableTestsId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSortableTestsIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSortableTestsWithPrefixId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSortableTestsWithPrefixIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterModelSetId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterModelSetIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterPoolBinsSetSeriesId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolBinsSetSeriesIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterPoolSetHistoryId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetHistoryIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterPoolSetId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterPoolSetSummarySetId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetSummarySetIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterSetEvalId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterSetEvalIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
+
+    member this.GetSetupSorterSetId() : Guid<queryParamsId> option =
+        ParamKeys.tryGetGuid ParamKeys.setupSorterSetIdKey this.paramMap
+        |> Option.map UMX.tag<queryParamsId>
 
     member this.GetSimpleSorterModelType() =
         this.paramMap.TryFind ParamKeys.simpleSorterModelTypeKey
@@ -310,6 +341,19 @@ type parameterSet<'kind> =
         ParamKeys.tryGetInt ParamKeys.sortingWidthKey this.paramMap
         |> Option.map UMX.tag<sortingWidth>
 
+    member this.GetSourceDbName() =
+        this.paramMap.TryFind ParamKeys.sourceDbNameKey |> Option.map UMX.tag<databaseName>
+
+    /// Zero-based index in the source run's generation save interval configuration.
+    member this.GetSourceGenerationInterval() =
+        ParamKeys.tryGetInt ParamKeys.sourceGenerationIntervalKey this.paramMap
+
+    member this.GetSourceProjectName() =
+        this.paramMap.TryFind ParamKeys.sourceProjectNameKey |> Option.map UMX.tag<projectName>
+
+    member this.GetSourceRunName() =
+        this.paramMap.TryFind ParamKeys.sourceRunNameKey |> Option.map UMX.tag<runName>
+
     member this.GetStageLength() =
         ParamKeys.tryGetInt ParamKeys.stageLengthKey this.paramMap
         |> Option.map UMX.tag<stageLength>
@@ -326,29 +370,20 @@ type parameterSet<'kind> =
     // With* members
     // ============================================================
 
-    member this.WithCodeModKey(dbn: string<codeModKey> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.codeModKey (dbn |> Option.map UmxExt.stringToRaw) }
+    member this.WithAdjustCeLengthFrequency(count: int<adjustCeLengthFrequency> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.adjustCeLengthFrequencyKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithCeLength(cl: int<ceLength> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.ceLengthKey (cl |> Option.map UmxExt.intToRaw) }
+
+    member this.WithCodeModKey(dbn: string<codeModKey> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.codeModKey (dbn |> Option.map UmxExt.stringToRaw) }
 
     member this.WithCollectNewSortableTests(cst: bool<collectNewSortableTests> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.collectSortableTestsKey (cst |> Option.map string) }
 
     member this.WithDatabaseName(dbn: string<databaseName> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.databaseNameKey (dbn |> Option.map UmxExt.stringToRaw) }
-
-    member this.WithSourceProjectName(value: string<projectName> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceProjectNameKey (value |> Option.map UmxExt.stringToRaw) }
-
-    member this.WithSourceDbName(value: string<databaseName> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceDbNameKey (value |> Option.map UmxExt.stringToRaw) }
-
-    member this.WithSourceRunName(value: string<runName> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceRunNameKey (value |> Option.map UmxExt.stringToRaw) }
-
-    member this.WithSourceGenerationInterval(value: int option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceGenerationIntervalKey (value |> Option.map string) }
 
     member this.WithDeletionRate(dr: float<deletionRate> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.deletionRateKey (dr |> Option.map UmxExt.floatToRaw) }
@@ -373,6 +408,12 @@ type parameterSet<'kind> =
 
     member this.WithGenerationIntervalLast(last: int<generationIntervalLast> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.generationIntervalLastKey (last |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationsPerMergedSet(count: int<generationsPerSubset> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.generationsPerMergedSetKey (count |> Option.map UmxExt.intToRaw) }
+
+    member this.WithGenerationsPerSubset(count: int<generationsPerSubset> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.generationsPerSubsetKey (count |> Option.map UmxExt.intToRaw) }
 
     member this.WithId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.idKey (id |> Option.map UmxExt.guidToRaw) }
@@ -422,15 +463,6 @@ type parameterSet<'kind> =
     member this.WithPartitionCount(count: int<partitionCount> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.partitionCountKey (count |> Option.map UmxExt.intToRaw) }
 
-    member this.WithGenerationsPerSubset(count: int<generationsPerSubset> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.generationsPerSubsetKey (count |> Option.map UmxExt.intToRaw) }
-
-    member this.WithGenerationsPerMergedSet(count: int<generationsPerSubset> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.generationsPerMergedSetKey (count |> Option.map UmxExt.intToRaw) }
-
-    member this.WithAdjustCeLengthFrequency(count: int<adjustCeLengthFrequency> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.adjustCeLengthFrequencyKey (count |> Option.map UmxExt.intToRaw) }
-
     member this.WithPrefixLibId(pfxLibId: prefixLibId option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.prefixLibIdKey (pfxLibId |> Option.map PrefixLibId.toString) }
 
@@ -461,17 +493,50 @@ type parameterSet<'kind> =
     member this.WithSeedModificationRate(mr: float<seedModificationRate> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.seedModificationRateKey (mr |> Option.map UmxExt.floatToRaw) }
 
-    member this.WithSeedSoss(seed: uint64<randomSeed> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.seedSossKey (seed |> Option.map UmxExt.uint64ToRaw) }
-
     member this.WithSeedSorterPoolSelectionType(ses: sorterSelectionType option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.seedSorterPoolSelectionTypeKey (ses |> Option.map SorterSelectionType.toString) }
+
+    member this.WithSeedSoss(seed: uint64<randomSeed> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.seedSossKey (seed |> Option.map UmxExt.uint64ToRaw) }
 
     member this.WithSelectedSorterCountPerPool(sc: int<sorterCountPerPool> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.selectedSorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
 
+    member this.WithSelectedSorterPoolCount(sc: int<sorterPoolCount> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.selectedSorterPoolCountKey (sc |> Option.map UmxExt.intToRaw) }
+
     member this.WithSelfSymRate(ssr: float<selfSymRate> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.selfSymRateKey (ssr |> Option.map UmxExt.floatToRaw) }
+
+    member this.WithSetupParametersId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupParametersIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSortableTestsId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSortableTestsIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSortableTestsWithPrefixId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSortableTestsWithPrefixIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterModelSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterModelSetIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterPoolBinsSetSeriesId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolBinsSetSeriesIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterPoolSetHistoryId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetHistoryIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterPoolSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterPoolSetSummarySetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetSummarySetIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterSetEvalId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterSetEvalIdKey (id |> Option.map UmxExt.guidToRaw) }
+
+    member this.WithSetupSorterSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterSetIdKey (id |> Option.map UmxExt.guidToRaw) }
 
     member this.WithSimpleSorterModelType(smt: simpleSorterModelType option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.simpleSorterModelTypeKey (smt |> Option.map SimpleSorterModelType.toString) }
@@ -536,6 +601,18 @@ type parameterSet<'kind> =
     member this.WithSortingWidth(w: int<sortingWidth> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
 
+    member this.WithSourceDbName(value: string<databaseName> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceDbNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceGenerationInterval(value: int option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceGenerationIntervalKey (value |> Option.map string) }
+
+    member this.WithSourceProjectName(value: string<projectName> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceProjectNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceRunName(value: string<runName> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceRunNameKey (value |> Option.map UmxExt.stringToRaw) }
+
     member this.WithStageLength(sl: int<stageLength> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }
 
@@ -544,75 +621,3 @@ type parameterSet<'kind> =
 
     member this.WithTextReportName(trn: string<textReportName> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.textReportNameKey (trn |> Option.map UmxExt.stringToRaw) }
-
-    // Setup output file ID accessors.
-    member this.GetSetupParametersId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupParametersIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupParametersId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupParametersIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSortableTestsId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSortableTestsIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSortableTestsId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSortableTestsIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSortableTestsWithPrefixId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSortableTestsWithPrefixIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSortableTestsWithPrefixId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSortableTestsWithPrefixIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterPoolSetId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterPoolSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterPoolSetSummarySetId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetSummarySetIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterPoolSetSummarySetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetSummarySetIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterSetId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterSetIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterSetIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterModelSetId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterModelSetIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterModelSetId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterModelSetIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterSetEvalId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterSetEvalIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterSetEvalId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterSetEvalIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterPoolBinsSetSeriesId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolBinsSetSeriesIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterPoolBinsSetSeriesId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolBinsSetSeriesIdKey (id |> Option.map UmxExt.guidToRaw) }
-
-    member this.GetSetupSorterPoolSetHistoryId() : Guid<queryParamsId> option =
-        ParamKeys.tryGetGuid ParamKeys.setupSorterPoolSetHistoryIdKey this.paramMap
-        |> Option.map UMX.tag<queryParamsId>
-
-    member this.WithSetupSorterPoolSetHistoryId(id: Guid<queryParamsId> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.setupSorterPoolSetHistoryIdKey (id |> Option.map UmxExt.guidToRaw) }
-

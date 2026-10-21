@@ -24,17 +24,17 @@ let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
-let Pool_128_Test ()  : run =
+let Pool_32_Test ()  : run =
     let parameterSpans =
         [
             (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
-            (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
+            (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
             (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
             (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
-            (ParamKeys.generationIntervalLastKey, [1] |> List.map string)
+            (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
             (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
             (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
-            (ParamKeys.mutationModKey, [0;] |> List.map string)
+            (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
             (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
             (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
             (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))

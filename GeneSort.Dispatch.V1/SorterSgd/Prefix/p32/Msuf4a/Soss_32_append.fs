@@ -11,7 +11,6 @@ let Pool_4_Debug () : run =
     let sourceParameterSpans =
         [
             ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string
         ]
     let executionParameterSpans =
         [
@@ -56,10 +55,9 @@ let Pool_4_Debug_Append () : run =
         Source = {
             Run = Pool_4_Debug ()
             GenerationInterval = 2
-            // Select modifier zero at size 64 from each original source lineage.
+            // Select modifier zero at every size from each original source lineage.
             ParameterSpans = [
                 ParamKeys.mutationModKey, ["0"]
-                ParamKeys.sorterCountPerPoolSetKey, ["64"]
             ]
         }
         ExecutionParameterSpans = [
