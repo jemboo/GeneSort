@@ -220,6 +220,17 @@ module RunParamEnhancerBuilders =
                 true
                 None
 
+        /// Combine the seed setup with the independently varied evolution settings.
+        let sossMsuf32 : runParamEnhancerBuilder =
+            fun context parameters ->
+                let combined =
+                    match context.SetupParameters with
+                    | None -> parameters
+                    | Some setup ->
+                        Map.fold (fun map key value -> Map.add key value map) setup.ParamMap parameters.ParamMap
+                        |> runParameters.create
+                msuf32MutationRate context combined
+
         let msrs32MutationRate =
             fromGlobalSorterCount
                 (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
@@ -286,6 +297,8 @@ module RunParamBuilderNames =
         [<Literal>]
         let msuf32MutationRate = "sgd-msuf32-mutation-rate"
         [<Literal>]
+        let sossMsuf32 = "sgd-soss-msuf32"
+        [<Literal>]
         let msrs32MutationRate = "sgd-msrs32-mutation-rate"
         [<Literal>]
         let msrs32MutationRateMax = "sgd-msrs32-mutation-rate-max"
@@ -314,6 +327,7 @@ module RunParamBuilders =
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterMutateStandard RunParamEnhancerBuilders.sorterMutateStandard |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sorterMutateStandardFormat RunParamEnhancerBuilders.sorterMutateStandardFormat |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msuf32MutationRate RunParamEnhancerBuilders.Sgd.msuf32MutationRate |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sossMsuf32 RunParamEnhancerBuilders.Sgd.sossMsuf32 |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRate RunParamEnhancerBuilders.Sgd.msrs32MutationRate |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRateMax RunParamEnhancerBuilders.Sgd.msrs32MutationRateMax |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msuf624p3bMutationRate RunParamEnhancerBuilders.Sgd.msuf624p3bMutationRate |> ignore

@@ -72,29 +72,52 @@ index, respectively. They are not generation numbers. The destination uses proje
 combinations, replica selection, and generation interval configuration.
 
 Append parameters include `SourceProjectName`, `SourceDbName`, `SourceRunName`, and
-`SourceGenerationInterval`. Setup reads the saved source run to resolve its query
-catalog and save interval configuration, then loads the matching Soss pool from
+`SourceGenerationInterval`. Setup reads the saved source run and its persisted
+execution parameters to resolve its query catalog and save interval configuration,
+then loads the matching Soss pool from
 Results for each parameter combination and replica. It also copies that source's
 Setup tests and prefix. Missing or invalid source inputs fail setup; no new seed is
 generated. Source files are only read. Source and destination roots both use
 `GENESORT_PROJECTS_ROOT` during local setup.
 
-The imported pool is stored in destination Setup at its original generation.
+Each imported Setup file is identified by `hash(destinationProjectName, sourceFileId)`.
+The source ID is the actual checkpoint or tests file being imported, including when
+it belongs to another append. Setup copies the pool unchanged and reuses the copy
+across execution branches. The imported generation remains in the pool contents.
 Earlier Soss checkpoints labeled generation N could contain a pool at N+1 because
 the loop saved after advancing. Append setup recognizes that specific offset,
 logs it, and preserves N+1. Other generation mismatches are rejected with the
 expected and actual values. Newly generated Soss checkpoints use matching file
 and pool generations and stop exactly at the configured final generation.
 `GenerationFirst` and `GenerationCurrent` are saved in the destination Project
-parameters with that generation. Test inputs remain at Setup generation zero.
+parameters with that generation. Imported Setup queries retain the replica folder
+(`0`, `1`, etc.), but replica and generation are not separately hashed into their IDs:
+those distinctions are already captured by the source file ID. Earlier imported
+files in `None` folders remain readable.
 Execution first resumes any destination Results checkpoint; otherwise it loads the
 imported Setup pool. Results and reports start after the imported generation.
 
-Use the same source parameter combinations for this initial implementation. The
-new source fields are included in destination query identities, so different source
-projects, runs, databases, and interval indices do not share output identities.
-Changing mutation or partition parameters independently of the source requires a
-separate source-parameter mapping, which is not part of this append spec.
+The saved destination parameters record `SourcePoolFileId`, `SourceTestsFileId`, and
+their destination Setup file references. Results use those references plus execution
+settings; source ancestry is not reconstructed or included as additional parameters.
+
+`Soss_32_append2.fromSource source sourceInterval lastInterval sourceMutationMod mutationMods`
+selects one source modifier and creates execution branches for `mutationMods`.
+The `Pool_4_Debug` and `Pool_32_Gens15` presets use `fromAllMutationMods`, which
+crosses every configured source mutation modifier with every execution modifier.
+Three source modifiers and sixteen execution modifiers therefore create 48 runs
+per replica, sharing one pool/tests copy per source. `fromSourceModifiers` accepts
+an explicit list of source modifiers when only a subset is wanted.
+It stores the source selection in the generic `SourceParameterOverrides` field
+(a JSON array of key/value pairs). Other changed settings can use the same field;
+there is no need for source-of-source parameter keys. Source matching must identify
+exactly one persisted execution for each replica, or setup fails before copying.
+
+Execution applies a changed mutation modifier to the imported pool in memory,
+giving changed pools/members new identities and resetting their mutation indices.
+This happens only when starting from Setup. Resuming Results preserves the saved
+pool and indices. Existing append files remain readable through their legacy query
+path; rerun setup for newly configured appends to obtain the shared Setup references.
 
 Transfer the destination Project and Setup folders after successful setup; cloud
 execution does not need the source project. As with other workflows, retain Project

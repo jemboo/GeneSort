@@ -39,7 +39,7 @@ module Pipeline_Soss =
             partitionEvals
             |> Map.fold (fun updated _ evaluations ->
                 SorterPoolSet_Soss.updateSorterEvals evaluations updated) poolSet
-        if evaluateAll && sortableTestPartitions.Count > 1 then
+        if evaluateAll && (sortableTestPartitions.Count > 1 || subsetIdForSelection = CommonSgdSoss.mergedSubsetId) then
             evaluatedPoolSet
             |> SorterPoolSet_Soss.updateSorterEvals (CommonSgdSoss.mergePartitionEvals partitionEvals)
         else
@@ -56,7 +56,6 @@ module Pipeline_Soss =
             (sortableTestPartitions: partitionOfSortableTests)
             (generationsPerSubset: int<generationsPerSubset>)
             (generationsPerMergedSet: int<generationsPerSubset>)
-            (adjustCeLengthFrequency: int<adjustCeLengthFrequency>)
             (prefix: ceBlock)
             (sorterEvalType: sorterEvalType)
             (selectionMeasure: sorterEvalMeasure)
@@ -76,18 +75,12 @@ module Pipeline_Soss =
             |> Seq.toArray
             |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset generationsPerMergedSet currentPoolSet.GenerationNumber
 
-        let adjustCeLengthsThisGeneration =
-            CommonSgdSoss.shouldAdjustCeLengths adjustCeLengthFrequency currentPoolSet.GenerationNumber
-
         // Members retain the selection subset used by the preceding generation step.
         let selectionSubsetChanged =
             currentPoolSet.SorterPools
             |> Map.values
             |> Seq.collect (fun pool -> pool.SorterPoolMembers)
             |> Seq.exists (fun memberValue -> memberValue.SubsetIdForSelection <> subsetIdForSelection)
-
-        // Refresh parent evaluations before adjusting CE lengths, even within the same subset.
-        let reEvaluateParents = selectionSubsetChanged || adjustCeLengthsThisGeneration
 
         let poolSetForSelection =
             currentPoolSet
@@ -98,7 +91,7 @@ module Pipeline_Soss =
            && not (Map.containsKey selectionPartitionId sortableTestPartitions.SortableTests) then
             invalidArg "subsetIdForSelection" (sprintf "Unknown selection subset '%s'." %subsetIdForSelection)
 
-        let evaluateForSelection reEvaluate poolSet =
+        let evaluateForSelection reEvaluate poolSet : sorterPoolSet_Soss =
             evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType reEvaluate
                 collectNewSortableTests subsetIdForSelection false poolSet
 
@@ -127,15 +120,24 @@ module Pipeline_Soss =
 
         // --- Step 1b: Evaluate Pool Set ---
 
-        let evaluatedPoolSet = evaluateForSelection reEvaluateParents mutatedPoolSet
+        // Transitions need fresh evaluations of every partition for merged length adjustment.
+        let evaluatedPoolSet =
+            if selectionSubsetChanged then
+                mutatedPoolSet
+                |> SorterPoolSet_Soss.withSubsetIdForSelection CommonSgdSoss.mergedSubsetId
+                |> evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType true
+                    collectNewSortableTests CommonSgdSoss.mergedSubsetId false
+            else
+                evaluateForSelection false mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed
 
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet =
-            if adjustCeLengthsThisGeneration then
+            if selectionSubsetChanged then
                 SorterPoolSet_Soss.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
+                |> SorterPoolSet_Soss.withSubsetIdForSelection subsetIdForSelection
             else
                 evaluatedPoolSet
 

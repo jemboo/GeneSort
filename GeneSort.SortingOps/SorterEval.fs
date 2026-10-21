@@ -640,7 +640,7 @@ module SorterEval =
                 sorterId
                 SortableTestsSubsetId.Default
                 sortingWidth
-                0<sortableCount>
+                (firstV2.UnsortedCount + secondV2.UnsortedCount)
                 sequenceHash
                 stageLength
                 ceUseArray
@@ -653,7 +653,7 @@ module SorterEval =
                 sorterId
                 SortableTestsSubsetId.Default
                 sortingWidth
-                0<sortableCount>
+                (firstV3.UnsortedCount + secondV3.UnsortedCount)
                 sequenceHash
                 stageLength
                 ceUseArray
@@ -667,7 +667,7 @@ module SorterEval =
                 sorterId
                 SortableTestsSubsetId.Default
                 sortingWidth
-                0<sortableCount>
+                (firstV2.UnsortedCount + secondV3.UnsortedCount)
                 sequenceHash
                 stageLength
                 ceUseArray
@@ -680,7 +680,7 @@ module SorterEval =
                 sorterId
                 SortableTestsSubsetId.Default
                 sortingWidth
-                0<sortableCount>
+                (firstV3.UnsortedCount + secondV2.UnsortedCount)
                 sequenceHash
                 stageLength
                 ceUseArray

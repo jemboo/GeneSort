@@ -1,4 +1,4 @@
-module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.VarModR_32
+module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard
 
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
@@ -24,7 +24,7 @@ let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 let dbPool32TestName = "Pool_32_Test" |> UMX.tag<databaseName>
 let dbPool512name = "Pool_512" |> UMX.tag<databaseName>
 
-let Pool_32_Test ()  : run =
+let Pool_128_Test ()  : run =
     let parameterSpans =
         [
             (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
@@ -45,17 +45,17 @@ let Pool_32_Test ()  : run =
             RunName = (sprintf @"Pool_32_Test%s" "GenStandard" |> UMX.tag)
             Description = "Rate comp for 32p4a Msuf4"
             AllowOverwrite = false
-            Execution = {
-                FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-            }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+            }
+            Execution = {
+                FunctionName = ExecuteFunctionNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
         } {
             MakerNames = EvolutionMakerNames.prefix
@@ -64,13 +64,13 @@ let Pool_32_Test ()  : run =
         }
     )
 
-let Pool_32_V1 ()  : run =
+let Pool_512_V1 ()  : run =
     let parameterSpans =
         [
+            (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
             (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
             (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
             (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
-            (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
             (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
             (ParamKeys.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
             (ParamKeys.mutationModKey, [0] |> List.map string)
@@ -85,17 +85,17 @@ let Pool_32_V1 ()  : run =
             RunName = (sprintf @"Pool_32_V1%s" "GenStandard" |> UMX.tag)
             Description = "Rate comp for 32p4a Msuf4"
             AllowOverwrite = false
-            Execution = {
-                FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-            }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+            }
+            Execution = {
+                FunctionName = ExecuteFunctionNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
         } {
             MakerNames = EvolutionMakerNames.prefix
@@ -125,17 +125,17 @@ let Pool_512_V2a ()  : run =
             RunName = (sprintf @"Pool_512_V2a%s" "GenStandard" |> UMX.tag)
             Description = "Rate comp for 32p4a Msuf4"
             AllowOverwrite = false
-            Execution = {
-                FunctionName = ExecuteFunctionNames.standard
-                ParameterSpans = parameterSpans
-                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
-            }
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 ParameterSpans = parameterSpans
                 QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+            }
+            Execution = {
+                FunctionName = ExecuteFunctionNames.standard
+                ParameterSpans = parameterSpans
+                QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
             }
         } {
             MakerNames = EvolutionMakerNames.prefix

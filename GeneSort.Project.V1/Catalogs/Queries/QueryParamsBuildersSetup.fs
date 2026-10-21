@@ -491,6 +491,9 @@ module QueryParamsBuildersSetup =
                     QueryCatalogNamesSetup.sorterSgdMssiOrthoPara, SorterSgd.MssiOrthoPara.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsufStandard, SorterSgd.Msuf.Standard.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsufSoss, SorterSgd.Msuf.Soss.queryParamsFromSetupParams
+                    QueryCatalogNamesSetup.sossMsuf32Seed, (fun project database parameters outputType ->
+                        Some (queryParams.create database project (parameters.GetRepl()) (parameters.GetGenerationCurrent())
+                            outputType (Map.toArray parameters.ParamMap)))
                     QueryCatalogNamesSetup.sorterSgdMsufSossAppend, SorterSgd.SossAppend.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate, SorterSgd.Msrs32MutationRate.queryParamsFromSetupParams
                     QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp, SorterSgd.MsrsPoolModComp.queryParamsFromSetupParams

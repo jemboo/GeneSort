@@ -88,6 +88,11 @@ type queryParams =
 
 
 
+    /// Imported setup files are identified only by destination project and source file.
+    static member createForImportedFile dbName projectName repl outputType (sourceFileId: Guid<queryParamsId>) =
+        let query = queryParams.create dbName projectName repl None outputType [| "SourceFileId", string %sourceFileId |]
+        { query with id = GuidUtils.guidFromObjs [box %projectName; box %sourceFileId] |> UMX.tag<queryParamsId> }
+
     static member createFromMap
             (dbName:         string<databaseName>)
             (projName:       string<projectName>)
@@ -123,6 +128,19 @@ type queryParams =
 
 
 module QueryParams = 
+
+    /// Resolve imported Setup independently of the current execution settings and generation.
+    let forSetup (parameters: runParameters) (query: queryParams) =
+        let sourceKey =
+            match query.OutputDataType with
+            | geneSortDataType.SorterPoolSet _ -> Some ParamKeys.sourcePoolFileIdKey
+            | geneSortDataType.SortableTestsWithPrefix _ -> Some ParamKeys.sourceTestsFileIdKey
+            | _ -> None
+        match sourceKey |> Option.bind (fun key -> Map.tryFind key parameters.ParamMap) with
+        | None -> query
+        | Some value ->
+            queryParams.createForImportedFile query.DbName query.ProjectName (parameters.GetRepl()) query.OutputDataType
+                (System.Guid.Parse value |> UMX.tag)
 
     // Creates a dataTableRecord from the Properties only, treating each of them as keys.
     let makeDataTableRecord (qp: queryParams) : GeneSort.Core.dataTableRecord =

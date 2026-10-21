@@ -3,6 +3,13 @@ namespace GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Queries
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.SortingOps
+open GeneSort.SortingLib.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.Eval.V1
 
 type setupEnhancerContext = {
     Run: run
@@ -24,6 +31,8 @@ module SetupEnhancerFunctionNames =
     let sorterMutate = "setup-enhancer.sorter-mutate"
     [<Literal>]
     let sorterSgd = "setup-enhancer.sorter-sgd"
+    [<Literal>]
+    let sossMsuf32 = "setup-enhancer.soss-msuf32"
 
 /// Setup enhancers supply file references for the associated run parameters.
 module SetupEnhancerCatalog =
@@ -50,6 +59,27 @@ module SetupEnhancerCatalog =
     let sorterSgd : setupEnhancerFunction =
         withFileReferences [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
 
+    /// Seed-pool settings need no execution-only mutation or partition settings.
+    let sossMsuf32 : setupEnhancerFunction = fun _ parameters ->
+        let perPool = parameters.GetSorterCountPerPool()
+                      |> Option.defaultWith (fun () -> invalidOp "Soss setup requires SorterCountPerPool.")
+        let total = parameters.GetSorterCountPerPoolSet()
+                    |> Option.defaultWith (fun () -> invalidOp "Soss setup requires SorterCountPerPoolSet.")
+        if int perPool <= 0 || int total <= 0 || int total % int perPool <> 0 then
+            invalidArg "parameters" "The total sorter count must be positive and divisible by the positive per-pool count."
+        let prefix = prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA
+        parameters.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
+                  .WithGenerationCurrent(Some 0<generationNumber>)
+                  .WithRngType(Some rngType.Lcg)
+                  .WithPrefixLibId(Some prefix)
+                  .WithSortingWidth(Some prefix.SortingWidth)
+                  .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4)
+                  .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
+                  .WithExcludeSelfCe(Some (UMX.tag true))
+                  .WithSeedSorterPoolSelectionType(Some (sorterSelectionType.GuidOrder 512<sorterCount>))
+                  .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
+                  .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
+
     let private syncRoot = obj ()
     let mutable private functions =
         Map.ofList [
@@ -59,6 +89,7 @@ module SetupEnhancerCatalog =
             SetupEnhancerFunctionNames.sorterEvalPrefix, sorterEvalPrefix
             SetupEnhancerFunctionNames.sorterMutate, sorterMutate
             SetupEnhancerFunctionNames.sorterSgd, sorterSgd
+            SetupEnhancerFunctionNames.sossMsuf32, sossMsuf32
         ]
 
     let register name (enhancer: setupEnhancerFunction) =

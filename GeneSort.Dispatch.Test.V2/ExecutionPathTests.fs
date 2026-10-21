@@ -150,8 +150,8 @@ let ``built-in hosts resolve setup for every execution family`` () =
         GeneSort.Dispatch.V1.SortableTests.SortableTestsSpecsPrefix.Specs.Prefix_32 ()
         GeneSort.Dispatch.V1.SorterEval.SorterEvalSpecsRs.Specs.Rand_Test ()
         GeneSort.Dispatch.V1.SorterMutate.MutateSpecsRp.Specs.Test_Mssi ()
-        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.VarModR_32.Pool_32_Test ()
-        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_32.Pool_4_Debug ()
+        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_128_Test ()
+        GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss.Pool_32_Debug ()
     ]
     for run in runs do
         let host = runHost.Create run 1

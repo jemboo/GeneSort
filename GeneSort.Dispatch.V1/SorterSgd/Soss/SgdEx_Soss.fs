@@ -23,6 +23,22 @@ open GeneSort.Project.V1.Parameters
 
 module SgdEx_Soss =
 
+    /// Branch an imported seed in memory. Call only when starting from Setup, never on resume.
+    let prepareImportedPool (rp: runParameters) (pool: sorterPoolSet_Soss) =
+        if not (Map.containsKey ParamKeys.sourcePoolFileIdKey rp.ParamMap) then Ok pool
+        else
+            rp.GetMutationMod() |> Result.ofOption "Missing MutationMod."
+            |> Result.map (fun modifier ->
+                if pool.SorterPools |> Map.forall (fun _ item -> item.MutationMod = modifier) then pool
+                else
+                    let pools =
+                        pool.SorterPools |> Map.values
+                        |> Seq.map (fun item ->
+                            if item.MutationMod = modifier then item
+                            else SorterPool_Soss.deriveChildPool (UMX.tag (Guid.NewGuid())) modifier item)
+                        |> Seq.toArray
+                    sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) pool.GenerationNumber pool.LatticeBounds (Some pools))
+
     /// Creates, evaluates, and saves the initial pool as Setup when no saved pool exists
     let initializeAndSaveSeedPoolSet 
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
@@ -171,6 +187,7 @@ module SgdEx_Soss =
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! setupData = Utils.loadSetupOutputData genDb initRp (geneSortDataType.SorterPoolSet "")
                             let! seedSet = OutputData.asSorterPoolSetSoss setupData
+                            let! seedSet = prepareImportedPool rp seedSet
                             log "Loaded initial Setup sorterPoolSet. Beginning evolution."
                             return seedSet, initRp.WithGenerationCurrent(Some seedSet.GenerationNumber)
                         }

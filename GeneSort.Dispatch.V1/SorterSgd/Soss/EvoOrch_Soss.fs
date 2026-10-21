@@ -50,8 +50,6 @@ module EvoOrch_Soss =
             do! if %generationsPerSubset > 0 then Ok () else Error "GenerationsPerSubset must be greater than zero."
             let! generationsPerMergedSet = rp.GetGenerationsPerMergedSet() |> Result.ofOption "Missing GenerationsPerMergedSet."
             do! if %generationsPerMergedSet > 0 then Ok () else Error "GenerationsPerMergedSet must be greater than zero."
-            let! adjustCeLengthFrequency = rp.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
-            do! if %adjustCeLengthFrequency > 0 then Ok () else Error "AdjustCeLengthFrequency must be greater than zero."
             let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
             let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
@@ -193,7 +191,6 @@ module EvoOrch_Soss =
                                     sortableTestPartitions
                                     generationsPerSubset
                                     generationsPerMergedSet
-                                    adjustCeLengthFrequency
                                     prefix
                                     evalType
                                     srtrEvalMeasure

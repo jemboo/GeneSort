@@ -224,7 +224,7 @@ module QueryParamsBuildersRun =
                     }
 
         module SossAppend =
-            let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+            let private legacyQuery projectName dbName (rp: runParameters) odt =
                 maybe {
                     let! query = Msuf.Soss.queryParamsFromRunParams projectName dbName rp odt
                     let! sourceProject = rp.GetSourceProjectName()
@@ -237,8 +237,28 @@ module QueryParamsBuildersRun =
                         |> Map.add ParamKeys.sourceDbNameKey %sourceDb
                         |> Map.add ParamKeys.sourceRunNameKey %sourceRun
                         |> Map.add ParamKeys.sourceGenerationIntervalKey (string sourceInterval)
+                        |> fun properties ->
+                            match Map.tryFind ParamKeys.sourceMutationModKey rp.ParamMap with
+                            | Some value -> Map.add ParamKeys.sourceMutationModKey value properties
+                            | None -> properties
                     return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                 }
+
+            let queryParamsFromRunParams projectName dbName (rp: runParameters) odt =
+                match odt with
+                | geneSortDataType.Run _
+                | geneSortDataType.RunParameters _ ->
+                    legacyQuery projectName dbName rp odt
+                    |> Option.map (fun query ->
+                        match Map.tryFind ParamKeys.sourceParameterOverridesKey rp.ParamMap with
+                        | None -> query
+                        | Some value ->
+                            queryParams.createFromMap query.DbName query.ProjectName query.Repl query.Generation odt
+                                (Map.add ParamKeys.sourceParameterOverridesKey value query.Properties))
+                | _ when Map.containsKey ParamKeys.sourcePoolFileIdKey rp.ParamMap ->
+                    // Setup links are attached by the catalog; ancestry is not part of result identity.
+                    Msuf.Soss.queryParamsFromRunParams projectName dbName rp odt
+                | _ -> legacyQuery projectName dbName rp odt
 
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =

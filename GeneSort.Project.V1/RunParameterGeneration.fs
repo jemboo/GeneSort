@@ -23,7 +23,8 @@ module RunParameterGeneration =
                let setups = SimpleRun.makeSetupParameters repl next (Seq.map (enhanceSetup setupContext)) configured.BaseRun
                for setup in setups do
                    let references =
-                       if configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix then []
+                       if configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+                          || configured.RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32 then []
                        else SetupOutputs.referencesFor configured setup
                    let context = runParamEnhancerContext.createForSetup runQuery configured setup
                    for parameters in runs do

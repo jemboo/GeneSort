@@ -17,6 +17,8 @@ module QueryCatalogNamesSetup =
     [<Literal>]
     let sorterSgdMsufSoss = "sorter-sgd.msuf-soss"
     [<Literal>]
+    let sossMsuf32Seed = "sorter-sgd.soss-msuf32-seed"
+    [<Literal>]
     let sorterSgdMsufSossAppend = "sorter-sgd.msuf-soss-append"
     [<Literal>]
     let sorterSgdMsrs32MutationRate = "sorter-sgd.msrs32-mutation-rate"

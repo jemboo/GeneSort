@@ -73,6 +73,8 @@ module QueryParamsCatalogRun =
             |> Option.map (fun query ->
                 let references =
                     match name, outputType with
+                    | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.Run _
+                    | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.RunParameters _ -> []
                     | QueryCatalogNamesRun.sorterEvalPrefix, _ -> []
                     | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _
                     | QueryCatalogNamesRun.sortableTestPrefix, geneSortDataType.SortableTests _ -> []

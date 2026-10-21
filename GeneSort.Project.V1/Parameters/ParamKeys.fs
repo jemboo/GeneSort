@@ -62,6 +62,14 @@ module ParamKeys =
     [<Literal>]
     let sourceGenerationIntervalKey = "SourceGenerationInterval"
     [<Literal>]
+    let sourceMutationModKey = "SourceMutationMod"
+    [<Literal>]
+    let sourceParameterOverridesKey = "SourceParameterOverrides"
+    [<Literal>]
+    let sourcePoolFileIdKey = "SourcePoolFileId"
+    [<Literal>]
+    let sourceTestsFileIdKey = "SourceTestsFileId"
+    [<Literal>]
     let deletionRateKey = "DeletionRate"
     [<Literal>]
     let distinctSorterHashesKey = "DistinctSorterHashes"
