@@ -36,13 +36,13 @@ let Pool_128_Test_append () : run =
 
     let sourceParameterSpans =
         [
-            ParamKeys.mutationModKey, [0] |> List.map string
+            ParamKeys.mutationModKey, [0 .. 2] |> List.map string
         ]
     let executionParameterSpans =
         [
-            ParamKeys.mutationModKey, [0 .. 7] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128;] |> List.map string
-            ParamKeys.generationIntervalLastKey, [5] |> List.map string
+            ParamKeys.mutationModKey, [0; 1] |> List.map string
+            ParamKeys.sorterCountPerPoolSetKey, [256;] |> List.map string
+            ParamKeys.generationIntervalLastKey, [3] |> List.map string
         ]
     EvoAppend.create {
         ProjectName = projName
@@ -50,7 +50,7 @@ let Pool_128_Test_append () : run =
         RunName = "Standard_append_Pool_128_Test-Append" |> UMX.tag<runName>
         Source = {
             Run = Pool_128_Test ()
-            GenerationInterval = 3
+            GenerationInterval = 1
             ParameterSpans = sourceParameterSpans
         }
         ExecutionParameterSpans = executionParameterSpans
