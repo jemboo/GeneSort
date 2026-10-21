@@ -428,12 +428,13 @@ let ``Append source branching shares setup in replica folders`` soss =
         Assert.Equal(expectedCount, pending |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
         for rp in pending do
             Assert.Contains(rp.ParamMap.[ParamKeys.sourceExecutionIdKey], sourceParameters |> Array.map (fun source -> string %(source.GetId().Value)))
-            Assert.Equal(int (rp.GetSorterCountPerPoolSet().Value) / perPool, int (rp.GetSorterPoolCount().Value))
+            Assert.Equal(sourcePoolCount, int (rp.GetSorterPoolCount().Value))
+            Assert.Equal(int (rp.GetSorterCountPerPoolSet().Value) / sourcePoolCount, int (rp.GetSorterCountPerPool().Value))
         for rp in pending do
             persist db geneSortDataMode.Project
                 (host.QueryParamsFromRunParams rp (geneSortDataType.RunParameters %configured.RunName) |> Option.get) (outputData.RunParameters rp)
         use cts = new CancellationTokenSource()
-        let invalid = pending.[0].WithSorterCountPerPool(Some 8<sorterCountPerPool>)
+        let invalid = pending.[0].WithSorterCountPerPool(Some 0<sorterCountPerPool>)
         let result = GeneSort.Dispatch.V1.SorterSgd.EvoAppendSetup.prepare sourceDb host invalid (UMX.tag false) cts None
                      |> Async.RunSynchronously
         Assert.True(Result.isError result)
@@ -795,9 +796,81 @@ let ``Standard checkpoints label produced generations and stop at the target`` (
     Assert.Equal(2, int final.GenerationNumber)
     Assert.Equal<(int option * int) list>([for gen in startingGeneration + 1 .. 2 -> Some gen, gen], List.ofSeq memory.PoolGenerations)
 
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Pool evaluation preserves copied models and their pool-specific lengths`` reEvaluateParents =
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 200 1)
+                |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let tinyTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
+                        [|sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>)|] |> sortableTests.Bools
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let standardPools =
+        [| for index in 0 .. 3 do
+            let memberValue = spMember_Standard.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None None 0<generationNumber>
+            yield sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "copy") (D1 index)
+                [|memberValue|] (UMX.tag (150 + index * 10)) (UMX.tag 0) |]
+    let standardSet (pools: sorterPool_Standard[]) = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 pools.Length) (Some pools)
+    let evaluateStandard = PoolRunner_Standard.evaluatePoolSet tinyTests prefix sorterEvalType.V2 reEvaluateParents (UMX.tag false)
+    let standard = standardSet standardPools
+    let evaluations = evaluateStandard standard
+    Assert.Equal(4, evaluations.Count)
+    for pool in standardPools do
+        let memberId = pool.SorterPoolMembers |> Seq.exactlyOne |> fun m -> m.SorterPoolMemberId
+        let expected = evaluateStandard (standardSet [|pool|])
+        Assert.Equal(expected.[memberId], evaluations.[memberId])
+    let updated = SorterPoolSet_Standard.updateSorterEvals evaluations standard
+    Assert.All(updated.SorterPools.Values, fun pool -> Assert.Single(pool.SorterPoolMembers) |> ignore)
+    let sossPools =
+        [| for index in 0 .. 3 do
+            let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+            yield sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "copy") (D1 index)
+                [|memberValue|] (UMX.tag (150 + index * 10)) (UMX.tag 0) |]
+    let sossSet (pools: sorterPool_Soss[]) = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 pools.Length) (Some pools)
+    let evaluateSoss = PoolRunner_Soss.evaluatePoolSet tinyTests prefix sorterEvalType.V2 reEvaluateParents (UMX.tag false)
+    let evaluations = evaluateSoss (sossSet sossPools)
+    Assert.Equal(4, evaluations.Count)
+    for pool in sossPools do
+        let memberId = pool.SorterPoolMembers |> Seq.exactlyOne |> fun m -> m.SorterPoolMemberId
+        let expected = evaluateSoss (sossSet [|pool|])
+        Assert.Equal(expected.[memberId], evaluations.[memberId])
+
+[<Fact>]
+let ``Current Standard append config produces three single-pool runs at each capacity`` () =
+    let configured = GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_128_Test ()
+    let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
+    Assert.Equal(6, parameters.Length)
+    Assert.Equal(6, parameters |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    for capacity in [128; 256] do
+        let matching = parameters |> Array.filter (fun rp -> int (rp.GetSorterCountPerPool().Value) = capacity)
+        Assert.Equal(3, matching.Length)
+        Assert.Equal<Set<int>>(set [0; 1; 2], matching |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
+        Assert.All(matching, fun rp ->
+            Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
+            Assert.Equal(capacity, int (rp.GetSorterCountPerPoolSet().Value))
+            Assert.Equal(capacity, int (rp.GetSelectedSorterCountPerPool().Value)))
+
+[<Theory>]
+[<InlineData(256, 64)>]
+[<InlineData(64, 16)>]
+let ``Append total preserves multiple source pools when growing or shrinking capacity`` total perPool =
+    let configured = appendFrom (standardSource ()) 1 3 [] [ParamKeys.sorterCountPerPoolSetKey, [string total]]
+    let rp = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> Array.exactlyOne
+    Assert.Equal(Some 4<sorterPoolCount>, rp.GetSorterPoolCount())
+    Assert.Equal(perPool, int (rp.GetSorterCountPerPool().Value))
+
+[<Theory>]
+[<InlineData(0)>]
+[<InlineData(129)>]
+let ``Append rejects totals that cannot fill source pools evenly`` total =
+    let configured = appendFrom (standardSource ()) 1 3 [] [ParamKeys.sorterCountPerPoolSetKey, [string total]]
+    let error = Assert.Throws<ArgumentException>(fun () -> RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> ignore)
+    Assert.Contains("divisible by the source SorterPoolCount", error.Message)
+
 [<Fact>]
 let ``Standard append starts from imported setup and resumes its resulting checkpoint`` () =
-    let configured = appendFrom (standardSource ()) 1 3 [] [
+    let sourceRun = standardSource () |> withSetupSpans [ParamKeys.sorterCountPerPoolSetKey, ["32"]]
+    let configured = appendFrom sourceRun 1 3 [] [
         ParamKeys.mutationModKey, ["0"; "1"; "2"]
         ParamKeys.sorterCountPerPoolSetKey, ["128"; "256"]
     ]
@@ -836,8 +909,9 @@ let ``Standard append starts from imported setup and resumes its resulting check
     let saved = GeneSort.Dispatch.V1.SorterSgd.Utils.loadHighestGenSorterPoolSet config db rp
                 |> Async.RunSynchronously |> Result.defaultWith failwith |> Option.get
     Assert.Equal(2, int saved.GenerationNumber)
-    Assert.Equal(8, saved.SorterPools.Count)
+    Assert.Equal(1, saved.SorterPools.Count)
     Assert.All(saved.SorterPools.Values, fun pool -> Assert.Equal(1, int pool.MutationMod))
+    Assert.All(saved.SorterPools.Values, fun pool -> Assert.NotEmpty(pool.SorterPoolMembers))
     let writes = memory.Writes.Count
     execute () |> ignore
     Assert.Equal(writes, memory.Writes.Count)
@@ -856,3 +930,165 @@ let ``Standard parameter sweeps append each source combination once`` v2 expecte
     Assert.Equal(expected, branches.Length)
     Assert.Equal(expected, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     Assert.Equal<string>(%source.DatabaseName, %appended.DatabaseName)
+
+[<Fact>]
+let ``Append interval validation identifies the run and conflicting values`` () =
+    let source = standardSource ()
+    let error = Assert.Throws<ArgumentException>(fun () -> appendFrom source 1 1 [] [] |> ignore)
+    Assert.Contains("Append run 'Append'", error.Message)
+    Assert.Contains(ParamKeys.generationIntervalLastKey + " [1]", error.Message)
+    Assert.Contains("greater than Source.GenerationInterval (1)", error.Message)
+    Assert.Contains(%source.RunName, error.Message)
+
+let private condenseFixture scenario =
+    let source = standardSource () |> withSetupSpans [
+        ParamKeys.mutationModKey, ["0"; "1"; "2"; "3"]
+        ParamKeys.sorterCountPerPoolSetKey, ["32"]
+    ]
+    let sourceHost = runHost.Create source 1
+    let candidates = sourceHost.MakeRunParameters 0<replNumber> 2<replNumber>
+    let memory = MemoryDb(sourceHost.QueryParamsFromRunParams)
+    let db = memory :> IGeneSortDb
+    memory.SavedParameters <- candidates
+    let persist mode query value =
+        db.saveAsync mode query value (UMX.tag true) |> Async.RunSynchronously |> Result.defaultWith failwith
+    persist geneSortDataMode.Project (queryParams.createForRun source.DatabaseName source.ProjectName source.RunName) (outputData.Run source)
+    let generation = GenIntervalConfig.getSampleAtIndex sourceHost.GenSaveIntervals.Value 1 |> Option.get
+    for rp in candidates do
+        let modifier = int (rp.GetMutationMod().Value)
+        let replica = int (rp.GetRepl().Value)
+        let lengths =
+            if scenario = "ties" then [10; 10]
+            elif replica = 0 then [| [1; 99]; [10; 10]; [20; 20]; [30; 30] |].[modifier]
+            else [| [40; 40]; [30; 30]; [20; 20]; [10; 10] |].[modifier]
+        let members = lengths |> List.map (fun length ->
+            let evaluation =
+                sorterEvalV1.create (UMX.tag (Guid.NewGuid())) (UMX.tag "all") 32<sortingWidth>
+                    0<sortableCount> (UMX.tag 1) (UMX.tag 1) (UMX.tag length) 100<ceLength>
+                    (UMX.tag false) (UMX.tag 0) (UMX.tag 0) |> sorterEval.V1
+            spMember_Standard.create (UMX.tag (Guid.NewGuid())) GeneSort.Model.Sorting.V1.sorterModel.Unknown
+                (UMX.tag 0) (rp.GetMutationMod().Value) None
+                (if scenario = "unevaluated" then None else Some evaluation) (UMX.tag generation)) |> List.toArray
+        let pools = [| for index in 0 .. (if scenario = "multiple-pools" then 1 else 0) ->
+                        sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 index)
+                            members 150<ceLength> (rp.GetMutationMod().Value) |]
+        let poolSet = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 pools.Length) (Some pools)
+        if scenario <> "missing-checkpoint" then
+            persist geneSortDataMode.Results
+                (sourceHost.QueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "") |> Option.get)
+                (outputData.SorterPoolSet(sorterPoolSet.Standard poolSet))
+        let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth> [||] |> sortableTests.Bools
+        let testsQuery = sourceHost.QueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag 0))) (geneSortDataType.SortableTestsWithPrefix "") |> Option.get
+        persist geneSortDataMode.Setup (QueryParams.forSetup rp testsQuery) (outputData.SortableTestsWithPrefix(sourceTests, [||]))
+    let selection = [
+        ParamKeys.selectedSorterPoolCountKey, [if scenario = "all" then "4" else "2"]
+        ParamKeys.mutationModKey, (if scenario = "missing-mod" then ["0"; "8"] else ["0"; "1"; "2"; "3"])
+    ]
+    let configured = appendFrom source 1 2 selection [
+        ParamKeys.mutationModKey, ["7"; "8"; "9"; "10"]
+    ]
+    let generate run =
+        RunParameterGeneration.generateWithSourceSelection
+            (GeneSort.Dispatch.V1.SorterSgd.EvoCondenseSelection.select (fun _ -> db)) run 0<replNumber> 2<replNumber>
+    configured, candidates, db, generate
+
+[<Fact>]
+let ``Condense ranks averages per replica and branches only winners through normal append setup`` () =
+    let configured, candidates, sourceDb, generate = condenseFixture "rank"
+    let roundTripped = configured |> GeneSort.Project.Mp.V1.RunDto.fromDomain |> GeneSort.Project.Mp.V1.RunDto.toDomain
+    let branches = generate roundTripped
+    Assert.Equal(16, branches.Length)
+    Assert.Equal(16, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    let host = (runHost.Create configured 1).WithRunDb(MemoryDb())
+    use cts = new CancellationTokenSource()
+    for replica in [0; 1] do
+        let selected = branches |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica)
+        let expectedMods = if replica = 0 then [1; 2] else [2; 3]
+        let expectedIds = candidates |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica && List.contains (int (rp.GetMutationMod().Value)) expectedMods)
+                                    |> Array.map (fun rp -> string %(rp.GetId().Value)) |> Set.ofArray
+        Assert.Equal<Set<string>>(expectedIds, selected |> Array.map (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) |> Set.ofArray)
+        for rp in selected do
+            let prepared = GeneSort.Dispatch.V1.SorterSgd.EvoAppendSetup.prepare sourceDb host rp (UMX.tag false) cts None
+                           |> Async.RunSynchronously |> Result.defaultWith failwith
+            Assert.True(prepared.GetSelectedSorterPoolCount().IsNone)
+            // Reuse the ordinary imported-file query and execution branching.
+            let poolQuery = host.QueryParamsFromRunParams prepared (geneSortDataType.SorterPoolSet "") |> Option.get |> QueryParams.forSetup prepared
+            let pool = host.RunDb.loadAsync geneSortDataMode.Setup poolQuery |> Async.RunSynchronously
+                       |> Result.bind OutputData.asSorterPoolSetStandard |> Result.defaultWith failwith
+            let branched = GeneSort.Dispatch.V1.SorterSgd.EvoAppendPools.prepareStandard prepared pool |> Result.defaultWith failwith
+            Assert.Equal(1, branched.SorterPools.Count)
+            Assert.Equal(prepared.GetMutationMod().Value, (branched.SorterPools |> Map.values |> Seq.exactlyOne).MutationMod)
+
+[<Theory>]
+[<InlineData("multiple-pools", "exactly one")>]
+[<InlineData("unevaluated", "fully evaluated")>]
+[<InlineData("missing-checkpoint", "Missing prepared input")>]
+[<InlineData("missing-mod", "subset")>]
+let ``Condense rejects unsuitable source checkpoints before creating branches`` scenario message =
+    let configured, _, _, generate = condenseFixture scenario
+    let error = Assert.Throws<InvalidOperationException>(fun () -> generate configured |> ignore)
+    Assert.Contains(message, error.Message)
+
+[<Fact>]
+let ``Condense permits selecting every requested source mutation variant`` () =
+    let configured, _, _, generate = condenseFixture "all"
+    Assert.Equal(32, (generate configured).Length)
+
+[<Fact>]
+let ``Condense validates source selection count and mutation subset size`` () =
+    let source = standardSource ()
+    for counts, modifiers in [(["1"; "2"], ["0"; "1"]); (["3"], ["0"; "1"]); (["0"], ["0"]); (["2"], ["0"; "0"])] do
+        Assert.Throws<ArgumentException>(fun () ->
+            let selection = [
+                ParamKeys.selectedSorterPoolCountKey, counts
+                ParamKeys.mutationModKey, modifiers
+            ]
+            appendFrom source 1 2 selection [] |> ignore) |> ignore
+
+[<Fact>]
+let ``Condense source mutation span filters candidates without branching winners`` () =
+    let _, candidates, _, generate = condenseFixture "rank"
+    let source = standardSource () |> withSetupSpans [
+        ParamKeys.mutationModKey, ["0"; "1"; "2"; "3"]
+        ParamKeys.sorterCountPerPoolSetKey, ["32"]
+    ]
+    let selection = [
+        ParamKeys.selectedSorterPoolCountKey, ["2"]
+        ParamKeys.mutationModKey, ["0"; "1"; "3"]
+    ]
+    let condensed = appendFrom source 1 2 selection []
+    let selected = generate condensed
+    Assert.Equal(4, selected.Length)
+    for replica in [0; 1] do
+        let expectedMods = [1; 3]
+        let expected = candidates |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica && List.contains (int (rp.GetMutationMod().Value)) expectedMods)
+                                  |> Array.map (fun rp -> string %(rp.GetId().Value)) |> Set.ofArray
+        let actual = selected |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica)
+                              |> Array.map (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) |> Set.ofArray
+        Assert.Equal<Set<string>>(expected, actual)
+
+[<Fact>]
+let ``Condense ties use stable source identities and pure expansion requires checkpoint access`` () =
+    let configured, candidates, _, generate = condenseFixture "ties"
+    let first = generate configured
+    let second = generate configured
+    Assert.Equal<Guid<queryParamsId> option array>(first |> Array.map (fun rp -> rp.GetId()), second |> Array.map (fun rp -> rp.GetId()))
+    for replica in [0; 1] do
+        let expected = candidates |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica)
+                                  |> Array.sortBy (fun rp -> rp.GetId().Value) |> Array.take 2
+                                  |> Array.map (fun rp -> string %(rp.GetId().Value)) |> Set.ofArray
+        let actual = first |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica)
+                           |> Array.map (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) |> Set.ofArray
+        Assert.Equal<Set<string>>(expected, actual)
+    Assert.Throws<InvalidOperationException>(fun () -> RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> ignore) |> ignore
+
+[<Fact>]
+let ``Appending a condensed run retains selected source identities without repeating selection settings`` () =
+    let configured, _, _, generate = condenseFixture "rank"
+    let selectedIds = generate configured |> Array.map (fun rp -> string %(rp.GetId().Value)) |> Set.ofArray
+    let appended = appendFrom configured 2 3 [] [ParamKeys.mutationModKey, ["11"; "12"]]
+    let roundTripped = appended |> GeneSort.Project.Mp.V1.RunDto.fromDomain |> GeneSort.Project.Mp.V1.RunDto.toDomain
+    let branches = generate roundTripped
+    Assert.Equal(32, branches.Length)
+    Assert.Equal<Set<string>>(selectedIds, branches |> Array.map (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) |> Set.ofArray)
+    Assert.All(branches, fun rp -> Assert.True(rp.GetSelectedSorterPoolCount().IsNone))

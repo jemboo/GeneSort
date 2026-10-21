@@ -1,0 +1,91 @@
+namespace GeneSort.Dispatch.V1.SorterSgd
+
+open System
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Db.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Eval.V1.Sgd.Standard
+
+/// Select source checkpoints before execution spans are expanded or parameters are saved.
+module EvoCondenseSelection =
+    let private require message = Result.ofOption message
+
+    let private rank (db: IGeneSortDb) (configured: run) (source: run) count (candidates: runParameters[]) =
+        asyncResult {
+            do! if source.ExecuteFunctionName = ExecuteFunctionNames.standard then Ok ()
+                else Error "Condense requires a Standard source."
+            do! if count > 0 && candidates.Length >= count then Ok ()
+                else Error "Condense requires at least SelectedSorterPoolCount source mutation variants."
+            let! repl = candidates.[0].GetRepl() |> require "Missing source replica."
+            do! if candidates |> Array.forall (fun rp -> rp.GetRepl() = Some repl) then Ok ()
+                else Error "Condense selects sources separately for each replica."
+            let modifiers = candidates |> Array.map (fun rp -> rp.GetMutationMod())
+            do! if modifiers |> Array.forall Option.isSome && (Array.distinct modifiers).Length = candidates.Length then Ok ()
+                else Error "Condense requires one source execution per MutationMod per replica. Narrow Source.ParameterSpans to one combination of the other parameters."
+            let! interval =
+                configured.RunParameterSpans |> List.tryFind (fst >> (=) ParamKeys.sourceGenerationIntervalKey)
+                |> Option.bind (fun (_, values) -> match values with [value] -> Some value | _ -> None)
+                |> require "Missing source generation interval."
+                |> Result.bind (fun value -> match Int32.TryParse value with true, n when n >= 0 -> Ok n | _ -> Error "Invalid source generation interval.")
+            let! sourceData = db.loadAsync geneSortDataMode.Project (queryParams.createForRun source.DatabaseName source.ProjectName source.RunName)
+            let! savedRun = OutputData.asRun sourceData
+            do! if savedRun.ProjectName = source.ProjectName && savedRun.DatabaseName = source.DatabaseName && savedRun.RunName = source.RunName
+                       && savedRun.ExecuteFunctionName = ExecuteFunctionNames.standard then Ok ()
+                else Error "Saved condense source does not match the configured Standard run."
+            let! intervalName = savedRun.GenSaveIntervalsName |> require "Source has no generation intervals."
+            let! intervals =
+                match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue intervalName with
+                | true, value -> Ok value
+                | _ -> Error (sprintf "Unknown source generation intervals '%s'." intervalName)
+            let! generation = GenIntervalConfig.getSampleAtIndex intervals interval |> require "Source generation interval is unavailable."
+            let! saved = db.getRunParameters source.RunName (Some repl) (Some (repl + 1<replNumber>)) None None
+            let query = QueryParamsCatalogRun.get savedRun.RunQueryCatalogName source.ProjectName source.DatabaseName
+            let scores = ResizeArray<float * Guid * runParameters>()
+            let mutable commonMeasure = None
+            for candidate in candidates do
+                let! id = candidate.GetId() |> require "Missing source execution ID."
+                let! parameters =
+                    match saved |> Array.filter (fun (rp: runParameters) -> rp.GetId() = Some id && rp.GetRepl() = Some repl) with
+                    | [|parameters|] -> Ok parameters
+                    | _ -> Error (sprintf "Expected exactly one saved source execution %O for replica %d." id (int repl))
+                let! measure = parameters.GetSorterEvalMeasure() |> require "Source has no sorter evaluation measure."
+                do! if commonMeasure |> Option.forall ((=) measure) then Ok ()
+                    else Error "Condense source evaluation measures must match."
+                commonMeasure <- Some measure
+                let! poolQuery = query (parameters.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "")
+                                 |> require "Cannot build source checkpoint query."
+                let! data = db.loadAsync geneSortDataMode.Results poolQuery
+                let! poolSet = OutputData.asSorterPoolSetStandard data
+                do! if int poolSet.GenerationNumber = generation || int poolSet.GenerationNumber = generation + 1 then Ok ()
+                    else Error "Source checkpoint generation does not match the requested interval."
+                let! pool =
+                    match poolSet.SorterPools |> Map.values |> Seq.toArray with
+                    | [|pool|] -> Ok pool
+                    | _ -> Error "Condense requires exactly one sorter pool in every source checkpoint."
+                let members = pool.SorterPoolMembers |> Seq.toArray
+                do! if members.Length > 0 && (members |> Array.forall (fun memberValue -> memberValue.SorterEval.IsSome)) then Ok ()
+                    else Error "Condense requires nonempty, fully evaluated source pools."
+                let score = SorterPool_Standard.getAverageScore measure pool |> float
+                do! if Double.IsFinite score then Ok () else Error "Condense requires finite average evaluation scores."
+                scores.Add(score, %id, candidate)
+            // Lower is better. Source execution ID makes tied selections repeatable.
+            return scores |> Seq.sortBy (fun (score, id, _) -> score, id)
+                          |> Seq.take count |> Seq.map (fun (_, _, candidate) -> candidate) |> Seq.toArray
+        }
+
+    /// The callback is also used recursively when appending to a condensed run.
+    let select (makeSourceDb: run -> IGeneSortDb) (configured: run) source candidates =
+        let spans = configured.ParameterSource |> Option.map snd |> Option.defaultValue []
+        match spans |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey) with
+        | None -> candidates
+        | Some (_, [value]) ->
+            match Int32.TryParse value with
+            | true, count when count > 0 ->
+                rank (makeSourceDb source) configured source count candidates
+                |> Async.RunSynchronously |> Result.defaultWith invalidOp
+            | _ -> invalidArg "SelectedSorterPoolCount" "SelectedSorterPoolCount must be positive."
+        | _ -> invalidArg "SelectedSorterPoolCount" "Specify exactly one selection count."

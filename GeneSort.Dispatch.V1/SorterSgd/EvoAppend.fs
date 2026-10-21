@@ -37,6 +37,18 @@ module EvoAppend =
             | _ -> invalidArg "Source" "Expected an Msuf Standard or Soss source run."
         if config.Source.GenerationInterval < 0 then
             invalidArg "Source" "Source interval must be nonnegative."
+        if config.ExecutionParameterSpans |> List.exists (fst >> (=) ParamKeys.selectedSorterPoolCountKey) then
+            invalidArg "ExecutionParameterSpans" "SelectedSorterPoolCount belongs in Source.ParameterSpans."
+        match config.Source.ParameterSpans |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey) with
+        | None -> ()
+        | Some (_, [value]) when source.ExecuteFunctionName = ExecuteFunctionNames.standard ->
+            match System.Int32.TryParse value with
+            | true, count when count > 0 ->
+                match config.Source.ParameterSpans |> List.tryFind (fst >> (=) ParamKeys.mutationModKey) with
+                | Some (_, values) when not values.IsEmpty && List.distinct values = values && count <= values.Length -> ()
+                | _ -> invalidArg "Source.ParameterSpans" "Condense requires distinct MutationMod values and SelectedSorterPoolCount <= their count."
+            | _ -> invalidArg "SelectedSorterPoolCount" "SelectedSorterPoolCount must be a positive integer."
+        | Some _ -> invalidArg "SelectedSorterPoolCount" "Condense requires a Standard source and a single selection count."
         for spans in [config.Source.ParameterSpans; config.ExecutionParameterSpans] do
             if spans |> List.exists (snd >> List.isEmpty) then
                 invalidArg "ParameterSpans" "Parameter spans must have at least one value."
@@ -55,7 +67,15 @@ module EvoAppend =
             match System.Int32.TryParse value with
             | true, interval -> interval > config.Source.GenerationInterval
             | _ -> false) -> ()
-        | _ -> invalidArg "ExecutionParameterSpans" "Specify a final interval after the source interval."
+        | _ ->
+            let finalIntervals =
+                config.ExecutionParameterSpans
+                |> List.tryFind (fst >> (=) ParamKeys.generationIntervalLastKey)
+                |> Option.map (snd >> String.concat ", ")
+                |> Option.defaultValue "<missing>"
+            invalidArg "ExecutionParameterSpans"
+                (sprintf "Append run '%s': %s [%s] must contain only intervals greater than Source.GenerationInterval (%d), from source run '%s'."
+                    %config.RunName ParamKeys.generationIntervalLastKey finalIntervals config.Source.GenerationInterval %source.RunName)
         SgdRun.create {
             ProjectName = config.ProjectName
             DatabaseName = config.DatabaseName

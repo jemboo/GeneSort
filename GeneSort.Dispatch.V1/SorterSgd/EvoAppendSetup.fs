@@ -81,9 +81,12 @@ module EvoAppendSetup =
             let! repl = rp.GetRepl() |> Result.ofOption "Missing Repl."
             let! sourceCandidates = sourceDb.getRunParameters sourceRunName (Some repl) (Some (repl + 1<replNumber>)) (Some cts.Token) progress
             let! sourceParameters = selectSourceParameters rp sourceCandidates
-            do! if rp.GetSorterCountPerPool() <> sourceParameters.GetSorterCountPerPool() then
-                    Error "Changing SorterCountPerPool is not supported when appending; preserve the source pool capacity."
-                else Ok ()
+            do!
+                match rp.GetSorterCountPerPoolSet(), rp.GetSorterCountPerPool(), rp.GetSorterPoolCount() with
+                | Some total, Some perPool, Some count
+                    when int total > 0 && int perPool > 0 && int count > 0
+                         && int total % int perPool = 0 && int total / int perPool = int count -> Ok ()
+                | _ -> Error "Append pool capacity must be positive and SorterCountPerPoolSet must equal SorterPoolCount * SorterCountPerPool."
             let atGeneration = sourceParameters.WithGenerationCurrent(Some (UMX.tag generation))
             let! poolQuery = sourceQuery atGeneration (geneSortDataType.SorterPoolSet "") |> Result.ofOption "Cannot build source pool query."
             let! checkpointExists = sourceDb.doesOutPutDataExist geneSortDataMode.Results poolQuery

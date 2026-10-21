@@ -31,6 +31,7 @@
     <Compile Include="SorterEval\SorterEvalExecution.fs" />
     <Compile Include="SorterMutate\SorterMutateExecution.fs" />
     <Compile Include="ExecuteFunctionCatalog.fs" />
+    <Compile Include="SorterSgd\EvoCondenseSelection.fs" />
     <Compile Include="RunHost.fs" />
     <Compile Include="RunParamsExecutor.fs" />
     <Compile Include="SortableTests\CommonSortableTests.fs" />

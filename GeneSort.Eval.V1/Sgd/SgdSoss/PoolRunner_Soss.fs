@@ -51,16 +51,6 @@ module PoolRunner_Soss =
             if membersToEvaluate.Length = 0 then
                 cachedEvaluations
             else
-                // 3. Compile an ID mapping between sorterId and poolMemberId for the targets being evaluated
-                let idMapping = 
-                    membersToEvaluate 
-                    |> Array.map (fun (_, m) -> 
-                        let modelId = SorterModel.getId m.SorterModel
-                        let sorterId = %modelId |> UMX.tag<sorterId>
-                        sorterId, m.SorterPoolMemberId
-                    ) 
-                    |> Map.ofArray
-
                 // 4. Materialize the filtered models into actual sorter executable structures
                 //    We wrap the pool's ceLength into an option block to match the original signature requirement
                 let sorters = 
@@ -81,11 +71,9 @@ module PoolRunner_Soss =
                     let evalWithShortCe = rawEvaluations |> Array.find (fun eval -> %(SorterEval.getCeLength eval) < 120)
                     System.Diagnostics.Debugger.Break()
 
-                // 6. Map raw evaluations back to poolMemberId and merge them with any cached evaluations
-                rawEvaluations
-                |> Array.fold (fun accMap eval ->
-                    let sorterId = SorterEval.getSorterId eval
-                    match Map.tryFind sorterId idMapping with
-                    | Some poolMemberId -> Map.add poolMemberId eval accMap
-                    | None -> accMap // Defensive bypass
+                // Evaluation preserves input order. Copied members can share a model ID,
+                // and each pool can evaluate that model at a different CE length.
+                Array.zip membersToEvaluate rawEvaluations
+                |> Array.fold (fun accMap ((_, memberValue), eval) ->
+                    Map.add memberValue.SorterPoolMemberId eval accMap
                 ) cachedEvaluations

@@ -202,7 +202,8 @@ type runHost =
         parameters |> Seq.map (this.SetupEnhancer context)
 
     member this.MakeRunParameters minReplica maxReplica =
-        RunParameterGeneration.generateWithBindings
+        RunParameterGeneration.generateWithBindingsAndSourceSelection
+            (EvoCondenseSelection.select RunHost.makeDatabase)
             this.QueryParamsFromRunParams this.QueryParamsFromSetupParams
             this.RunEnhancer this.SetupEnhancer this.Run minReplica maxReplica
 

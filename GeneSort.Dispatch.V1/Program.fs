@@ -16,8 +16,8 @@ let main argv =
     //let yab = [| "setup"; "eval" |]
     //let yab = [| "execute"; "eval" |]
     //let yab = [| "setup"; "sgd" |]
-    let yab = [| "execute"; "sgd" |]
-    //let yab = [| "report"; "sgd"; "summary" |]
+    //let yab = [| "execute"; "sgd" |]
+    let yab = [| "report"; "sgd"; "summary" |]
 
     let command =
         match yab with
@@ -43,7 +43,8 @@ let main argv =
             Console.ReadKey() |> ignore
             0
         with error ->
-            eprintfn "%s" error.Message
+            // Unwrap initialization errors without showing runtime wrappers or stack traces.
+            eprintfn "Error: %s" (error.GetBaseException().Message)
             
             Console.ReadKey() |> ignore
             1

@@ -10,21 +10,20 @@ let projName = "SorterSgd.Standard_condense.32p4a.Msuf" |> UMX.tag<projectName>
 let dbPool32name = "Pool_32" |> UMX.tag<databaseName>
 
 let Pool_32_Test () : run =
+    // Rank only these source MutationMods during preparation.
     let sourceParameterSpans =
         [
-            ParamKeys.mutationModKey, [0] |> List.map string
-            ParamKeys.selectedSorterCountPerPoolKey, [2] |> List.map string
+            ParamKeys.selectedSorterPoolCountKey, [2] |> List.map string
+            ParamKeys.mutationModKey, [0 .. 3] |> List.map string
         ]
     let executionParameterSpans =
         [
-            ParamKeys.mutationModKey, [0 .. 3] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128;] |> List.map string
             ParamKeys.generationIntervalLastKey, [3] |> List.map string
         ]
     EvoAppend.create {
         ProjectName = projName
         DatabaseName = dbPool32name
-        RunName = "Pool_32_TestGenStandard_Append" |> UMX.tag<runName>
+        RunName = "Pool_32_TestGenStandard_Condense" |> UMX.tag<runName>
         Source = {
             Run = Standard.Pool_32_Test ()
             GenerationInterval = 2
