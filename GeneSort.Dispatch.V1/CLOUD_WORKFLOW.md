@@ -118,7 +118,7 @@ checkpoints remain Standard pools; Soss checkpoints remain Soss pools.
 let host = runHost.Create (Standard_append.Pool_128_Test ()) 8
 ```
 
-`Pool_128_Test` imports `Standard.Pool_128_Test` at interval 2 and continues through
+`Pool_128_Test` imports `Standard.Pool_128_Test` at interval 1 and continues through
 interval 3. It branches modifier 0 into modifiers 0, 1, and 2, each with total sorter
 capacities 128 and 256: six runs per replica, keeping 32 sorters per pool.
 `Pool_512_V1` and `Pool_512_V2a` import all their matching Standard source combinations

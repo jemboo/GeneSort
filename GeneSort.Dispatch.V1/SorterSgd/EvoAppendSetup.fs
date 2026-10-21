@@ -86,6 +86,10 @@ module EvoAppendSetup =
                 else Ok ()
             let atGeneration = sourceParameters.WithGenerationCurrent(Some (UMX.tag generation))
             let! poolQuery = sourceQuery atGeneration (geneSortDataType.SorterPoolSet "") |> Result.ofOption "Cannot build source pool query."
+            let! checkpointExists = sourceDb.doesOutPutDataExist geneSortDataMode.Results poolQuery
+            do! if checkpointExists then Ok ()
+                else Error (sprintf "Source checkpoint not found for %s/%s/%s, replica %d, interval %d (generation %d), file ID %O. Run the source through this interval or select an interval it has saved."
+                                %sourceProject %sourceDatabase %sourceRunName %repl interval generation poolQuery.Id)
             let! poolData = sourceDb.loadAsync geneSortDataMode.Results poolQuery
             let! poolGeneration =
                 match sourceRun.ExecuteFunctionName with

@@ -570,6 +570,12 @@ let ``Soss append copies the selected source checkpoint and tests only after val
     Assert.Equal(originalWrites, sourceMemory.Writes.Count)
     if scenario <> "valid" && scenario <> "previous-save-convention" && scenario <> "retired-configuration" && not chained then
         Assert.True(Result.isError result)
+        if scenario = "missing" then
+            match result with
+            | Error message ->
+                Assert.Contains("Source checkpoint not found", message)
+                Assert.Contains(sprintf "interval %d (generation %d)" sourceInterval generation, message)
+            | Ok _ -> failwith "Expected a missing-checkpoint error."
         Assert.Empty(destinationMemory.Writes)
     else
         let updated = result |> Result.defaultWith failwith
