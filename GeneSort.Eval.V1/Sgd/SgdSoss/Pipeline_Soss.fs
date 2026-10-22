@@ -120,15 +120,10 @@ module Pipeline_Soss =
 
         // --- Step 1b: Evaluate Pool Set ---
 
-        // Transitions need fresh evaluations of every partition for merged length adjustment.
+        // Transitions need all partitions for CE adjustment, without changing selection.
         let evaluatedPoolSet =
-            if selectionSubsetChanged then
-                mutatedPoolSet
-                |> SorterPoolSet_Soss.withSubsetIdForSelection CommonSgdSoss.mergedSubsetId
-                |> evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType true
-                    collectNewSortableTests CommonSgdSoss.mergedSubsetId false
-            else
-                evaluateForSelection false mutatedPoolSet
+            evaluateRequiredPartitions sortableTestPartitions prefix sorterEvalType selectionSubsetChanged
+                collectNewSortableTests subsetIdForSelection selectionSubsetChanged mutatedPoolSet
 
         if hasEmptyPool evaluatedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if evaluation or eval update failed
@@ -136,7 +131,14 @@ module Pipeline_Soss =
         // --- Step 2: Adjust Constraint Boundaries ---
         let adjustedPoolSet =
             if selectionSubsetChanged then
-                SorterPoolSet_Soss.adjustCeLengths sortedFractionThreshold evaluatedPoolSet
+                // A single partition already covers the merged set. Scope the merged
+                // evaluation to CE adjustment and restore selection before pruning.
+                let adjustmentSubsetId =
+                    if sortableTestPartitions.Count = 1 then subsetIdForSelection
+                    else CommonSgdSoss.mergedSubsetId
+                evaluatedPoolSet
+                |> SorterPoolSet_Soss.withSubsetIdForSelection adjustmentSubsetId
+                |> SorterPoolSet_Soss.adjustCeLengths sortedFractionThreshold
                 |> SorterPoolSet_Soss.withSubsetIdForSelection subsetIdForSelection
             else
                 evaluatedPoolSet
@@ -145,13 +147,16 @@ module Pipeline_Soss =
             Debugger.Break() // Pause if length adjustment emptied a pool
 
         // --- Step 3: Prune Sorter Pools ---
+        // Length adjustment invalidates every subset cache in changed pools.
+        // Refresh the scheduled evaluation before ranking/filtering survivors.
+        let poolSetForPruning = evaluateForSelection false adjustedPoolSet
         let prunedPoolSet =
             SorterPoolSet_Soss.pruneSorterPools
                 selectionMeasure
                 prioritizeNewMutants
                 distinctSorterHashes
                 sorterCountPerPool
-                adjustedPoolSet
+                poolSetForPruning
 
         if hasEmptyPool prunedPoolSet && Debugger.IsAttached then
             Debugger.Break() // Pause if pruning reduced a pool to zero members

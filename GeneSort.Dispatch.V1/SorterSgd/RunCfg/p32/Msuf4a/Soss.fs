@@ -74,22 +74,22 @@ module Pool_4 =
 module Pool_32 =
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Gens15 ()  : run =
+    let Gens100 ()  : run =
         let names = RunNaming.create()
         let parameterSpansSetup =
             [
-                (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
+                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
             ]
         let parameterSpansRun =
             [
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [3; 9] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [15;] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [15;] |> List.map string)
+                (ParamKeys.partitionCountKey, [4;] |> List.map string)
+                (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
+                (ParamKeys.generationsPerMergedSetKey, [100;] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [14] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [6] |> List.map string)
                 (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
                 (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
@@ -118,7 +118,7 @@ module Pool_32 =
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
                 GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "uniformInterval5"
+                GenSaveSubIntervalsName = "uniformInterval10"
             }
         )
 

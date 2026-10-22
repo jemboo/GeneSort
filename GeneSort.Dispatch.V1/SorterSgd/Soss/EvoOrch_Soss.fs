@@ -145,38 +145,22 @@ module EvoOrch_Soss =
                             if shouldSummaryReport then
                                 log (sprintf "Starting evolution step. Generation %d of %d" currentGen totalGen)
 
-                            // Complete partition evaluations before the incoming-generation snapshot.
-                            let poolSetForSummary =
-                                if shouldSummaryReport then
-                                    let subsetId =
-                                        sortableTestPartitions.SortableTests
-                                        |> Map.keys
-                                        |> Seq.toArray
-                                        |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset generationsPerMergedSet currentSorterPoolSet.GenerationNumber
-                                    Pipeline_Soss.evaluateRequiredPartitions sortableTestPartitions prefix evalType false
-                                        collectNewSortableTests subsetId true currentSorterPoolSet
-                                else
-                                    currentSorterPoolSet
-
-                            // Snapshot summary before applying structural changes
-                            let updatedSorterPoolSetSummary = 
-                                if shouldSummaryReport then 
-                                    let currentSnapshot = SorterPoolSetSummary_Soss.fromPoolSet poolSetForSummary
-                                    currentSnapshot :: historyAcc
-                                else 
-                                    historyAcc
-
                             // Perform Pool Expansion on milestone
                             let poolSetForStep =
                                 if shouldExpandPools then
                                     let expansionRate = optSorterPoolExpansionRate.Value
                                     let poolMeasure = optPoolMeasure.Value
                                     log (sprintf "Expanding pools at Generation %d (Rate: %d)..." %currentGen %expansionRate)
-                                    poolSetForSummary
-                                    |> SorterPoolSet_Soss.trimPools expansionRate poolMeasure
+                                    let subsetId =
+                                        sortableTestPartitions.SortableTests |> Map.keys |> Seq.toArray
+                                        |> CommonSgdSoss.subsetIdForGeneration generationsPerSubset generationsPerMergedSet currentSorterPoolSet.GenerationNumber
+                                    currentSorterPoolSet
+                                    |> Pipeline_Soss.evaluateRequiredPartitions sortableTestPartitions prefix evalType false
+                                        collectNewSortableTests subsetId false
+                                    |> SorterPoolSet_Soss.trimPoolsForSubset subsetId expansionRate poolMeasure
                                     |> SorterPoolSet_Soss.expandPools expansionRate
                                 else
-                                    poolSetForSummary
+                                    currentSorterPoolSet
 
                             // Step Evolution
 
@@ -198,6 +182,13 @@ module EvoOrch_Soss =
                                     shouldSummaryReport
                                     collectNewSortableTests
                                     sortedFractionThreshold
+
+                            // Summaries, bins, and checkpoints describe the same completed
+                            // generation, including expansion, CE adjustment and selection.
+                            let updatedSorterPoolSetSummary =
+                                if shouldSummaryReport then
+                                    SorterPoolSetSummary_Soss.fromPoolSet nextSorterPoolSet :: historyAcc
+                                else historyAcc
 
                             // Track all generated members using direct parent reference
                             //let updatedRunningHistoryMap = 

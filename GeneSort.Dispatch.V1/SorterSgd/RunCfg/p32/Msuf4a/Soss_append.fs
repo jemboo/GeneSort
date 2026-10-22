@@ -52,7 +52,7 @@ module Pool_32_append =
             SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
             Source = evoContinuationSource.create {
-                Run = Soss.Pool_32.Gens15 ()
+                Run = Soss.Pool_32.Gens100 ()
                 GenerationInterval = 14
                 ParameterSpans = ([ParamKeys.mutationModKey, [0 .. 3] |> List.map string])
             }

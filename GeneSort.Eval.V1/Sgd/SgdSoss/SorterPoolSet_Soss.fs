@@ -55,6 +55,11 @@ type sorterPoolSet_Soss =
 
 module SorterPoolSet_Soss =
 
+    /// Checkpoints without evaluation-length metadata cannot safely reuse caches.
+    let clearEvaluations (poolSet: sorterPoolSet_Soss) =
+        { poolSet with
+            _sorterPools = poolSet._sorterPools |> Map.map (fun _ pool -> SorterPool_Soss.clearEvaluations pool) }
+
     let withSelectionMeasure measure (poolSet: sorterPoolSet_Soss) =
         let pools = poolSet._sorterPools |> Map.map (fun _ pool ->
             SorterPool_Soss.withSelectionMeasure measure pool)
@@ -109,8 +114,8 @@ module SorterPoolSet_Soss =
 
     // reduces the sorterPoolCount by a factor of sorterPoolExpansionRate, effectively pruning the pool set,
     // selecting only the top-performing pools based on SorterPool.getAverageScore
-    let trimPools (sorterPoolExpansionRate: int<sorterPoolExpansionRate>) 
-                  (measure: sorterPoolMeasure) 
+    let private trimPoolsByScore (scorePool: sorterPool_Soss -> float<sorterPoolEvalScore>)
+                  (sorterPoolExpansionRate: int<sorterPoolExpansionRate>)
                   (poolSet: sorterPoolSet_Soss) : sorterPoolSet_Soss =
 
         let currentPoolCount = poolSet._sorterPools.Count
@@ -136,7 +141,7 @@ module SorterPoolSet_Soss =
                 poolSet._sorterPools
                 |> Map.values
                 |> Seq.map (fun pool -> 
-                    let score = PoolEvalFunctions_Soss.getPoolScore measure pool
+                    let score = scorePool pool
                     (score, pool)
                 )
                 // Lower score represents better performance; sort ascending
@@ -145,6 +150,16 @@ module SorterPoolSet_Soss =
                 |> Seq.map snd
 
             sorterPoolSet_Soss.create poolSet.SorterPoolSetId poolSet.GenerationNumber poolSet.LatticeBounds (Some updatedPools)
+
+    let trimPools expansionRate measure poolSet =
+        trimPoolsByScore (PoolEvalFunctions_Soss.getPoolScore measure) expansionRate poolSet
+
+    /// Rank on the scheduled subset without overwriting the previous generation's
+    /// subset marker, which the pipeline needs for CE-adjustment transitions.
+    let trimPoolsForSubset subsetId expansionRate measure poolSet =
+        trimPoolsByScore
+            (SorterPool_Soss.withSubsetIdForSelection subsetId >> PoolEvalFunctions_Soss.getPoolScore measure)
+            expansionRate poolSet
 
 
     // Increases the poolSet.PoolCount by a factor of sorterPoolExpansionRate.

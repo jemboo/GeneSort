@@ -55,6 +55,10 @@ type sorterPool_Soss =
 
 module SorterPool_Soss = 
 
+    let clearEvaluations (pool: sorterPool_Soss) =
+        { pool with
+            _sorterPoolMembers = pool._sorterPoolMembers |> Map.map (fun _ memberValue -> SpMember_Soss.withEval None memberValue) }
+
     let withSelectionMeasure measure (pool: sorterPool_Soss) =
         let members = pool._sorterPoolMembers |> Map.map (fun _ memberValue ->
             SpMember_Soss.withSelectionMeasure measure memberValue)
@@ -297,6 +301,7 @@ module SorterPool_Soss =
 
             let targetIndex = min (targetCount - 1) (sortedByLastCe.Length - 1)
             let _, thresholdLastCeIndex = sortedByLastCe.[targetIndex]
+            let adjustedCeLength = UMX.tag<ceLength> %thresholdLastCeIndex
 
             // 3. Filter out all pool members whose LastCeIndex exceeds the cutoff
             let updatedMembers =
@@ -306,6 +311,11 @@ module SorterPool_Soss =
                     | Some eval -> SorterEval.getLastCeIndex eval <= thresholdLastCeIndex
                     | None -> true
                 )
+                // Every subset (including Merge) was evaluated at the old length.
+                // Invalidate all of them together, even inactive selection subsets.
+                |> Seq.map (fun spm ->
+                    if adjustedCeLength <> pool.RawCeLength then SpMember_Soss.withEval None spm
+                    else spm)
                 |> Seq.toArray
 
             // Re-create the pool with the newly calculated cutoff as RawCeLength
@@ -315,7 +325,7 @@ module SorterPool_Soss =
                 pool.Name 
                 pool.SorterPoolTag
                 updatedMembers 
-                (UMX.tag<ceLength> %thresholdLastCeIndex)
+                adjustedCeLength
                 pool.MutationMod
 
 

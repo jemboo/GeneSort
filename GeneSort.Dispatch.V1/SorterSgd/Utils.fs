@@ -201,26 +201,24 @@ module Utils =
                 let wrp = rp.WithGenerationCurrent(Some currentGen)
                 generationalDb.makeQueryParamsFromRunParams wrp dataType
 
-            let rec findHighestExistingIndex low high bestIdx =
+            // Saved generations need not be contiguous: earlier checkpoints may
+            // have been removed or only a retained checkpoint may be available.
+            // Probe newest first, deserializing only the first existing result.
+            let rec findHighestExistingIndex index =
                 async {
-                    if low > high then return bestIdx
+                    if index < 0 then return None
                     else
-                        let mid = low + (high - low) / 2
-                        match getQueryParams mid with
-                        | None -> return! findHighestExistingIndex low (mid - 1) bestIdx
+                        match getQueryParams index with
+                        | None -> return! findHighestExistingIndex (index - 1)
                         | Some qp ->
                             let! exists = generationalDb.doesOutPutDataExist geneSortDataMode.Results qp
-                            if exists then return! findHighestExistingIndex (mid + 1) high (Some mid)
-                            // Generation zero is now stored as Setup, so its absence from
-                            // Results must not hide the first evolved checkpoint.
-                            elif intervals.[mid] = UMX.tag<generationNumber> 0 then
-                                return! findHighestExistingIndex (mid + 1) high bestIdx
-                            else return! findHighestExistingIndex low (mid - 1) bestIdx
+                            if exists then return Some index
+                            else return! findHighestExistingIndex (index - 1)
                 }
 
             if intervals.Length = 0 then return Ok None
             else
-                let! highestIndexOpt = findHighestExistingIndex 0 (intervals.Length - 1) None
+                let! highestIndexOpt = findHighestExistingIndex (intervals.Length - 1)
                 match highestIndexOpt with
                 | None -> return Ok None
                 | Some idx ->

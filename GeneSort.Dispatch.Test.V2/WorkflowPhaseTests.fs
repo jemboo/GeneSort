@@ -166,6 +166,100 @@ let private save (db: IGeneSortDb) mode (generation: int) dataType value =
     let query = db.makeQueryParamsFromRunParams rp dataType |> Option.get
     db.saveAsync mode query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
 
+let private verifySavedSossReport (db: IGeneSortDb) (rp: runParameters) (generation: int)
+                                  partitions prefix (expectedSubset: string) hasSummary =
+    GeneSort.Core.Mp.MessagePackSetup.configure()
+    let load kind =
+        let query = db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) kind |> Option.get
+        db.loadAsync geneSortDataMode.Results query |> Async.RunSynchronously |> Result.defaultWith failwith
+    let saved = load (geneSortDataType.SorterPoolSet "") |> OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
+    let bytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto saved |> MessagePack.MessagePackSerializer.Serialize
+    let checkpoint = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+                     |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+    Assert.Equal(generation, int checkpoint.GenerationNumber)
+    let fresh =
+        checkpoint |> SorterPoolSet_Soss.clearEvaluations
+        |> Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 true
+            (UMX.tag false) (UMX.tag expectedSubset) true
+    for KeyValue(poolId, pool) in checkpoint.SorterPools do
+        let freshMembers = fresh.SorterPools.[poolId].SorterPoolMembers |> Seq.map (fun m -> m.SorterPoolMemberId, m) |> Map.ofSeq
+        for memberValue in pool.SorterPoolMembers do
+            Assert.Equal(expectedSubset, %memberValue.SubsetIdForSelection)
+            let freshMember = freshMembers.[memberValue.SorterPoolMemberId]
+            Assert.Equal(float freshMember.Score, float memberValue.Score)
+            for KeyValue(subset, evaluation) in memberValue.SorterEvalMap do
+                Assert.True((evaluation = freshMember.SorterEvalMap.[subset]))
+    let summarySet =
+        match load (geneSortDataType.SorterPoolSetSummarySet "") with
+        | outputData.SorterPoolSetSummarySet (spSummarySet.Soss value) -> value
+        | _ -> failwith "Expected Soss summary set"
+    let summaryBytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummarySetDto_Soss.toDto summarySet |> MessagePack.MessagePackSerializer.Serialize
+    let restoredSummary = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetSummarySetDto_Soss>(summaryBytes)
+                          |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummarySetDto_Soss.fromDto
+    Assert.Equal(generation, int restoredSummary.LastGeneration)
+    if not hasSummary then Assert.Empty(restoredSummary.SorterPoolSetSummaries)
+    else
+        let snapshot = restoredSummary.SorterPoolSetSummaries |> Array.exactlyOne
+        Assert.Equal(generation, int snapshot.GenerationNumber)
+        Assert.True(snapshot.SorterPoolSetId = checkpoint.SorterPoolSetId)
+        Assert.Equal(fresh.SortedSorterEvalPercentage, snapshot.SortedSorterEvalPercentage)
+        let expectedRows = fresh.SorterPools |> Map.values |> Seq.sumBy (fun p ->
+            p.SorterPoolMembers |> Seq.collect (fun m -> Map.keys m.SorterEvalMap) |> Seq.distinct |> Seq.length)
+        Assert.Equal(expectedRows, snapshot.SorterPoolSummaries.Length)
+        for row in snapshot.SorterPoolSummaries do
+            let pool = fresh.SorterPools.[row.SorterPoolId]
+            let evaluations = pool.SorterPoolMembers |> Seq.map (fun m -> m.SorterEvalMap.[row.SortableTestsSubsetId]) |> Seq.toArray
+            let scores = evaluations |> Array.map (SorterEvalFunctions.getFunctionForMeasure (rp.GetSorterEvalMeasure().Value) >> float)
+            Assert.Equal(int pool.RawCeLength, int row.RawCeLength)
+            Assert.Equal(Array.average scores, float row.AverageSorterPoolScore)
+            Assert.Equal(Array.min scores, float row.MinimumSorterPoolScore)
+            Assert.Equal(evaluations |> Array.averageBy (SorterEval.getUnsortedCount >> float), row.AverageUnsortedCount)
+
+    let bins =
+        match load (geneSortDataType.SorterPoolBinsSetSeries "") with
+        | outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Soss value) -> value
+        | _ -> failwith "Expected Soss evaluation bins"
+    let binBytes = GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto_Soss.fromDomain bins |> MessagePack.MessagePackSerializer.Serialize
+    let restoredBins = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Bins.Soss.sorterPoolBinsSetSeriesDto_Soss>(binBytes)
+                       |> GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto_Soss.toDomain
+    if not hasSummary then Assert.Equal(0, restoredBins.Count)
+    else
+        let binSet = restoredBins.SorterPoolEvalBinsSets |> Map.values |> Seq.exactlyOne
+        Assert.Equal(generation, int binSet.GenerationNumber)
+        Assert.True(binSet.SorterPoolSetId = checkpoint.SorterPoolSetId)
+        Assert.Equal(checkpoint.SorterPools.Count, binSet.SorterPoolEvalBinsMap.Count)
+        let poolBinsById = binSet.SorterPoolEvalBinsMap |> Map.values |> Seq.map (fun b -> b.SorterPoolId, b) |> Map.ofSeq
+        Assert.Equal(checkpoint.SorterPools.Count, poolBinsById.Count)
+        // Bins intentionally store V1 evaluations. Compare full downgraded payloads
+        // as multisets: copied models may share a sorter ID and must not be deduplicated.
+        let payloadCounts evaluations =
+            evaluations |> Seq.map (fun evaluation ->
+                SorterEval.downgradeTo sorterEvalType.V1 evaluation
+                |> GeneSort.SortingOps.Mp.SorterEvalDto.fromDomain
+                |> MessagePack.MessagePackSerializer.Serialize |> Convert.ToHexString)
+            |> Seq.countBy id |> Seq.sortBy fst |> Seq.toArray
+        let snapshot = restoredSummary.SorterPoolSetSummaries |> Array.exactlyOne
+        for KeyValue(poolId, pool) in fresh.SorterPools do
+            let poolBins = poolBinsById.[poolId]
+            let expected = pool.SorterPoolMembers |> Seq.map (fun m -> m.SorterEvalForSelection.Value) |> Seq.toArray
+            let actual = poolBins.Bins |> Map.values |> Seq.collect (fun b -> b.SorterEvals) |> Seq.toArray
+            Assert.True((payloadCounts expected = payloadCounts actual), sprintf "Saved bins diverged at generation %d pool %A" generation poolId)
+            for KeyValue(key, bin) in poolBins.Bins do
+                Assert.Equal(bin.SorterEvals.Count, bin.EvalCount)
+                Assert.Equal(bin.EvalCount, bin.SortedCount + bin.UnsortedCount)
+                Assert.Equal(bin.SorterEvals |> Seq.filter SorterEval.getIsSorted |> Seq.length, bin.SortedCount)
+                for evaluation in bin.SorterEvals do
+                    Assert.Equal(expectedSubset, %(SorterEval.getSortableTestsSubsetId evaluation))
+                    Assert.Equal(int key.CeCount, int (SorterEval.getCeLength evaluation))
+                    Assert.Equal(int key.StageLength, int (SorterEval.getStageLength evaluation))
+            let summaryRow = snapshot.SorterPoolSummaries |> Array.find (fun row ->
+                row.SorterPoolId = poolId && %row.SortableTestsSubsetId = expectedSubset)
+            let scores = actual |> Array.map (SorterEvalFunctions.getFunctionForMeasure (rp.GetSorterEvalMeasure().Value) >> float)
+            // Grouping changes summation order, so allow floating-point roundoff.
+            Assert.Equal(Array.average scores, float summaryRow.AverageSorterPoolScore, 12)
+            Assert.Equal(Array.min scores, float summaryRow.MinimumSorterPoolScore)
+            Assert.Equal(actual |> Array.averageBy (SorterEval.getUnsortedCount >> float), summaryRow.AverageUnsortedCount)
+
 [<Fact>]
 let ``Pool 4 debug generates split parameters and completes setup and execution`` () =
     let configured = singleSource ()
@@ -201,11 +295,13 @@ let ``Pool 4 debug generates split parameters and completes setup and execution`
         mode = geneSortDataMode.Results && outputType = geneSortDataType.SorterPoolSet "")
 
 [<Theory>]
-[<InlineData(true, true)>]
-[<InlineData(true, false)>]
-[<InlineData(false, true)>]
-[<InlineData(false, false)>]
-let ``Soss adjusts only on subset transitions and uses merged evaluations`` changed otherPartitionUnsorted =
+[<InlineData(true, true, 2)>]
+[<InlineData(true, false, 2)>]
+[<InlineData(false, true, 2)>]
+[<InlineData(false, false, 2)>]
+[<InlineData(true, false, 1)>]
+[<InlineData(false, false, 1)>]
+let ``Soss adjusts on merged evaluations but retains the scheduled partition for selection`` changed otherPartitionUnsorted partitionCount =
     let host = runHost.Create (singleSource ()) 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
     let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
@@ -216,6 +312,7 @@ let ``Soss adjusts only on subset transitions and uses merged evaluations`` chan
     let partitions =
         [ UMX.tag "0", makeTests (Array.init 32 (fun i -> otherPartitionUnsorted && i < 16))
           UMX.tag "1", makeTests (Array.create 32 false) ]
+        |> List.filter (fun (id, _) -> partitionCount > 1 || id = UMX.tag "1")
         |> Map.ofList |> partitionOfSortableTests.create
     let model =
         msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 1)
@@ -236,11 +333,534 @@ let ``Soss adjusts only on subset transitions and uses merged evaluations`` chan
     let resultPool = result.SorterPools.[poolId]
     let survivor = resultPool.SorterPoolMembers |> Seq.exactlyOne
     Assert.True(survivor.SubsetIdForSelection = UMX.tag<sortableTestsSubsetId> "1")
-    Assert.Equal(changed, Map.containsKey CommonSgdSoss.mergedSubsetId survivor.SorterEvalMap)
+    Assert.Equal(changed && otherPartitionUnsorted && partitionCount > 1, Map.containsKey CommonSgdSoss.mergedSubsetId survivor.SorterEvalMap)
+    Assert.True(survivor.SorterEvalForSelection.Value = survivor.SorterEvalMap.[UMX.tag "1"])
+    if changed && otherPartitionUnsorted then
+        Assert.True(SorterEval.getIsSorted survivor.SorterEvalForSelection.Value)
+        Assert.False(SorterEval.getIsSorted survivor.SorterEvalMap.[CommonSgdSoss.mergedSubsetId])
     if changed && not otherPartitionUnsorted then
         Assert.True(resultPool.RawCeLength < inputPool.RawCeLength)
     else
         Assert.Equal(inputPool.RawCeLength, resultPool.RawCeLength)
+
+[<Theory>]
+[<InlineData(1, false, false)>]
+[<InlineData(1, true, false)>]
+[<InlineData(2, false, false)>]
+[<InlineData(2, true, false)>]
+[<InlineData(2, false, true)>]
+[<InlineData(2, true, true)>]
+let ``Soss length changes invalidate every subset before parent and survivor ranking`` (partitionCount: int) forReport mergedSelection =
+    let host = runHost.Create (singleSource ()) 1
+    let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
+    let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
+                  |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
+    let values = Array.create 32 true
+    values.[1] <- false
+    let test = sortableBoolArray.create(values, 32<sortingWidth>)
+    // Two failures have a strictly worse UnsortedCount score than zero failures.
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> [|test; test|] |> sortableTests.Bools
+    let partitions = [0 .. partitionCount - 1] |> List.map (fun i -> UMX.tag (string i), tests)
+                     |> Map.ofList |> partitionOfSortableTests.create
+    let makeMember (id: Guid) cePosition =
+        let codes = Array.create 150 0
+        codes.[cePosition] <- 1 // Comparator (0,1).
+        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+                    |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+        spMember_Soss.create (UMX.tag id) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+    // At the original length both sort; at the adjusted budget of one CE only B sorts.
+    // A sorts first by ID, so stale equal scores would select A instead of B.
+    let memberA = makeMember Guid.Empty 1
+    let memberB = makeMember (Guid.Parse "00000000-0000-0000-0000-000000000001") 0
+    let poolId = UMX.tag (Guid.NewGuid())
+    let pool = sorterPool_Soss.create poolId None (UMX.tag "length") (D1 0) [|memberA; memberB|] 150<ceLength> (UMX.tag 0)
+    let generation = if mergedSelection then 2<generationNumber> else 0<generationNumber>
+    let input = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) generation (Dim1 1) (Some [pool])
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let selectedId = if mergedSelection then CommonSgdSoss.mergedSubsetId else UMX.tag<sortableTestsSubsetId> "0"
+    let adjustmentId = if partitionCount = 1 then selectedId else CommonSgdSoss.mergedSubsetId
+    let evaluate selected force poolSet =
+        Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 force
+            (UMX.tag false) selected true poolSet
+    let cached = input |> SorterPoolSet_Soss.withSubsetIdForSelection adjustmentId |> evaluate adjustmentId true
+    let adjusted = cached |> SorterPoolSet_Soss.adjustCeLengths 1.0<sortedFraction>
+    Assert.Equal(1, int adjusted.SorterPools.[poolId].RawCeLength)
+    for memberValue in adjusted.SorterPools.[poolId].SorterPoolMembers do
+        Assert.Empty(memberValue.SorterEvalMap)
+        Assert.True(memberValue.SorterEvalForSelection.IsNone)
+    // An unchanged length must retain its caches.
+    let unchanged =
+        sorterPool_Soss.create poolId None pool.Name pool.SorterPoolTag
+            (cached.SorterPools.[poolId].SorterPoolMembers |> Seq.toArray) 1<ceLength> pool.MutationMod
+        |> SorterPool_Soss.adjustCeLengthByThreshold 1.0<sortedFraction>
+    Assert.All(unchanged.SorterPoolMembers, fun memberValue -> Assert.NotEmpty(memberValue.SorterEvalMap))
+    let measure = unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount
+    for parentSelection in [true; false] do
+        // Parent test starts after adjustment; survivor test adjusts inside the step.
+        let start =
+            if parentSelection then adjusted |> SorterPoolSet_Soss.withSubsetIdForSelection selectedId
+            else cached |> SorterPoolSet_Soss.withSubsetIdForSelection SortableTestsSubsetId.Default
+        let result =
+            Pipeline_Soss.runGenerationStepSoss mutator
+                (if parentSelection then 2<sorterCountPerPool> else 1<sorterCountPerPool>)
+                (if parentSelection then 1<sorterCountPerPool> else 2<sorterCountPerPool>)
+                0<sorterChildCount> (UMX.tag false) (UMX.tag false) partitions
+                1<generationsPerSubset> 1<generationsPerSubset> prefix sorterEvalType.V2 measure
+                start forReport (UMX.tag false) 1.0<sortedFraction>
+        let survivor = result.SorterPools.[poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.True(survivor.SorterPoolMemberId = memberB.SorterPoolMemberId)
+        Assert.Equal(0, int (SorterEval.getUnsortedCount survivor.SorterEvalForSelection.Value))
+        let fresh = evaluate selectedId true result
+        let freshMember = fresh.SorterPools.[poolId].SorterPoolMembers |> Seq.exactlyOne
+        for KeyValue(subset, evaluation) in survivor.SorterEvalMap do
+            Assert.True((evaluation = freshMember.SorterEvalMap.[subset]))
+
+[<Theory>]
+[<InlineData(1, true)>]
+[<InlineData(1, false)>]
+[<InlineData(2, true)>]
+[<InlineData(2, false)>]
+let ``Soss resume replaces legacy length caches before parent and survivor selection`` (partitionCount: int) parentSelection =
+    GeneSort.Core.Mp.MessagePackSetup.configure()
+    let host = runHost.Create (singleSource ()) 1
+    let baseRp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne)
+                     .WithPartitionCount(Some (UMX.tag partitionCount))
+                     .WithGenerationsPerSubset(Some 3<generationsPerSubset>)
+                     .WithGenerationsPerMergedSet(Some 2<generationsPerSubset>)
+                     .WithSorterCountPerPool(Some (if parentSelection then 2<sorterCountPerPool> else 1<sorterCountPerPool>))
+                     .WithSelectedSorterCountPerPool(Some (if parentSelection then 1<sorterCountPerPool> else 2<sorterCountPerPool>))
+                     .WithSorterChildCount(Some 0<sorterChildCount>)
+                     .WithSorterCountCycle(None)
+                     .WithSorterPoolExpansionRate(None)
+                     .WithSorterEvalMeasure(Some (unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount))
+    let values = Array.create 32 true
+    values.[1] <- false
+    let test = sortableBoolArray.create(values, 32<sortingWidth>)
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 4 test) |> sortableTests.Bools
+    let partitions = SgdEx_Soss.makeSortableTestsPartitions (baseRp.GetRngType().Value) (baseRp.GetSeedSoss().Value)
+                         (UMX.tag partitionCount) tests
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let makeMember (id: Guid) cePosition =
+        let codes = Array.create 150 0
+        codes.[cePosition] <- 1
+        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+                    |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+        spMember_Soss.create (UMX.tag id) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+    let memberA = makeMember Guid.Empty 140
+    let memberB = makeMember (Guid.Parse "00000000-0000-0000-0000-000000000001") 20
+    let poolId = UMX.tag (Guid.NewGuid())
+    let fullPool = sorterPool_Soss.create poolId None (UMX.tag "legacy") (D1 0) [|memberA; memberB|] 150<ceLength> (UMX.tag 0)
+    let selectedFor generation =
+        if partitionCount = 1 then UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId> SortableTestsPartitionId.Default
+        elif generation % 8 < 3 then UMX.tag "0"
+        elif generation % 8 < 6 then UMX.tag "1"
+        else CommonSgdSoss.mergedSubsetId
+    // Resume within a phase and at every kind of transition, without summary
+    // reporting that might accidentally refresh caches before parent ranking.
+    for generation in [1; 3; 6; 8] do
+        let previousSubset = selectedFor (generation - 1)
+        let fullSet =
+            sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [fullPool])
+            |> SorterPoolSet_Soss.withSubsetIdForSelection previousSubset
+            |> Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 true
+                (UMX.tag false) previousSubset true
+        let evaluatedPool = fullSet.SorterPools.[poolId]
+        Assert.All(evaluatedPool.SorterPoolMembers, fun memberValue -> Assert.Equal(0, int (SorterEval.getUnsortedCount memberValue.SorterEvalForSelection.Value)))
+        // Reproduce the old bug: shorten the pool but preserve evaluations from 150 CEs.
+        let legacyPool = sorterPool_Soss.create poolId None fullPool.Name fullPool.SorterPoolTag
+                             (evaluatedPool.SorterPoolMembers |> Seq.toArray) 100<ceLength> fullPool.MutationMod
+        let legacy = fullSet |> SorterPoolSet_Soss.upsertPool legacyPool
+        let bytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto legacy |> MessagePack.MessagePackSerializer.Serialize
+        let restored = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+                       |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+        let rp = baseRp.WithGenerationIntervalLast(Some (UMX.tag (generation + 1))).WithGenerationCurrent(Some 0<generationNumber>)
+        let memory = MemoryDb()
+        let db = memory :> IGeneSortDb
+        let query gen kind = db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some gen)) kind |> Option.get
+        let save mode gen kind value = db.saveAsync mode (query gen kind) value (UMX.tag false)
+                                       |> Async.RunSynchronously |> Result.defaultWith failwith
+        save geneSortDataMode.Setup 0<generationNumber> (geneSortDataType.SortableTestsWithPrefix "") (outputData.SortableTestsWithPrefix(tests, [||]))
+        save geneSortDataMode.Results (UMX.tag generation) (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss restored))
+        use cts = new CancellationTokenSource()
+        SgdEx_Soss.evaluateEvolutionRunSoss host.ExecutionContext.MakeMutator.Value db
+            { intervals with MaxCount = Some 10 } { intervals with Method = Constant 100 }
+            rp (UMX.tag false) cts None
+        |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+        let result = db.loadAsync geneSortDataMode.Results (query (UMX.tag (generation + 1)) (geneSortDataType.SorterPoolSet ""))
+                     |> Async.RunSynchronously |> Result.bind OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
+        let survivor = result.SorterPools.[poolId].SorterPoolMembers |> Seq.exactlyOne
+        Assert.True(survivor.SorterPoolMemberId = memberB.SorterPoolMemberId,
+            sprintf "Stale cache selected A on resume at generation %d (parent=%b, partitions=%d)" generation parentSelection partitionCount)
+        Assert.True(survivor.SubsetIdForSelection = selectedFor generation)
+        let fresh = Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 true
+                        (UMX.tag false) (selectedFor generation) true result
+        let freshMember = fresh.SorterPools.[poolId].SorterPoolMembers |> Seq.exactlyOne
+        for KeyValue(subset, evaluation) in survivor.SorterEvalMap do
+            Assert.True((evaluation = freshMember.SorterEvalMap.[subset]))
+
+[<Theory>]
+[<InlineData(false, false, 2)>]
+[<InlineData(false, true, 2)>]
+[<InlineData(true, false, 2)>]
+[<InlineData(true, true, 2)>]
+[<InlineData(false, false, 1)>]
+[<InlineData(false, true, 1)>]
+[<InlineData(true, false, 1)>]
+[<InlineData(true, true, 1)>]
+let ``Soss parent survivor and pool rankings follow every cycle boundary`` cached forReport partitionCount =
+    let host = runHost.Create (singleSource ()) 1
+    let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
+    let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
+                  |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
+    // Each test has one adjacent inversion at a different position.
+    let makeTests cuts =
+        cuts |> Array.map (fun cut ->
+            let values = Array.init 32 (fun i -> i >= cut)
+            values.[cut - 1] <- true
+            values.[cut] <- false
+            sortableBoolArray.create(values, 32<sortingWidth>))
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth>
+        |> sortableTests.Bools
+    let partitions =
+        [ UMX.tag "0", makeTests [|1; 2; 3; 4; 5|]
+          UMX.tag "1", makeTests [|6; 7; 8; 9; 10|] ]
+        |> List.take partitionCount |> Map.ofList |> partitionOfSortableTests.create
+    // A wins partition 0, B wins partition 1, C wins Merge (4 failures vs 5).
+    // Use at least two failures to avoid the log-score tie between zero and one.
+    let members =
+        [| [|1; 2; 3; 4; 5|]; [|6; 7; 8; 9; 10|]; [|1; 2; 3; 6; 7; 8|] |]
+        |> Array.map (fun cuts ->
+            let codes = Array.create 150 0
+            cuts |> Array.iteri (fun i cut ->
+                codes.[i] <- GeneSort.Sorting.Sorter.ce.create (cut - 1) cut |> GeneSort.Sorting.Sorter.Ce.toIndex)
+            let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+                        |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+            spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>)
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let measure = unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount
+    let expectedSubset generation =
+        if partitionCount = 1 || generation % 7 < 2 then "0"
+        elif generation % 7 < 4 then "1"
+        else "Merge"
+    // Two complete cycles plus wraparound, with unequal subset/merged durations.
+    for generation in 0 .. 14 do
+        for selectParents in [true; false] do
+            let previous = if generation = 0 then "Default" else expectedSubset (generation - 1)
+            let selected = expectedSubset generation
+            let expectedIndex = match selected with "0" -> 0 | "1" -> 1 | _ -> 2
+            let poolId = UMX.tag (Guid.NewGuid())
+            let inputPool = sorterPool_Soss.create poolId None (UMX.tag "boundary") (D1 0) members 150<ceLength> (UMX.tag 0)
+            let input =
+                sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [inputPool])
+                |> SorterPoolSet_Soss.withSubsetIdForSelection (UMX.tag previous)
+            let prepared =
+                if cached then
+                    Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 false
+                        (UMX.tag false) (UMX.tag selected) true input
+                else input
+            // Isolate each ranking: either parent retention or survivor pruning
+            // reduces three candidates to one. No mutation obscures their identities.
+            let result =
+                Pipeline_Soss.runGenerationStepSoss mutator
+                    (if selectParents then 3<sorterCountPerPool> else 1<sorterCountPerPool>)
+                    (if selectParents then 1<sorterCountPerPool> else 3<sorterCountPerPool>)
+                    0<sorterChildCount> (UMX.tag false) (UMX.tag false) partitions
+                    2<generationsPerSubset> 3<generationsPerSubset> prefix sorterEvalType.V2 measure
+                    prepared forReport (UMX.tag false) 1.0<sortedFraction>
+            let survivor = result.SorterPools.[poolId].SorterPoolMembers |> Seq.exactlyOne
+            Assert.True(survivor.SorterPoolMemberId = members.[expectedIndex].SorterPoolMemberId,
+                sprintf "generation=%d subset=%s parentSelection=%b cached=%b report=%b partitions=%d"
+                    generation selected selectParents cached forReport partitionCount)
+            Assert.Equal(selected, %survivor.SubsetIdForSelection)
+            Assert.Equal(selected, %(SorterEval.getSortableTestsSubsetId survivor.SorterEvalForSelection.Value))
+            Assert.Equal(generation + 1, int result.GenerationNumber)
+
+        // Exercise milestone trimming/expansion through the orchestrator as well.
+        let previous = if generation = 0 then "Default" else expectedSubset (generation - 1)
+        let selected = expectedSubset generation
+        let expectedIndex = match selected with "0" -> 0 | "1" -> 1 | _ -> 2
+        let pools = members |> Array.mapi (fun i memberValue ->
+            sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag (string i)) (D1 i)
+                [|memberValue|] 150<ceLength> (UMX.tag 0))
+        let input =
+            sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 3) (Some pools)
+            |> SorterPoolSet_Soss.withSubsetIdForSelection (UMX.tag previous)
+        let prepared =
+            if cached then
+                Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 false
+                    (UMX.tag false) (UMX.tag selected) true input
+            else input
+        let poolMeasure = stDevPoolMeasure.create 0.0<stDevWeight> measure |> sorterPoolMeasure.StDevPool
+        let config = { intervals with MaxCount = Some 16 }
+        let expansionRp = rp.WithGenerationIntervalLast(Some (UMX.tag (generation + 1)))
+                            .WithGenerationsPerSubset(Some 2<generationsPerSubset>)
+                            .WithGenerationsPerMergedSet(Some 3<generationsPerSubset>)
+                            .WithSorterPoolExpansionRate(Some 3<sorterPoolExpansionRate>)
+                            .WithSorterPoolSelectionIntervals(Some config)
+                            .WithSorterPoolMeasure(Some poolMeasure)
+                            .WithSorterCountPerPool(Some 1<sorterCountPerPool>)
+                            .WithSelectedSorterCountPerPool(Some 1<sorterCountPerPool>)
+                            .WithSorterChildCount(Some 0<sorterChildCount>)
+                            .WithSorterCountCycle(None)
+                            .WithSorterEvalMeasure(Some measure)
+        let reportConfig = if forReport then config else { config with Method = Constant 100 }
+        let reportingDb = MemoryDb()
+        let expanded =
+            EvoOrch_Soss.runSossEvolutionAsync reportingDb config reportConfig expansionRp (UMX.tag false)
+                prepared partitions prefix mutator CancellationToken.None ignore
+            |> Async.RunSynchronously |> Result.defaultWith failwith
+        Assert.Equal(3, int expanded.SorterPoolCount)
+        let copiedIds = expanded.SorterPools |> Map.values |> Seq.collect (fun p -> p.SorterPoolMembers) |> Seq.map (fun m -> m.SorterPoolMemberId) |> Seq.toArray
+        Assert.Equal(3, copiedIds |> Array.distinct |> Array.length)
+        for childPool in expanded.SorterPools |> Map.values do
+            Assert.True(childPool.ParentSorterPoolId = Some pools.[expectedIndex].SorterPoolId,
+                sprintf "Wrong pool expanded at generation=%d subset=%s cached=%b report=%b" generation selected cached forReport)
+            let memberValue = childPool.SorterPoolMembers |> Seq.exactlyOne
+            Assert.Equal(selected, %memberValue.SubsetIdForSelection)
+            Assert.DoesNotContain(memberValue.SorterPoolMemberId, members |> Array.map (fun m -> m.SorterPoolMemberId))
+            if partitionCount = 1 && generation = 0 then
+                Assert.True(childPool.RawCeLength < 150<ceLength>, "Expansion must preserve CE adjustment transition detection.")
+        verifySavedSossReport reportingDb expansionRp (generation + 1) partitions prefix selected forReport
+
+        if forReport && partitionCount = 2 && List.contains generation [0; 2; 4; 7] then
+            // Keep multiple score bins and duplicate model IDs in a single pool.
+            // This detects grouping errors or accidental deduplication that singleton
+            // expanded pools would not expose.
+            let copy = SpMember_Soss.deriveForChildPool (UMX.tag (Guid.NewGuid())) (UMX.tag 0) members.[0]
+            let groupedPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "bin-groups") (D1 0)
+                                  (Array.append members [|copy|]) 150<ceLength> (UMX.tag 0)
+            let groupedInput = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [groupedPool])
+                               |> SorterPoolSet_Soss.withSubsetIdForSelection (UMX.tag previous)
+            let groupedRp = expansionRp.WithSorterPoolExpansionRate(None)
+                                       .WithSorterCountPerPool(Some 4<sorterCountPerPool>)
+                                       .WithSelectedSorterCountPerPool(Some 4<sorterCountPerPool>)
+                                       .WithDistinctSorterHashes(Some (UMX.tag false))
+            let groupedDb = MemoryDb()
+            let groupedResult =
+                EvoOrch_Soss.runSossEvolutionAsync groupedDb config config groupedRp (UMX.tag false)
+                    groupedInput partitions prefix mutator CancellationToken.None ignore
+                |> Async.RunSynchronously |> Result.defaultWith failwith
+            Assert.Equal(4, groupedResult.SorterPools.[groupedPool.SorterPoolId].SorterPoolMembers |> Seq.length)
+            let distinctKeys = groupedResult.SorterPools.[groupedPool.SorterPoolId].SorterPoolMembers
+                               |> Seq.map (fun m -> GeneSort.Eval.V1.Bins.SorterEvalKey.fromSorterEval m.SorterEvalForSelection.Value)
+                               |> Seq.distinct |> Seq.length
+            Assert.True(distinctKeys > 1)
+            verifySavedSossReport groupedDb groupedRp (generation + 1) partitions prefix selected true
+
+[<Fact>]
+let ``Soss copied members reevaluate independently at destination pool lengths`` () =
+    let values = Array.create 32 true
+    values.[1] <- false
+    let test = sortableBoolArray.create(values, 32<sortingWidth>)
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> [|test; test|] |> sortableTests.Bools
+    let partitions = Map.ofList [UMX.tag "0", tests; UMX.tag "1", tests] |> partitionOfSortableTests.create
+    let codes = Array.create 150 0
+    codes.[140] <- 1
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+                |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let original = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 5) (UMX.tag 0) None Map.empty 0<generationNumber>
+    let sourcePool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 0) [|original|] 150<ceLength> (UMX.tag 0)
+    let sourceSet = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [sourcePool])
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let evaluate poolSet = Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 false
+                               (UMX.tag false) CommonSgdSoss.mergedSubsetId true poolSet
+    let cachedSet = sourceSet |> SorterPoolSet_Soss.withSubsetIdForSelection CommonSgdSoss.mergedSubsetId |> evaluate
+    let cachedPool = cachedSet.SorterPools.[sourcePool.SorterPoolId]
+    let cachedMember = cachedPool.SorterPoolMembers |> Seq.exactlyOne
+    Assert.Equal(3, cachedMember.SorterEvalMap.Count)
+    Assert.Equal(0, int (SorterEval.getUnsortedCount cachedMember.SorterEvalForSelection.Value))
+    let children =
+        [|100; 150|] |> Array.mapi (fun i length ->
+            let derived = SorterPool_Soss.deriveChildPool (UMX.tag (Guid.NewGuid())) (UMX.tag i) cachedPool
+            let copied = derived.SorterPoolMembers |> Seq.exactlyOne
+            Assert.Empty(copied.SorterEvalMap)
+            Assert.True(copied.SorterPoolMemberId <> cachedMember.SorterPoolMemberId)
+            Assert.True(copied.SorterModel = cachedMember.SorterModel)
+            Assert.Equal(0, int copied.MutationIndex)
+            sorterPool_Soss.create derived.SorterPoolId derived.ParentSorterPoolId derived.Name (D1 i)
+                [|copied|] (UMX.tag length) derived.MutationMod)
+    let result = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 2) (Some children) |> evaluate
+    for i in 0 .. 1 do
+        let memberValue = result.SorterPools.[children.[i].SorterPoolId].SorterPoolMembers |> Seq.exactlyOne
+        for KeyValue(subset, evaluation) in memberValue.SorterEvalMap do
+            let expected = if i = 1 then 0 elif subset = CommonSgdSoss.mergedSubsetId then 4 else 2
+            Assert.Equal(expected, int (SorterEval.getUnsortedCount evaluation))
+    // Derivation never invalidates the original source member's own cache.
+    Assert.Equal(3, cachedMember.SorterEvalMap.Count)
+
+[<Theory>]
+[<InlineData("Lcg", false)>]
+[<InlineData("Net", false)>]
+[<InlineData("Smx", false)>]
+[<InlineData("Lcg", true)>]
+[<InlineData("Net", true)>]
+[<InlineData("Smx", true)>]
+let ``Soss SeedSoss recreates ordered partition contents and cached evaluations after serialization`` rngName bitVector =
+    GeneSort.Core.Mp.MessagePackSetup.configure()
+    let rngType = match rngName with "Lcg" -> Lcg | "Net" -> Net | _ -> Smx
+    // Unique inputs span several SIMD blocks, including a partially filled block.
+    let rows =
+        [| for value in 0 .. 1026 ->
+            Array.init 32 (fun bit -> (value &&& (1 <<< bit)) <> 0)
+            |> fun values -> sortableBoolArray.create(values, 32<sortingWidth>) |]
+    let setupTests =
+        if bitVector then
+            SortableBitv512Tests.fromBoolArrays (UMX.tag (Guid.NewGuid())) 32<sortingWidth> rows |> sortableTests.Bitv512
+        else
+            sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> rows |> sortableTests.Bools
+    let setupBytes =
+        GeneSort.Sorting.Mp.Sortable.SortableTestsDto.fromDomain setupTests
+        |> MessagePack.MessagePackSerializer.Serialize
+    let restoredTests =
+        MessagePack.MessagePackSerializer.Deserialize<GeneSort.Sorting.Mp.Sortable.sortableTestsDto>(setupBytes)
+        |> GeneSort.Sorting.Mp.Sortable.SortableTestsDto.toDomain
+    let contents (partitions: partitionOfSortableTests) =
+        partitions.SortableTests |> Map.map (fun _ tests ->
+            let arrays =
+                match tests with
+                | sortableTests.Bools values -> values.SortableBinaryArrays
+                | sortableTests.Bitv512 values -> values.SimdSortBlocks |> Array.collect SortBlockBitv512.toSortableBoolArrays
+                | _ -> failwith "Unexpected test format"
+            arrays |> Array.map (fun value -> value.Values))
+    let model =
+        msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.init 150 (fun i -> 1 + i % 90))
+        |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+    let inputPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "cache") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
+    let input = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 7<generationNumber> (Dim1 1) (Some [inputPool])
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let serializePool value =
+        GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto value |> MessagePack.MessagePackSerializer.Serialize
+    for count in [1; 3; 7] do
+        for seed in [1UL; 0x123456789ABCDEF0UL] do
+            let make tests (seed: uint64) = SgdEx_Soss.makeSortableTestsPartitions rngType (UMX.tag seed) (UMX.tag count) tests
+            let original = make setupTests seed
+            let recreated = make restoredTests seed
+            Assert.True(contents original = contents recreated,
+                sprintf "Partition contents/order changed for RNG=%s count=%d seed=%d SIMD=%b" rngName count seed bitVector)
+            if count > 1 then
+                // Ensure this fixture detects accidentally ignoring or changing SeedSoss.
+                Assert.False(contents original = contents (make restoredTests (seed + 1UL)))
+            let subset = original.SortableTests |> Map.keys |> Seq.head |> UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId>
+            let evaluate partitions force pool =
+                Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 force
+                    (UMX.tag false) subset true pool
+            let cached = input |> SorterPoolSet_Soss.withSubsetIdForSelection subset |> evaluate original true
+            let checkpointBytes = serializePool cached
+            let restored =
+                MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(checkpointBytes)
+                |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+            let reused = evaluate recreated false restored |> serializePool
+            let fresh = evaluate recreated true restored |> serializePool
+            // Compare the entire member evaluation map, including Merge, not only scores.
+            Assert.True((checkpointBytes = reused))
+            Assert.True((checkpointBytes = fresh),
+                sprintf "Cached evaluations changed for RNG=%s count=%d seed=%d SIMD=%b" rngName count seed bitVector)
+
+[<Theory>]
+[<InlineData(1, false)>]
+[<InlineData(2, false)>]
+[<InlineData(1, true)>]
+[<InlineData(2, true)>]
+let ``Soss serialized checkpoint resumes match uninterrupted cycles at every boundary`` (partitionCount: int) sparse =
+    GeneSort.Core.Mp.MessagePackSetup.configure()
+    let host = runHost.Create (singleSource ()) 1
+    let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne)
+                 .WithPartitionCount(Some (UMX.tag partitionCount))
+                 .WithGenerationsPerSubset(Some 2<generationsPerSubset>)
+                 .WithGenerationsPerMergedSet(Some 3<generationsPerSubset>)
+                 .WithGenerationIntervalLast(Some (UMX.tag 15))
+                 .WithSorterCountPerPool(Some 1<sorterCountPerPool>)
+                 .WithSelectedSorterCountPerPool(Some 1<sorterCountPerPool>)
+                 .WithSorterChildCount(Some 0<sorterChildCount>)
+                 .WithSorterCountCycle(None)
+                 .WithSorterPoolExpansionRate(None)
+                 .WithSorterEvalMeasure(Some (unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount))
+    let config = { intervals with MaxCount = Some 16 }
+    let testSet =
+        [| for cut in 1 .. 10 ->
+            let values = Array.init 32 (fun i -> i >= cut)
+            values.[cut - 1] <- true
+            values.[cut] <- false
+            sortableBoolArray.create(values, 32<sortingWidth>) |]
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth>
+        |> sortableTests.Bools
+    // Keep a nonempty, deterministic population so evaluation caches and subset IDs
+    // are checked without random child IDs obscuring exact checkpoint comparisons.
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 0)
+                |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+    let seedPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "resume") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
+    let seed = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [seedPool])
+    let serialize value =
+        GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto value
+        |> MessagePack.MessagePackSerializer.Serialize
+    let restore (bytes: byte array) =
+        MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+        |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+    let query (db: IGeneSortDb) (generation: int) kind =
+        db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) kind |> Option.get
+    let saveValue (db: IGeneSortDb) mode generation kind value =
+        db.saveAsync mode (query db generation kind) value (UMX.tag false)
+        |> Async.RunSynchronously |> Result.defaultWith failwith
+    let saveCheckpoint db (value: sorterPoolSet_Soss) =
+        saveValue db geneSortDataMode.Results (int value.GenerationNumber) (geneSortDataType.SorterPoolSet "")
+            (outputData.SorterPoolSet (sorterPoolSet.Soss value))
+    let initialize (db: IGeneSortDb) =
+        saveValue db geneSortDataMode.Setup 0 (geneSortDataType.SortableTestsWithPrefix "")
+            (outputData.SortableTestsWithPrefix(testSet, [||]))
+    let loadCheckpoint (db: IGeneSortDb) generation =
+        db.loadAsync geneSortDataMode.Results (query db generation (geneSortDataType.SorterPoolSet ""))
+        |> Async.RunSynchronously |> Result.bind OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
+    let execute db =
+        use cts = new CancellationTokenSource()
+        // Deliberately stale caller generation: checkpoint discovery must supply it.
+        SgdEx_Soss.evaluateEvolutionRunSoss host.ExecutionContext.MakeMutator.Value db config config
+            (rp.WithGenerationCurrent(Some 0<generationNumber>)) (UMX.tag false) cts None
+        |> Async.RunSynchronously |> Result.defaultWith failwith
+    let uninterrupted = MemoryDb()
+    initialize uninterrupted
+    saveCheckpoint uninterrupted seed
+    execute uninterrupted |> ignore
+    let baseline = [| for generation in 0 .. 15 -> loadCheckpoint uninterrupted generation |> serialize |]
+    let partitions = SgdEx_Soss.makeSortableTestsPartitions (rp.GetRngType().Value) (rp.GetSeedSoss().Value)
+                         (UMX.tag partitionCount) testSet
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    // Includes before/at/after partition transitions (2,9), Merge entry (4,11),
+    // wraparound (7,14), and an already-complete checkpoint (15).
+    for checkpointGeneration in 1 .. 15 do
+        let checkpoint = restore baseline.[checkpointGeneration]
+        Assert.Equal(checkpointGeneration, int checkpoint.GenerationNumber)
+        let previousPosition = (checkpointGeneration - 1) % 7
+        let expectedPrevious =
+            if partitionCount = 1 then %SortableTestsPartitionId.Default
+            elif previousPosition < 2 then "0"
+            elif previousPosition < 4 then "1"
+            else "Merge"
+        let savedMember = checkpoint.SorterPools |> Map.values |> Seq.exactlyOne |> fun p -> p.SorterPoolMembers |> Seq.exactlyOne
+        Assert.Equal(expectedPrevious, %savedMember.SubsetIdForSelection)
+        let resumed = MemoryDb()
+        initialize resumed
+        saveCheckpoint resumed seed
+        if not sparse then
+            for earlier in 1 .. checkpointGeneration - 1 do
+                saveCheckpoint resumed (restore baseline.[earlier])
+        saveCheckpoint resumed checkpoint
+        resumed.PoolGenerations.Clear()
+        let finished = execute resumed
+        Assert.Equal(Some 15<generationNumber>, finished.GetGenerationCurrent())
+        Assert.Equal<(int option * int) list>(
+            [for generation in checkpointGeneration + 1 .. 15 -> Some generation, generation],
+            List.ofSeq resumed.PoolGenerations)
+        for generation in checkpointGeneration .. 15 do
+            let actual = loadCheckpoint resumed generation |> serialize
+            Assert.True(baseline.[generation] = actual,
+                sprintf "Resuming checkpoint %d diverged at generation %d (%d partitions)" checkpointGeneration generation partitionCount)
+            if generation > checkpointGeneration then
+                let position = (generation - 1) % 7
+                let selected = if partitionCount = 1 then %SortableTestsPartitionId.Default
+                               elif position < 2 then "0" elif position < 4 then "1" else "Merge"
+                verifySavedSossReport resumed rp generation partitions prefix selected true
 
 [<Theory>]
 [<InlineData(0)>]
@@ -1202,7 +1822,7 @@ let ``Soss condense ranks per replica and copies selected Soss checkpoints into 
             Assert.Single(branched.SorterPools) |> ignore
             Assert.All(branched.SorterPools.Values, fun pool ->
                 Assert.Equal(prepared.GetMutationMod().Value, pool.MutationMod)
-                Assert.All(pool.SorterPoolMembers, fun m -> Assert.True(m.SorterEvalForSelection.IsSome)))
+                Assert.All(pool.SorterPoolMembers, fun m -> Assert.Empty(m.SorterEvalMap)))
 
 [<Theory>]
 [<InlineData("multiple-pools", "exactly one")>]

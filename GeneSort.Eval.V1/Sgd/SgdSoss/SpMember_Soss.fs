@@ -78,6 +78,7 @@ module SpMember_Soss =
     /// Derives a child pool member for a new pool branch:
     /// Assigns a fresh sorterPoolMemberId, updates mutationMod, resets mutationIndex to 0,
     /// and preserves the existing sorterMutationSource and sorterModel.
+    /// Evaluation caches are discarded: the copy may be used at a different pool length.
     let deriveForChildPool 
             (newMemberId: Guid<sorterPoolMemberId>) 
             (newMod: int<mutationMod>) 
@@ -85,6 +86,7 @@ module SpMember_Soss =
         { spm with 
             _sorterPoolMemberId = newMemberId
             _mutationMod = newMod
+            _sorterEvalMap = Map.empty
             _mutationIndex = 0 |> UMX.tag<mutationIndex> }
 
     /// Adds or replaces one subset evaluation; None clears every cached evaluation.

@@ -25,6 +25,17 @@ module SgdEx_Soss =
 
     let prepareImportedPool = EvoAppendPools.prepareSoss
 
+    /// Recreate partition membership from saved setup tests and the run's fixed seed.
+    /// Each invocation starts a fresh RNG, independently of the resumed generation.
+    let makeSortableTestsPartitions rngType seedSoss (partitionCount: int<partitionCount>) sortableTests =
+        let sossRng: IRando =
+            match rngType with
+            | Lcg -> randomLcg(seedSoss) :> IRando
+            | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
+            | Smx -> randomSplitMix64(seedSoss) :> IRando
+        PartitionOfSortableTests.partition sossRng.NextIndex
+            (UMX.cast<partitionCount, sortableTestsCount> partitionCount) sortableTests
+
     /// Creates, evaluates, and saves the initial pool as Setup when no saved pool exists
     let initializeAndSaveSeedPoolSet 
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
@@ -146,13 +157,8 @@ module SgdEx_Soss =
                 let! rngType =
                     rp.GetRngType()
                     |> Result.ofOption "Missing RNG type."
-                let sossRng: IRando =
-                    match rngType with
-                    | Lcg -> randomLcg(seedSoss) :> IRando
-                    | Net -> randomNet(UMX.tag<randomSeed> (int32 seedSoss)) :> IRando
-                    | Smx -> randomSplitMix64(seedSoss) :> IRando
                 let sortableTestsPartitions =
-                    PartitionOfSortableTests.partition sossRng.NextIndex (UMX.cast<partitionCount, sortableTestsCount> partitionCount) sortableTests
+                    makeSortableTestsPartitions rngType seedSoss partitionCount sortableTests
                 let partitionSizes =
                     sortableTestsPartitions.SortableTests
                     |> Map.values
@@ -194,6 +200,25 @@ module SgdEx_Soss =
                 let! (sSmm: simpleSorterModelMutator) = makeMutator activeRp
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
+                let! poolSetForEvolution = asyncResult {
+                    if highestPoolSetOpt.IsNone then return activeSeedPoolSet
+                    else
+                        // Legacy caches do not record the sorter length used to
+                        // evaluate them. Refresh all subsets before the orchestrator
+                        // can rank members or pools; preserve the previous selection
+                        // subset so transition detection still works on resume.
+                        let subsetId =
+                            sortableTestsPartitions.SortableTests |> Map.keys |> Seq.head
+                            |> UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId>
+                        let! collectNewSortableTests =
+                            activeRp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
+                        log "Refreshing checkpoint evaluations at the saved pool CE lengths."
+                        return activeSeedPoolSet
+                               |> SorterPoolSet_Soss.clearEvaluations
+                               |> Pipeline_Soss.evaluateRequiredPartitions sortableTestsPartitions prefix sorterEvalType.V2 true
+                                   collectNewSortableTests subsetId true
+                }
+
                 log "Executing unified evolution run..."
                 let! (finalRunResult: sorterPoolSet_Soss) =
                     EvoOrch_Soss.runSossEvolutionAsync
@@ -202,7 +227,7 @@ module SgdEx_Soss =
                         subIntervals
                         activeRp
                         allowOverwrite
-                        activeSeedPoolSet
+                        poolSetForEvolution
                         sortableTestsPartitions
                         prefix
                         sorterModelMutator
