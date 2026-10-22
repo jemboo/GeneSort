@@ -58,12 +58,14 @@ type sorterSelection =
 
     static member Empty = 
         
-        let _cestM_noRs = ceStMeasure.create 
-                                    (1.1<stageWeight>) 
-                                    (true |> UMX.tag<filterUnsorted>)
-                                    (false |> UMX.tag<filterReflectionSymmetric>)
-                                    (0.0 |> UMX.tag<stageCrossingWeight>)
-                          |> sorterEvalMeasure.CeSt
+        let _cestM_noRs =
+            ceStMeasure.create {
+                StageWeight = 1.1<stageWeight>
+                FilterUnsorted = true |> UMX.tag<filterUnsorted>
+                FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+                StageCrossingWeight = 0.0 |> UMX.tag<stageCrossingWeight>
+            }
+            |> sorterEvalMeasure.CeSt
         { selectionType = Tmb 0<sorterCount>; 
           measure = _cestM_noRs; 
           labeledSorterEvals = [||] 

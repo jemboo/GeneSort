@@ -6,6 +6,13 @@ open GeneSort.Project.V1.Parameters
 type setupFunction = runParameters -> Async<Result<unit, string>>
 
 /// Per-run storage bindings. Catalogs never retain a host or overwrite policy.
+type setupContextArgs = {
+    MakeSorterModelSets: Map<string, setupFunction>
+    MakeStandardTestsWithPrefix: setupFunction
+    MakeMergeTestsWithPrefix: setupFunction
+    MakePrefixTestsWithPrefix: setupFunction
+}
+
 type setupContext =
     private {
         makeSorterModelSets: Map<string, setupFunction>
@@ -14,17 +21,12 @@ type setupContext =
         makePrefixTestsWithPrefix: setupFunction
     }
 
-    static member create
-            (makeSorterModelSets: Map<string, setupFunction>)
-            (makeStandardTestsWithPrefix: setupFunction)
-            (makeMergeTestsWithPrefix: setupFunction)
-            (makePrefixTestsWithPrefix: setupFunction)
-            : setupContext =
+    static member create (args: setupContextArgs) : setupContext =
         {
-            makeSorterModelSets = makeSorterModelSets
-            makeStandardTestsWithPrefix = makeStandardTestsWithPrefix
-            makeMergeTestsWithPrefix = makeMergeTestsWithPrefix
-            makePrefixTestsWithPrefix = makePrefixTestsWithPrefix
+            makeSorterModelSets = args.MakeSorterModelSets
+            makeStandardTestsWithPrefix = args.MakeStandardTestsWithPrefix
+            makeMergeTestsWithPrefix = args.MakeMergeTestsWithPrefix
+            makePrefixTestsWithPrefix = args.MakePrefixTestsWithPrefix
         }
 
     member this.MakeSorterModelSets with get() = this.makeSorterModelSets

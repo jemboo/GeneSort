@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
@@ -17,9 +18,11 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalSpecsRs =
 
-    module Specs =
+    module Standard =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_Test ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -30,9 +33,9 @@ module SorterEvalSpecsRs =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Standard.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand-Test16_%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -50,7 +53,9 @@ module SorterEvalSpecsRs =
                 }
             )
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_Small () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -61,9 +66,9 @@ module SorterEvalSpecsRs =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Standard.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand-Small_%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -81,7 +86,9 @@ module SorterEvalSpecsRs =
                 }
             )
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_Medium () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -92,9 +99,9 @@ module SorterEvalSpecsRs =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Standard.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand-Medium_%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -117,11 +124,11 @@ module SorterEvalSpecsRs =
         | Rand_Small
         | Rand_Medium
 
-    let Configs = Map.ofList 
-                    [ 
-                        (configType.Rand_Test, Specs.Rand_Test); 
-                        (configType.Rand_Small, Specs.Rand_Small);
-                        (configType.Rand_Medium, Specs.Rand_Medium);
+    let Configs = Map.ofList
+                    [
+                        (configType.Rand_Test, Standard.Rand_Test);
+                        (configType.Rand_Small, Standard.Rand_Small);
+                        (configType.Rand_Medium, Standard.Rand_Medium);
                     ]
 
     let getRun (config: configType) () : run =

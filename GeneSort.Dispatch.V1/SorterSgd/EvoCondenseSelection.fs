@@ -9,6 +9,7 @@ open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd.Soss
 
 /// Select source checkpoints before execution spans are expanded or parameters are saved.
 module EvoCondenseSelection =
@@ -16,8 +17,8 @@ module EvoCondenseSelection =
 
     let private rank (db: IGeneSortDb) (configured: run) (source: run) count (candidates: runParameters[]) =
         asyncResult {
-            do! if source.ExecuteFunctionName = ExecuteFunctionNames.standard then Ok ()
-                else Error "Condense requires a Standard source."
+            do! if source.ExecuteFunctionName = ExecuteFunctionNames.standard || source.ExecuteFunctionName = ExecuteFunctionNames.soss then Ok ()
+                else Error "Condense requires a Standard or Soss source."
             do! if count > 0 && candidates.Length >= count then Ok ()
                 else Error "Condense requires at least SelectedSorterPoolCount source mutation variants."
             let! repl = candidates.[0].GetRepl() |> require "Missing source replica."
@@ -34,8 +35,8 @@ module EvoCondenseSelection =
             let! sourceData = db.loadAsync geneSortDataMode.Project (queryParams.createForRun source.DatabaseName source.ProjectName source.RunName)
             let! savedRun = OutputData.asRun sourceData
             do! if savedRun.ProjectName = source.ProjectName && savedRun.DatabaseName = source.DatabaseName && savedRun.RunName = source.RunName
-                       && savedRun.ExecuteFunctionName = ExecuteFunctionNames.standard then Ok ()
-                else Error "Saved condense source does not match the configured Standard run."
+                       && savedRun.ExecuteFunctionName = source.ExecuteFunctionName then Ok ()
+                else Error "Saved condense source does not match the configured run."
             let! intervalName = savedRun.GenSaveIntervalsName |> require "Source has no generation intervals."
             let! intervals =
                 match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue intervalName with
@@ -46,6 +47,7 @@ module EvoCondenseSelection =
             let query = QueryParamsCatalogRun.get savedRun.RunQueryCatalogName source.ProjectName source.DatabaseName
             let scores = ResizeArray<float * Guid * runParameters>()
             let mutable commonMeasure = None
+            let mutable commonSubset = None
             for candidate in candidates do
                 let! id = candidate.GetId() |> require "Missing source execution ID."
                 let! parameters =
@@ -59,17 +61,35 @@ module EvoCondenseSelection =
                 let! poolQuery = query (parameters.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "")
                                  |> require "Cannot build source checkpoint query."
                 let! data = db.loadAsync geneSortDataMode.Results poolQuery
-                let! poolSet = OutputData.asSorterPoolSetStandard data
-                do! if int poolSet.GenerationNumber = generation || int poolSet.GenerationNumber = generation + 1 then Ok ()
+                let! checkpointGeneration, score = asyncResult {
+                    if source.ExecuteFunctionName = ExecuteFunctionNames.soss then
+                        let! poolSet = OutputData.asSorterPoolSetSoss data
+                        let! pool =
+                            match poolSet.SorterPools |> Map.values |> Seq.toArray with
+                            | [|pool|] -> Ok pool
+                            | _ -> Error "Condense requires exactly one sorter pool in every source checkpoint."
+                        let members = pool.SorterPoolMembers |> Seq.toArray
+                        do! if members.Length > 0 && (members |> Array.forall (fun m -> m.SorterEvalForSelection.IsSome)) then Ok ()
+                            else Error "Condense requires nonempty, fully evaluated source pools."
+                        let subset = members.[0].SubsetIdForSelection
+                        do! if (members |> Array.forall (fun m -> m.SubsetIdForSelection = subset))
+                                   && (commonSubset |> Option.forall ((=) subset)) then Ok ()
+                            else Error "Soss condense source selection subsets must match."
+                        commonSubset <- Some subset
+                        return poolSet.GenerationNumber, float (SorterPool_Soss.getAverageScore measure pool)
+                    else
+                        let! poolSet = OutputData.asSorterPoolSetStandard data
+                        let! pool =
+                            match poolSet.SorterPools |> Map.values |> Seq.toArray with
+                            | [|pool|] -> Ok pool
+                            | _ -> Error "Condense requires exactly one sorter pool in every source checkpoint."
+                        let members = pool.SorterPoolMembers |> Seq.toArray
+                        do! if members.Length > 0 && (members |> Array.forall (fun m -> m.SorterEval.IsSome)) then Ok ()
+                            else Error "Condense requires nonempty, fully evaluated source pools."
+                        return poolSet.GenerationNumber, float (SorterPool_Standard.getAverageScore measure pool)
+                }
+                do! if int checkpointGeneration = generation || int checkpointGeneration = generation + 1 then Ok ()
                     else Error "Source checkpoint generation does not match the requested interval."
-                let! pool =
-                    match poolSet.SorterPools |> Map.values |> Seq.toArray with
-                    | [|pool|] -> Ok pool
-                    | _ -> Error "Condense requires exactly one sorter pool in every source checkpoint."
-                let members = pool.SorterPoolMembers |> Seq.toArray
-                do! if members.Length > 0 && (members |> Array.forall (fun memberValue -> memberValue.SorterEval.IsSome)) then Ok ()
-                    else Error "Condense requires nonempty, fully evaluated source pools."
-                let score = SorterPool_Standard.getAverageScore measure pool |> float
                 do! if Double.IsFinite score then Ok () else Error "Condense requires finite average evaluation scores."
                 scores.Add(score, %id, candidate)
             // Lower is better. Source execution ID makes tied selections repeatable.

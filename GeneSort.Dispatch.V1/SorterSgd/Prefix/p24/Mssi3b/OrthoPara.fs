@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
@@ -17,15 +18,15 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Mssi3b.Common
 open GeneSort.Dispatch.V1.SorterSgd
-let dbOrthoPara64Name = "OrthoPara64" |> UMX.tag<databaseName>
-let dbOrthoPara128Name = "OrthoPara128" |> UMX.tag<databaseName>
 
 
 
 
-module Specs64 =
+module OrthoPara64 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -39,9 +40,9 @@ module Specs64 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara64Name
-                ProjectName = projName
-                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
@@ -64,7 +65,9 @@ module Specs64 =
         )
 
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let SymForceDiff1 ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["SymForce_Diff1"] |> List.map string)
@@ -78,9 +81,9 @@ module Specs64 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara64Name
-                ProjectName = projName
-                RunName = (sprintf @"SymForce_Diff1%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
@@ -103,7 +106,9 @@ module Specs64 =
         )
 
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let SymForce ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["SymForce"] |> List.map string)
@@ -117,9 +122,9 @@ module Specs64 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara64Name
-                ProjectName = projName
-                RunName = (sprintf @"SymForce%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
@@ -142,9 +147,11 @@ module Specs64 =
         )
 
 
-module Specs128 =
+module OrthoPara128 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -158,9 +165,9 @@ module Specs128 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara128Name
-                ProjectName = projName
-                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {

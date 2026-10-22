@@ -39,7 +39,7 @@ module Example =
 
     let concato() =  //C:\Projects\SorterSgd.Standard_append.32p4a.Msuf\Pool_32_Test\Data\Results\Report\TextReport_SummaryReport
 
-            let rootDir = @"C:\Projects\SorterSgd.Standard_append.32p4a.Msuf\Pool_32_Test_append\Data\Results\Report\TextReport_SummaryReport"
+            let rootDir = @"C:\Projects\SorterSgd.Soss_append.32p4a.Msuf\Pool_4\Data\Results\Report\TextReport_SummaryReport"
 
             DataTableIO.concatenateAllFiles rootDir  $"{rootDir}\\MergeReport_report.txt"
 

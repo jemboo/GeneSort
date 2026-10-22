@@ -56,13 +56,14 @@ module SorterEvalExecutor =
                 return! setup rp
             }
         let context =
-            setupContext.create
-                (Map.ofList [
+            setupContext.create {
+                MakeSorterModelSets = Map.ofList [
                     SorterModelSetCatalogNames.uniform, SorterModelSetMakers.makeUniformSorterModelSet host allowOverwrite |> checkedSetup
-                ])
-                (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
+                ]
+                MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup
+            }
         host.WithSetupContext(context)
 
 

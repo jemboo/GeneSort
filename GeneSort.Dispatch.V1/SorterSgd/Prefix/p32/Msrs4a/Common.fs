@@ -13,7 +13,6 @@ open GeneSort.FileDb.V1
 
 module Common =
 
-    let projName = "SorterSgd.Prfefix.32p4a.Msrs" |> UMX.tag<projectName>
     let seedSorterCount = 512
 
     let projectParams (rp:runParameters) =

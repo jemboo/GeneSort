@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
@@ -16,9 +17,11 @@ open GeneSort.SortingOps
 
 module SorterEvalSpecsRm =
 
-    module Specs =
+    module Merge =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_MergeTest_Test () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -31,9 +34,9 @@ module SorterEvalSpecsRm =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Merge.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand_MergeTest-Test_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -51,8 +54,9 @@ module SorterEvalSpecsRm =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_MergeTest_Small () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -66,9 +70,9 @@ module SorterEvalSpecsRm =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Merge.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand_MergeTest-Small_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -86,8 +90,9 @@ module SorterEvalSpecsRm =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_MergeTest_MediumLd () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -101,9 +106,9 @@ module SorterEvalSpecsRm =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Merge.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand_MergeTest-MediumLd_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -121,8 +126,9 @@ module SorterEvalSpecsRm =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_MergeTest_MediumHd () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -136,9 +142,9 @@ module SorterEvalSpecsRm =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Merge.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand_MergeTest-MediumHd_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -156,8 +162,9 @@ module SorterEvalSpecsRm =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Rand_MergeTest_LargeLd () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     rngTypeLcg
@@ -171,9 +178,9 @@ module SorterEvalSpecsRm =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Merge.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Rand_MergeTest-LargeLd_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -191,7 +198,6 @@ module SorterEvalSpecsRm =
                 }
             )
 
-
     type configType =
         | Rand_MergeTest_Test
         | Rand_MergeTest_Small
@@ -202,11 +208,11 @@ module SorterEvalSpecsRm =
 
     let Configs = Map.ofList
                     [
-                        (configType.Rand_MergeTest_Test, Specs.Rand_MergeTest_Test);
-                        (configType.Rand_MergeTest_Small, Specs.Rand_MergeTest_Small);
-                        (configType.Rand_MergeTest_MediumLd, Specs.Rand_MergeTest_MediumLd);
-                        (configType.Rand_MergeTest_MediumHd, Specs.Rand_MergeTest_MediumHd);
-                        (configType.Rand_MergeTest_LargeLd, Specs.Rand_MergeTest_LargeLd);
+                        (configType.Rand_MergeTest_Test, Merge.Rand_MergeTest_Test);
+                        (configType.Rand_MergeTest_Small, Merge.Rand_MergeTest_Small);
+                        (configType.Rand_MergeTest_MediumLd, Merge.Rand_MergeTest_MediumLd);
+                        (configType.Rand_MergeTest_MediumHd, Merge.Rand_MergeTest_MediumHd);
+                        (configType.Rand_MergeTest_LargeLd, Merge.Rand_MergeTest_LargeLd);
                     ]
 
     let getRun (config: configType) () : run =

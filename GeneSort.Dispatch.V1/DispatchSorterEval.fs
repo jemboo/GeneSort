@@ -50,7 +50,7 @@ module DispatchSorterEval =
 
 
 
-    let private host: runHost = runHost.Create (SorterEvalSpecsTestPrefix.Specs.Prefix_32 ()) 5
+    let private host: runHost = runHost.Create (SorterEvalSpecsTestPrefix.Prefix.Prefix_32 ()) 5
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

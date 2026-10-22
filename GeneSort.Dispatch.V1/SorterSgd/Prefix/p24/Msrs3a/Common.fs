@@ -13,7 +13,6 @@ open GeneSort.SortingLib.Sorter
 
 module Common =
 
-    let projName = "SorterSgd.Prfefix.Msrs24p3a" |> UMX.tag<projectName>
     let seedSorterCount = 512
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)

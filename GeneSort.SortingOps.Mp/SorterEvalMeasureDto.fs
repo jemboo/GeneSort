@@ -85,16 +85,18 @@ module SorterEvalMeasureDto =
         | UnsortedCount d ->
             sorterEvalMeasure.UnsortedCount (unsortedCountMeasure.create d.FilterReflectionSymmetric)
         | CeSt d ->            
-            sorterEvalMeasure.CeSt (ceStMeasure.create 
-                                        (d.StageWeight |> UMX.tag)
-                                        (d.FilterUnsorted |> UMX.tag)
-                                        (d.FilterReflectionSymmetric |> UMX.tag)
-                                        (d.StageCrossingWeight |> UMX.tag))
+            sorterEvalMeasure.CeSt (ceStMeasure.create {
+                StageWeight = d.StageWeight |> UMX.tag
+                FilterUnsorted = d.FilterUnsorted |> UMX.tag
+                FilterReflectionSymmetric = d.FilterReflectionSymmetric |> UMX.tag
+                StageCrossingWeight = d.StageCrossingWeight |> UMX.tag
+            })
         | CeStUc d ->
-            sorterEvalMeasure.CeStUc (ceStUcMeasure.create 
-                                        (d.StageWeight |> UMX.tag)
-                                        (d.UnsortedWeight |> UMX.tag)
-                                        (d.FilterReflectionSymmetric |> UMX.tag))
+            sorterEvalMeasure.CeStUc (ceStUcMeasure.create {
+                StageWeight = d.StageWeight |> UMX.tag
+                UnsortedWeight = d.UnsortedWeight |> UMX.tag
+                FilterReflectionSymmetric = d.FilterReflectionSymmetric |> UMX.tag
+            })
 
     let pack (domain: sorterEvalMeasure) : byte[] =
         domain |> fromDomain |> MessagePackSerializer.Serialize

@@ -364,15 +364,16 @@ module SorterMutateExecutor =
                 return! setup rp
             }
         let context =
-            setupContext.create
-                (Map.ofList [
+            setupContext.create {
+                MakeSorterModelSets = Map.ofList [
                     SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet makeMutantStandardSorterModels host allowOverwrite cts
                     SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet makeMutantMergeSorterModels host allowOverwrite cts
                     SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet makeMutantPrefixSorterModels host allowOverwrite cts
-                ])
-                (SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup)
-                (SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup)
+                ]
+                MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests host allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getMergeTests host allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.getPrefixTests host allowOverwrite |> checkedSetup
+            }
         host.WithSetupContext(context)
 
     let setupExecutor =

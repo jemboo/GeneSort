@@ -46,16 +46,17 @@ let private makeRun queryCatalog setupCatalog =
 let private makeHost () = runHost.Create (makeRun QueryCatalogNamesRun.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 
 let private context (step: string -> setupFunction) : setupContext =
-    setupContext.create
-        (Map.ofList [
+    setupContext.create {
+        MakeSorterModelSets = Map.ofList [
             SorterModelSetCatalogNames.uniform, step "models"
             SorterModelSetCatalogNames.mutantStandard, step "mutant-standard"
             SorterModelSetCatalogNames.mutantMerge, step "mutant-merge"
             SorterModelSetCatalogNames.mutantPrefix, step "mutant-prefix"
-        ])
-        (step "standard")
-        (step "merge")
-        (step "prefix")
+        ]
+        MakeStandardTestsWithPrefix = step "standard"
+        MakeMergeTestsWithPrefix = step "merge"
+        MakePrefixTestsWithPrefix = step "prefix"
+    }
 
 [<Theory>]
 [<InlineData("setup.standard", "standard")>]

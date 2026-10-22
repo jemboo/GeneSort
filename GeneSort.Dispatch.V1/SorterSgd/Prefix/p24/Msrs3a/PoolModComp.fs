@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
@@ -17,17 +18,15 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
-let dbName_Sz_2048_Of_4096 = "Sz_2048_Of_4096" |> UMX.tag<databaseName>
-let dbNamePools4096_2_vs_256 = "PoolsSelSzTest_2_vs_256" |> UMX.tag<databaseName>
-let dbNamePools4096_4096 = "Pools4096_4096" |> UMX.tag<databaseName>
-let dbNamePoolSz128 = "PoolSelSz128" |> UMX.tag<databaseName>
 
 
 
 
-module Specs =
+module PoolSelSz128 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let TestSpec ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
@@ -41,9 +40,9 @@ module Specs =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbNamePoolSz128
-                ProjectName = projName
-                RunName = (sprintf @"PoolSz32_Mod_Testc%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "Para rate comp for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {
@@ -65,8 +64,11 @@ module Specs =
             }
         )
 
+module Sz_2048_Of_4096 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Sz_2048_Of_4096 ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
@@ -77,9 +79,9 @@ module Specs =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbName_Sz_2048_Of_4096
-                ProjectName = projName
-                RunName = (sprintf @"Sz_2048_Of_4096_%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "Selection size comp for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {
@@ -101,8 +103,11 @@ module Specs =
             }
         )
 
+module PoolsSelSzTest_2_vs_256 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let PoolSz_2n256 ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
@@ -113,9 +118,9 @@ module Specs =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbNamePools4096_2_vs_256
-                ProjectName = projName
-                RunName = (sprintf @"PoolSz_2_vs_256_%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "Pool size comp (2 vs 256) for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {

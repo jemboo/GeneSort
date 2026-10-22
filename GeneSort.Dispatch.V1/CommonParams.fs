@@ -488,35 +488,43 @@ module CommonParams =
 
     // SorterEvalMeasures
 
-    let _cestM_ScwP3 = ceStMeasure.create 
-                            (1.1<stageWeight>) 
-                            (true |> UMX.tag<filterUnsorted>)
-                            (false |> UMX.tag<filterReflectionSymmetric>)
-                            (0.5 |> UMX.tag<stageCrossingWeight>)
-                    |> sorterEvalMeasure.CeSt
+    let _cestM_ScwP3 =
+        ceStMeasure.create {
+            StageWeight = 1.1<stageWeight>
+            FilterUnsorted = true |> UMX.tag<filterUnsorted>
+            FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+            StageCrossingWeight = 0.5 |> UMX.tag<stageCrossingWeight>
+        }
+        |> sorterEvalMeasure.CeSt
 
-    let _cestM_ScwP2 = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.3 |> UMX.tag<stageCrossingWeight>)
-                    |> sorterEvalMeasure.CeSt
-
-
-    let _cestM_ScwP1 = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (0.1 |> UMX.tag<stageCrossingWeight>)
-                    |> sorterEvalMeasure.CeSt
+    let _cestM_ScwP2 =
+        ceStMeasure.create {
+            StageWeight = 1.1<stageWeight>
+            FilterUnsorted = true |> UMX.tag<filterUnsorted>
+            FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+            StageCrossingWeight = 0.3 |> UMX.tag<stageCrossingWeight>
+        }
+        |> sorterEvalMeasure.CeSt
 
 
-    let _cestM_ScwN1 = ceStMeasure.create 
-                                (1.1<stageWeight>) 
-                                (true |> UMX.tag<filterUnsorted>)
-                                (false |> UMX.tag<filterReflectionSymmetric>)
-                                (-0.05 |> UMX.tag<stageCrossingWeight>)
-                    |> sorterEvalMeasure.CeSt
+    let _cestM_ScwP1 =
+        ceStMeasure.create {
+            StageWeight = 1.1<stageWeight>
+            FilterUnsorted = true |> UMX.tag<filterUnsorted>
+            FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+            StageCrossingWeight = 0.1 |> UMX.tag<stageCrossingWeight>
+        }
+        |> sorterEvalMeasure.CeSt
+
+
+    let _cestM_ScwN1 =
+        ceStMeasure.create {
+            StageWeight = 1.1<stageWeight>
+            FilterUnsorted = true |> UMX.tag<filterUnsorted>
+            FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+            StageCrossingWeight = -0.05 |> UMX.tag<stageCrossingWeight>
+        }
+        |> sorterEvalMeasure.CeSt
 
 
 

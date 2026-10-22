@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
@@ -18,16 +19,18 @@ open GeneSort.SortingOps
 open GeneSort.Project.V1.Parameters
 
 
-module MutateSpecsRs = 
+module MutateSpecsRs =
 
-    let sorterEvalSelectionType = 
-            (ParamKeys.seedSorterPoolSelectionTypeKey, 
+    let sorterEvalSelectionType =
+            (ParamKeys.seedSorterPoolSelectionTypeKey,
             [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
-    
 
-    module Specs =
 
+    module RandomStandard =
+
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Msrs ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     msrsModelType
@@ -44,9 +47,9 @@ module MutateSpecsRs =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Rand-Test_Msrs%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for Msrs"
                     AllowOverwrite = false
                     Execution = {
@@ -64,8 +67,9 @@ module MutateSpecsRs =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Msuf4 ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     msuf4ModelType
@@ -82,9 +86,9 @@ module MutateSpecsRs =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomStandard.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Rand-Test_Msuf4%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -102,22 +106,16 @@ module MutateSpecsRs =
                 }
             )
 
-
-
-
-
     type configType =
         | Test_Msrs
         | Rand_Small
         | Rand_Medium
 
-    let Configs = Map.ofList 
-                    [ 
-                        (configType.Test_Msrs, Specs.Test_Msrs); 
+    let Configs = Map.ofList
+                    [
+                        (configType.Test_Msrs, RandomStandard.Test_Msrs);
                     ]
 
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
-
-

@@ -16,9 +16,10 @@ open GeneSort.Dispatch.V1.CommonParams
 
 module SorterEvalDbs =
     
-    let projectName = "SorterEval" |> UMX.tag<projectName>
 
     module Standard =
+
+        let projectName = (SorterEvalSpecsRs.Standard.Rand_Test ()).ProjectName
 
         let dbName = "Standard" |> UMX.tag<databaseName>
         let dbFolder = 
@@ -33,6 +34,8 @@ module SorterEvalDbs =
 
     module Merge =
 
+        let projectName = (SorterEvalSpecsRm.Merge.Rand_MergeTest_Test ()).ProjectName
+
         let dbName = "Merge" |> UMX.tag<databaseName>
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
@@ -44,6 +47,8 @@ module SorterEvalDbs =
 
 
     module Prefix =
+
+        let projectName = (SorterEvalSpecsTestPrefix.Prefix.Prefix_32 ()).ProjectName
 
         let dbName = "Prefix" |> UMX.tag<databaseName>
         let dbFolder = 

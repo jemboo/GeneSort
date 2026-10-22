@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
@@ -13,9 +14,11 @@ open CommonParams
 
 module SortableTestsSpecsPrefix =
 
-    module Specs =
+    module PrefixTest =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Prefix_Test  () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     dataFomatBitv512
@@ -23,9 +26,9 @@ module SortableTestsSpecsPrefix =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SortableTestsDbs.Prefix.dbNameTest
-                    ProjectName = CommonSortableTests.projectName
-                    RunName = (sprintf @"Prefix24-4b_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Bitv512 prefix sorter test sets"
                     AllowOverwrite = false
                     Execution = {
@@ -43,9 +46,11 @@ module SortableTestsSpecsPrefix =
                 }
             )
 
+    module Prefix =
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Prefix_24s  () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     dataFomatBitv512
@@ -53,9 +58,9 @@ module SortableTestsSpecsPrefix =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SortableTestsDbs.Prefix.dbName
-                    ProjectName = CommonSortableTests.projectName
-                    RunName = (sprintf @"Prefix-24s_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Bitv512 prefix sorter test sets"
                     AllowOverwrite = false
                     Execution = {
@@ -73,7 +78,9 @@ module SortableTestsSpecsPrefix =
                 }
             )
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Prefix_32  () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     dataFomatBitv512
@@ -81,9 +88,9 @@ module SortableTestsSpecsPrefix =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SortableTestsDbs.Prefix.dbName
-                    ProjectName = CommonSortableTests.projectName
-                    RunName = (sprintf @"Prefix-32_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Bitv512 prefix sorter test sets"
                     AllowOverwrite = false
                     Execution = {
@@ -101,15 +108,14 @@ module SortableTestsSpecsPrefix =
                 }
             )
 
-
     type configType =
         | Prefix_24s
         | Prefix_32
 
-    let Configs = Map.ofList 
-                    [ 
-                        (configType.Prefix_24s, Specs.Prefix_24s);
-                        (configType.Prefix_32, Specs.Prefix_32);
+    let Configs = Map.ofList
+                    [
+                        (configType.Prefix_24s, Prefix.Prefix_24s);
+                        (configType.Prefix_32, Prefix.Prefix_32);
                     ]
 
     let getRun (config: configType) () : run =

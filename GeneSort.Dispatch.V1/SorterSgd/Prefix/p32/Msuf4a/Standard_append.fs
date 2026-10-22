@@ -1,14 +1,17 @@
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard_append
 
+open System.Runtime.CompilerServices
 open FSharp.UMX
+open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Dispatch.V1.SorterSgd
 
-let projName = "SorterSgd.Standard_append.32p4a.Msuf" |> UMX.tag<projectName>
-let dbPool32TestAppendName = "Pool_32_Test_append" |> UMX.tag<databaseName>
 
-let Pool_128_Test () : run =
+[<MethodImpl(MethodImplOptions.NoInlining)>]
+let Test () : run =
+    let names = RunNaming.create()
     let sourceParameterSpans =
         [
             ParamKeys.mutationModKey, [0] |> List.map string
@@ -17,59 +20,83 @@ let Pool_128_Test () : run =
         [
             ParamKeys.mutationModKey, [0 .. 2] |> List.map string
             ParamKeys.sorterCountPerPoolSetKey, [128; 256] |> List.map string
+            ParamKeys.paraRateKey,    [1.25;] |> List.map string
+            ParamKeys.selfSymRateKey, [2.25;]  |> List.map string
             ParamKeys.generationIntervalLastKey, [1] |> List.map string
         ]
-    EvoAppend.create {
-        ProjectName = projName
-        DatabaseName = Standard.dbPool32TestName
-        RunName = "Standard_Pool_128-Append" |> UMX.tag<runName>
-        Source = {
-            Run = Standard.Pool_32_Test ()
+    evoContinuationConfig.create {
+        ProjectName = names.ProjectName
+        DatabaseName = names.DatabaseName
+        RunName = names.RunName
+        SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+        RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+        Source = evoContinuationSource.create {
+            Run = Standard.Pool_32.Test ()
             GenerationInterval = 0
             ParameterSpans = sourceParameterSpans
         }
         ExecutionParameterSpans = executionParameterSpans
     }
+    |> EvoAppend.createStandard
 
-    
-let Pool_128_Test_append () : run =
 
-    let sourceParameterSpans =
-        [
-            ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-        ]
-    let executionParameterSpans =
-        [
-            ParamKeys.mutationModKey, [0; 1] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [256;] |> List.map string
-            ParamKeys.generationIntervalLastKey, [3] |> List.map string
-        ]
-    EvoAppend.create {
-        ProjectName = projName
-        DatabaseName = dbPool32TestAppendName
-        RunName = "Standard_append_Pool_128_Test-Append" |> UMX.tag<runName>
-        Source = {
-            Run = Pool_128_Test ()
-            GenerationInterval = 1
-            ParameterSpans = sourceParameterSpans
+module Pool_128 =
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let V1 () : run =
+        let names = RunNaming.create()
+
+        let sourceParameterSpans =
+            [
+                ParamKeys.mutationModKey, [0 .. 2] |> List.map string
+            ]
+        let executionParameterSpans =
+            [
+                ParamKeys.mutationModKey, [0; 1] |> List.map string
+                ParamKeys.sorterCountPerPoolSetKey, [256;] |> List.map string
+                ParamKeys.generationIntervalLastKey, [3] |> List.map string
+            ]
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            Source = evoContinuationSource.create {
+                Run = Test ()
+                GenerationInterval = 1
+                ParameterSpans = sourceParameterSpans
+            }
+            ExecutionParameterSpans = executionParameterSpans
         }
-        ExecutionParameterSpans = executionParameterSpans
-    }
+        |> EvoAppend.createStandard
 
-let Pool_512_V1 () : run =
-    EvoAppend.create {
-        ProjectName = projName
-        DatabaseName = Standard.dbPool32name
-        RunName = "Pool_512_V1GenStandard_Append" |> UMX.tag<runName>
-        Source = { Run = Standard.Pool_512_V1 (); GenerationInterval = 3; ParameterSpans = [] }
-        ExecutionParameterSpans = [ParamKeys.generationIntervalLastKey, ["4"]]
-    }
+module Pool_512 =
 
-let Pool_512_V2a () : run =
-    EvoAppend.create {
-        ProjectName = projName
-        DatabaseName = Standard.dbPool512name
-        RunName = "Pool_512_V2aGenStandard_Append" |> UMX.tag<runName>
-        Source = { Run = Standard.Pool_512_V2a (); GenerationInterval = 3; ParameterSpans = [] }
-        ExecutionParameterSpans = [ParamKeys.generationIntervalLastKey, ["4"]]
-    }
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let V1 () : run =
+        let names = RunNaming.create()
+        let sourceParameterSpans =
+            [
+                ParamKeys.mutationModKey, [0 .. 2] |> List.map string
+            ]
+        let executionParameterSpans =
+            [
+                ParamKeys.mutationModKey, [0; 1] |> List.map string
+                ParamKeys.sorterCountPerPoolSetKey, [512;] |> List.map string
+                ParamKeys.generationIntervalLastKey, [3] |> List.map string
+            ]
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            Source = evoContinuationSource.create {
+                Run = Test ()
+                GenerationInterval = 1
+                ParameterSpans = sourceParameterSpans
+            }
+            ExecutionParameterSpans = executionParameterSpans
+        }
+        |> EvoAppend.createStandard

@@ -68,37 +68,42 @@ type unsortedCountMeasure = private {
         unsortedCountMeasure.create fRefl
 
 
+type ceStMeasureArgs = {
+    StageWeight: float<stageWeight>
+    FilterUnsorted: bool<filterUnsorted>
+    FilterReflectionSymmetric: bool<filterReflectionSymmetric>
+    StageCrossingWeight: float<stageCrossingWeight>
+}
+
 type ceStMeasure = private {
     stageWeight: float<stageWeight>
     filterUnsorted: bool<filterUnsorted>
     filterReflectionSymmetric: bool<filterReflectionSymmetric>
     stageCrossingWeight: float<stageCrossingWeight>
 } with
-    static member create 
-        (stageWeight: float<stageWeight>) 
-        (filterUnsorted: bool<filterUnsorted>) 
-        (filterReflectionSymmetric: bool<filterReflectionSymmetric>) 
-        (stageCrossingWeight: float<stageCrossingWeight>) : ceStMeasure =
+    static member create (args: ceStMeasureArgs) : ceStMeasure =
         {
-            stageWeight = stageWeight
-            filterUnsorted = filterUnsorted
-            filterReflectionSymmetric = filterReflectionSymmetric
-            stageCrossingWeight = stageCrossingWeight
+            stageWeight = args.StageWeight
+            filterUnsorted = args.FilterUnsorted
+            filterReflectionSymmetric = args.FilterReflectionSymmetric
+            stageCrossingWeight = args.StageCrossingWeight
         }
 
     static member stageBiasedFilterUnsorted () = 
-            ceStMeasure.create
-                    (1.1<stageWeight>)
-                    (true |> UMX.tag<filterUnsorted>)
-                    (false |> UMX.tag<filterReflectionSymmetric>)
-                    (0.0 |> UMX.tag<stageCrossingWeight>)
+            ceStMeasure.create {
+                StageWeight = 1.1<stageWeight>
+                FilterUnsorted = true |> UMX.tag<filterUnsorted>
+                FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+                StageCrossingWeight = 0.0 |> UMX.tag<stageCrossingWeight>
+            }
 
     static member stageBiased () = 
-            ceStMeasure.create
-                    (1.1<stageWeight>)
-                    (false |> UMX.tag<filterUnsorted>)
-                    (false |> UMX.tag<filterReflectionSymmetric>)
-                    (0.0 |> UMX.tag<stageCrossingWeight>)
+            ceStMeasure.create {
+                StageWeight = 1.1<stageWeight>
+                FilterUnsorted = false |> UMX.tag<filterUnsorted>
+                FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+                StageCrossingWeight = 0.0 |> UMX.tag<stageCrossingWeight>
+            }
 
     member this.StageWeight: float<stageWeight> = this.stageWeight
     member this.FilterUnsorted: bool<filterUnsorted> = this.filterUnsorted
@@ -116,22 +121,25 @@ type ceStMeasure = private {
         let fUnsorted = CompactStringParser.parseBool "fUnsorted" s
         let fRefl = CompactStringParser.parseBool "fRefl" s
         let stcXW = CompactStringParser.parseFloat "stcXW" s
-        ceStMeasure.create stW fUnsorted fRefl stcXW
+        ceStMeasure.create { StageWeight = stW; FilterUnsorted = fUnsorted; FilterReflectionSymmetric = fRefl; StageCrossingWeight = stcXW }
 
+
+type ceStUcMeasureArgs = {
+    StageWeight: float<stageWeight>
+    UnsortedWeight: float<unsortedWeight>
+    FilterReflectionSymmetric: bool<filterReflectionSymmetric>
+}
 
 type ceStUcMeasure = private {
     stageWeight: float<stageWeight>
     unsortedWeight: float<unsortedWeight>
     filterReflectionSymmetric: bool<filterReflectionSymmetric>
 } with
-    static member create (stageWeight: float<stageWeight>) 
-                         (unsortedWeight: float<unsortedWeight>) 
-                         (filterReflectionSymmetric: bool<filterReflectionSymmetric>) 
-                         : ceStUcMeasure =
+    static member create (args: ceStUcMeasureArgs) : ceStUcMeasure =
         {
-            stageWeight = stageWeight
-            unsortedWeight = unsortedWeight
-            filterReflectionSymmetric = filterReflectionSymmetric
+            stageWeight = args.StageWeight
+            unsortedWeight = args.UnsortedWeight
+            filterReflectionSymmetric = args.FilterReflectionSymmetric
         }
 
     member this.StageWeight: float<stageWeight> = this.stageWeight
@@ -147,14 +155,15 @@ type ceStUcMeasure = private {
         let stW = CompactStringParser.parseFloat "stW" s
         let ucW = CompactStringParser.parseFloat "ucW" s
         let fRefl = CompactStringParser.parseBool "fRefl" s
-        ceStUcMeasure.create stW ucW fRefl
+        ceStUcMeasure.create { StageWeight = stW; UnsortedWeight = ucW; FilterReflectionSymmetric = fRefl }
 
 
     static member stageBiased () = 
-            ceStUcMeasure.create
-                    (1.1<stageWeight>)
-                    (5.25<unsortedWeight>)
-                    (false |> UMX.tag<filterReflectionSymmetric>)
+            ceStUcMeasure.create {
+                StageWeight = 1.1<stageWeight>
+                UnsortedWeight = 5.25<unsortedWeight>
+                FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+            }
 
 
 

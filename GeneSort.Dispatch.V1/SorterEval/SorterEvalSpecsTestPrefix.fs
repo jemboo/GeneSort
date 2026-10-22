@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
@@ -16,9 +17,11 @@ open GeneSort.SortingOps
 
 module SorterEvalSpecsTestPrefix =
 
-    module Specs =
+    module Prefix =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Prefix_24s () : run =
+            let names = RunNaming.create()
             let parameterSpansSetup =
                     [
                         rngTypeLcg
@@ -33,9 +36,9 @@ module SorterEvalSpecsTestPrefix =
                     ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Prefix.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Prefix_24s_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
                     AllowOverwrite = false
                     Setup = {
@@ -53,8 +56,9 @@ module SorterEvalSpecsTestPrefix =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Prefix_32 () : run =
+            let names = RunNaming.create()
             let parameterSpansSetup =
                     [
                         rngTypeLcg
@@ -69,9 +73,9 @@ module SorterEvalSpecsTestPrefix =
                     ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterEvalDbs.Prefix.dbName
-                    ProjectName = SorterEvalDbs.projectName
-                    RunName = (sprintf @"Prefix_32_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
                     AllowOverwrite = false
                     Setup = {
@@ -89,15 +93,14 @@ module SorterEvalSpecsTestPrefix =
                 }
             )
 
-
     type configType =
         | Prefix_24s
         | Prefix_32
 
     let Configs = Map.ofList
                     [
-                        (configType.Prefix_24s, Specs.Prefix_24s);
-                        (configType.Prefix_32, Specs.Prefix_32);
+                        (configType.Prefix_24s, Prefix.Prefix_24s);
+                        (configType.Prefix_32, Prefix.Prefix_32);
                     ]
 
     let getRun (config: configType) () : run =

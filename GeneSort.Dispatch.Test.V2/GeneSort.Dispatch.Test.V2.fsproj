@@ -18,6 +18,7 @@
     <Compile Include="ParameterSetTests.fs" />
     <Compile Include="SetupOutputTests.fs" />
     <Compile Include="RunParameterExpansionTests.fs" />
+    <Compile Include="RunNameTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
@@ -17,7 +18,6 @@ open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3a.Common
 open GeneSort.Dispatch.V1.SorterSgd
-let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
 
 
@@ -25,9 +25,11 @@ let dbOrthoPara32Name = "OrthoPara32" |> UMX.tag<databaseName>
 
 
 
-module Specs =
+module OrthoPara32 =
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let PickMode2_2 ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["PickMode2_2"] |> List.map string)
@@ -41,9 +43,9 @@ module Specs =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara32Name
-                ProjectName = projName
-                RunName = (sprintf @"PickMode2_2_%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3a Msrs, PickMode2_2"
                 AllowOverwrite = false
                 Execution = {
@@ -65,7 +67,9 @@ module Specs =
             }
         )
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -79,9 +83,9 @@ module Specs =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbOrthoPara32Name
-                ProjectName = projName
-                RunName = (sprintf @"NoMods%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "OrthroPara rate comp for 24pfx3a Msrs, NoMods"
                 AllowOverwrite = false
                 Execution = {

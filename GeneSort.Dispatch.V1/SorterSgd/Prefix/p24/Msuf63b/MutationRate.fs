@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.SortingOps
@@ -19,15 +20,15 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msuf63b.Common
 open GeneSort.Dispatch.V1.SorterSgd
 
-let dbVariableModR_32Name = "VariableModRates_Uf6_32" |> UMX.tag<databaseName>
 
 let private sorterEvalMeasures =
     [ 4.5; 5.5; 7.5; 9.5 ]
     |> List.map (fun unsortedWeight ->
-        ceStUcMeasure.create
-            (1.1<stageWeight>)
-            (unsortedWeight |> UMX.tag<unsortedWeight>)
-            (false |> UMX.tag<filterReflectionSymmetric>)
+        ceStUcMeasure.create {
+            StageWeight = 1.1<stageWeight>
+            UnsortedWeight = unsortedWeight |> UMX.tag<unsortedWeight>
+            FilterReflectionSymmetric = false |> UMX.tag<filterReflectionSymmetric>
+        }
         |> sorterEvalMeasure.CeStUc
         |> SorterEvalMeasure.toCompactString
     )
@@ -37,7 +38,9 @@ let private sorterEvalMeasures =
 module VarModR_32 =
 
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test () : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
@@ -55,9 +58,9 @@ module VarModR_32 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbVariableModR_32Name
-                ProjectName = projName
-                RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "Mutation rate test for Msuf6 24p3b"
                 AllowOverwrite = false
                 Execution = {
@@ -79,7 +82,9 @@ module VarModR_32 =
             }
         )
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
     let WideTest () : run =
+        let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
@@ -97,9 +102,9 @@ module VarModR_32 =
             ]
         run.SgdRun (
             SgdRun.create {
-                DatabaseName = dbVariableModR_32Name
-                ProjectName = projName
-                RunName = (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
                 Description = "Wide mutation rate test for Msuf6 24p3b"
                 AllowOverwrite = false
                 Execution = {

@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Model.Sorting.V1
 open GeneSort.Dispatch.V1
@@ -18,15 +19,17 @@ open GeneSort.SortingOps
 open GeneSort.Project.V1.Parameters
 
 
-module MutateSpecsRp = 
+module MutateSpecsRp =
 
-    let seedSorterPoolSelectionType = 
-            (ParamKeys.seedSorterPoolSelectionTypeKey, 
+    let seedSorterPoolSelectionType =
+            (ParamKeys.seedSorterPoolSelectionTypeKey,
             [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
 
-    module Specs =
+    module RandomPrefix =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Msce ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     msceModelType
@@ -43,9 +46,9 @@ module MutateSpecsRp =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Test-Msce_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for merge Msce"
                     AllowOverwrite = false
                     Execution = {
@@ -63,8 +66,9 @@ module MutateSpecsRp =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Mssi ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     mssiModelType
@@ -81,9 +85,9 @@ module MutateSpecsRp =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Test-Mssi_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for merge Mssi"
                     AllowOverwrite = false
                     Execution = {
@@ -101,8 +105,9 @@ module MutateSpecsRp =
                 }
             )
 
-
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Msrs ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     msrsModelType
@@ -119,9 +124,9 @@ module MutateSpecsRp =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Test-Msrs_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for merge Msrs"
                     AllowOverwrite = false
                     Execution = {
@@ -139,7 +144,9 @@ module MutateSpecsRp =
                 }
             )
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test_Msuf4 ()  : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     msuf4ModelType
@@ -156,9 +163,9 @@ module MutateSpecsRp =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SorterMutateDbs.RandomPrefix.Uniform.dbName
-                    ProjectName = SorterMutateDbs.projectName
-                    RunName = (sprintf @"Test-Msuf4_%s" "GenPrefix" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Mutation analysis for merge Msuf4"
                     AllowOverwrite = false
                     Execution = {
@@ -176,7 +183,6 @@ module MutateSpecsRp =
                 }
             )
 
-
     type configType =
         | Test_Msce
         | Test_Mssi
@@ -184,16 +190,14 @@ module MutateSpecsRp =
         | Test_Msuf4
         | Test_Msuf6
 
-    let Configs = Map.ofList 
-                    [ 
-                        (configType.Test_Msce, Specs.Test_Msce); 
-                        (configType.Test_Mssi, Specs.Test_Mssi); 
-                        (configType.Test_Msrs, Specs.Test_Msrs); 
-                        (configType.Test_Msuf4, Specs.Test_Msuf4);
+    let Configs = Map.ofList
+                    [
+                        (configType.Test_Msce, RandomPrefix.Test_Msce);
+                        (configType.Test_Mssi, RandomPrefix.Test_Mssi);
+                        (configType.Test_Msrs, RandomPrefix.Test_Msrs);
+                        (configType.Test_Msuf4, RandomPrefix.Test_Msuf4);
                     ]
 
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
-
-

@@ -356,7 +356,7 @@ let ``saved SGD runs must name their execute function explicitly`` () =
 [<Fact>]
 let ``SGD host resolves custom configured makers`` () =
     let key = Guid.NewGuid().ToString()
-    let names = evolutionMakerNames.create (key) (key) (key)
+    let names = evolutionMakerNames.create { SortableTests = (key); SeedPoolSet = (key); Mutator = (key) }
     SortableTestsMakerCatalog.register key (fun _ _ -> async { return Error "host tests" })
     SeedSorterPoolSetMakerCatalog.register key (fun _ _ -> async { return Error "host seed" })
     MutatorMakerCatalog.register key (fun _ -> async { return Error "host mutator" })
@@ -385,7 +385,7 @@ let ``SGD host rejects unknown makers before execution`` field =
 [<Fact>]
 let ``SGD maker names survive MessagePack round trip`` () =
     MessagePackSetup.configure ()
-    let names = evolutionMakerNames.create ("custom.tests") ("custom.seed") ("custom.mutator")
+    let names = evolutionMakerNames.create { SortableTests = ("custom.tests"); SeedPoolSet = ("custom.seed"); Mutator = ("custom.mutator") }
     let dto = makeRun names "Tests" "Custom" |> RunDto.fromDomain
     let restored = MessagePackSerializer.Serialize dto |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(Some names, restored.MakerNames)

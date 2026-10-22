@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Evolution
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
@@ -21,11 +22,7 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 module MutationRate =
 
-    let dbVariableModR_32Name = "VariableModRates_32" |> UMX.tag<databaseName>
-    let dbVariableModR_64Name = "VariableModRates_64" |> UMX.tag<databaseName>
 
-    let dbMaxModRate_32Name = "MaxModRate_32" |> UMX.tag<databaseName>
-    let dbMaxModRate_64Name = "MaxModRate_64" |> UMX.tag<databaseName>
 
 
 
@@ -36,7 +33,9 @@ module MutationRate =
 
 
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -52,9 +51,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_32Name
-                    ProjectName = projName
-                    RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -77,7 +76,9 @@ module MutationRate =
             )
 
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let EqualOPS () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -93,9 +94,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_32Name
-                    ProjectName = projName
-                    RunName = (sprintf @"EqualOPS%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -117,9 +118,11 @@ module MutationRate =
                 }
             )
 
-        
 
+
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let EqualOPS2 () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -135,9 +138,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_32Name
-                    ProjectName = projName
-                    RunName = (sprintf @"EqualOPS2%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -159,12 +162,14 @@ module MutationRate =
                 }
             )
 
-        
+
     module VarModR_64 =
 
 
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -179,9 +184,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_64Name
-                    ProjectName = projName
-                    RunName = (sprintf @"Test%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -204,7 +209,9 @@ module MutationRate =
             )
 
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let WideTest () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -219,9 +226,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_64Name
-                    ProjectName = projName
-                    RunName = (sprintf @"WideTest%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -243,9 +250,11 @@ module MutationRate =
                 }
             )
 
-        
 
+
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let NarrowTest () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -260,9 +269,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbVariableModR_64Name
-                    ProjectName = projName
-                    RunName = (sprintf @"NarrowTest%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -290,8 +299,10 @@ module MutationRate =
     module MaxModR_32 =
 
 
-        
+
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test2 () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -305,9 +316,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbMaxModRate_32Name
-                    ProjectName = projName
-                    RunName = (sprintf @"Test2%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
@@ -334,8 +345,10 @@ module MutationRate =
     module MaxModR_64 =
 
 
-        
+
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let WideTest () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -349,9 +362,9 @@ module MutationRate =
                 ]
             run.SgdRun (
                 SgdRun.create {
-                    DatabaseName = dbMaxModRate_64Name
-                    ProjectName = projName
-                    RunName = (sprintf @"WideTest2%s" "GenStandard" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {

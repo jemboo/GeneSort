@@ -34,7 +34,7 @@ let sortableTestsRun prefix =
         if prefix then ParamKeys.prefixLibIdKey, [prefixId 32]
         else ParamKeys.mergeLibIdKey, [mergeLibId.create 4<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString]
     ]
-    simpleFixture CommonSortableTests.projectName
+    simpleFixture (if prefix then SortableTestsDbs.Prefix.projectName else SortableTestsDbs.Merge.projectName)
         (if prefix then SortableTestsDbs.Prefix.dbName else SortableTestsDbs.Merge.dbName)
         "SortableTestsFixture"
         {
@@ -51,7 +51,7 @@ let sortableTestsRun prefix =
         }
 
 let prefixEvaluation width =
-    simpleFixture SorterEvalDbs.projectName SorterEvalDbs.Prefix.dbName "PrefixEvaluationFixture"
+    simpleFixture SorterEvalDbs.Prefix.projectName SorterEvalDbs.Prefix.dbName "PrefixEvaluationFixture"
         {
             FunctionName = SetupCatalogNames.prefix
             ParameterSpans = [

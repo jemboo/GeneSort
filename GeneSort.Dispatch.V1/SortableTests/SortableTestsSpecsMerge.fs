@@ -5,6 +5,7 @@ open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Queries
+open System.Runtime.CompilerServices
 open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
@@ -13,9 +14,11 @@ open CommonParams
 
 module SortableTestsSpecsMerge =
 
-    module Specs =
+    module Merge =
 
+        [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Merge_Test  () : run =
+            let names = RunNaming.create()
             let parameterSpans =
                 [
                     mergeLib_Merge32s
@@ -23,9 +26,9 @@ module SortableTestsSpecsMerge =
                 ]
             run.SimpleRun (
                 SimpleRun.create {
-                    DatabaseName = SortableTestsDbs.Merge.dbName
-                    ProjectName = CommonSortableTests.projectName
-                    RunName = (sprintf @"Merge-Test_%s" "GenMerge" |> UMX.tag)
+                    DatabaseName = names.DatabaseName
+                    ProjectName = names.ProjectName
+                    RunName = names.RunName
                     Description = "Int8 merge sorter test sets"
                     AllowOverwrite = false
                     Execution = {
@@ -43,14 +46,13 @@ module SortableTestsSpecsMerge =
                 }
             )
 
-
     type configType =
         | Merge_Test
         | Merge_Small
 
-    let Configs = Map.ofList 
-                    [ 
-                        (configType.Merge_Test, Specs.Merge_Test); 
+    let Configs = Map.ofList
+                    [
+                        (configType.Merge_Test, Merge.Merge_Test);
                     ]
 
     let getRun (config: configType) () : run =

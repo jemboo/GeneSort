@@ -1,6 +1,12 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
 /// Serializable selections, independent of the evolution strategy and storage host.
+type evolutionMakerNamesArgs = {
+    SortableTests: string
+    SeedPoolSet: string
+    Mutator: string
+}
+
 type evolutionMakerNames =
     private {
         sortableTests: string
@@ -8,15 +14,11 @@ type evolutionMakerNames =
         mutator: string
     }
 
-    static member create
-            (sortableTests: string)
-            (seedPoolSet: string)
-            (mutator: string)
-            : evolutionMakerNames =
+    static member create (args: evolutionMakerNamesArgs) : evolutionMakerNames =
         {
-            sortableTests = sortableTests
-            seedPoolSet = seedPoolSet
-            mutator = mutator
+            sortableTests = args.SortableTests
+            seedPoolSet = args.SeedPoolSet
+            mutator = args.Mutator
         }
 
     member this.SortableTests with get() = this.sortableTests
@@ -57,7 +59,11 @@ module SeedSorterPoolSetMakerNames =
         let prefix = "seed-pool.soss.prefix"
 
 module EvolutionMakerNames =
-    let standard = evolutionMakerNames.create SortableTestsMakerNames.standard SeedSorterPoolSetMakerNames.Standard.standard MutatorMakerNames.simpleSorterModel
+    let standard = evolutionMakerNames.create {
+        SortableTests = SortableTestsMakerNames.standard
+        SeedPoolSet = SeedSorterPoolSetMakerNames.Standard.standard
+        Mutator = MutatorMakerNames.simpleSorterModel
+    }
     let merge = standard.WithSortableTests(SortableTestsMakerNames.merge).WithSeedPoolSet(SeedSorterPoolSetMakerNames.Standard.merge)
     let prefix = standard.WithSortableTests(SortableTestsMakerNames.prefix).WithSeedPoolSet(SeedSorterPoolSetMakerNames.Standard.prefix)
     let sossStandard = standard.WithSeedPoolSet(SeedSorterPoolSetMakerNames.Soss.standard)

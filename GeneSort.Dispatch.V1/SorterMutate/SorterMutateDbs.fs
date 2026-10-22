@@ -15,13 +15,14 @@ open GeneSort.SortingLib.Sorter
 
 module SorterMutateDbs =
     
-    let projectName = "SorterMutate" |> UMX.tag<projectName>
 
     module RandomStandard =
 
+        let projectName = (MutateSpecsRs.RandomStandard.Test_Msrs ()).ProjectName
+
         module Uniform =
 
-            let dbName = "Rsu" |> UMX.tag<databaseName>
+            let dbName = "RandomStandard" |> UMX.tag<databaseName>
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
@@ -30,10 +31,12 @@ module SorterMutateDbs =
 
 
     module RandomMerge =
+
+        let projectName = (MutateSpecsRm.RandomMerge.Test_Msce ()).ProjectName
     
         module Uniform =
             
-            let dbName = "Rmu" |> UMX.tag<databaseName>
+            let dbName = "RandomMerge" |> UMX.tag<databaseName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -42,10 +45,12 @@ module SorterMutateDbs =
 
 
     module RandomPrefix =
+
+        let projectName = (MutateSpecsRp.RandomPrefix.Test_Msce ()).ProjectName
     
         module Uniform =
             
-            let dbName = "Rpu" |> UMX.tag<databaseName>
+            let dbName = "RandomPrefix" |> UMX.tag<databaseName>
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 

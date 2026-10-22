@@ -82,6 +82,13 @@ module RunParameterGeneration =
                            parameters
                            |> SetupFileReferences.attach references
                            |> enhanceRun context
+                           |> fun enhanced ->
+                               if configured.ParameterSource.IsSome then
+                                   // Execution spans override source values and enhancer defaults.
+                                   // Apply before computing the final identity below.
+                                   Map.fold (fun map key value -> Map.add key value map) enhanced.ParamMap parameters.ParamMap
+                                   |> runParameters.create
+                               else enhanced
                            |> SetupFileReferences.attach references
                        let query =
                            runQuery enhanced (geneSortDataType.Run configured.RunName)

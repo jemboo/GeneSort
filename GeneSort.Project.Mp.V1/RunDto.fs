@@ -125,10 +125,11 @@ module RunDto =
                     invalidArg "dto" (sprintf "An SGD run must specify an explicit %s." field)
                 value
             let makerNames =
-                evolutionMakerNames.create
-                    (requireMakerName "SortableTestsMakerName" dto.SortableTestsMakerName)
-                    (requireMakerName "SeedPoolSetMakerName" dto.SeedPoolSetMakerName)
-                    (requireMakerName "MutatorMakerName" dto.MutatorMakerName)
+                evolutionMakerNames.create {
+                    SortableTests = requireMakerName "SortableTestsMakerName" dto.SortableTestsMakerName
+                    SeedPoolSet = requireMakerName "SeedPoolSetMakerName" dto.SeedPoolSetMakerName
+                    Mutator = requireMakerName "MutatorMakerName" dto.MutatorMakerName
+                }
             SgdRun (
                 SgdRun.create config {
                     MakerNames = makerNames

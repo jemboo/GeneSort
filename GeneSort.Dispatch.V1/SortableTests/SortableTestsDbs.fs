@@ -10,11 +10,12 @@ open GeneSort.Sorting
 open GeneSort.FileDb.V1
 open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
-open CommonSortableTests
 
 module SortableTestsDbs =
 
     module Merge =
+
+        let projectName = (SortableTestsSpecsMerge.Merge.Merge_Test ()).ProjectName
 
         let dbName = "Merge" |> UMX.tag<databaseName>
         let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
@@ -45,6 +46,8 @@ module SortableTestsDbs =
 
 
     module Prefix =
+
+        let projectName = (SortableTestsSpecsPrefix.Prefix.Prefix_32 ()).ProjectName
     
         let dbNameTest = "PrefixTest" |> UMX.tag<databaseName>
         let dbName = "Prefix" |> UMX.tag<databaseName>
