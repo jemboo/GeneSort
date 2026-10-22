@@ -1,5 +1,70 @@
 # Local setup and cloud execution
 
+Run configuration modules live under `RunCfg` in each workflow's folder and
+namespace: `SorterSgd.RunCfg`, `SorterEval.RunCfg`, `SorterMutate.RunCfg`, and
+`SortableTests.RunCfg`. Execution code and shared database readers stay in their
+workflow folders. Project names derived from these modules include `RunCfg`.
+
+`SorterSgd.RunCfg.p32.Test.OnePool` provides `TestStandard` and `TestSoss` base
+runs with one pool of 32 sorters for each mutation value 0–3. Run the desired base through
+setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
+`TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
+Append tests use source mutation 0 and branch into mutation values 0–2 at capacities
+32 and 64, preserving one pool in each of six runs. Condense tests rank all four
+source mutation values and select the best two per replica. Both continuation workflows finish at interval 1, using the base's
+save schedule; selection and copying happen before execution as usual.
+
+Each family also has `TestStandardAppendCondense` / `TestSossAppendCondense`
+and `TestStandardCondenseAppend` / `TestSossCondenseAppend`:
+
+- Append → Condense selects the best two of the three size-64 Append candidates.
+- Condense → Append branches both selected winners into sizes 64 and 128,
+  preserving their mutation values and one pool per execution.
+
+These chains import their immediate source's interval-1 checkpoint and finish at
+interval 2. Standard sources stay Standard and Soss sources stay Soss. The suite
+now has ten configurations and 36 executions for replica 0. The runner discovers
+the dependency order automatically; verification discovers all continuations,
+checks their immediate source members, sizes, and selections, and includes their
+reports in the combined output. Configuration discovery does not require existing
+results; on a fresh data folder, the script builds the sources before their chains.
+
+From the repository root, run the complete OnePool batch with:
+
+```powershell
+.\scripts\Run-OnePool.ps1
+```
+
+The script builds its runner, prepares the `SortableTests.RunCfg.Prefix.Width32`
+and `SorterEval.RunCfg.Prefix.Width32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
+and completes setup, execution, and the evolution summary report for each preset.
+Source presets finish before any dependent Append or Condense presets. It runs
+replica 0, defaults to eight parallel jobs within each phase, respects each preset's
+overwrite setting for setup and execution, preserves existing run parameters when
+resuming, regenerates summary reports, and stops with a nonzero exit code on failure.
+After all summary reports are generated, it runs `OnePoolAudit` to verify the
+Append size/mutation combinations against report rows and final checkpoints,
+and the Condense selections against source checkpoint scores and imported Setup
+members. It also rejects summary rows with stale `Default` subset evaluations;
+these evaluations are discarded when Standard seed pools are converted to Soss.
+Verification failures also return a nonzero exit code. Expected pool
+sizes, pool counts, and execution combinations come from the configured parameter
+spans. Condense candidates and selection count come from its source spans, and
+the source checkpoint generation is resolved from its source interval and the
+source run's save schedule. Candidate scores are ranked independently against
+the saved selections, so changing these configurations requires no audit edits.
+After verification, the script combines the current configurations' summary
+reports into `Data/Results/Report/OnePool_SummaryReport.txt` under the OnePool
+database. This tab-delimited file has one header with `RunName` first. Columns
+shared by Standard and Soss are aligned by name; unavailable fields are blank.
+The file is replaced on each successful run. Inputs are resolved from current run
+parameters, so older reports and the combined file itself are never included.
+Use `-MaxParallel 4` to change concurrency, `-ListOnly` to preview the order without
+running phases or verification, or `-NoBuild` to reuse existing runner and audit builds. Use the default
+`C:\Projects` root: the shared library readers currently use that location.
+The initial library preparation evaluates four sets of 10,000 sorters and can take
+several minutes; completed prerequisite runs are skipped on subsequent invocations.
+
 Run presets capture all three names with one call:
 
 ```fsharp
@@ -19,8 +84,12 @@ the helper also disables inlining. The naming tests check this requirement.
 
 The project is the module hierarchy above the database module, with the common
 `GeneSort.Dispatch.V1.` prefix removed. For example, `Standard.Pool_32.Test()`
-has project `SorterSgd.Prefix.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
-Top-level presets such as `Standard_append.Test()` use their entire module hierarchy
+has project `SorterSgd.RunCfg.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
+Modules directly under a workflow's `RunCfg` namespace act as databases. For example,
+`SorterEval.RunCfg.Standard.Test()` has project `SorterEval.RunCfg`, database
+`Standard`, and run `Test`. The distinct sortable-test group is
+`SortableTests.RunCfg.PrefixTest.Test()` (database `PrefixTest`).
+Top-level presets deeper in the hierarchy, such as `Standard_append.Test()`, use their entire module hierarchy
 as the project. Shared database readers obtain their project from a producing preset
 so module renames update both writing and reading locations.
 
@@ -38,8 +107,8 @@ for sortable tests, evaluation, and mutation. For example:
 | `Soss.Pool_4.Debug()` | `Pool_4` | `Debug` |
 | `Soss_append.Pool_4_append.Debug()` | `Pool_4_append` | `Debug` |
 | `Soss_condense.Pool_128_condense.Test()` | `Pool_128_condense` | `Test` |
-| `SorterEvalSpecsRs.Standard.Rand_Test()` | `Standard` | `Rand_Test` |
-| `MutateSpecsRp.RandomPrefix.Test_Mssi()` | `RandomPrefix` | `Test_Mssi` |
+| `SorterEval.RunCfg.Standard.Test()` | `Standard` | `Test` |
+| `SorterMutate.RunCfg.Prefix.Mssi()` | `Prefix` | `Mssi` |
 
 Seed pool groups describe capacity per pool, not the total pool-set size.
 Continuation groups describe the source pool family and retain workflow suffixes
@@ -108,7 +177,7 @@ Select the append spec when creating the dispatch host:
 let host = runHost.Create (Soss_append.Pool_4_append.Debug ()) 8
 ```
 
-The module is `GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_append`.
+The module is `GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_append`.
 It uses `EvoAppend.createSoss` with separate `Source.ParameterSpans` and
 `ExecutionParameterSpans`. Source spans filter configured source executions;
 omitted source keys select all their configured values. Execution spans form a

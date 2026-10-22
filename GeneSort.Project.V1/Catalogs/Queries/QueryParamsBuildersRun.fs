@@ -248,8 +248,14 @@ module QueryParamsBuildersRun =
                 | geneSortDataType.RunParameters _ ->
                     metadataQuery baseQuery projectName dbName rp odt
                 | _ ->
-                    // Setup links are attached by the catalog; ancestry is not part of result identity.
-                    baseQuery projectName dbName rp odt
+                    // Continuations with equal mutation settings can start from different pools.
+                    // Keep their checkpoints separate, including Append and Condense in one database.
+                    maybe {
+                        let! query = metadataQuery baseQuery projectName dbName rp odt
+                        let! runName = rp.GetRunName()
+                        let properties = query.Properties |> Map.add ParamKeys.runNameKey %runName
+                        return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
+                    }
 
         module Msrs32MutationRate =
             let makeQueryParams projectName dbName repl codeMod genCurrent sorterCtPerPool sorterPoolCt para selfSym modR mmod outDt =

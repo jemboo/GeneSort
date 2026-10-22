@@ -17,12 +17,16 @@ type runNames =
 module RunNaming =
     let private fromMethod (method: MethodBase) : runNames =
         let container = method.DeclaringType
-        // A top-level preset (such as Standard_append.Test) uses its function
-        // name as the database, leaving its entire module as the project.
-        let projectModule =
-            if isNull container.DeclaringType then container else container.DeclaringType
+        // Direct RunCfg modules are databases in the workflow's RunCfg project.
+        // Deeper configurations retain their enclosing module as the project.
+        let isWorkflowDatabase =
+            isNull container.DeclaringType && container.Namespace.EndsWith(".RunCfg", System.StringComparison.Ordinal)
+        let hierarchy =
+            if isWorkflowDatabase then container.Namespace
+            elif isNull container.DeclaringType then container.FullName
+            else container.DeclaringType.FullName
         let prefix = "GeneSort.Dispatch.V1."
-        let hierarchy = projectModule.FullName.Replace('+', '.')
+        let hierarchy = hierarchy.Replace('+', '.')
         if not (hierarchy.StartsWith(prefix, System.StringComparison.Ordinal)) then
             invalidArg (nameof method) "Run presets must belong to GeneSort.Dispatch.V1."
         let name =
@@ -31,7 +35,7 @@ module RunNaming =
             else method.Name
         {
             _projectName = hierarchy.Substring(prefix.Length) |> UMX.tag<projectName>
-            _databaseName = (if isNull container.DeclaringType then name else container.Name) |> UMX.tag<databaseName>
+            _databaseName = (if isNull container.DeclaringType && not isWorkflowDatabase then name else container.Name) |> UMX.tag<databaseName>
             _runName = name |> UMX.tag<runName>
         }
 

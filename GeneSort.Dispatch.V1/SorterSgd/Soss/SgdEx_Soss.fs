@@ -50,6 +50,9 @@ module SgdEx_Soss =
                     evalType
                     true // reEvaluateParents
                     (false |> UMX.tag<collectNewSortableTests>)
+                // These tests cover the full set, so this is the merged Soss evaluation.
+                |> Map.map (fun _ evaluation ->
+                    SorterEval.withSortableTestsSubsetId CommonSgdSoss.mergedSubsetId evaluation)
             
             let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let evaluatedSeedSet =
@@ -192,7 +195,7 @@ module SgdEx_Soss =
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (_finalRunResult: sorterPoolSet_Soss) =
+                let! (finalRunResult: sorterPoolSet_Soss) =
                     EvoOrch_Soss.runSossEvolutionAsync
                         genDb
                         saveIntervals
@@ -207,7 +210,7 @@ module SgdEx_Soss =
                         log
 
                 log "evaluateEvolutionRun completed."
-                return activeRp
+                return activeRp.WithGenerationCurrent(Some finalRunResult.GenerationNumber).WithRunFinished(Some true)
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message

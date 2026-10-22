@@ -46,7 +46,7 @@ module DispatchSortableTests =
 
 
 
-    let private host: runHost = runHost.Create (SortableTestsSpecsPrefix.Prefix.Prefix_32 ()) 1
+    let private host: runHost = runHost.Create (SortableTests.RunCfg.Prefix.Width32 ()) 1
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

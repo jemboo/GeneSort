@@ -1,0 +1,209 @@
+module OnePoolAudit
+
+open System
+open System.IO
+open System.Reflection
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Core.Mp
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.FileDb.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Project.V1.Catalogs.Evolution
+
+let unwrap computation = computation |> Async.RunSynchronously |> Result.defaultWith failwith
+let require condition message = if not condition then failwith message
+let parameters (host: runHost) =
+    host.RunDb.getRunParameters host.Run.RunName (Some (UMX.tag 0)) (Some (UMX.tag 1)) None None |> unwrap
+let query (host: runHost) rp kind = host.QueryParamsFromRunParams rp kind |> Option.get
+let checkpoint (host: runHost) rp = host.RunDb.loadAsync geneSortDataMode.Results (query host rp (geneSortDataType.SorterPoolSet "")) |> unwrap
+let members soss data =
+    if soss then
+        (data |> OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith).SorterPools
+        |> Map.values |> Seq.map (fun pool -> pool.SorterPoolMembers |> Seq.map (fun m -> string m.SorterPoolMemberId) |> Set.ofSeq) |> Seq.toArray
+    else
+        (data |> OutputData.asSorterPoolSetStandard |> Result.defaultWith failwith).SorterPools
+        |> Map.values |> Seq.map (fun pool -> pool.SorterPoolMembers |> Seq.map (fun m -> string m.SorterPoolMemberId) |> Set.ofSeq) |> Seq.toArray
+
+let report (host: runHost) (rp: runParameters) =
+    let qp = query host rp (geneSortDataType.TextReport (UMX.tag "SummaryReport"))
+    let path = OutputDataFile.getFullOutputDataFilePath (RunHost.makeDataFolder host.Run) geneSortDataMode.Results qp |> UMX.untag
+    let lines = File.ReadAllLines path
+    require (lines.Length > 1) ("Empty report: " + path)
+    let headers = lines.[0].Split '\t'
+    let rows = lines.[1..] |> Array.filter (String.IsNullOrWhiteSpace >> not) |> Array.map (fun line -> Array.zip headers (line.Split '\t') |> Map.ofArray)
+    require (headers |> Array.filter ((=) ParamKeys.runNameKey) |> Array.length = 1)
+        ("Summary report must contain exactly one RunName column: " + path)
+    require (rows |> Array.forall (fun row -> row.[ParamKeys.runNameKey] = %host.Run.RunName))
+        ("Summary report contains an incorrect RunName: " + path)
+    require (rows |> Array.forall (fun row -> Map.tryFind "SortableTestsSubsetId" row <> Some "Default"))
+        ("Summary report contains a stale Default evaluation: " + path)
+    printfn "REPORT %s mutation=%d size=%d rows=%d file=%s" %host.Run.RunName (int (rp.GetMutationMod().Value)) (int (rp.GetSorterCountPerPool().Value)) rows.Length path
+    rows
+
+let singleSpan key spans =
+    match spans |> List.tryFind (fst >> (=) key) with
+    | Some (_, [value]) -> value
+    | _ -> failwithf "Expected exactly one configured value for %s." key
+
+let generated (host: runHost) = host.MakeRunParameters (UMX.tag 0) (UMX.tag 1)
+
+// Compare the full configured sweep, including multiplicity, before inspecting artifacts.
+let verifySweep (host: runHost) (saved: runParameters[]) =
+    let expected = generated host
+    let signature (rp: runParameters) =
+        rp.GetId(), rp.GetRepl(), rp.GetMutationMod(), rp.GetSorterCountPerPool(),
+        rp.GetSorterPoolCount(), Map.tryFind ParamKeys.sourceExecutionIdKey rp.ParamMap
+    require ((expected |> Array.map signature |> Array.sort) = (saved |> Array.map signature |> Array.sort))
+        (sprintf "%s: saved executions do not match the configured parameter sweep." %host.Run.RunName)
+    expected
+
+let verifyPools soss (host: runHost) (expected: runParameters) (rp: runParameters) =
+    require (rp.GetRunFinished() = Some true) (sprintf "%s: execution is unfinished." %host.Run.RunName)
+    let size, count = int (expected.GetSorterCountPerPool().Value), int (expected.GetSorterPoolCount().Value)
+    let pools = checkpoint host rp |> members soss
+    require (pools.Length = count && pools |> Array.forall (fun pool -> pool.Count = size))
+        (sprintf "%s: checkpoint differs from configured %d pools of %d sorters." %host.Run.RunName count size)
+    let rows = report host rp
+    require (rows.Length > 0) "Summary report has no data rows."
+    for row in rows do
+        require (int row.["SorterCountPerPool"] = size && int row.["SorterPoolCount"] = count)
+            (sprintf "%s: summary differs from configured pool sizes." %host.Run.RunName)
+    rows
+
+let audit soss configured =
+    let host = runHost.Create configured 1
+    let sourceRun, sourceSpans = configured.ParameterSource |> Option.get
+    let source = runHost.Create sourceRun 1
+    // ParameterSource keeps only the base configuration; the saved run retains its schedule.
+    let savedSourceRun =
+        source.RunDb.loadAsync geneSortDataMode.Project
+            (queryParams.createForRun sourceRun.DatabaseName sourceRun.ProjectName sourceRun.RunName)
+        |> unwrap |> OutputData.asRun |> Result.defaultWith failwith
+    require (savedSourceRun.ProjectName = sourceRun.ProjectName && savedSourceRun.DatabaseName = sourceRun.DatabaseName
+             && savedSourceRun.RunName = sourceRun.RunName && savedSourceRun.ExecuteFunctionName = sourceRun.ExecuteFunctionName)
+        "Saved source run does not match the configured continuation source."
+    let sourceSchedule =
+        (runHost.Create savedSourceRun 1).GenSaveIntervals
+        |> Option.defaultWith (fun () -> failwith "Continuation source has no generation save schedule.")
+
+    let sourceInterval = singleSpan ParamKeys.sourceGenerationIntervalKey configured.RunParameterSpans |> int
+    let sourceGeneration =
+        GenIntervalConfig.getSampleAtIndex sourceSchedule sourceInterval
+        |> Option.defaultWith (fun () -> failwith "Configured source interval is unavailable.")
+    let filters = sourceSpans |> List.filter (fst >> (<>) ParamKeys.selectedSorterPoolCountKey)
+    let candidates = generated source |> Array.filter (fun rp ->
+        filters |> List.forall (fun (key, values) ->
+            Map.tryFind key rp.ParamMap |> Option.exists (fun value -> List.contains value values)))
+    let selectionCount =
+        if sourceSpans |> List.exists (fst >> (=) ParamKeys.selectedSorterPoolCountKey) then
+            singleSpan ParamKeys.selectedSorterPoolCountKey sourceSpans |> int
+        else candidates.Length
+    require (sourceRun.ExecuteFunctionName = configured.ExecuteFunctionName) "OnePool chains must stay within the same workflow family."
+    require (selectionCount > 0 && candidates.Length >= selectionCount) "Insufficient configured continuation candidates."
+    let savedSources = parameters source
+    let scores = candidates |> Array.map (fun candidate ->
+        let rp = savedSources |> Array.filter (fun saved -> saved.GetId() = candidate.GetId()) |> Array.exactlyOne
+        let atSource = rp.WithGenerationCurrent(Some (UMX.tag sourceGeneration))
+        let data = checkpoint source atSource
+        let measure = rp.GetSorterEvalMeasure().Value
+        let score, subset =
+            if soss then
+                let pool = (data |> OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith).SorterPools |> Map.values |> Seq.exactlyOne
+                float (SorterPool_Soss.getAverageScore measure pool), string (pool.SorterPoolMembers |> Seq.head).SubsetIdForSelection
+            else
+                let pool = (data |> OutputData.asSorterPoolSetStandard |> Result.defaultWith failwith).SorterPools |> Map.values |> Seq.exactlyOne
+                float (SorterPool_Standard.getAverageScore measure pool), "full"
+        require (Double.IsFinite score) "Source checkpoint has a nonfinite score."
+        let id = string (rp.GetId().Value)
+        printfn "SOURCE %s mutation=%d generation=%d score=%.12f selectionSubset=%s id=%s" %source.Run.RunName (int (rp.GetMutationMod().Value)) sourceGeneration score subset id
+        score, rp.GetId().Value, rp, data)
+    // Rank checkpoint contents independently of the continuation's parameter generator.
+    let expectedIds = scores |> Array.sortBy (fun (score, id, _, _) -> score, id) |> Array.take selectionCount |> Array.map (fun (_, id, _, _) -> string id) |> Set.ofArray
+    let selected = parameters host
+    let actualIds = selected |> Array.map (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) |> Set.ofArray
+    require (expectedIds = actualIds) (sprintf "Continuation did not select the best %d configured source pools." selectionCount)
+    let expectedContinuation = verifySweep host selected
+    for rp in selected do
+        let sourceId = rp.ParamMap.[ParamKeys.sourceExecutionIdKey]
+        let _, _, sourceRp, data = scores |> Array.find (fun (_, id, _, _) -> string id = sourceId)
+        require (rp.GetSourceGenerationInterval() = Some sourceInterval && rp.GetGenerationFirst() = Some (UMX.tag sourceGeneration))
+            "Continuation imported the wrong source generation."
+        let imported = Utils.loadSetupOutputData host.RunDb rp (geneSortDataType.SorterPoolSet "") |> unwrap
+        require (members soss imported = members soss data) "Continuation Setup does not contain the selected source members."
+        let expected = expectedContinuation |> Array.find (fun candidate -> candidate.GetId() = rp.GetId())
+        for row in verifyPools soss host expected rp do
+            require (row.["SourceExecutionId"] = sourceId && int row.["SourceGenerationInterval"] = sourceInterval)
+                "Continuation summary provenance is incorrect."
+        printfn "SELECTED %s sourceMutation=%d sourceId=%s setupMembersMatch=true" %host.Run.RunName (int (sourceRp.GetMutationMod().Value)) sourceId
+
+let currentRuns () =
+    let presets = typeof<runHost>.Assembly.GetType("GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool", true)
+    let runs =
+        typeof<runHost>.Assembly.GetTypes()
+        |> Array.filter (fun candidate -> candidate = presets || candidate.FullName.StartsWith(presets.FullName + "+" , StringComparison.Ordinal))
+        |> Array.collect (fun candidate -> candidate.GetMethods(BindingFlags.Public ||| BindingFlags.Static ||| BindingFlags.DeclaredOnly))
+        |> Array.filter (fun method -> method.ReturnType = typeof<run> && method.GetParameters().Length = 0)
+        |> Array.map (fun method -> method.Invoke(null, [||]) :?> run)
+        |> Array.sortBy (fun configured -> %configured.RunName)
+    require (runs.Length > 0) "No OnePool configurations found."
+    runs
+
+let combineReports () =
+    let runs = currentRuns ()
+    let mutable reportCount = 0
+    let rows = runs |> Array.collect (fun configured ->
+        let host = runHost.Create configured 1
+        let saved = parameters host
+        verifySweep host saved |> ignore
+        saved |> Array.sortBy (fun rp -> rp.GetId()) |> Array.collect (fun rp ->
+            reportCount <- reportCount + 1
+            report host rp))
+    // Standard and Soss reports have different columns; align their union by name.
+    let headers =
+        rows |> Seq.collect Map.keys |> Set.ofSeq |> Set.remove ParamKeys.runNameKey |> Set.toArray
+        |> Array.append [|ParamKeys.runNameKey|]
+    let combined = DataTableReport.create "OnePool Summary" headers
+    for row in rows do
+        combined.AppendDataRow(headers |> Array.map (fun header -> Map.tryFind header row |> Option.defaultValue ""))
+    let path = Path.Combine(%(RunHost.makeDataFolder runs.[0]), "Results", "Report", "OnePool_SummaryReport.txt")
+    Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
+    // Replace only after the complete combined report has been written successfully.
+    let temporaryPath = path + ".tmp"
+    try
+        do
+            use stream = File.Create temporaryPath
+            combined.SaveToStream stream
+        File.Move(temporaryPath, path, true)
+    finally
+        if File.Exists temporaryPath then File.Delete temporaryPath
+    printfn "COMBINED: %d reports, %d rows, %d runs -> %s" reportCount rows.Length runs.Length path
+
+[<EntryPoint>]
+let main args =
+    try
+        require (args = [||] || args = [|"--combine"|]) "Usage: OnePoolAudit [--combine]"
+        MessagePackSetup.configure ()
+        for configured in currentRuns () do
+            match configured.ParameterSource with
+            | Some _ -> audit (configured.ExecuteFunctionName = ExecuteFunctionNames.soss) configured
+            | None ->
+                let host = runHost.Create configured 1
+                let saved = parameters host
+                verifySweep host saved |> ignore
+                for rp in saved do report host rp |> ignore
+        printfn "PASS: Append sizes, Condense ranking, imported members, final checkpoints, and current summary reports."
+        if args = [|"--combine"|] then combineReports ()
+        0
+    with error ->
+        eprintfn "FAIL: %s" error.Message
+        1
+
+
+
+

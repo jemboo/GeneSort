@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+    <ProjectReference Include="../../GeneSort.Dispatch.V1/GeneSort.Dispatch.V1.fsproj" />
+    <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
+  </ItemGroup>
+</Project>

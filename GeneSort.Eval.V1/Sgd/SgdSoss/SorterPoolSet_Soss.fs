@@ -3,6 +3,7 @@ namespace GeneSort.Eval.V1.Sgd.Soss
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
@@ -64,7 +65,7 @@ module SorterPoolSet_Soss =
             _sorterPools = poolSet._sorterPools |> Map.map (fun _ pool ->
                 SorterPool_Soss.withSubsetIdForSelection subsetIdForSelection pool) }
 
-    /// Copies a Standard seed pool into Soss while preserving identities and evaluations.
+    /// Copies a Standard seed pool into Soss, discarding stale full-test Default evaluations.
     let fromStandard (source: Standard.sorterPoolSet_Standard) : sorterPoolSet_Soss =
         let pools =
             source.SorterPools
@@ -75,6 +76,8 @@ module SorterPoolSet_Soss =
                     |> Seq.map (fun memberValue ->
                         let evaluations =
                             memberValue.SorterEval
+                            |> Option.filter (fun evaluation ->
+                                SorterEval.getSortableTestsSubsetId evaluation <> SortableTestsSubsetId.Default)
                             |> Option.map (fun evaluation ->
                                 Map.ofList [ SorterEval.getSortableTestsSubsetId evaluation, evaluation ])
                             |> Option.defaultValue Map.empty

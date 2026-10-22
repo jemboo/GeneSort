@@ -8,37 +8,39 @@ open GeneSort.Dispatch.V1
 
 let private allPresets () =
     typeof<runHost>.Assembly.GetTypes()
-    |> Array.filter (fun t -> t.FullName.Contains("Specs") || t.FullName.Contains(".SorterSgd.Prefix."))
+    |> Array.filter (fun t -> t.FullName.Contains(".RunCfg."))
     |> Array.collect (fun t -> t.GetMethods(BindingFlags.Public ||| BindingFlags.Static ||| BindingFlags.DeclaredOnly))
     |> Array.filter (fun m -> m.ReturnType = typeof<run> && m.GetParameters().Length = 0)
 
 [<Fact>]
 let ``Project names follow the hierarchy above the database module`` () =
     let presets =
-        [ "SorterSgd.Prefix.p32.Msuf4a.Standard", SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_32.Test
-          "SorterSgd.Prefix.p32.Msuf4a.Standard_append", SorterSgd.Prefix.p32.Msuf4a.Standard_append.Test
-          "SorterSgd.Prefix.p32.Msuf4a.Standard_append", SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_128.V1
-          "SorterSgd.Prefix.p32.Msuf4a.Soss_condense", SorterSgd.Prefix.p32.Msuf4a.Soss_condense.Pool_128_condense.Test
-          "SorterSgd.Prefix.p32.Msrs4a.MutationRate", SorterSgd.Prefix.p32.Msrs4a.MutationRate.VarModR_32.Test
-          "SorterEval.SorterEvalSpecsRs", SorterEval.SorterEvalSpecsRs.Standard.Rand_Test
-          "SorterMutate.MutateSpecsRp", SorterMutate.MutateSpecsRp.RandomPrefix.Test_Mssi
-          "SortableTests.SortableTestsSpecsPrefix", SortableTests.SortableTestsSpecsPrefix.Prefix.Prefix_32 ]
+        [ "SorterSgd.RunCfg.p32.Msuf4a.Standard", SorterSgd.RunCfg.p32.Msuf4a.Standard.Pool_32.Test
+          "SorterSgd.RunCfg.p32.Msuf4a.Standard_append", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Test
+          "SorterSgd.RunCfg.p32.Msuf4a.Standard_append", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Pool_128.V1
+          "SorterSgd.RunCfg.p32.Msuf4a.Soss_condense", SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_128_condense.Test
+          "SorterSgd.RunCfg.p32.Msrs4a.MutationRate", SorterSgd.RunCfg.p32.Msrs4a.MutationRate.VarModR_32.Test
+          "SorterEval.RunCfg", SorterEval.RunCfg.Standard.Test
+          "SorterMutate.RunCfg", SorterMutate.RunCfg.Prefix.Mssi
+          "SortableTests.RunCfg", SortableTests.RunCfg.Prefix.Width32
+          "SortableTests.RunCfg", SortableTests.RunCfg.PrefixTest.Test ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).ProjectName)
 
 [<Fact>]
-let ``Shared source readers use the projects of their producing presets`` () =
+let ``Shared source readers use the projects and databases of their producing presets`` () =
     let readers =
-        [ SortableTests.SortableTestsDbs.Merge.projectName, SortableTests.SortableTestsSpecsMerge.Merge.Merge_Test
-          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsSpecsPrefix.Prefix.Prefix_32
-          SorterEval.SorterEvalDbs.Standard.projectName, SorterEval.SorterEvalSpecsRs.Standard.Rand_Test
-          SorterEval.SorterEvalDbs.Merge.projectName, SorterEval.SorterEvalSpecsRm.Merge.Rand_MergeTest_Test
-          SorterEval.SorterEvalDbs.Prefix.projectName, SorterEval.SorterEvalSpecsTestPrefix.Prefix.Prefix_32
-          SorterMutate.SorterMutateDbs.RandomStandard.projectName, SorterMutate.MutateSpecsRs.RandomStandard.Test_Msrs
-          SorterMutate.SorterMutateDbs.RandomMerge.projectName, SorterMutate.MutateSpecsRm.RandomMerge.Test_Msce
-          SorterMutate.SorterMutateDbs.RandomPrefix.projectName, SorterMutate.MutateSpecsRp.RandomPrefix.Test_Msce ]
-    for readerProject, preset in readers do
+        [ SortableTests.SortableTestsDbs.Merge.projectName, SortableTests.SortableTestsDbs.Merge.dbName, SortableTests.RunCfg.Merge.Test
+          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsDbs.Prefix.dbName, SortableTests.RunCfg.Prefix.Width32
+          SorterEval.SorterEvalDbs.Standard.projectName, SorterEval.SorterEvalDbs.Standard.dbName, SorterEval.RunCfg.Standard.Test
+          SorterEval.SorterEvalDbs.Merge.projectName, SorterEval.SorterEvalDbs.Merge.dbName, SorterEval.RunCfg.Merge.Test
+          SorterEval.SorterEvalDbs.Prefix.projectName, SorterEval.SorterEvalDbs.Prefix.dbName, SorterEval.RunCfg.Prefix.Width32
+          SorterMutate.SorterMutateDbs.RandomStandard.projectName, SorterMutate.SorterMutateDbs.RandomStandard.Uniform.dbName, SorterMutate.RunCfg.Standard.Msrs
+          SorterMutate.SorterMutateDbs.RandomMerge.projectName, SorterMutate.SorterMutateDbs.RandomMerge.Uniform.dbName, SorterMutate.RunCfg.Merge.Msce
+          SorterMutate.SorterMutateDbs.RandomPrefix.projectName, SorterMutate.SorterMutateDbs.RandomPrefix.Uniform.dbName, SorterMutate.RunCfg.Prefix.Msce ]
+    for readerProject, readerDatabase, preset in readers do
         Assert.Equal(%(preset ()).ProjectName, %readerProject)
+        Assert.Equal(%(preset ()).DatabaseName, %readerDatabase)
 
 [<Fact>]
 let ``Database names follow their modules and preset identities are unique`` () =
@@ -57,15 +59,15 @@ let ``Database names follow their modules and preset identities are unique`` () 
 [<Fact>]
 let ``Standard append database names follow the test function and pool modules`` () =
     let presets =
-        [ "Test", SorterSgd.Prefix.p32.Msuf4a.Standard_append.Test
-          "Pool_128", SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_128.V1
-          "Pool_512", SorterSgd.Prefix.p32.Msuf4a.Standard_append.Pool_512.V1 ]
+        [ "Test", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Test
+          "Pool_128", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Pool_128.V1
+          "Pool_512", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Pool_512.V1 ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).DatabaseName)
 
 [<Fact>]
 let ``Caller name is the defining function even when invoked through another function`` () =
-    let invoke () = SorterSgd.Prefix.p32.Msuf4a.Standard.Pool_32.Test ()
+    let invoke () = SorterSgd.RunCfg.p32.Msuf4a.Standard.Pool_32.Test ()
     Assert.Equal("Test", %(invoke ()).RunName)
 
 [<Fact>]

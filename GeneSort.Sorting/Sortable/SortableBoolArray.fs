@@ -165,13 +165,57 @@ module SortableBoolArray =
         | NoSuffix -> fromLatticeCubeFull latticeDimension edgeLength
         | VV_1 -> fromLatticeCubeVV_1 latticeDimension edgeLength
 
-    /// Streams values on-demand, filters out duplicates lazily, and drops history/counters entirely.
+    /// Enumerates independent comparator components separately, then combines their images.
+    /// Ordering is the same as sorting all binary inputs and keeping each first occurrence.
     let getAllPossibleResultsFromCeArray
             (ces: ce[])
             (sortingWidth: int<sortingWidth>) : seq<sortableBoolArray> =
         
-        let initialArrays = getAllSortableBoolArrays sortingWidth
-        
-        initialArrays
-        |> Seq.map (fun arr -> arr.SortByCes ces)
-        |> removeDuplicates
+        if sortingWidth < 0<sortingWidth> || sortingWidth >= 64<sortingWidth> then
+            invalidArg "sortingWidth" "Sorting width must be between 0 and 63."
+        let width = int sortingWidth
+        let parents = Array.init width id
+        let rec root i =
+            if parents.[i] = i then i
+            else
+                parents.[i] <- root parents.[i]
+                parents.[i]
+        for comparator in ces do
+            if comparator.Hi >= width then
+                invalidArg "ces" "Comparator index exceeds sorting width."
+            parents.[root comparator.Hi] <- root comparator.Low
+        let components = [| 0 .. width - 1 |] |> Array.groupBy root |> Array.map snd
+        if ces.Length = 0 || components.Length <= 1 then
+            getAllSortableBoolArrays sortingWidth
+            |> Seq.map (fun arr -> arr.SortByCes ces)
+            |> removeDuplicates
+        else
+            seq {
+                let images =
+                    components |> Array.map (fun channels ->
+                        let localIndex = channels |> Array.mapi (fun i channel -> channel, i) |> Map.ofArray
+                        let localCes =
+                            ces |> Array.filter (fun comparator -> Map.containsKey comparator.Low localIndex)
+                                |> Array.map (fun comparator -> ce.create localIndex.[comparator.Low] localIndex.[comparator.Hi])
+                        let seen = HashSet<sortableBoolArray>()
+                        getAllSortableBoolArrays (channels.Length |> UMX.tag<sortingWidth>)
+                        |> Seq.map (fun input -> input, input.SortByCes localCes)
+                        |> Seq.choose (fun (input, output) ->
+                            if seen.Add output then
+                                let mutable firstInput, result = 0UL, 0UL
+                                for i in 0 .. channels.Length - 1 do
+                                    if input.[i] then
+                                        firstInput <- firstInput ||| (1UL <<< channels.[i])
+                                    if output.[i] then result <- result ||| (1UL <<< channels.[i])
+                                Some (firstInput, result)
+                            else None)
+                        |> Seq.toArray)
+                let rec combine componentIndex firstInput result = seq {
+                    if componentIndex = images.Length then yield firstInput, result
+                    else
+                        for input, output in images.[componentIndex] do
+                            yield! combine (componentIndex + 1) (firstInput ||| input) (result ||| output)
+                }
+                for _, result in combine 0 0UL 0UL |> Seq.sortBy fst do
+                    yield sortableBoolArray.create(Array.init width (fun i -> (result >>> i) &&& 1UL <> 0UL), sortingWidth)
+            }

@@ -21,6 +21,7 @@ module Reporting =
             (getGeneration: 'T -> int<generationNumber>)
             (extractRecords: 'T -> dataTableRecord seq)
             (reportNameTag: string)
+            (runName: string<runName>)
             (saveIntervals: genIntervalConfig)
             (genDb: IGeneSortDb)
             (rp: runParameters)
@@ -39,13 +40,12 @@ module Reporting =
                 OpsUtils.report progress (sprintf "%s Starting Dynamic %s for Run %s" 
                         (StringUtils.getTimestampString()) reportNameTag %runId)
 
-                let! (curGen: int<generationNumber>) = 
-                    rp.GetGenerationCurrent() |> Result.ofOption "Missing GenerationCurrent."
+                let curGen = rp.GetGenerationFirst() |> Option.defaultValue (UMX.tag<generationNumber> 0)
 
                 // 1. Dynamic discovery and streaming of slices
                 let! slicesSeq = loadSlices saveIntervals genDb curGen rp cts.Token log
 
-                let yab = slicesSeq |> Seq.toList
+                let slicesSeq = slicesSeq |> Seq.toArray
 
                 if Seq.isEmpty slicesSeq then
                     return! Error (sprintf "No valid slice files discovered for %s starting at generation %d." reportNameTag %curGen)
@@ -80,7 +80,7 @@ module Reporting =
 
                 // 4. Combine metadata lead columns with dynamic records
                 log "Combining collected records into final report format..."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord runName
                 let combinedDtrs = dataTableRecord.combineWithMany accumulatedDetails leadCols
                 let report = DataTableReport.fromDataTableRecords combinedDtrs
 
@@ -111,6 +111,7 @@ module Reporting =
             (fun spss -> spss.LastGeneration)
             (SpSummarySet.toDataTableRecords "")
             "SummaryReport"
+            host.Run.RunName
             saveIntervals
             genDb rp allowOverwrite cts progress
 
@@ -125,6 +126,7 @@ module Reporting =
             (fun srtrPoolSet -> srtrPoolSet.GenerationNumber)
             (SorterPoolSet.toDataTableRecordsSnapshot "")
             "SnapshotReport"
+            host.Run.RunName
             saveIntervals
             genDb rp allowOverwrite cts progress
 
@@ -139,6 +141,7 @@ module Reporting =
             (fun hist -> hist.SaveGeneration)
             Spsh.toDataTableRecords
             "SorterPoolSetHistoryReport"
+            host.Run.RunName
             saveIntervals
             genDb rp allowOverwrite cts progress
 
@@ -153,6 +156,7 @@ module Reporting =
             (fun hist -> hist.MaxGeneration)
             SorterPoolBinsSetSeries.makeDataTableRecords
             "SorterPoolBinsReport"
+            host.Run.RunName
             saveIntervals
             genDb rp allowOverwrite cts progress
 

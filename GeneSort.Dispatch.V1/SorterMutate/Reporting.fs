@@ -57,7 +57,7 @@ module Reporting =
                     host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                     |> Result.ofOption "Failed to create QueryParams for Report."
 
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord host.Run.RunName
                 let parentRecordMap = sorterEvalSelection |> EvalReporting.toDataTableRecords leadCols "Parent_"
 
                 // 4. Directly create bin set from parent evaluation set
@@ -124,7 +124,7 @@ module Reporting =
 
                 let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord host.Run.RunName
                 let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs

@@ -19,9 +19,10 @@ module SorterEvalDbs =
 
     module Standard =
 
-        let projectName = (SorterEvalSpecsRs.Standard.Rand_Test ()).ProjectName
+        let private sourceRun = SorterEval.RunCfg.Standard.Test ()
+        let projectName = sourceRun.ProjectName
 
-        let dbName = "Standard" |> UMX.tag<databaseName>
+        let dbName = sourceRun.DatabaseName
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -34,9 +35,10 @@ module SorterEvalDbs =
 
     module Merge =
 
-        let projectName = (SorterEvalSpecsRm.Merge.Rand_MergeTest_Test ()).ProjectName
+        let private sourceRun = SorterEval.RunCfg.Merge.Test ()
+        let projectName = sourceRun.ProjectName
 
-        let dbName = "Merge" |> UMX.tag<databaseName>
+        let dbName = sourceRun.DatabaseName
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -48,9 +50,10 @@ module SorterEvalDbs =
 
     module Prefix =
 
-        let projectName = (SorterEvalSpecsTestPrefix.Prefix.Prefix_32 ()).ProjectName
+        let private sourceRun = SorterEval.RunCfg.Prefix.Width32 ()
+        let projectName = sourceRun.ProjectName
 
-        let dbName = "Prefix" |> UMX.tag<databaseName>
+        let dbName = sourceRun.DatabaseName
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 

@@ -48,7 +48,7 @@ module Reporting =
 
                 let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord host.Run.RunName
                 let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
                 let dtrs = dataTableRecord.combineWithMany details leadCols
                 let report = DataTableReport.fromDataTableRecords dtrs
@@ -87,7 +87,7 @@ module Reporting =
 
                 let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord host.Run.RunName
 
                 let stageStatsRecordMaker (eval: sorterEval) : dataTableRecord [] =
                     eval
@@ -142,7 +142,7 @@ module Reporting =
 
                 let! qpReport = host.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
                                 |> Result.ofOption "Failed to create QueryParams for Report."
-                let leadCols = qpReport |> QueryParams.makeDataTableRecord
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord host.Run.RunName
 
                 let evalBins = 
                         sorterSetEvals.SorterEvals

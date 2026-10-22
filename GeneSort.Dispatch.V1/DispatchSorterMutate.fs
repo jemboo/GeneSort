@@ -56,7 +56,7 @@ module DispatchSorterMutate =
 
 
 
-    let private host: runHost = runHost.Create (MutateSpecsRp.getRun MutateSpecsRp.configType.Test_Mssi ()) 4
+    let private host: runHost = runHost.Create (SorterMutate.RunCfg.Prefix.getRun SorterMutate.RunCfg.Prefix.configType.Mssi ()) 4
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
 

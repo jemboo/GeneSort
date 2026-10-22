@@ -154,3 +154,7 @@ module QueryParams =
         qp.Properties
         |> Map.toSeq
         |> Seq.fold (fun acc (k, v) -> GeneSort.Core.dataTableRecord.addData k v acc) baseRecord
+
+    /// Report labels come from the owning run without changing query or file identities.
+    let makeReportDataTableRecord (runName: string<runName>) (qp: queryParams) =
+        makeDataTableRecord qp |> dataTableRecord.addData ParamKeys.runNameKey %runName

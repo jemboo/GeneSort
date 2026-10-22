@@ -697,6 +697,26 @@ module OutputUnionTests =
         Assert.True(memberValue.SorterEvalMap.[Fixtures.subsetId] = Fixtures.evaluation)
 
     [<Fact>]
+    let ``Standard seed conversion discards Default evaluations while preserving seed identities`` () =
+        let evaluation = SorterEval.withSortableTestsSubsetId SortableTestsSubsetId.Default Fixtures.evaluation
+        let memberValue = Fixtures.memberStandard |> SpMember_Standard.withEval (Some evaluation)
+        let pool =
+            sorterPool_Standard.create Fixtures.poolId Fixtures.poolStandard.ParentSorterPoolId
+                Fixtures.poolStandard.Name Fixtures.poolStandard.SorterPoolTag [|memberValue|]
+                Fixtures.poolStandard.RawCeLength Fixtures.poolStandard.MutationMod
+        let source = Fixtures.standard |> SorterPoolSet_Standard.upsertPool pool
+        let converted = SorterPoolSet_Soss.fromStandard source
+        let convertedPool = converted.SorterPools.[Fixtures.poolId]
+        let convertedMember = convertedPool.SorterPoolMembers |> Seq.exactlyOne
+        Assert.Empty(convertedMember.SorterEvalMap)
+        Assert.Equal(source.SorterPoolSetId, converted.SorterPoolSetId)
+        Assert.Equal(source.GenerationNumber, converted.GenerationNumber)
+        Assert.Equal(pool.ParentSorterPoolId, convertedPool.ParentSorterPoolId)
+        Assert.Equal(memberValue.SorterPoolMemberId, convertedMember.SorterPoolMemberId)
+        Assert.Equal(memberValue.MutationMod, convertedMember.MutationMod)
+        Assert.Equal(memberValue.Birthday, convertedMember.Birthday)
+
+    [<Fact>]
     let ``all output variants round trip through files with nested state intact`` () =
         MessagePackSetup.configure()
         for dataType, original in Fixtures.outputs do

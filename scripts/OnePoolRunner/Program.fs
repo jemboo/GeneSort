@@ -1,0 +1,112 @@
+module OnePoolRunner
+
+open System
+open System.Reflection
+open System.Threading
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Core.Mp
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs
+open GeneSort.Dispatch.V1
+
+let identity (configured: run) =
+    %configured.ProjectName, %configured.DatabaseName, %configured.RunName
+
+let orderedRuns () =
+    let moduleName = "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+    let presets = typeof<runHost>.Assembly.GetType(moduleName, true)
+    let runs =
+        typeof<runHost>.Assembly.GetTypes()
+        |> Array.filter (fun candidate -> candidate = presets || candidate.FullName.StartsWith(presets.FullName + "+" , StringComparison.Ordinal))
+        |> Array.collect (fun candidate -> candidate.GetMethods(BindingFlags.Public ||| BindingFlags.Static ||| BindingFlags.DeclaredOnly))
+        |> Array.filter (fun method -> method.ReturnType = typeof<run> && method.GetParameters().Length = 0)
+        |> Array.map (fun method -> method.Invoke(null, [||]) :?> run)
+        |> Array.sortBy (fun configured -> %configured.RunName)
+        |> Array.toList
+    if runs.IsEmpty then failwith "No OnePool run configurations were found."
+    let rec order completed (remaining: run list) =
+        match remaining with
+        | [] -> []
+        | _ ->
+            let ready, waiting = remaining |> List.partition (fun configured ->
+                match configured.ParameterSource with
+                | None -> true
+                | Some (source, _) -> Set.contains (identity source) completed)
+            if ready.IsEmpty then
+                failwith "OnePool contains a source outside this module or a circular dependency."
+            ready @ order (ready |> List.fold (fun seen configured -> Set.add (identity configured) seen) completed) waiting
+    order Set.empty runs
+
+let checkBatch phase result =
+    match result with
+    | Error error -> failwithf "%s: %s" phase error
+    | Ok results ->
+        let summary = RunResult.analyze results
+        printfn "%s: %d succeeded, %d skipped, %d failed or cancelled."
+            phase summary.Successes summary.MissingLog.Length summary.IssueLog.Length
+        if summary.IssueLog.Length > 0 then
+            failwith (String.concat Environment.NewLine summary.IssueLog)
+
+let execute maxParallel includeSummary configured =
+    let host = runHost.Create configured maxParallel
+    use cts = new CancellationTokenSource()
+    let progress = Some { new IProgress<string> with member _.Report message = printfn "%s" message }
+    let minReplica, maxReplica = 0<replNumber>, 1<replNumber>
+    printfn "\n=== %s / %s / %s ===" %configured.ProjectName %configured.DatabaseName %configured.RunName
+    printfn "Setup"
+    // Keep persisted completion/checkpoint state when resuming an interrupted batch.
+    let newParameters =
+        host.MakeRunParameters minReplica maxReplica
+        |> Array.filter (fun parameters ->
+            let query =
+                host.QueryParamsFromRunParams parameters (geneSortDataType.RunParameters configured.RunName)
+                |> Option.defaultWith (fun () -> failwith "Could not build the run-parameter query.")
+            host.RunDb.doesOutPutDataExist geneSortDataMode.Project query
+            |> Async.RunSynchronously |> not)
+    ParamOps.initRunAndParamFiles host.RunDb progress host.Run minReplica maxReplica
+        host.AllowOverwrite (fun _ _ -> newParameters)
+    |> Async.RunSynchronously
+    |> Result.defaultWith (fun error -> failwithf "Initialize parameters: %s" error)
+    ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts progress host maxParallel
+    |> Async.RunSynchronously |> checkBatch "Setup"
+    printfn "Execute"
+    ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts progress host maxParallel
+    |> Async.RunSynchronously |> checkBatch "Execute"
+    if includeSummary then
+        printfn "Summary report"
+        // Reports are derived outputs and can safely be regenerated on a retry.
+        ReportOps.executeReport ReportCatalog.evolutionSummary minReplica maxReplica (true |> UMX.tag) cts progress host maxParallel
+        |> Async.RunSynchronously |> checkBatch "Summary report"
+
+[<EntryPoint>]
+let main argv =
+    try
+        let listOnly, maxParallel =
+            match argv with
+            | [| parallelism |] -> false, int parallelism
+            | [| "--list"; parallelism |] -> true, int parallelism
+            | _ -> failwith "Use Run-OnePool.ps1 [-MaxParallel N] [-ListOnly] [-NoBuild]."
+        if maxParallel < 1 then invalidArg "MaxParallel" "Must be positive."
+        MessagePackSetup.configure ()
+        ProjectCatalogs.registerAll ()
+        let runs = orderedRuns ()
+        let prerequisites = [
+            SortableTests.RunCfg.Prefix.Width32 ()
+            SorterEval.RunCfg.Prefix.Width32 ()
+        ]
+        printfn "OnePool: %d configurations; replica 0; projects root: %s" runs.Length (RunHost.projectsRoot ())
+        for configured in prerequisites do
+            if listOnly then
+                printfn "Prerequisite %s / %s / %s: setup -> execute"
+                    %configured.ProjectName %configured.DatabaseName %configured.RunName
+            else execute maxParallel false configured
+        for configured in runs do
+            if listOnly then
+                printfn "%s / %s / %s: setup -> execute -> summary"
+                    %configured.ProjectName %configured.DatabaseName %configured.RunName
+            else execute maxParallel true configured
+        0
+    with error ->
+        eprintfn "Error: %s" (error.GetBaseException().Message)
+        1

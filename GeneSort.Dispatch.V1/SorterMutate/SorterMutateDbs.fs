@@ -18,11 +18,12 @@ module SorterMutateDbs =
 
     module RandomStandard =
 
-        let projectName = (MutateSpecsRs.RandomStandard.Test_Msrs ()).ProjectName
+        let private sourceRun = SorterMutate.RunCfg.Standard.Msrs ()
+        let projectName = sourceRun.ProjectName
 
         module Uniform =
 
-            let dbName = "RandomStandard" |> UMX.tag<databaseName>
+            let dbName = sourceRun.DatabaseName
             let dbFolder = 
                     @$"c:\Projects\{projectName}\{%dbName}\Data" |> UMX.tag<pathToRootFolder>
 
@@ -32,11 +33,12 @@ module SorterMutateDbs =
 
     module RandomMerge =
 
-        let projectName = (MutateSpecsRm.RandomMerge.Test_Msce ()).ProjectName
+        let private sourceRun = SorterMutate.RunCfg.Merge.Msce ()
+        let projectName = sourceRun.ProjectName
     
         module Uniform =
             
-            let dbName = "RandomMerge" |> UMX.tag<databaseName>
+            let dbName = sourceRun.DatabaseName
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 
@@ -46,11 +48,12 @@ module SorterMutateDbs =
 
     module RandomPrefix =
 
-        let projectName = (MutateSpecsRp.RandomPrefix.Test_Msce ()).ProjectName
+        let private sourceRun = SorterMutate.RunCfg.Prefix.Msce ()
+        let projectName = sourceRun.ProjectName
     
         module Uniform =
             
-            let dbName = "RandomPrefix" |> UMX.tag<databaseName>
+            let dbName = sourceRun.DatabaseName
             let dbFolder = 
                     $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
 

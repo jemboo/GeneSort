@@ -15,9 +15,10 @@ module SortableTestsDbs =
 
     module Merge =
 
-        let projectName = (SortableTestsSpecsMerge.Merge.Merge_Test ()).ProjectName
+        let private sourceRun = SortableTests.RunCfg.Merge.Test ()
+        let projectName = sourceRun.ProjectName
 
-        let dbName = "Merge" |> UMX.tag<databaseName>
+        let dbName = sourceRun.DatabaseName
         let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
                        |> UMX.tag<pathToRootFolder>
 
@@ -47,10 +48,11 @@ module SortableTestsDbs =
 
     module Prefix =
 
-        let projectName = (SortableTestsSpecsPrefix.Prefix.Prefix_32 ()).ProjectName
+        let private sourceRun = SortableTests.RunCfg.Prefix.Width32 ()
+        let projectName = sourceRun.ProjectName
     
         let dbNameTest = "PrefixTest" |> UMX.tag<databaseName>
-        let dbName = "Prefix" |> UMX.tag<databaseName>
+        let dbName = sourceRun.DatabaseName
         let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
                        |> UMX.tag<pathToRootFolder>
 

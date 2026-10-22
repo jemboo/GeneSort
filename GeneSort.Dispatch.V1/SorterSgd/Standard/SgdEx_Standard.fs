@@ -162,7 +162,7 @@ module SgdEx_Standard =
                 let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
 
                 log "Executing unified evolution run..."
-                let! (_finalRunResult: sorterPoolSet_Standard) = 
+                let! (finalRunResult: sorterPoolSet_Standard) =
                     EvoOrch_Standard.runStandardEvolutionAsync
                         genDb
                         saveIntervals
@@ -177,7 +177,7 @@ module SgdEx_Standard =
                         log
 
                 log "evaluateEvolutionRun completed."
-                return activeRp
+                return activeRp.WithGenerationCurrent(Some finalRunResult.GenerationNumber).WithRunFinished(Some true)
 
             with e -> 
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
