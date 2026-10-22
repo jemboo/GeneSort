@@ -1,8 +1,8 @@
 namespace GeneSort.Project.V1.Catalogs.Setup
 
 open GeneSort.Core
-open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Project.V1.Catalogs.SortableTestsWithPrefix
+open GeneSort.Project.V1.Catalogs.SorterModelSet
 
 module SetupFunctions =
     /// Models are persisted first; a failure prevents tests setup from starting.

@@ -1,8 +1,8 @@
 namespace GeneSort.Core.Test
 
 open Xunit
-open SysExt
 open GeneSort.Core.ByteUtils
+open SysExt
 
 
 type SysExtTests() =

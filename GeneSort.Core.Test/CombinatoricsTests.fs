@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core.Test
 
-open Xunit
-open GeneSort.Core.Combinatorics
-open FsUnit.Xunit
 open FSharp.UMX
+open FsUnit.Xunit
+open Xunit
 open GeneSort.Core
+open GeneSort.Core.Combinatorics
 
 type CombinatoricsTests() =
 

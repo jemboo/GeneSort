@@ -1,15 +1,15 @@
 module GeneSort.Dispatch.Test.V2.WorkflowFixtures
 
 open FSharp.UMX
+open GeneSort.Sorting
+open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Sorting
-open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Dispatch.V1.SorterEval
 

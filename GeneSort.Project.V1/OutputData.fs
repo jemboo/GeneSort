@@ -1,12 +1,12 @@
 
 namespace GeneSort.Project.V1
 
-open GeneSort.Sorting.Sortable
 open GeneSort.Core
-open GeneSort.SortingOps
+open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
-open GeneSort.Eval.V1.Sgd
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Project.V1.Parameters
 
 

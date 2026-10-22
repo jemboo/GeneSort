@@ -4,10 +4,10 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 /// Inputs available to run functions, independent of the host and executor modules.
 type executeContext = {

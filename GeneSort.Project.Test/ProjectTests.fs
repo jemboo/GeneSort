@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Project.Test
 
-open Xunit
 open FSharp.UMX
+open Xunit
 open GeneSort.Project.V1
 
 type ProjectTests() =

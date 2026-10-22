@@ -2,8 +2,8 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Eval.V1
 open GeneSort.Core
+open GeneSort.Eval.V1
 
 type spSummarySet_Soss =
     private {

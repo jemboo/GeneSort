@@ -1,13 +1,13 @@
 namespace GeneSort.Eval.V1.Sgd.Standard
 
+open System.Diagnostics
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open System.Diagnostics
+open GeneSort.Eval.V1.Sgd
 
 module Pipeline_Standard =
 

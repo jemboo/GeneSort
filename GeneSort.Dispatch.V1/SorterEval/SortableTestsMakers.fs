@@ -1,17 +1,17 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
 open System
-open FsToolkit.ErrorHandling
 open FSharp.UMX
-open GeneSort.Sorting.Sorter
-open GeneSort.Project.V1
+open FsToolkit.ErrorHandling
 open GeneSort.Sorting.Sortable
-open GeneSort.Model.Sortable.V1
-open GeneSort.Dispatch.V1.SortableTests
+open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
+open GeneSort.Model.Sortable.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Project.V1.Parameters
+open GeneSort.Dispatch.V1.SortableTests
 
 module SortableTestsMakers =
 

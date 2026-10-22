@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core
+open FSharp.UMX
 open GeneSort.Core.Permutation
 open CollectionUtils
-open FSharp.UMX
 open Combinatorics
 
 // permSi: a permutation that is its own inverse (p ∘ p = identity)

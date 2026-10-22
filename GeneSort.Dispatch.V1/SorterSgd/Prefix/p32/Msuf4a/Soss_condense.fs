@@ -2,10 +2,10 @@ module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Soss_condense
 
 open System.Runtime.CompilerServices
 open FSharp.UMX
-open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Parameters
+open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
 

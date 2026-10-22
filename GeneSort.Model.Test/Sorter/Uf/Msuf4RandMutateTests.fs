@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Model.Test.Sorter.Uf
 
 open System
-open FSharp.UMX
-open Xunit
 open EvoMergeSort.Core
 open EvoMergeSort.Sorter
-open Uf4Seeds
-open GeneSort.Model.Sorter.Uf4
+open FSharp.UMX
+open Xunit
 open GeneSort.Model.Sorter
+open GeneSort.Model.Sorter.Uf4
+open Uf4Seeds
 
 type Msuf4RandMutateTests() =
 

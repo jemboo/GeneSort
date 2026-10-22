@@ -1,15 +1,15 @@
 ﻿namespace GeneSort.Project.Test
 
 open System
+open System.Collections.Generic
+open System.IO
+open System.Threading
 open FSharp.UMX
-open Xunit
-open MessagePack.Resolvers
 open MessagePack
 open MessagePack.FSharp
-open System.IO
+open MessagePack.Resolvers
+open Xunit
 open GeneSort.Project
-open System.Threading
-open System.Collections.Generic
 
 
 type MapStringTransformerTests() =

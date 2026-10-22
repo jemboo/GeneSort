@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core.Test.TwoOrbit
 open System
+open FSharp.UMX
 open Xunit
 open GeneSort.Core
-open FSharp.UMX
-open GeneSort.Core.TwoOrbitPairOps
 open GeneSort.Core.PrototypeUnfolder
+open GeneSort.Core.TwoOrbitPairOps
 
 type TwoOrbitPairTests() =
 

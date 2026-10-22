@@ -1,10 +1,10 @@
 ﻿
 namespace GeneSort.Sorting.Sortable
 
+open System.Collections.Concurrent
+open System.Runtime.Intrinsics
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Runtime.Intrinsics
-open System.Collections.Concurrent
 
 [<Struct>]
 type sortBlockUint8v512 = 

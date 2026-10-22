@@ -1,11 +1,11 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
-open GeneSort.Project.V1
-open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Model.Sorting.Simple.V1
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Model.Sorting.Simple.V1
 
 type sortableTestsMaker = evolutionSetupSources -> runParameters -> Async<Result<sortableTests * ce array, string>>
 type seedSorterPoolSetMaker = evolutionSetupSources -> runParameters -> Async<Result<sorterPoolSet, string>>

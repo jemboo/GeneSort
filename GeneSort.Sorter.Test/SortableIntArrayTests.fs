@@ -1,12 +1,12 @@
 ﻿namespace GeneSort.Sorter.Tests
 
+open System
+open FSharp.UMX
 open Xunit
 open GeneSort.Core
-open FSharp.UMX
-open System
 open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 
 type SortableIntArrayTests() =
 

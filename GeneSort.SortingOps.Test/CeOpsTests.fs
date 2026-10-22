@@ -2,12 +2,12 @@ namespace GeneSort.Model.Mp.Sorter.Tests
 
 open System
 open FSharp.UMX
-open Xunit
 open FsUnit.Xunit   
+open Xunit
 open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingOps
-open GeneSort.Sorting.Sortable
 
 type CeOpsTests() =
 

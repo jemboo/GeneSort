@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Sorting.Sortable
 
 open System
+open System.Collections.Generic
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open System.Collections.Generic
 
 
 module BinaryIntArrays =

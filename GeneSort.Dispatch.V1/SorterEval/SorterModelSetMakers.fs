@@ -4,11 +4,11 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Project.V1
 open GeneSort.Model.Sorting.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Project.V1.Parameters
 
 module SorterModelSetMakers =
 

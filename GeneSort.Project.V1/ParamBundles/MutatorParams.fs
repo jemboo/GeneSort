@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Project.V1.ParamBundles
 
 open FSharp.UMX
+open FsToolkit.ErrorHandling
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Simple.V1
-open FsToolkit.ErrorHandling
 
 
 type simpleMutatorCase =

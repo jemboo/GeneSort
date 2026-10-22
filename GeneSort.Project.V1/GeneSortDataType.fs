@@ -1,7 +1,7 @@
 namespace GeneSort.Project.V1
 
-open FSharp.UMX
 open System
+open FSharp.UMX
 
 type geneSortDataMode =
     | Project

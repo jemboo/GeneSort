@@ -1,13 +1,13 @@
 namespace GeneSort.Project.V1.Catalogs.Queries
 
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.SortingOps
-open GeneSort.Model.Sorting.V1
 open GeneSort.Core
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Project.V1
 open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
 

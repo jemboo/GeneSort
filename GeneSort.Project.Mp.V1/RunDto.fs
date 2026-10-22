@@ -1,11 +1,11 @@
 namespace GeneSort.Project.Mp.V1
 
-open GeneSort.Project.V1.Catalogs.Evolution
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 open FSharp.UMX
+open MessagePack
+open MessagePack.FSharp
+open MessagePack.Resolvers
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
 
 type parameterSpanDto =
     {

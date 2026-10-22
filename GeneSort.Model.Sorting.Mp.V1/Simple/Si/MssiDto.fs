@@ -3,10 +3,10 @@ namespace GeneSort.Model.Sorting.Mp.V1.Simple.Si
 
 open System
 open FSharp.UMX
+open GeneSort.Core.Mp
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple.Si
-open GeneSort.Core.Mp
 
 type mssiDto =
     { id: Guid

@@ -4,14 +4,14 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
-open GeneSort.Dispatch.V1
-open GeneSort.Model.Sortable.V1
-open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Sorting
 open GeneSort.SortingLib.Sorter
+open GeneSort.Model.Sortable.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.OpsUtils
 
 module SortableTestsExecution =
     /// Generates standalone tests directly into Results for downstream workflows.

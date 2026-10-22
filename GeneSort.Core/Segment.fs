@@ -1,6 +1,6 @@
 ﻿namespace GeneSort.Core
-open LanguagePrimitives
 open System
+open LanguagePrimitives
 
 type segment = {
     start: int

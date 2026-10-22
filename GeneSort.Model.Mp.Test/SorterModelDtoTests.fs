@@ -1,22 +1,22 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Tests
 
 open System
-open Xunit
 open FSharp.UMX
 open MessagePack
-open MessagePack.Resolvers
 open MessagePack.FSharp
+open MessagePack.Resolvers
+open Xunit
 open GeneSort.Core
-open GeneSort.Model.Sorting.V1.Simple.Uf6
 open GeneSort.Sorting
-open GeneSort.Model.Sorting.V1.Simple.Uf4
-open GeneSort.Model.Sorting.V1.Simple.Rs
-open GeneSort.Model.Sorting.V1.Simple.Si
-open GeneSort.Model.Sorting.V1.Simple.Ce
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple
-open GeneSort.Model.Sorting.Mp.V1.Simple
+open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.Model.Sorting.V1.Simple.Rs
+open GeneSort.Model.Sorting.V1.Simple.Si
+open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
+open GeneSort.Model.Sorting.V1.Simple.Uf6
+open GeneSort.Model.Sorting.Mp.V1.Simple
 
 type SorterModelDtoTests() =
 

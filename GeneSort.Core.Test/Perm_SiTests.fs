@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Core.Test
 open System
 open FSharp.UMX
+open FsUnit.Xunit
 open Xunit
 open GeneSort.Core
 open GeneSort.Core.Combinatorics
-open GeneSort.Core.Permutation
-open GeneSort.Core.PermSi
 open GeneSort.Core.CoreGen
-open FsUnit.Xunit
+open GeneSort.Core.PermSi
+open GeneSort.Core.Permutation
 
 type PermSiTests() =
 

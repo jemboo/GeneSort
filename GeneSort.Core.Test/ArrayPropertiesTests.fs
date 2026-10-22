@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Core.Test
 
-open Xunit
-open FsUnit.Xunit
-open GeneSort.Core.ArrayUtils
 open System
+open FsUnit.Xunit
+open Xunit
+open GeneSort.Core.ArrayUtils
 
 type ArrayPropertiesTests() =
 

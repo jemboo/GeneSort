@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Core
-open LanguagePrimitives
 open System
 open System.Collections
-open System.Runtime.CompilerServices
 open System.Collections.Generic
+open System.Runtime.CompilerServices
+open LanguagePrimitives
 
 module MapUtils =
     /// Merges a sequence of maps into a single map.

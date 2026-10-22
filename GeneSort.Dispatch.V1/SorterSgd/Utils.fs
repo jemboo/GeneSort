@@ -3,16 +3,16 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
-open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.SortingOps
-open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 module Utils =
 

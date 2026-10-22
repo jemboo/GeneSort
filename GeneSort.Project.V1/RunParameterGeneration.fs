@@ -1,11 +1,11 @@
 namespace GeneSort.Project.V1
 
 open FSharp.UMX
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 
 module RunParameterGeneration =
     /// Pair every run span combination with every enhanced setup combination within the same replica.

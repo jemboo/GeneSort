@@ -3,10 +3,10 @@ namespace GeneSort.Model.Sorting.Mp.V1.Simple.Uf6
 
 open System
 open FSharp.UMX
-open GeneSort.Model.Mp.Sorter.Uf6
+open GeneSort.Core.Mp
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple.Uf6
-open GeneSort.Core.Mp
+open GeneSort.Model.Mp.Sorter.Uf6
 
 type msuf6RandMutateDto =
     { id: Guid

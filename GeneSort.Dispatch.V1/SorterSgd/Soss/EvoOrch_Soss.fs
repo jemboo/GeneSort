@@ -4,18 +4,18 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Sorting.Sortable
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
-open GeneSort.Db.V1
-open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
-open GeneSort.SortingOps
+open GeneSort.Sorting.Sortable
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
-open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Bins.Soss
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 module EvoOrch_Soss =
 

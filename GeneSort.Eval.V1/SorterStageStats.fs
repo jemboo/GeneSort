@@ -3,8 +3,8 @@
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingOps
 
 //The paper "Large [g,d] Sorting Networks" by David C. Van Voorhis from August 1971 describes special constructions for [2^r, 2^r]
 //f-networks that reduce the number of comparators required by large N-sorter networks. Stanford

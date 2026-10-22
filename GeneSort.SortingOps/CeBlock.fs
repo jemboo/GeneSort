@@ -2,9 +2,9 @@
 
 open System
 open FSharp.UMX
-open GeneSort.Sorting.Sorter
-open GeneSort.Sorting
 open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Sorting.Sorter
 
 type ceBlock = 
     private { 

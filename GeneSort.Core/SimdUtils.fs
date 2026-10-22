@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Core
 open System
-open System.Runtime.Intrinsics
-open System.Runtime.Intrinsics.X86
-open System.Runtime.Intrinsics.Arm
 open System.Runtime.CompilerServices
-open Microsoft.FSharp.NativeInterop
-
-open ArrayUtils
 open System.Runtime.InteropServices
+open System.Runtime.Intrinsics
+open System.Runtime.Intrinsics.Arm
+open System.Runtime.Intrinsics.X86
+
+open Microsoft.FSharp.NativeInterop
+open ArrayUtils
 
 
 [<Measure>] type simdLength

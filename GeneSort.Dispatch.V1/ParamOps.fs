@@ -1,12 +1,12 @@
 namespace GeneSort.Dispatch.V1
-open GeneSort.Project.V1.Catalogs.Queries
 open System
 open FSharp.UMX
 open GeneSort.Core
-open OpsUtils
-open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open OpsUtils
 
 module ParamOps =
 

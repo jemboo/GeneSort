@@ -2,10 +2,10 @@
 
 open FSharp.UMX
 open MessagePack
+open MessagePack.FSharp
 open MessagePack.Resolvers
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
-open MessagePack.FSharp
 
 type runParametersDto = 
     { 

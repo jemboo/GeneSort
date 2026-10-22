@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Core.Test
 
-open Xunit
-open FsUnit.Xunit
 open System.Collections.Generic
+open FsUnit.Xunit
+open Xunit
 open GeneSort.Core
 open GeneSort.Core.Orbit
 

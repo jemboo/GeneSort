@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Sorter.Tests
 
 open System
-open Xunit
 open FSharp.UMX
+open FsUnit.Xunit
+open Xunit
 open GeneSort.Core.Combinatorics
 open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
-open FsUnit.Xunit
+open GeneSort.Sorting.Sorter
 
 type CeTests() =
 

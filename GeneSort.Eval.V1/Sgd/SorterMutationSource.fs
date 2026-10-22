@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Eval.V1.Sgd
 
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
 open GeneSort.Core
+open GeneSort.Model.Sorting.V1
 open GeneSort.Eval.V1
 
 type sorterMutationSource =

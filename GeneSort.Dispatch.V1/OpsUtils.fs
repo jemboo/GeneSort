@@ -5,8 +5,8 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.Db.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 module OpsUtils =
 

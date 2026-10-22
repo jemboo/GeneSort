@@ -1,20 +1,20 @@
 module GeneSort.Dispatch.Test.V2.SetupCatalogTests
 
 open System
-open GeneSort.Project.V1.Catalogs.SetupParameters
-open Xunit
-open GeneSort.Project.V1
-open GeneSort.Project.V1.Catalogs.Setup
-open GeneSort.Project.V1.Catalogs.SorterModelSet
-open GeneSort.Project.V1.Catalogs.SortableTestsWithPrefix
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Dispatch.V1
 open FSharp.UMX
-open GeneSort.Project.Mp.V1
-open GeneSort.Core.Mp
 open MessagePack
-open GeneSort.Dispatch.V1.SorterEval
+open Xunit
+open GeneSort.Core.Mp
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Catalogs.SortableTestsWithPrefix
+open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.Mp.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SorterEval
 
 let private parameters = runParameters.create Map.empty
 

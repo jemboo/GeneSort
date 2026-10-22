@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core.Test
 
-open Xunit
-open FsUnit.Xunit
 open System
-open GeneSort.Core
 open FSharp.UMX
+open FsUnit.Xunit
+open Xunit
+open GeneSort.Core
 open GeneSort.Core.RandomSeed
 
 type RandoTests() =

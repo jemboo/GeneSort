@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Eval.V1.Sgd
 
 open FSharp.UMX
-open GeneSort.SortingOps
 open GeneSort.Core
+open GeneSort.SortingOps
 
 [<Measure>] type stDevWeight
 [<Measure>] type sorterPoolEvalScore

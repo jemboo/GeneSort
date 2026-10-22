@@ -2,8 +2,8 @@
 
 open System
 open FSharp.UMX
-open Xunit
 open FsUnit.Xunit   
+open Xunit
 //open GeneSort.Sorter
 //open GeneSort.Sorter.Sorter
 //open GeneSort.SortingOps

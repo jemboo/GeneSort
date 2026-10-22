@@ -1,29 +1,29 @@
 module GeneSort.Dispatch.Test.V2.MakerCatalogTests
 
-open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Project.V1.Catalogs.Evolution
-open GeneSort.Project.V1.Catalogs
 open System
-open Xunit
-open GeneSort.Project.V1
-open GeneSort.Dispatch.V1.SorterSgd
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.SortingLib.Sorter
-open GeneSort.Dispatch.V1
-open GeneSort.Project.Mp.V1
-open GeneSort.Core.Mp
 open MessagePack
+open Xunit
 open GeneSort.Core
-open GeneSort.SortingOps
+open GeneSort.Core.Mp
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.Mp.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SorterSgd
 
 let private emptyParameters = runParameters.create Map.empty
 

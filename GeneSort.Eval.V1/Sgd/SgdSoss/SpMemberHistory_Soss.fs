@@ -2,8 +2,8 @@
 
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
 
 type spMemberHistory_Soss = 

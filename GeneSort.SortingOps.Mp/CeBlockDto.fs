@@ -2,9 +2,9 @@
 
 open System
 open FSharp.UMX
-open GeneSort.SortingOps
-open GeneSort.Sorting.Mp.Sorter
 open GeneSort.Sorting
+open GeneSort.Sorting.Mp.Sorter
+open GeneSort.SortingOps
 
 type ceBlockDto = {
     CeBlockId: Guid

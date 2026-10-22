@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core.Test.TwoOrbit
 open System
-open Xunit
 open FsUnit.Xunit
+open Xunit
 open GeneSort.Core
 
 

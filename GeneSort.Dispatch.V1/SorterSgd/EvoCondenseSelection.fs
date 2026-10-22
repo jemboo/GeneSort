@@ -3,13 +3,13 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 open System
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Db.V1
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 /// Select source checkpoints before execution spans are expanded or parameters are saved.
 module EvoCondenseSelection =

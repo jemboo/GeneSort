@@ -1,11 +1,11 @@
 module GeneSort.Dispatch.Test.V2.ParameterSetTests
 
-open Xunit
-open GeneSort.Project.V1.Parameters
-open GeneSort.Project.Mp.V1
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
+open Xunit
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.Mp.V1
 
 [<Fact>]
 let ``Setup updates preserve their type and leave the original unchanged`` () =

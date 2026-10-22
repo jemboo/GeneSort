@@ -1,13 +1,13 @@
 namespace GeneSort.FileDb.V1
 
-open GeneSort.Project.V1.Catalogs.Queries
 open System
 open System.IO
 open System.Threading
 open FSharp.UMX
-open GeneSort.Db.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 
 type private DbMessage =

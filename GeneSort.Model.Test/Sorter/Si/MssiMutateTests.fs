@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Model.Test.Sorter.Si
 
 open System
-open Xunit
 open FSharp.UMX
+open Xunit
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1

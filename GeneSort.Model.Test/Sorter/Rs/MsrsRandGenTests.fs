@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Model.Test.Sorter.Rs
 
 open System
-open Xunit
 open FSharp.UMX
 open FsUnit.Xunit
+open Xunit
 open GeneSort.Core
+open GeneSort.Core.Rando
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Rs
-open GeneSort.Core.Rando
 
 type MsrsRandGenTests() =
     // Helper function to create a mock random number generator

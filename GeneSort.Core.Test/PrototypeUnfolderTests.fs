@@ -3,8 +3,8 @@
 open System
 open Xunit
 open GeneSort.Core
-open GeneSort.Core.TwoOrbitPairOps
 open GeneSort.Core.PrototypeUnfolder
+open GeneSort.Core.TwoOrbitPairOps
 
 
 type PrototypeUnfolderTests() =

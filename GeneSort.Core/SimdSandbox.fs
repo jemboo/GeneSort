@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Core
 open System
-open System.Runtime.Intrinsics
-open System.Runtime.Intrinsics.X86
-open System.Runtime.Intrinsics.Arm
 open System.Runtime.CompilerServices
+open System.Runtime.Intrinsics
+open System.Runtime.Intrinsics.Arm
+open System.Runtime.Intrinsics.X86
 open Microsoft.FSharp.NativeInterop
 
 open ArrayUtils

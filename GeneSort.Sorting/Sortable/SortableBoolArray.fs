@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.Sorting.Sortable
 
 open System
+open System.Collections
+open System.Collections.Generic
+open System.Linq
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open System.Linq
-open System.Collections
-open System.Collections.Generic
 
 [<Struct; CustomEquality; NoComparison>]
 type sortableBoolArray =

@@ -4,9 +4,9 @@ open System
 open FSharp.UMX
 open Xunit
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 
 let private makeRun spans query enhancer =
     // Execution and run-only catalogs need not exist to predict setup outputs.

@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Uf4
 
 open System
-open GeneSort.Core
 open MessagePack
-open MessagePack.Resolvers
 open MessagePack.FSharp
+open MessagePack.Resolvers
+open GeneSort.Core
 
 type uf4MutationRatesArrayDto =
     { uf4MutationRatesDtos: uf4MutationRatesDto array }

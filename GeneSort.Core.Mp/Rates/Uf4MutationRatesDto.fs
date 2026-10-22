@@ -1,11 +1,11 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Uf4
 
 open System
+open MessagePack
+open MessagePack.FSharp
+open MessagePack.Resolvers
 open GeneSort.Core
 open GeneSort.Core.Mp.RatesAndOps
-open MessagePack
-open MessagePack.Resolvers
-open MessagePack.FSharp
 
 type uf4MutationRatesDto =
     { order: int

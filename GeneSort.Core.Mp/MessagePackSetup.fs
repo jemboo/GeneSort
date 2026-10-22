@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Core.Mp
 
 open MessagePack
-open MessagePack.Resolvers
 open MessagePack.FSharp
+open MessagePack.Resolvers
 
 module MessagePackSetup =
 

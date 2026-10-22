@@ -5,15 +5,15 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
-open GeneSort.Db.V1
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SorterModelSet
-open GeneSort.Model.Sorting.V1
-open GeneSort.Sorting.Sortable
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 

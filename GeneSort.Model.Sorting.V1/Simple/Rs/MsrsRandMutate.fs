@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Model.Sorting.V1.Simple.Rs
 
+open System
 open FSharp.UMX
 open GeneSort.Core
-open System
 open GeneSort.Model.Sorting.V1
 
 [<Struct; CustomEquality; NoComparison>]

@@ -1,15 +1,15 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Prefix.p24.Msrs3b
 
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
-open GeneSort.Core
+open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.FileDb.V1
-open GeneSort.SortingOps
-open GeneSort.Eval.V1
-open GeneSort.SortingLib.Sorter
 
 module Common =
 

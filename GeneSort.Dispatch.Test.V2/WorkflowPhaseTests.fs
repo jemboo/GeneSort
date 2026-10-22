@@ -2,34 +2,34 @@ module GeneSort.Dispatch.Test.V2.WorkflowPhaseTests
 
 open System
 open System.Threading
-open Xunit
 open FSharp.UMX
+open Xunit
 open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
+open GeneSort.Model.Sorting.V1.Simple
+open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
-open GeneSort.Dispatch.V1.SorterSgd.Standard
-open GeneSort.Dispatch.V1.SorterSgd.Soss
-open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SortableTests
-open GeneSort.SortingLib.Sorter
-open GeneSort.Project.V1.Parameters
-open GeneSort.Model.Sorting.V1.Simple
-open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
-
-open GeneSort.Dispatch.Test.V2.WorkflowFixtures
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Dispatch.V1.SorterSgd.Soss
+
+open GeneSort.Dispatch.V1.SorterSgd.Standard
+open GeneSort.Dispatch.Test.V2.WorkflowFixtures
 
 let private sourceWithMutationMods modifiers = sossSource modifiers
 

@@ -1,10 +1,10 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
-open GeneSort.Project.V1
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.Project.V1
 open GeneSort.Model.Sorting.Simple.V1
 
 module SeedSorterModelGeneration =

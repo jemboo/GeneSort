@@ -4,8 +4,8 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 
 
 type sorterSelectionType = 

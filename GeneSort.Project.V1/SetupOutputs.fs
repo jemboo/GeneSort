@@ -2,10 +2,10 @@ namespace GeneSort.Project.V1
 
 open System
 open FSharp.UMX
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 
 module SetupOutputs =
     /// Carry enhancer-supplied file references alongside the identity of the setup settings.

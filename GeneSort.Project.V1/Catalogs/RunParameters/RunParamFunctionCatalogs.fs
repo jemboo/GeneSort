@@ -1,14 +1,14 @@
 namespace GeneSort.Project.V1.Catalogs.RunParameters
 
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Project.V1
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open GeneSort.SortingLib.Sorter
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
 
 /// Context available to a run parameter enhancer without depending on dispatch infrastructure.

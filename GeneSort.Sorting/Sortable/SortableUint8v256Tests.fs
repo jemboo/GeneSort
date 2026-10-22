@@ -2,9 +2,9 @@
 namespace GeneSort.Sorting.Sortable
 
 open System
+open System.Threading.Tasks
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Threading.Tasks
 
 [<Struct>]
 type sortableUint8v256Tests =

@@ -2,9 +2,9 @@
 namespace GeneSort.Model.Sorting.Mp.V1.Simple.Si
 
 open FSharp.UMX
+open GeneSort.Core.Mp
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Si
-open GeneSort.Core.Mp
 
 type mssiRandGenDto = 
     { sortingWidth: int

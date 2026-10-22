@@ -1,22 +1,22 @@
 namespace GeneSort.Dispatch.V1.SorterMutate
 
-open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.Evolution
-open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Project.V1.Catalogs.Setup
-open GeneSort.Project.V1.Catalogs.Queries
 open System.Runtime.CompilerServices
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
-open GeneSort.Dispatch.V1
 open GeneSort.Core
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
 open GeneSort.Sorting
-open GeneSort.Dispatch.V1.SorterMutate
-open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.CommonParams
+open GeneSort.Dispatch.V1.SorterMutate
 
 
 module MutateSpecsRs =

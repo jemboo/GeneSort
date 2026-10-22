@@ -3,8 +3,8 @@ namespace GeneSort.SortingOps.Mp
 open System
 open FSharp.UMX
 open GeneSort.Sorting
-open GeneSort.SortingOps
 open GeneSort.Sorting.Mp.Sortable
+open GeneSort.SortingOps
 
 type sorterEvalV1Dto = {
     SorterId : Guid

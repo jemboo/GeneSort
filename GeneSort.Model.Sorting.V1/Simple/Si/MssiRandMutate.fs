@@ -4,8 +4,8 @@ open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Core.PermSi
-open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
 
 [<Struct; CustomEquality; NoComparison>]
 type mssiRandMutate = 

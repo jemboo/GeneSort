@@ -1,14 +1,14 @@
 namespace GeneSort.SortingOps
 
+open System
+open System.Collections.Concurrent
+open System.Collections.Generic
 open System.Runtime.Intrinsics
+open System.Threading
 open System.Threading.Tasks
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open System.Collections.Concurrent
-open System.Collections.Generic
-open System
-open System.Threading
 
 module CeBlockOpsUint8v512 =
 

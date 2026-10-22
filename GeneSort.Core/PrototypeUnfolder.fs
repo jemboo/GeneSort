@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Core
 
-open Combinatorics
 open CollectionUtils
-open TwoOrbitPairOps
+open Combinatorics
 open MathUtils
+open TwoOrbitPairOps
 
 
 module PrototypeUnfolder =

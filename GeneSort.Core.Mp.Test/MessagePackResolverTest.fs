@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Core.Test
 
 open System
-open Xunit
 open MessagePack
+open Xunit
 open GeneSort.Core.Mp // Ensures assembly load trigger
 
 

@@ -3,14 +3,14 @@
 open System
 open FSharp.UMX
 
+open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple.Ce
-open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Rs
+open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
-open GeneSort.Sorting
-open GeneSort.Model.Sorting.V1
 
 
 type simpleSorterModel =

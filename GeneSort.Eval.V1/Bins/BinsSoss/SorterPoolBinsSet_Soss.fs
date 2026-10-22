@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Eval.V1.Sgd.Bins.Soss
 
-open FSharp.UMX
 open System
+open FSharp.UMX
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Eval.V1.Sgd.Soss

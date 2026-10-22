@@ -2,8 +2,8 @@
 namespace GeneSort.Sorting.Sorter
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
+open GeneSort.Sorting
 
 
 module BitonicSorter =

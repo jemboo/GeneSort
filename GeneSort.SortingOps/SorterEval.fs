@@ -3,8 +3,8 @@ namespace GeneSort.SortingOps
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
 open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
 
 type sorterEvalV1 =
     private { 

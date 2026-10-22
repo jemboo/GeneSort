@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Sorting.Sortable
 
+open System.Runtime.Intrinsics
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Runtime.Intrinsics
 
 [<Struct>]
 type sortBlockBitv512 = 

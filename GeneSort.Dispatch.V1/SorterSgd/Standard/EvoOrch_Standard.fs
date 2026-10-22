@@ -1,20 +1,20 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Standard
 
-open FSharp.UMX
+open System
 open System.Threading
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting.Sortable
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
-open GeneSort.Db.V1
-open GeneSort.Eval.V1.Sgd
-open GeneSort.SortingOps
-open System
 open GeneSort.Model.Sorting.V1
-open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 module EvoOrch_Standard =
 

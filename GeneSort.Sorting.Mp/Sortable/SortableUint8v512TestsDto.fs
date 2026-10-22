@@ -1,10 +1,10 @@
 namespace GeneSort.Sorting.Mp.Sortable
 
 open System
+open System.Runtime.Intrinsics
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open System.Runtime.Intrinsics
 
 type sortableUint8v512TestsDto = {
     Id: Guid

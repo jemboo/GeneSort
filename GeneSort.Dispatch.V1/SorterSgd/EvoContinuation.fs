@@ -2,12 +2,12 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 
 open FSharp.UMX
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Parameters
 
 /// Named inputs for constructing a continuation source.
 type evoContinuationSourceArgs = {

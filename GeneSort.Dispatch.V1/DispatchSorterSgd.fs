@@ -6,8 +6,8 @@ open System.Threading
 
 open FSharp.UMX
 
-open GeneSort.Dispatch.V1
 open GeneSort.Project.V1
+open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
 module DispatchSorterSgd = 

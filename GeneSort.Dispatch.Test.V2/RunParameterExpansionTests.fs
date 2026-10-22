@@ -3,17 +3,17 @@ module GeneSort.Dispatch.Test.V2.RunParameterExpansionTests
 open System
 open FSharp.UMX
 open Xunit
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.SortingOps
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTests
-open GeneSort.Sorting
-open GeneSort.SortingOps
-open GeneSort.Core
 open GeneSort.Dispatch.V1.SorterEval
 
 [<Fact>]

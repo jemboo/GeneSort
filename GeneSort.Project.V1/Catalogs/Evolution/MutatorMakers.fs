@@ -1,13 +1,13 @@
 
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
+open FsToolkit.ErrorHandling
+open GeneSort.Core
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1
-open FsToolkit.ErrorHandling
+open GeneSort.Project.V1.Parameters
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Model.Sorting.Simple.V1.SimpleSorterModelMutator
-open GeneSort.Core
-open GeneSort.Project.V1.Parameters
 
 module MutatorMakers =
 

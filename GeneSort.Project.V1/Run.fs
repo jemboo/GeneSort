@@ -1,9 +1,9 @@
 namespace GeneSort.Project.V1
 
-open GeneSort.Project.V1.Catalogs.Evolution
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Parameters
 
 

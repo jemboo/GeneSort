@@ -1,7 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterSgd
 
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Parameters
 
 /// Continue each matching source execution without ranking sources.
 module EvoAppend =

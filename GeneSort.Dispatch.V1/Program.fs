@@ -1,8 +1,8 @@
 module Program
 
 open System
-open GeneSort.Project.V1.Catalogs
 open GeneSort.Core.Mp
+open GeneSort.Project.V1.Catalogs
 open GeneSort.Dispatch.V1
 
 [<EntryPoint>]

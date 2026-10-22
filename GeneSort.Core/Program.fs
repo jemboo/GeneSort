@@ -1,8 +1,8 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 
-open GeneSort.Core
-open FSharp.UMX
 open System
+open FSharp.UMX
+open GeneSort.Core
 
 
 

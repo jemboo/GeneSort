@@ -1,13 +1,13 @@
 namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
-open MessagePack
 open FSharp.UMX
+open MessagePack
 open GeneSort.Sorting
 open GeneSort.SortingOps
-open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.SortingOps.Mp
 
 // ----------------------------------------------------------------------------
 // sorterPoolMemberHistoryDto

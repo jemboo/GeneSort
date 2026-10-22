@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Model.Sorting.V1.Simple.Si
 
+open System
 open FSharp.UMX
 open GeneSort.Core
-open System
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 

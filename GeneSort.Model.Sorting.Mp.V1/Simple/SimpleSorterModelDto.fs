@@ -1,12 +1,12 @@
 ﻿
 namespace GeneSort.Model.Sorting.Mp.V1.Simple
 
+open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Model.Sorting.Mp.V1.Simple.Ce
-open GeneSort.Model.Sorting.Mp.V1.Simple.Si
 open GeneSort.Model.Sorting.Mp.V1.Simple.Rs
+open GeneSort.Model.Sorting.Mp.V1.Simple.Si
 open GeneSort.Model.Sorting.Mp.V1.Simple.Uf4
 open GeneSort.Model.Sorting.Mp.V1.Simple.Uf6
-open GeneSort.Model.Sorting.V1.Simple
 
 type simpleSorterModelDto =
     | Msce of msceDto

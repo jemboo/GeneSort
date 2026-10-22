@@ -3,12 +3,12 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 open System
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1.Parameters
-open GeneSort.SortingOps
 
 /// Apply branch settings once when loading imported Setup, never when resuming Results.
 module EvoAppendPools =

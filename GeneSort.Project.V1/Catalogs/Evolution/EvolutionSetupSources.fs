@@ -1,12 +1,12 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
-open GeneSort.Project.V1
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
+open GeneSort.Project.V1
 
 /// Loaders for the saved tests and evaluations used to prepare evolution inputs.
 type evolutionSetupSources = {

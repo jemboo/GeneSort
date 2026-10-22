@@ -6,13 +6,13 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open GeneSort.SortingLib.Sorter
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Project.V1.ParamBundles
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
+open GeneSort.Project.V1.ParamBundles
 
 /// Shared immutable parameters; the kind keeps setup and run values distinct.
 module ParamKeys =

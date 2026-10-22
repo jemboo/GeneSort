@@ -1,12 +1,12 @@
 ﻿namespace GeneSort.Core.Test
 
-open Xunit
+open System
 open FSharp.UMX
+open Xunit
 open GeneSort.Core
 open GeneSort.Core.CollectionUtils
-open GeneSort.Core.Permutation
 open GeneSort.Core.CoreGen
-open System
+open GeneSort.Core.Permutation
 
 type CoreGenTests() =
 

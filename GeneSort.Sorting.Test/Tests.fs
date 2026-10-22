@@ -1,9 +1,9 @@
 ﻿module Tests
 
 open System
+open Microsoft.FSharp.Reflection
 open Xunit
 open GeneSort.Sorting
-open Microsoft.FSharp.Reflection
 
 [<Fact>]
 let ``All sortable data formats round trip through strings`` () =

@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core
 
-open System.Security.Cryptography
 open System
+open System.Security.Cryptography
+open FSharp.UMX
 open CollectionUtils
 open Combinatorics
-open FSharp.UMX
 
 [<Measure>] type Order
 

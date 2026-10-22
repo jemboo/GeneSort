@@ -1,30 +1,30 @@
 namespace GeneSort.FileDb.V1
 open System
 open System.IO
+open System.Text
 open System.Threading
 open FSharp.UMX
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
-open GeneSort.Db.V1
+open GeneSort.Core
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.Sorting.Mp.Sortable
+open GeneSort.Sorting.Mp.Sorter
+open GeneSort.Model.Sorting.Mp.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.SortingOps.Mp
+open GeneSort.Eval.Mp.V1.Bins
+open GeneSort.Eval.Mp.V1.Sgd
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 open GeneSort.Project.Mp.V1
-open GeneSort.Sorting.Mp.Sortable
-open GeneSort.Sorting.Sortable
-open System.Text
-open GeneSort.SortingOps.Mp
-open GeneSort.SortingOps
-open GeneSort.Sorting.Mp.Sorter
-open GeneSort.Sorting.Sorter
-open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.Mp.V1.Sgd
-open GeneSort.Core
-open GeneSort.Eval.Mp.V1.Bins
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Bins.Standard
-open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.Mp.V1
 
 [<Measure>] type fullPathToFolder
 [<Measure>] type pathToRootFolder

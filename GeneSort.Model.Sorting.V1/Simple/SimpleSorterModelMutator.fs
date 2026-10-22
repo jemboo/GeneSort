@@ -6,8 +6,8 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.Model.Sorting.V1.Simple.Ce
-open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Rs
+open GeneSort.Model.Sorting.V1.Simple.Si
 open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Sorting.V1.Simple.Uf6
 

@@ -1,13 +1,13 @@
 namespace GeneSort.Eval.Mp.V1.Sgd.Soss
 
 open System
-open MessagePack
 open FSharp.UMX
-open GeneSort.Eval.V1.Sgd
+open MessagePack
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Eval.V1
-open GeneSort.Core
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Soss
 
 // ---------------------------------------------------------------------
@@ -95,7 +95,7 @@ module SorterPoolSetSummaryDto =
                     (p.minStageLength |> UMX.tag<stageLength>)
                     (p.aveStageLength |> UMX.tag<stageLength>)
                     (p.stdDevStageLength |> UMX.tag<stageLength>)
-                    (p.aveStageCrossings |> UMX.tag<stageCrossings>)
+                    (p.aveStageCrossings |> UMX.tag<GeneSort.SortingOps.stageCrossings>)
                     (p.aveReflectiveCount |> UMX.tag<reflectiveCount>)
                     p.averageUnsortedCount
                 |> fun summary -> summary.WithScores(

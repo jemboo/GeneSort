@@ -1,12 +1,12 @@
 namespace GeneSort.Eval.V1.Sgd.Soss
 
+open System.Diagnostics
 open FSharp.UMX
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open System.Diagnostics
 
 module Pipeline_Soss =
 

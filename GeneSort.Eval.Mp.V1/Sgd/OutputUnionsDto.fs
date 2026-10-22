@@ -1,9 +1,9 @@
 namespace GeneSort.Eval.Mp.V1.Sgd
 
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.Mp.V1.Sgd.Soss
 open GeneSort.Eval.Mp.V1.Bins
 open GeneSort.Eval.Mp.V1.Bins.Soss
+open GeneSort.Eval.Mp.V1.Sgd.Soss
 
 [<RequireQualifiedAccess>]
 type sorterPoolSetDto =

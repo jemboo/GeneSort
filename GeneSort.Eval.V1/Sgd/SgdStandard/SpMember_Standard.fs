@@ -1,12 +1,12 @@
 namespace GeneSort.Eval.V1.Sgd.Standard
 
-open GeneSort.Eval.V1.Sgd
-
 open System
+
 open FSharp.UMX
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 
 type spMember_Standard =
     private {

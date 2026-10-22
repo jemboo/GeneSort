@@ -2,8 +2,8 @@
 namespace GeneSort.Sorting.Sortable
 
 open FSharp.UMX
-open GeneSort.Sorting
 open GeneSort.Core
+open GeneSort.Sorting
 
 type partitionOfSortableTests =
     private { sortableTests: Map<string<sortableTestsPartitionId>, sortableTests> }

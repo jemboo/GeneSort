@@ -3,9 +3,9 @@ namespace GeneSort.Model.Sorting.Mp.V1.Simple.Uf4
 
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1.Simple.Uf4
-open GeneSort.Model.Sorting.V1
 open GeneSort.Core.Mp
+open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Model.Mp.Sorter.Uf4
 
 type msuf4RandMutateDto =

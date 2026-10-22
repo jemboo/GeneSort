@@ -1,16 +1,16 @@
 namespace GeneSort.Dispatch.V1.SorterEval
 
-open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
-open GeneSort.Sorting
-open GeneSort.SortingOps
-open GeneSort.Model.Sorting.V1
 open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
-open GeneSort.SortingLib.Sorter
 open GeneSort.Dispatch.V1.CommonParams
 
 

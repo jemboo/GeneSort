@@ -2,15 +2,15 @@ namespace GeneSort.Eval.Mp.V1.Sgd
 
 open System
 open FSharp.UMX
-open GeneSort.SortingOps
-open GeneSort.SortingOps.Mp
-open GeneSort.Eval.V1
-open GeneSort.Model.Sorting.Mp.V1
-open GeneSort.Eval.V1.Sgd
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.Mp.V1
+open GeneSort.Model.Sorting.Mp.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.SortingOps.Mp
 
 type sorterPoolMemberDto = {
     sorterPoolMemberId: Guid

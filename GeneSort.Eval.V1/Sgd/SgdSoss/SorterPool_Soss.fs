@@ -1,12 +1,12 @@
 namespace GeneSort.Eval.V1.Sgd.Soss
 
 open System
+open System.Diagnostics
 open FSharp.UMX
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
-open System.Diagnostics
 open GeneSort.Eval.V1.Sgd
 
 

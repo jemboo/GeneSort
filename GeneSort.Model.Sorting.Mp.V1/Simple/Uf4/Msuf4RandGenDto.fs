@@ -3,10 +3,10 @@ namespace GeneSort.Model.Sorting.Mp.V1.Simple.Uf4
 
 open System
 open FSharp.UMX
-open GeneSort.Core.Mp.RatesAndOps
-open GeneSort.Model.Sorting.V1.Simple.Uf4
 open GeneSort.Core.Mp
+open GeneSort.Core.Mp.RatesAndOps
 open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1.Simple.Uf4
 
 type msuf4RandGenDto =
     { id: Guid

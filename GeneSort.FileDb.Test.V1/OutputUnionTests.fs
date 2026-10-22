@@ -1,32 +1,32 @@
 namespace GeneSort.FileDb.Test.V1
 
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Model.Sorting.V1.Simple
-open GeneSort.Model.Sorting.V1.Simple.Ce
 open System
 open System.IO
-open Xunit
 open FSharp.UMX
 open MessagePack
+open Xunit
 open GeneSort.Core
 open GeneSort.Core.Mp
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple
+open GeneSort.Model.Sorting.V1.Simple.Ce
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Soss
-open GeneSort.Eval.V1.Sgd.Bins.Standard
 open GeneSort.Eval.V1.Sgd.Bins.Soss
-open GeneSort.Eval.Mp.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.Mp.V1.Bins
+open GeneSort.Eval.Mp.V1.Sgd
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open GeneSort.Project.V1.Parameters
 
 module private Fixtures =
     let poolId = (UMX.tag<sorterPoolId> (Guid.NewGuid()))

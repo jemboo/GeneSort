@@ -1,11 +1,11 @@
 namespace GeneSort.Eval.Mp.V1.Bins.Soss
 
 open System
-open MessagePack
 open FSharp.UMX
+open MessagePack
 open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.Mp.V1.Bins.Soss
 open GeneSort.Eval.V1.Sgd.Bins.Soss
+open GeneSort.Eval.Mp.V1.Bins.Soss
 
 // ---------------------------------------------------------------------
 // 1. DTO Definition

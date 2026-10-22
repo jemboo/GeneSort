@@ -1,8 +1,8 @@
 ﻿
 namespace GeneSort.Core
 
-open FSharp.UMX
 open System
+open FSharp.UMX
 
 [<Measure>] type latticeDistance
 [<Measure>] type latticeDimension

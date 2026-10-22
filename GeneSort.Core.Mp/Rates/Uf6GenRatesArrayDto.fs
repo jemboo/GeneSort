@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Model.Mp.Sorter.Uf6
 
-open GeneSort.Core
 open MessagePack
-open MessagePack.Resolvers
 open MessagePack.FSharp
+open MessagePack.Resolvers
+open GeneSort.Core
 open GeneSort.Core.Mp.RatesAndOps
 
 type uf6GenRatesArrayDto =

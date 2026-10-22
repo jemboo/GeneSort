@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Eval.V1.Sgd.Standard
 
 open FSharp.UMX
-open GeneSort.SortingOps
 open GeneSort.Core
+open GeneSort.SortingOps
 open GeneSort.Eval.V1.Sgd
 
 module PoolEvalFunctions_Standard  =

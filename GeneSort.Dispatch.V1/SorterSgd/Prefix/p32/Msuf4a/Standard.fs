@@ -1,20 +1,20 @@
 
 module GeneSort.Dispatch.V1.SorterSgd.Prefix.p32.Msuf4a.Standard
-open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.SetupParameters
-open GeneSort.Project.V1.Catalogs.Setup
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Project.V1.Catalogs.Evolution
 open System.Runtime.CompilerServices
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
-open GeneSort.Core
+open GeneSort.Eval.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
-open GeneSort.Eval.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 

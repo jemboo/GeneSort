@@ -2,23 +2,23 @@ namespace GeneSort.Dispatch.V1.SorterEval
 
 open System
 open System.Threading
-open FsToolkit.ErrorHandling
 open FSharp.UMX
+open FsToolkit.ErrorHandling
 open GeneSort.Core
 open GeneSort.Sorting
-open GeneSort.Sorting.Sorter
-open GeneSort.SortingOps
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Model.Sorting.V1
 open GeneSort.Sorting.Sortable
-open GeneSort.Dispatch.V1
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.Model.Sortable.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
 open GeneSort.Dispatch.V1.SortableTests
-open GeneSort.Eval.V1
-open GeneSort.SortingLib.Sorter
-open GeneSort.Project.V1.Parameters
 
 module Reporting =
 

@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core.Test
 open System
-open Xunit
 open FsUnit.Xunit
-open GeneSort.Core.Permutation
+open Xunit
 open GeneSort.Core
 open GeneSort.Core.OrbitSet
+open GeneSort.Core.Permutation
 
 type PermutationTests() =
 

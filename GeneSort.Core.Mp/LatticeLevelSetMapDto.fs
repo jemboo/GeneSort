@@ -2,8 +2,8 @@
 
 open System
 open System.Collections.Generic
-open GeneSort.Core
 open FSharp.UMX
+open GeneSort.Core
 
 type latticeLevelSetMapDto = {
     centerSideMap: (latticePointDto * latticePointDto list) array

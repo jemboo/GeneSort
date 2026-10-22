@@ -1,13 +1,13 @@
 ﻿namespace GeneSort.SortingOps
 
 open System
-open FSharp.UMX
-open GeneSort.Sorting.Sortable
-open System.Collections.Generic
 open System.Buffers    
+open System.Collections.Generic
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
+open FSharp.UMX
 open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 
 
 type PackedOffsetComparer(data: int[], sw: int) =

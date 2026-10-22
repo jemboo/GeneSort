@@ -1,8 +1,8 @@
 ﻿
 namespace GeneSort.SortingLib.Sorter
 
-open FSharp.UMX
 open System
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable

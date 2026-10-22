@@ -1,10 +1,10 @@
 namespace GeneSort.Sorting.Sortable
 
 open System
+open System.Runtime.Intrinsics
+open System.Threading.Tasks
 open FSharp.UMX
 open GeneSort.Sorting
-open System.Threading.Tasks
-open System.Runtime.Intrinsics
 
 [<Struct>]
 type sortableUint8v512Tests =

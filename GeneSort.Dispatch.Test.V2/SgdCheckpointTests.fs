@@ -1,19 +1,19 @@
 module GeneSort.Dispatch.Test.V2.SgdCheckpointTests
 
 open System
-open Xunit
 open FSharp.UMX
+open Xunit
 open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
-open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Soss
-open GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1.SorterSgd
 
 [<Theory>]
 [<InlineData(false, -1)>]

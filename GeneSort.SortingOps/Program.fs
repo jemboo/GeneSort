@@ -1,14 +1,14 @@
 // For more information see https://aka.ms/fsharp-console-apps
 open System
 open FSharp.UMX
-open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sortable.V1
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open GeneSort.SortingOps
 open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
-open GeneSort.Core
+open GeneSort.Model.Sortable.V1
+open GeneSort.SortingOps
 
 module Sandbox =
 

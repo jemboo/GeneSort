@@ -3,12 +3,12 @@
 open System
 open FSharp.UMX
 open Xunit
-open GeneSort.Model.Sorting.V1.Simple.Uf4
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Core
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple
+open GeneSort.Model.Sorting.V1.Simple.Uf4
 
 type Msuf4Tests() =
 

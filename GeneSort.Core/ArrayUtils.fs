@@ -1,10 +1,10 @@
 ﻿namespace GeneSort.Core
 
-open LanguagePrimitives
 open System
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 open System.Runtime.Intrinsics
+open LanguagePrimitives
 
 
 module ArrayUtils =

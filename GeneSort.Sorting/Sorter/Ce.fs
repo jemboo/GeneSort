@@ -2,10 +2,10 @@
 namespace GeneSort.Sorting.Sorter
 
 open System
+open System.Collections
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
-open System.Collections
 
 [<Measure>] type sequenceHash
 [<Measure>] type reflectiveCount

@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Eval.V1
 
+open System
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.SortingOps
-open System
 
 
 /// Contains percentiles and averages for both the CE Data Sequence Position Index and its Use Count.

@@ -2,11 +2,11 @@
 
 
 open System
-open FSharp.UMX
-open Xunit
 open EvoMergeSort.Core
 open EvoMergeSort.Core.Uf4Seeds
 open EvoMergeSort.Sorter
+open FSharp.UMX
+open Xunit
 open GeneSort.Model.Sorter.Uf4
 open MathUtils
 

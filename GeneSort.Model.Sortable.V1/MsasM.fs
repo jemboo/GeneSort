@@ -1,13 +1,13 @@
 namespace GeneSort.Model.Sortable.V1
 
 open System
+open System.Runtime.Intrinsics
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open System.Runtime.Intrinsics
-open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingLib.Sorter
 
 [<Struct; CustomEquality; NoComparison>]
 type msasM = 

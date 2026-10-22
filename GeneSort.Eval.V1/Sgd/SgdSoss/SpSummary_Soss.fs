@@ -1,11 +1,11 @@
 namespace GeneSort.Eval.V1.Sgd.Soss
 
 open FSharp.UMX
-open GeneSort.SortingOps
-open GeneSort.Eval.V1
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Core
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
 
 
 type spSummary_Soss =

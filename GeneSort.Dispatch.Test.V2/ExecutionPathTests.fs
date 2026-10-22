@@ -1,16 +1,16 @@
 module GeneSort.Dispatch.Test.V2.ExecutionPathTests
 
 open System
-open GeneSort.Project.V1.Catalogs.SetupParameters
 open System.Threading
-open Xunit
 open FSharp.UMX
-open GeneSort.Db.V1
+open Xunit
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Setup
-open GeneSort.Dispatch.V1
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 
 let private createHostWithSaveResult saveResult finished execute =
     let name = Guid.NewGuid().ToString()

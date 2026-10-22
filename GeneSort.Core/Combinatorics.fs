@@ -1,6 +1,6 @@
 ﻿namespace GeneSort.Core
-open FSharp.UMX
 open System
+open FSharp.UMX
 
 module Combinatorics =
 

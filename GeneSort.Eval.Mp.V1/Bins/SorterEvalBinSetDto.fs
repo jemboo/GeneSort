@@ -3,8 +3,8 @@
 open System
 open FSharp.UMX
 open GeneSort.Eval.V1.Bins
-open GeneSort.SortingOps.Mp
 open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.SortingOps.Mp
 
 type sorterEvalKeyDto = {
     CeCount: int

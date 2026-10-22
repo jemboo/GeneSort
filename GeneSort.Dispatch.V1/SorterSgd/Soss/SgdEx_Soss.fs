@@ -1,25 +1,25 @@
 namespace GeneSort.Dispatch.V1.SorterSgd.Soss
 
-open GeneSort.Project.V1.Catalogs.Evolution
 open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Db.V1
-open GeneSort.Project.V1
-open GeneSort.Eval.V1
-open GeneSort.Model.Sorting.V1
-open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
-open GeneSort.Eval.V1.Sgd
-open GeneSort.SortingOps
-open GeneSort.Dispatch.V1
 open GeneSort.Sorting.Sorter
-open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
+open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Model.Sorting.Simple.V1
 
 module SgdEx_Soss =
 

@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Core
 
 open System
-open FSharp.UMX
 open System.Globalization
+open FSharp.UMX
 
 module StringUtils = 
 

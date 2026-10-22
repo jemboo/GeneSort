@@ -3,9 +3,9 @@ namespace GeneSort.Dispatch.V1
 open System
 open System.Threading
 open FSharp.UMX
-open GeneSort.Db.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Db.V1
 
 /// Define the contract for an Executor
 type IRunParamsExecutor =

@@ -1,11 +1,11 @@
 namespace GeneSort.Core.Test
 
-open Xunit
-open GeneSort.Core.CollectionUtils
-open GeneSort.Core.ByteUtils
-open FsUnit.Xunit
-open GeneSort.Core
 open System
+open FsUnit.Xunit
+open Xunit
+open GeneSort.Core
+open GeneSort.Core.ByteUtils
+open GeneSort.Core.CollectionUtils
 
 
 type ByteUtilsTests() =

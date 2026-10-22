@@ -2,11 +2,11 @@
 
 
 open System
-open FSharp.UMX
 open EvoMergeSort.Core
+open EvoMergeSort.Core.Uf6Seeds
+open FSharp.UMX
 open MessagePack
 open GeneSort.Core.MessagePack
-open EvoMergeSort.Core.Uf6Seeds
 open GeneSort.Core.MessagePack.TwoOrbit
 open GeneSort.Core.MessagePack.TwoOrbit.Unfolder6Seeds
 

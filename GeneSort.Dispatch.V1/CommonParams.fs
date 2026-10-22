@@ -1,17 +1,17 @@
 namespace GeneSort.Dispatch.V1
 
-open GeneSort.Project.V1.Catalogs.Evolution
 open FSharp.UMX
 open GeneSort.Core
-open GeneSort.Project.V1
 open GeneSort.Sorting
-open GeneSort.SortingOps
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
 open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.ParamBundles
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1.Parameters
 
 module CommonParams =

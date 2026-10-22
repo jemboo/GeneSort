@@ -1,7 +1,7 @@
 namespace GeneSort.Dispatch.V1.SorterSgd
 
-open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Parameters
 
 /// Rank source checkpoints during preparation, then continue the winners.
 module EvoCondense =

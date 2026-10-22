@@ -1,9 +1,9 @@
 
 namespace GeneSort.SortingLib.Sorter
-open FSharp.UMX
-open GeneSort.Sorting
 open System
+open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
 
 
 type sorterLibVariant =

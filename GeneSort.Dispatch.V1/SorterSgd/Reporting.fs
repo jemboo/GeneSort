@@ -4,15 +4,15 @@ open System
 open System.Threading
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Bins.Standard
+open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
-open GeneSort.Eval.V1.Sgd
-open GeneSort.Eval.V1
-open GeneSort.Eval.V1.Sgd.Standard
-open GeneSort.Eval.V1.Sgd.Bins.Standard
-open GeneSort.Project.V1.Parameters
 module Reporting =
 
     /// Generic execution engine for dynamic generation-sliced reports.

@@ -1,9 +1,9 @@
 namespace GeneSort.SortingOps.Mp
 
 open FSharp.UMX
-open GeneSort.SortingOps
 open GeneSort.Sorting
 open GeneSort.Sorting.Mp.Sortable
+open GeneSort.SortingOps
 
 type ceBlockEvalDto = {
     Prefix: ceBlockDto

@@ -1,15 +1,15 @@
 namespace GeneSort.Project.V1.Catalogs.Evolution
 
-open GeneSort.Project.V1
-open FsToolkit.ErrorHandling
-open FSharp.UMX
 open System
+open FSharp.UMX
+open FsToolkit.ErrorHandling
 open GeneSort.Sorting
-open GeneSort.Model.Sortable.V1
 open GeneSort.Sorting.Sortable
-
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
+
+open GeneSort.Model.Sortable.V1
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 
 

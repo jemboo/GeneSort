@@ -2,9 +2,9 @@
 
 open System
 open FSharp.UMX
+open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Model.Sorting.V1.Simple.Ce
-open GeneSort.Sorting
 
 type msceDto =
     { id: Guid

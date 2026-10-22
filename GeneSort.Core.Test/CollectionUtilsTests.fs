@@ -1,8 +1,8 @@
 ﻿namespace GeneSort.Core.Test
 
+open FsUnit.Xunit
 open Xunit
 open GeneSort.Core.CollectionUtils
-open FsUnit.Xunit
 
 type CollectionUtilsTests() =
 

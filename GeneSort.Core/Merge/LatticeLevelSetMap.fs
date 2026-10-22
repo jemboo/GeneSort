@@ -1,7 +1,7 @@
 ﻿namespace GeneSort.Core
 
-open FSharp.UMX
 open System.Collections.Generic
+open FSharp.UMX
 
 type coverType =
     | FullCover = 0

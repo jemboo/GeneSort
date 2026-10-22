@@ -1,14 +1,14 @@
 namespace GeneSort.Dispatch.V1.SortableTests
 
-open GeneSort.Project.V1.Catalogs.Queries
 open FSharp.UMX
 open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
 open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Db.V1
-open GeneSort.Sorting
 open GeneSort.FileDb.V1
-open GeneSort.Sorting.Sortable
 open GeneSort.Dispatch.V1
 
 module SortableTestsDbs =

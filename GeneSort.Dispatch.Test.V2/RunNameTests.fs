@@ -1,8 +1,8 @@
 module GeneSort.Dispatch.Test.V2.RunNameTests
 
 open System.Reflection
-open Xunit
 open FSharp.UMX
+open Xunit
 open GeneSort.Project.V1
 open GeneSort.Dispatch.V1
 

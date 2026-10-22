@@ -1,9 +1,9 @@
 namespace GeneSort.Run.Test.V1
 
-open Xunit
 open MessagePack
-open MessagePack.Resolvers
 open MessagePack.FSharp
+open MessagePack.Resolvers
+open Xunit
 open GeneSort.Project.V1
 open GeneSort.Project.Mp.V1
 

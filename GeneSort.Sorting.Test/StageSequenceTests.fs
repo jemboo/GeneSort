@@ -1,9 +1,9 @@
 ﻿namespace GeneSort.Sorting.Tests
 
+open FsUnit.Xunit
 open Xunit
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open FsUnit.Xunit
 
 type StageSequenceTests() =
 

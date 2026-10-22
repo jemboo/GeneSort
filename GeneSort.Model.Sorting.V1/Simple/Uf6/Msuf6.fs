@@ -2,9 +2,9 @@
 
 open System
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
-open GeneSort.Core
 open GeneSort.Model.Sorting.V1
 
 /// Represents a collection of TwoOrbitUnfolder4 instances with a consistent sorting width.
