@@ -24,9 +24,6 @@ module EvoCondenseSelection =
             let! repl = candidates.[0].GetRepl() |> require "Missing source replica."
             do! if candidates |> Array.forall (fun rp -> rp.GetRepl() = Some repl) then Ok ()
                 else Error "Condense selects sources separately for each replica."
-            let modifiers = candidates |> Array.map (fun rp -> rp.GetMutationMod())
-            do! if modifiers |> Array.forall Option.isSome && (Array.distinct modifiers).Length = candidates.Length then Ok ()
-                else Error "Condense requires one source execution per MutationMod per replica. Narrow Source.ParameterSpans to one combination of the other parameters."
             let! interval =
                 configured.RunParameterSpans |> List.tryFind (fst >> (=) ParamKeys.sourceGenerationIntervalKey)
                 |> Option.bind (fun (_, values) -> match values with [value] -> Some value | _ -> None)
@@ -98,14 +95,21 @@ module EvoCondenseSelection =
         }
 
     /// The callback is also used recursively when appending to a condensed run.
-    let select (makeSourceDb: run -> IGeneSortDb) (configured: run) source candidates =
+    let select (makeSourceDb: run -> IGeneSortDb) (configured: run) source (candidates: runParameters[]) =
         let spans = configured.ParameterSource |> Option.map snd |> Option.defaultValue []
         match spans |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey) with
         | None -> candidates
         | Some (_, [value]) ->
             match Int32.TryParse value with
             | true, count when count > 0 ->
-                rank (makeSourceDb source) configured source count candidates
-                |> Async.RunSynchronously |> Result.defaultWith invalidOp
+                let db = makeSourceDb source
+                // Keep all source settings together; only mutation and ancestry vary.
+                candidates
+                |> Array.groupBy (RunParameterGeneration.sourceCombinationKey source)
+                |> Array.collect (fun (combination, group) ->
+                    (if count = group.Length then Ok group else
+                        rank db configured source count group |> Async.RunSynchronously)
+                    |> Result.defaultWith (fun error ->
+                        invalidOp (sprintf "Condense source combination %A: %s" combination error)))
             | _ -> invalidArg "SelectedSorterPoolCount" "SelectedSorterPoolCount must be positive."
         | _ -> invalidArg "SelectedSorterPoolCount" "Specify exactly one selection count."

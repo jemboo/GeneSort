@@ -69,7 +69,6 @@
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Standard_append.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Standard_condense.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Soss.fs" />
-    <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Soss_append.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Soss_condense.fs" />
     <Compile Include="SorterSgd\RunCfg\p24\Msuf63b\Common.fs" />
     <Compile Include="SorterSgd\RunCfg\p24\Msuf63b\MutationRate.fs" />

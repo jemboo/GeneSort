@@ -35,6 +35,24 @@ let private sourceWithMutationMods modifiers = sossSource modifiers
 
 let private singleSource () = sourceWithMutationMods [0]
 
+let private sourceSelection (source: run) interval selection =
+    let modifiers =
+        selection |> List.tryFind (fst >> ParamKeys.sourceParameterKey >> (=) ParamKeys.mutationModKey)
+        |> Option.map snd
+        |> Option.defaultWith (fun () -> RunParameterGeneration.effectiveSpans source |> Map.find ParamKeys.mutationModKey)
+        |> List.map int
+    let count =
+        selection |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey)
+        |> Option.map (snd >> List.exactlyOne >> int)
+        |> Option.defaultWith (fun () ->
+            match source.ParameterSource with
+            | Some (_, spans) when selection.IsEmpty ->
+                let parents = spans |> List.find (fst >> (=) ParamKeys.selectedSorterPoolCountKey) |> snd |> List.exactlyOne |> int
+                let branches = source.RunParameterSpans |> List.tryFind (fst >> (=) ParamKeys.mutationModKey) |> Option.map (snd >> List.length) |> Option.defaultValue 1
+                parents * branches
+            | _ -> modifiers.Length)
+    evoContinuationSource.create { SourceRun = source; GenerationInterval = interval; SourceMutationMods = modifiers; SelectedSorterPoolCount = count }
+
 let private continuationConfig (source: run) interval lastInterval selection execution : evoContinuationConfig =
     evoContinuationConfig.create {
         ProjectName = UMX.tag (sprintf "Tests.Append%d" interval)
@@ -46,7 +64,7 @@ let private continuationConfig (source: run) interval lastInterval selection exe
         RunQueryCatalogName =
             if source.ExecuteFunctionName = ExecuteFunctionNames.soss then QueryCatalogNamesRun.sorterSgdMsufSossAppend
             else QueryCatalogNamesRun.sorterSgdMsufStandardAppend
-        Source = evoContinuationSource.create { Run = source; GenerationInterval = interval; ParameterSpans = selection }
+        Source = sourceSelection source interval selection
         ExecutionParameterSpans = (ParamKeys.generationIntervalLastKey, [string lastInterval]) :: execution
     }
 
@@ -94,17 +112,17 @@ let ``Continuation workflows use explicitly configured query catalogs`` () =
         Assert.Equal(source.ExecuteFunctionName, configured.ExecuteFunctionName)
 
 [<Fact>]
-let ``Continuation workflows reject the wrong source family and implicit condense`` () =
+let ``Continuation workflows require Soss transition settings and share explicit selection`` () =
     let standard = continuationConfig (standardSource ()) 1 2 [] []
     let soss = continuationConfig (sossSource [0]) 1 2 [] []
-    Assert.Throws<ArgumentException>(fun () -> EvoAppend.createStandard soss |> ignore) |> ignore
+    Assert.Equal(ExecuteFunctionNames.standard, (EvoAppend.createStandard soss).ExecuteFunctionName)
     Assert.Throws<ArgumentException>(fun () -> EvoAppend.createSoss standard |> ignore) |> ignore
-    Assert.Throws<ArgumentException>(fun () -> EvoCondense.createStandard standard |> ignore) |> ignore
+    Assert.Equal(ExecuteFunctionNames.standard, (EvoCondense.createStandard standard).ExecuteFunctionName)
     let selection = [ParamKeys.selectedSorterPoolCountKey, ["1"]; ParamKeys.mutationModKey, ["0"]]
     let condensed = continuationConfig (standardSource ()) 1 2 selection []
-    Assert.Throws<ArgumentException>(fun () -> EvoAppend.createStandard condensed |> ignore) |> ignore
+    Assert.Equal(ExecuteFunctionNames.standard, (EvoAppend.createStandard condensed).ExecuteFunctionName)
     let wrongSource = continuationConfig (sossSource [0]) 1 2 selection []
-    Assert.Throws<ArgumentException>(fun () -> EvoCondense.createStandard wrongSource |> ignore) |> ignore
+    Assert.Equal(ExecuteFunctionNames.standard, (EvoCondense.createStandard wrongSource).ExecuteFunctionName)
     Assert.Throws<ArgumentException>(fun () -> EvoCondense.createSoss condensed |> ignore) |> ignore
 
 let private parameters =
@@ -862,6 +880,185 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
                                elif position < 2 then "0" elif position < 4 then "1" else "Merge"
                 verifySavedSossReport resumed rp generation partitions prefix selected true
 
+let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cancelAfter: int option) =
+    GeneSort.Core.Mp.MessagePackSetup.configure()
+    let host = runHost.Create (singleSource ()) 1
+    let target = saveEvery * 4
+    let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne)
+                 .WithPartitionCount(Some 2<partitionCount>)
+                 .WithGenerationsPerSubset(Some 2<generationsPerSubset>)
+                 .WithGenerationsPerMergedSet(Some 3<generationsPerSubset>)
+                 .WithSorterCountPerPool(Some 1<sorterCountPerPool>)
+                 .WithSelectedSorterCountPerPool(Some 1<sorterCountPerPool>)
+                 .WithSorterChildCount(Some 0<sorterChildCount>)
+                 .WithSorterCountCycle(None).WithSorterPoolExpansionRate(None)
+                 .WithSorterEvalMeasure(Some (unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount))
+    let tests =
+        [| for cut in 1 .. 11 ->
+            let values = Array.init 32 (fun i -> i >= cut)
+            values.[cut - 1] <- true
+            values.[cut] <- false
+            sortableBoolArray.create(values, 32<sortingWidth>) |]
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> |> sortableTests.Bools
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 0)
+                |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
+    let pool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "buffered") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
+    let seed = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [pool])
+    let config step = { intervals with Method = Constant step; MaxCount = Some (target + 1) }
+    let query (db: IGeneSortDb) (generation: int) kind =
+        db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) kind |> Option.get
+    let saveValue (db: IGeneSortDb) mode generation kind value =
+        db.saveAsync mode (query db generation kind) value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
+    let load (db: IGeneSortDb) generation kind =
+        db.loadAsync geneSortDataMode.Results (query db generation kind) |> Async.RunSynchronously |> Result.defaultWith failwith
+    let initialize db =
+        saveValue db geneSortDataMode.Setup 0 (geneSortDataType.SortableTestsWithPrefix "") (outputData.SortableTestsWithPrefix(tests, [||]))
+        saveValue db geneSortDataMode.Results 0 (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss seed))
+    let execute db saveStep =
+        use cts = new CancellationTokenSource()
+        SgdEx_Soss.evaluateEvolutionRunSoss host.ExecutionContext.MakeMutator.Value db (config saveStep) (config reportEvery)
+            (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveStep)))) (UMX.tag false) cts None
+        |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    let summaries db generation =
+        let source = match load db generation (geneSortDataType.SorterPoolSetSummarySet "") with
+                     | outputData.SorterPoolSetSummarySet (spSummarySet.Soss value) -> value
+                     | _ -> failwith "Expected summaries"
+        let bytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummarySetDto_Soss.toDto source |> MessagePack.MessagePackSerializer.Serialize
+        MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetSummarySetDto_Soss>(bytes)
+        |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummarySetDto_Soss.fromDto
+    let bins db generation =
+        let source = match load db generation (geneSortDataType.SorterPoolBinsSetSeries "") with
+                     | outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Soss value) -> value
+                     | _ -> failwith "Expected bins"
+        let bytes = GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto_Soss.fromDomain source |> MessagePack.MessagePackSerializer.Serialize
+        MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Bins.Soss.sorterPoolBinsSetSeriesDto_Soss>(bytes)
+        |> GeneSort.Eval.Mp.V1.Bins.Soss.SorterPoolBinsSetSeriesDto_Soss.toDomain
+    let summaryPayload snapshot =
+        GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetSummaryDto.toDto snapshot |> MessagePack.MessagePackSerializer.Serialize |> Convert.ToHexString
+    let binPayload (snapshot: GeneSort.Eval.V1.Sgd.Bins.Soss.sorterPoolBinsSet_Soss) =
+        snapshot.SorterPoolEvalBinsMap |> Map.values |> Seq.map (fun poolBins ->
+            let evaluations = poolBins.Bins |> Map.values |> Seq.collect (fun b -> b.SorterEvals)
+                              |> Seq.map (fun e -> GeneSort.SortingOps.Mp.SorterEvalDto.fromDomain e |> MessagePack.MessagePackSerializer.Serialize |> Convert.ToHexString)
+                              |> Seq.sort |> Seq.toArray
+            poolBins.SorterPoolId, evaluations) |> Map.ofSeq
+    // Reference saves each generation but reports on the same absolute schedule.
+    let reference = MemoryDb()
+    initialize reference
+    execute reference 1
+    let partitions = SgdEx_Soss.makeSortableTestsPartitions (rp.GetRngType().Value) (rp.GetSeedSoss().Value) 2<partitionCount> tests
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let expectedSubset generation =
+        let position = (generation - 1) % 7
+        if position < 2 then "0" elif position < 4 then "1" else "Merge"
+    for generation in reportEvery .. reportEvery .. target do
+        verifySavedSossReport reference rp generation partitions prefix (expectedSubset generation) true
+    let uninterrupted = MemoryDb()
+    initialize uninterrupted
+    match cancelAfter with
+    | None -> ()
+    | Some generation ->
+        Assert.NotEqual(0, generation % saveEvery)
+        Assert.Equal(0, generation % reportEvery)
+        use cts = new CancellationTokenSource()
+        let mutable cancellationTriggered = false
+        let mutator = host.ExecutionContext.MakeMutator.Value rp |> Async.RunSynchronously |> Result.defaultWith failwith
+                      |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
+        // This synchronous callback requests cancellation during the chosen step.
+        // That step finishes (including its buffered report); the next loop exits.
+        let log message =
+            if message = sprintf "Starting evolution step. Generation %d of %d" generation target then
+                cancellationTriggered <- true
+                cts.Cancel()
+        uninterrupted.PoolGenerations.Clear()
+        let outcome =
+            EvoOrch_Soss.runSossEvolutionAsync uninterrupted (config saveEvery) (config reportEvery)
+                (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveEvery)))) (UMX.tag false)
+                seed partitions prefix mutator cts.Token log
+            |> Async.RunSynchronously
+        Assert.True(cancellationTriggered)
+        match outcome with
+        | Error message -> Assert.Contains("cancelled", message)
+        | Ok _ -> failwith "Expected cancellation"
+        let lastSaved = generation / saveEvery * saveEvery
+        Assert.Equal<(int option * int) list>([for g in saveEvery .. saveEvery .. lastSaved -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
+        for g in lastSaved + 1 .. generation do
+            for kind in [geneSortDataType.SorterPoolSet ""; geneSortDataType.SorterPoolSetSummarySet ""; geneSortDataType.SorterPoolBinsSetSeries ""] do
+                let exists = (uninterrupted :> IGeneSortDb).doesOutPutDataExist geneSortDataMode.Results (query uninterrupted g kind)
+                             |> Async.RunSynchronously
+                Assert.False(exists)
+        let checkpoint = Utils.loadHighestGenSorterPoolSetSoss (config saveEvery) uninterrupted rp
+                         |> Async.RunSynchronously |> Result.defaultWith failwith |> Option.get
+        Assert.Equal(lastSaved, int checkpoint.GenerationNumber)
+        // Resume from serialized persisted state, with all unsaved accumulators gone.
+        let bytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto checkpoint |> MessagePack.MessagePackSerializer.Serialize
+        let restored = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+                       |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+        saveValue uninterrupted geneSortDataMode.Results lastSaved (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss restored))
+        uninterrupted.PoolGenerations.Clear()
+    execute uninterrupted saveEvery
+    match cancelAfter with
+    | Some generation ->
+        let lastSaved = generation / saveEvery * saveEvery
+        Assert.Equal<(int option * int) list>([for g in lastSaved + saveEvery .. saveEvery .. target -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
+    | None -> ()
+    // Check uninterrupted execution and resume from each saved checkpoint,
+    // including checkpoints between reports and an already-completed run.
+    for resumeAt in 0 .. saveEvery .. target do
+        let db =
+            if resumeAt = 0 then uninterrupted
+            else
+                let resumed = MemoryDb()
+                initialize resumed
+                let source = load uninterrupted resumeAt (geneSortDataType.SorterPoolSet "") |> OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
+                let bytes = GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto source |> MessagePack.MessagePackSerializer.Serialize
+                let restored = MessagePack.MessagePackSerializer.Deserialize<GeneSort.Eval.Mp.V1.Sgd.Soss.sorterPoolSetDto_Soss>(bytes)
+                               |> GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.fromDto
+                saveValue resumed geneSortDataMode.Results resumeAt (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss restored))
+                resumed.PoolGenerations.Clear()
+                execute resumed saveEvery
+                Assert.Equal<(int option * int) list>([for g in resumeAt + saveEvery .. saveEvery .. target -> Some g, g], List.ofSeq resumed.PoolGenerations)
+                resumed
+        for savedGeneration in resumeAt + saveEvery .. saveEvery .. target do
+            let expected = [| for g in savedGeneration - saveEvery + 1 .. savedGeneration do if g % reportEvery = 0 then yield g |]
+            let summarySet = summaries db savedGeneration
+            let binSeries = bins db savedGeneration
+            let summarySnapshots = summarySet.SorterPoolSetSummaries |> Array.sortBy (fun s -> int s.GenerationNumber)
+            let binSnapshots = binSeries.SorterPoolEvalBinsSets |> Map.values |> Seq.sortBy (fun s -> int s.GenerationNumber) |> Seq.toArray
+            Assert.Equal(savedGeneration, int summarySet.LastGeneration)
+            Assert.True((expected = (summarySnapshots |> Array.map (fun s -> int s.GenerationNumber))))
+            Assert.True((expected = (binSnapshots |> Array.map (fun s -> int s.GenerationNumber))))
+            for index in 0 .. expected.Length - 1 do
+                let generation = expected.[index]
+                let expectedSummary = (summaries reference generation).SorterPoolSetSummaries |> Array.exactlyOne
+                let expectedBins = (bins reference generation).SorterPoolEvalBinsSets |> Map.values |> Seq.exactlyOne
+                Assert.Equal(summaryPayload expectedSummary, summaryPayload summarySnapshots.[index])
+                Assert.True((binPayload expectedBins = binPayload binSnapshots.[index]))
+                Assert.True(binSnapshots.[index].SorterPoolSetId = summarySnapshots.[index].SorterPoolSetId)
+                for poolBins in binSnapshots.[index].SorterPoolEvalBinsMap |> Map.values do
+                    for bin in poolBins.Bins |> Map.values do
+                        for evaluation in bin.SorterEvals do
+                            Assert.Equal(expectedSubset generation, %(SorterEval.getSortableTestsSubsetId evaluation))
+
+[<Theory>]
+[<InlineData(5, 1)>]
+[<InlineData(5, 2)>]
+[<InlineData(3, 7)>]
+[<InlineData(7, 3)>]
+let ``Soss buffered reports retain their own generations and subsets across saves and resume`` saveEvery reportEvery =
+    verifyBufferedSossReports saveEvery reportEvery None
+
+[<Theory>]
+[<InlineData(5, 1, 6)>]
+[<InlineData(5, 1, 7)>]
+[<InlineData(5, 1, 8)>]
+[<InlineData(5, 1, 9)>]
+[<InlineData(3, 1, 4)>]
+[<InlineData(3, 1, 5)>]
+[<InlineData(5, 2, 8)>]
+let ``Soss cancellation discards unsaved work and resume regenerates reports on the original cycle`` saveEvery reportEvery cancelAfter =
+    verifyBufferedSossReports saveEvery reportEvery (Some cancelAfter)
+
 [<Theory>]
 [<InlineData(0)>]
 [<InlineData(1)>]
@@ -1004,7 +1201,7 @@ let ``Repeated append branches share immutable setup without growing parameter h
                 RunName = UMX.tag "Branch"
                 SetupQueryCatalogName = if soss then QueryCatalogNamesSetup.sossMsuf32Seed else QueryCatalogNamesSetup.sorterSgdMsufStandard
                 RunQueryCatalogName = if soss then QueryCatalogNamesRun.sorterSgdMsufSossAppend else QueryCatalogNamesRun.sorterSgdMsufStandardAppend
-                Source = evoContinuationSource.create { Run = sourceRun; GenerationInterval = interval; ParameterSpans = ([ParamKeys.idKey, [string %(sourceRp.GetId().Value)]]) }
+                Source = sourceSelection sourceRun interval [ParamKeys.sourceMutationModKey, [string %(sourceRp.GetMutationMod().Value)]]
                 ExecutionParameterSpans = [ ParamKeys.mutationModKey, [interval; interval + 10] |> List.map string; ParamKeys.generationIntervalLastKey, [string (interval + 1)] ]
             }
             |> (if soss then EvoAppend.createSoss else EvoAppend.createStandard)
@@ -1093,8 +1290,8 @@ let ``Append source branching shares setup in replica folders`` soss =
                 RunName = UMX.tag "ExplicitAppend"
                 SetupQueryCatalogName = if soss then QueryCatalogNamesSetup.sossMsuf32Seed else QueryCatalogNamesSetup.sorterSgdMsufStandard
                 RunQueryCatalogName = if soss then QueryCatalogNamesRun.sorterSgdMsufSossAppend else QueryCatalogNamesRun.sorterSgdMsufStandardAppend
-                Source = evoContinuationSource.create { Run = sourceRun; GenerationInterval = 1; ParameterSpans = ([ParamKeys.mutationModKey, ["0"; "1"; "2"]]) }
-                ExecutionParameterSpans = [ ParamKeys.mutationModKey, [0 .. 15] |> List.map string; ParamKeys.sorterCountPerPoolSetKey, [sourcePoolCount * perPool; sourcePoolCount * perPool * 2] |> List.map string; ParamKeys.generationIntervalLastKey, ["2"] ]
+                Source = sourceSelection sourceRun 1 [ParamKeys.sourceMutationModKey, ["0"; "1"; "2"]]
+                ExecutionParameterSpans = [ ParamKeys.mutationModKey, [0 .. 15] |> List.map string; ParamKeys.sorterCountPerPoolSetKey, [sourcePoolCount * perPool * 2] |> List.map string; ParamKeys.generationIntervalLastKey, ["2"] ]
             }
             |> (if soss then EvoAppend.createSoss else EvoAppend.createStandard)
         // Round-trip the entire source-generation configuration, including nested append sources.
@@ -1102,7 +1299,7 @@ let ``Append source branching shares setup in replica folders`` soss =
                          |> MessagePack.MessagePackSerializer.Serialize
                          |> MessagePack.MessagePackSerializer.Deserialize<GeneSort.Project.Mp.V1.runDto>
                          |> GeneSort.Project.Mp.V1.RunDto.toDomain
-        let expectedCount = 192
+        let expectedCount = 96
         let destinationRoot, db = makeDb configured
         let host = (runHost.Create configured 1).WithRunDb db
         let pending = host.MakeRunParameters 0<replNumber> 2<replNumber>
@@ -1136,7 +1333,7 @@ let ``Append source branching shares setup in replica folders`` soss =
         Assert.Equal(12, files.Length)
         Assert.All(files, fun path -> Assert.Contains(System.IO.Directory.GetParent(path).Name, [|"0"; "1"|]))
         Assert.All(loaded |> Array.groupBy (fun rp -> rp.GetRepl(), rp.ParamMap.[ParamKeys.setupSorterPoolSetIdKey]),
-            fun (_, branches) -> Assert.Equal(32, branches.Length))
+            fun (_, branches) -> Assert.Equal(16, branches.Length))
         for rp in loaded do
             let savedData = GeneSort.Dispatch.V1.SorterSgd.Utils.loadSetupOutputData reopened rp (geneSortDataType.SorterPoolSet "")
                             |> Async.RunSynchronously |> Result.defaultWith failwith
@@ -1440,7 +1637,7 @@ let ``Explicit chained appends retain each immediate source identity across seri
                 RunName = UMX.tag "Branch"
                 SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
                 RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
-                Source = evoContinuationSource.create { Run = source; GenerationInterval = interval; ParameterSpans = [] }
+                Source = sourceSelection source interval []
                 ExecutionParameterSpans = [ParamKeys.mutationModKey, ["7"; "8"]; ParamKeys.generationIntervalLastKey, [string (interval + 1)]]
             }
             |> EvoAppend.createSoss
@@ -1460,14 +1657,14 @@ let ``Explicit chained appends retain each immediate source identity across seri
 
 
 [<Fact>]
-let ``Append combines three sources with three modifiers and two sizes`` () =
+let ``Append combines three sources with three modifiers and a single size override`` () =
     let configured = appendFrom (sossSource [0; 1; 2]) 1 2 [] [
         ParamKeys.mutationModKey, ["0"; "1"; "2"]
-        ParamKeys.sorterCountPerPoolSetKey, ["32"; "64"]
+        ParamKeys.sorterCountPerPoolSetKey, ["64"]
     ]
     let branches = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
-    Assert.Equal(18, branches.Length)
-    Assert.Equal(18, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    Assert.Equal(9, branches.Length)
+    Assert.Equal(9, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     Assert.Equal("Tests.Append1", string configured.ProjectName)
 
 [<Fact>]
@@ -1543,15 +1740,15 @@ let ``Pool evaluation preserves copied models and their pool-specific lengths`` 
         Assert.Equal(expected.[memberId], evaluations.[memberId])
 
 [<Fact>]
-let ``Current Standard append config produces three single-pool runs at each capacity`` () =
+let ``Current Standard append config produces three single-pool runs at its single overridden capacity`` () =
     let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Test ()
     let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
-    Assert.Equal(6, parameters.Length)
-    Assert.Equal(6, parameters |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    Assert.Equal(3, parameters.Length)
+    Assert.Equal(3, parameters |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     Assert.All(parameters, fun rp ->
         Assert.Equal("1.25", rp.ParamMap.[ParamKeys.paraRateKey])
         Assert.Equal("2.25", rp.ParamMap.[ParamKeys.selfSymRateKey]))
-    for capacity in [128; 256] do
+    for capacity in [128] do
         let matching = parameters |> Array.filter (fun rp -> int (rp.GetSorterCountPerPool().Value) = capacity)
         Assert.Equal(3, matching.Length)
         Assert.Equal<Set<int>>(set [0; 1; 2], matching |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
@@ -1563,7 +1760,7 @@ let ``Current Standard append config produces three single-pool runs at each cap
 [<Theory>]
 [<InlineData(false)>]
 [<InlineData(true)>]
-let ``OnePool append test presets continue their bases and preserve one pool when resizing`` soss =
+let ``OnePool append test presets continue their bases and preserve one pool of 32 sorters`` soss =
     let configured =
         if soss then GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Continuation.TestSossAppend ()
         else GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Continuation.TestStandardAppend ()
@@ -1571,10 +1768,10 @@ let ``OnePool append test presets continue their bases and preserve one pool whe
     Assert.Equal((if soss then "TestSoss" else "TestStandard"), %source.RunName)
     Assert.Equal("SorterSgd.RunCfg.p32.Test.OnePool", %configured.ProjectName)
     Assert.Equal("Continuation", %configured.DatabaseName)
-    Assert.Contains((ParamKeys.mutationModKey, ["0"]), spans)
+    Assert.Contains((ParamKeys.sourceMutationModKey, ["0"]), spans)
     let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
-    Assert.Equal(6, parameters.Length)
-    for capacity in [32; 64] do
+    Assert.Equal(3, parameters.Length)
+    for capacity in [32] do
         let matching = parameters |> Array.filter (fun rp -> int (rp.GetSorterCountPerPool().Value) = capacity)
         Assert.Equal(3, matching.Length)
         Assert.All(matching, fun rp ->
@@ -1595,7 +1792,7 @@ let ``OnePool condense test presets select the best two of four source candidate
     let source, spans = configured.ParameterSource.Value
     Assert.Equal((if soss then "TestSoss" else "TestStandard"), %source.RunName)
     Assert.Contains((ParamKeys.selectedSorterPoolCountKey, ["2"]), spans)
-    Assert.Contains((ParamKeys.mutationModKey, ["0"; "1"; "2"; "3"]), spans)
+    Assert.Contains((ParamKeys.sourceMutationModKey, ["0"; "1"; "2"; "3"]), spans)
     let candidates = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
     Assert.Equal(4, candidates.Length)
     Assert.Equal<Set<int>>(set [0; 1; 2; 3], candidates |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
@@ -1606,7 +1803,7 @@ let ``OnePool condense test presets select the best two of four source candidate
 [<Fact>]
 let ``Append execution spans override inherited values and enhancer defaults`` () =
     let overrides = [
-        ParamKeys.paraRateKey, ["1.25"; "1.5"]
+        ParamKeys.paraRateKey, ["1.25"]
         ParamKeys.selfSymRateKey, ["2.25"]
         ParamKeys.sorterChildCountKey, ["3"]
         ParamKeys.distinctSorterHashesKey, ["False"]
@@ -1616,8 +1813,8 @@ let ``Append execution spans override inherited values and enhancer defaults`` (
     let original = RunParameterGeneration.generate source 0<replNumber> 1<replNumber> |> Array.exactlyOne
     let configured = appendFrom source 1 3 [] overrides
     let generated = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
-    Assert.Equal(2, generated.Length)
-    Assert.Equal(2, generated |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    Assert.Equal(1, generated.Length)
+    Assert.Equal(1, generated |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     for rp in generated do
         for key, values in overrides do
             Assert.Contains(rp.ParamMap.[key], values)
@@ -1646,12 +1843,12 @@ let ``Standard append starts from imported setup and resumes its resulting check
     let sourceRun = standardSource () |> withSetupSpans [ParamKeys.sorterCountPerPoolSetKey, ["32"]]
     let configured = appendFrom sourceRun 1 3 [] [
         ParamKeys.mutationModKey, ["0"; "1"; "2"]
-        ParamKeys.sorterCountPerPoolSetKey, ["128"; "256"]
+        ParamKeys.sorterCountPerPoolSetKey, ["256"]
     ]
     let host = runHost.Create configured 1
     let pending = host.MakeRunParameters 0<replNumber> 1<replNumber>
-    Assert.Equal(6, pending.Length)
-    Assert.Equal(6, pending |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    Assert.Equal(3, pending.Length)
+    Assert.Equal(3, pending |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     let rp = pending |> Array.find (fun rp -> int (rp.GetMutationMod().Value) = 1 && int (rp.GetSorterCountPerPoolSet().Value) = 256)
     let poolSourceId = Guid.NewGuid() |> UMX.tag<queryParamsId>
     let testsSourceId = Guid.NewGuid() |> UMX.tag<queryParamsId>
@@ -1716,12 +1913,22 @@ let ``Append interval validation identifies the run and conflicting values`` () 
     Assert.Contains("greater than Source.GenerationInterval (1)", error.Message)
     Assert.Contains(%source.RunName, error.Message)
 
-let private condenseFixtureFor soss scenario =
+let private condenseFixtureFor soss (scenario: string) =
     let source = (if soss then sossSource [0; 1; 2; 3] else standardSource ()) |> withSetupSpans [
         ParamKeys.mutationModKey, ["0"; "1"; "2"; "3"]
         ParamKeys.sorterCountPerPoolKey, ["32"]
         ParamKeys.sorterCountPerPoolSetKey, ["32"]
     ]
+    let source =
+        if scenario.StartsWith("partition-") then
+            let dto = GeneSort.Project.Mp.V1.RunDto.fromDomain source
+            let spans = dto.RunParameterSpans |> Array.map (fun span ->
+                if span.Key = ParamKeys.partitionCountKey then { span with Values = [|"1"; "4"|] }
+                elif scenario = "partition-combinations" && span.Key = ParamKeys.paraRateKey then { span with Values = [|"1.15"; "1.25"|] }
+                else span)
+            { dto with RunParameterSpans = spans }
+            |> GeneSort.Project.Mp.V1.RunDto.toDomain
+        else source
     let sourceHost = runHost.Create source 1
     let candidates = sourceHost.MakeRunParameters 0<replNumber> 2<replNumber>
     let memory = MemoryDb(sourceHost.QueryParamsFromRunParams)
@@ -1734,9 +1941,17 @@ let private condenseFixtureFor soss scenario =
     for rp in candidates do
         let modifier = int (rp.GetMutationMod().Value)
         let replica = int (rp.GetRepl().Value)
-        let subset = (if scenario = "different-subsets" && modifier = 3 then "other" else "all") |> UMX.tag<sortableTestsSubsetId>
+        let partition = rp.GetPartitionCount() |> Option.map int |> Option.defaultValue 0
+        let subset = (if scenario.StartsWith("partition-") then string partition
+                      elif scenario = "different-subsets" && modifier = 3 then "other" else "all") |> UMX.tag<sortableTestsSubsetId>
         let lengths =
-            if scenario = "ties" then [10; 10]
+            if scenario.StartsWith("partition-") then
+                let score =
+                    if scenario = "partition-combinations" && rp.ParamMap.[ParamKeys.paraRateKey] = "1.25" then
+                        if modifier = 1 || modifier = 2 then 200 + modifier else 300 + modifier
+                    elif partition = 1 then modifier + 1 else 100 - modifier
+                [score; score]
+            elif scenario = "ties" then [10; 10]
             elif replica = 0 then [| [1; 99]; [10; 10]; [20; 20]; [30; 30] |].[modifier]
             else [| [40; 40]; [30; 30]; [20; 20]; [10; 10] |].[modifier]
         let members = lengths |> List.map (fun length ->
@@ -1770,19 +1985,172 @@ let private condenseFixtureFor soss scenario =
             (GeneSort.Dispatch.V1.SorterSgd.EvoCondenseSelection.select (fun _ -> db)) run 0<replNumber> 2<replNumber>
     configured, candidates, db, generate
 
+[<Fact>]
+let ``Soss condense selects and evaluates within each partition count before branching`` () =
+    let configured, candidates, _, generate = condenseFixtureFor true "partition-rank"
+    let branches = generate configured
+    Assert.Equal(32, branches.Length) // 2 replicas x 2 partitions x 2 winners x 4 mutations
+    Assert.Equal(32, branches |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    for replica in [0; 1] do
+        for partition, winningMods in [1, set [0; 1]; 4, set [2; 3]] do
+            let group = branches |> Array.filter (fun rp -> int (rp.GetRepl().Value) = replica && int (rp.GetPartitionCount().Value) = partition)
+            Assert.Equal(8, group.Length)
+            Assert.Equal<Set<int>>(winningMods, group |> Array.map (fun rp -> int (rp.GetSourceMutationMod().Value)) |> Set.ofArray)
+            for sourceId, variants in group |> Array.groupBy (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey]) do
+                let source = candidates |> Array.find (fun rp -> string %(rp.GetId().Value) = sourceId)
+                Assert.Equal(Some (UMX.tag partition), source.GetPartitionCount())
+                Assert.Equal<Set<int>>(set [7; 8; 9; 10], variants |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
+
+[<Fact>]
+let ``Condense selects within every source parameter combination rather than just partition count`` () =
+    let configured, _, _, generate = condenseFixtureFor true "partition-combinations"
+    let branches = generate configured
+    Assert.Equal(64, branches.Length)
+    for replica in [0; 1] do
+        for partition in [1; 4] do
+            for rate in ["1.15"; "1.25"] do
+                let group = branches |> Array.filter (fun rp ->
+                    int (rp.GetRepl().Value) = replica && int (rp.GetPartitionCount().Value) = partition
+                    && rp.ParamMap.[ParamKeys.paraRateKey] = rate)
+                let expected = if rate = "1.25" then set [1; 2] elif partition = 1 then set [0; 1] else set [2; 3]
+                Assert.Equal(8, group.Length)
+                Assert.Equal<Set<int>>(expected, group |> Array.map (fun rp -> int (rp.GetSourceMutationMod().Value)) |> Set.ofArray)
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Continuation refuses multiplexed execution overrides`` multipleSourceValues =
+    let source = standardSource () |> withSetupSpans [ParamKeys.paraRateKey, (if multipleSourceValues then ["1.1"; "1.2"] else ["1.1"])]
+    let values = if multipleSourceValues then ["1.3"] else ["1.3"; "1.4"]
+    let error = Assert.Throws<ArgumentException>(fun () -> appendFrom source 1 2 [] [ParamKeys.paraRateKey, values] |> ignore)
+    Assert.Contains(ParamKeys.paraRateKey, error.Message)
+    Assert.Contains((if multipleSourceValues then "must be inherited" else "exactly one value"), error.Message)
+
+[<Fact>]
+let ``Continuation refuses overriding a multiplexed inherited source setting`` () =
+    let source = standardSource () |> withSetupSpans [ParamKeys.paraRateKey, ["1.1"; "1.2"]]
+    let first = appendFrom source 1 2 [] [ParamKeys.mutationModKey, ["7"; "8"]]
+    Assert.Equal(4, (RunParameterGeneration.generate first 0<replNumber> 1<replNumber>).Length)
+    let error = Assert.Throws<ArgumentException>(fun () -> appendFrom first 2 3 [] [ParamKeys.paraRateKey, ["1.3"]] |> ignore)
+    Assert.Contains("must be inherited", error.Message)
+
+[<Fact>]
+let ``Continuation source exposes only required typed selection fields`` () =
+    let source = standardSource ()
+    for modifiers, count in [[], 1; [0; 0], 1; [0], 0; [0], -1] do
+        Assert.Throws<ArgumentException>(fun () ->
+            evoContinuationSource.create { SourceRun = source; GenerationInterval = 1; SourceMutationMods = modifiers; SelectedSorterPoolCount = count }
+            |> ignore) |> ignore
+    let configured = continuationConfig source 1 2 [] [] |> EvoCondense.createStandard
+    let _, spans = configured.ParameterSource.Value
+    Assert.Equal<Set<string>>(set [ParamKeys.sourceMutationModKey; ParamKeys.selectedSorterPoolCountKey], spans |> List.map fst |> Set.ofList)
+
+[<Fact>]
+let ``Condense rejects insufficient candidates in any source combination`` () =
+    let configured, _, db, _ = condenseFixtureFor true "partition-rank"
+    let source = configured.ParameterSource.Value |> fst
+    let candidates = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
+                     |> Array.filter (fun rp -> rp.GetPartitionCount() = Some 1<partitionCount> || rp.GetMutationMod() = Some (UMX.tag 0))
+    let error = Assert.Throws<InvalidOperationException>(fun () -> EvoCondenseSelection.select (fun _ -> db) configured source candidates |> ignore)
+    Assert.Contains("source combination", error.Message)
+    Assert.Contains("at least", error.Message)
+
+[<Fact>]
+let ``Source mutation filtering cannot silently drop a source parameter combination`` () =
+    let configured, _, db, generate = condenseFixtureFor true "partition-rank"
+    let sourceIdentity = configured.ParameterSource.Value |> fst
+    let source = db.loadAsync geneSortDataMode.Project (queryParams.createForRun sourceIdentity.DatabaseName sourceIdentity.ProjectName sourceIdentity.RunName)
+                 |> Async.RunSynchronously |> Result.bind OutputData.asRun |> Result.defaultWith failwith
+    let first = continuationConfig source 1 2
+                    [ParamKeys.sourceMutationModKey, ["0"; "1"; "2"; "3"]; ParamKeys.selectedSorterPoolCountKey, ["2"]] []
+                |> EvoCondense.createSoss
+    let second = continuationConfig first 2 3
+                    [ParamKeys.sourceMutationModKey, ["0"]; ParamKeys.selectedSorterPoolCountKey, ["1"]] []
+                 |> EvoCondense.createSoss
+    let error = Assert.Throws<InvalidOperationException>(fun () -> generate second |> ignore)
+    Assert.Contains("0 matching executions", error.Message)
+
+[<Fact>]
+let ``Pool X Step2 ranks repeated mutation values from distinct Step1 winners within each combination`` () =
+    let baseRun = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_X.Base ()
+    let step1 = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_X.Step1 ()
+    let step2 = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_X.Step2 ()
+    let databases = System.Collections.Generic.Dictionary<string, IGeneSortDb>()
+    let seed (configured: run) sourceInterval (parameters: runParameters[]) (score: runParameters -> int) =
+        let host = runHost.Create configured 1
+        let memory = MemoryDb(host.QueryParamsFromRunParams)
+        memory.SavedParameters <- parameters
+        let db = memory :> IGeneSortDb
+        databases.[%configured.RunName] <- db
+        let persist mode query value = db.saveAsync mode query value (UMX.tag true) |> Async.RunSynchronously |> Result.defaultWith failwith
+        persist geneSortDataMode.Project (queryParams.createForRun configured.DatabaseName configured.ProjectName configured.RunName) (outputData.Run configured)
+        let generation = GenIntervalConfig.getSampleAtIndex host.GenSaveIntervals.Value sourceInterval |> Option.get
+        for rp in parameters do
+            let subset = string (int (rp.GetPartitionCount().Value)) |> UMX.tag<sortableTestsSubsetId>
+            let evaluation = sorterEvalV1.create (UMX.tag (Guid.NewGuid())) subset 32<sortingWidth>
+                                 0<sortableCount> (UMX.tag 1) (UMX.tag 1) (UMX.tag (score rp)) 100<ceLength>
+                                 (UMX.tag false) (UMX.tag 0) (UMX.tag 0) |> sorterEval.V1
+            let members = Array.init 32 (fun _ ->
+                spMember_Standard.create (UMX.tag (Guid.NewGuid())) GeneSort.Model.Sorting.V1.sorterModel.Unknown
+                    (UMX.tag 0) (rp.GetMutationMod().Value) None (Some evaluation) (UMX.tag generation))
+            let pool = sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 0) members 150<ceLength> (rp.GetMutationMod().Value)
+            let poolSet = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [pool])
+                          |> SorterPoolSet_Soss.fromStandard |> SorterPoolSet_Soss.withSubsetIdForSelection subset
+            let query = host.QueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "") |> Option.get
+            persist geneSortDataMode.Results query (outputData.SorterPoolSet (sorterPoolSet.Soss poolSet))
+    let generate configured =
+        RunParameterGeneration.generateWithSourceSelection
+            (EvoCondenseSelection.select (fun source -> databases.[%source.RunName])) configured 0<replNumber> 1<replNumber>
+    let baseParameters = RunParameterGeneration.generate baseRun 0<replNumber> 1<replNumber>
+    seed baseRun 0 baseParameters (fun rp -> if rp.GetPartitionCount() = Some 1<partitionCount> then 1 + int (rp.GetMutationMod().Value) else 100 - int (rp.GetMutationMod().Value))
+    let first = generate step1
+    Assert.Equal(8, first.Length)
+    // Both best children have MutationMod=0, but descend from different winners.
+    seed step1 1 first (fun rp -> if rp.GetMutationMod() = Some (UMX.tag 0) then 1 + int (rp.GetSourceMutationMod().Value) else 100)
+    let second = generate step2
+    Assert.Equal(8, second.Length)
+    Assert.Equal(8, second |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    for partition in [1; 4] do
+        let group = second |> Array.filter (fun rp -> int (rp.GetPartitionCount().Value) = partition)
+        Assert.Equal(4, group.Length)
+        Assert.All(group, fun rp -> Assert.Equal(Some (UMX.tag 0), rp.GetSourceMutationMod()))
+        let sources = group |> Array.groupBy (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey])
+        Assert.Equal(2, sources.Length)
+        for _, variants in sources do
+            Assert.Equal<Set<int>>(set [0; 1], variants |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
+            Assert.All(variants, fun rp ->
+                Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
+                Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool()))
+
+[<Fact>]
+let ``Pool X Step1 expands two winners per partition into poolCount runs`` () =
+    let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_X.Step1 ()
+    let select _ _ (candidates: runParameters[]) =
+        candidates |> Array.groupBy (fun rp -> rp.GetPartitionCount())
+        |> Array.collect (fun (_, group) -> group |> Array.sortBy (fun rp -> rp.GetMutationMod()) |> Array.take 2)
+    let branches = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
+    Assert.Equal(8, branches.Length)
+    for partition in [1; 4] do
+        let group = branches |> Array.filter (fun rp -> int (rp.GetPartitionCount().Value) = partition)
+        Assert.Equal(4, group.Length)
+        Assert.All(group, fun rp -> Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount()))
+
 let private condenseFixture scenario = condenseFixtureFor false scenario
 
 [<Fact>]
-let ``Soss condense preset selects single-pool Soss sources with explicit catalogs`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_128_condense.Test ()
+let ``OnePool Soss condense preset selects single-pool Soss sources with explicit catalogs`` () =
+    let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Continuation.TestSossCondense ()
     Assert.Equal(ExecuteFunctionNames.soss, configured.ExecuteFunctionName)
     Assert.Equal(QueryCatalogNamesSetup.sossMsuf32Seed, configured.SetupQueryCatalogName)
     Assert.Equal(QueryCatalogNamesRun.sorterSgdMsufSossAppend, configured.RunQueryCatalogName)
     let source, spans = configured.ParameterSource.Value
     Assert.Contains((ParamKeys.selectedSorterPoolCountKey, ["2"]), spans)
     let candidates = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
-    Assert.Equal(8, candidates.Length)
-    Assert.All(candidates, fun rp -> Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount()))
+    Assert.Equal(4, candidates.Length)
+    Assert.Equal<Set<int>>(set [0; 1; 2; 3], candidates |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
+    Assert.All(candidates, fun rp ->
+        Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
+        Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool()))
 
 [<Fact>]
 let ``Soss condense ties are stable and can select every candidate`` () =
@@ -1880,7 +2248,7 @@ let ``Condense permits selecting every requested source mutation variant`` () =
 [<Fact>]
 let ``Condense validates source selection count and mutation subset size`` () =
     let source = standardSource ()
-    for counts, modifiers in [(["1"; "2"], ["0"; "1"]); (["3"], ["0"; "1"]); (["0"], ["0"]); (["2"], ["0"; "0"])] do
+    for counts, modifiers in [(["1"; "2"], ["0"; "1"]); (["0"], ["0"]); (["2"], ["0"; "0"])] do
         Assert.Throws<ArgumentException>(fun () ->
             let selection = [
                 ParamKeys.selectedSorterPoolCountKey, counts
@@ -1948,11 +2316,11 @@ let ``OnePool chains preserve their family and expand the immediate source`` sos
     let generate configured = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
     let cases =
         if soss then [
-            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestSossAppendCondense(), "TestSossAppend", [|64; 64|]
-            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestSossCondenseAppend(), "TestSossCondense", [|64; 64; 128; 128|]
+            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestSossAppendCondense(), "TestSossAppend", [|32; 32|]
+            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestSossCondenseAppend(), "TestSossCondense", Array.create 8 32
         ] else [
-            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestStandardAppendCondense(), "TestStandardAppend", [|64; 64|]
-            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestStandardCondenseAppend(), "TestStandardCondense", [|64; 64; 128; 128|]
+            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestStandardAppendCondense(), "TestStandardAppend", [|32; 32|]
+            GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SameFamilyChain.TestStandardCondenseAppend(), "TestStandardCondense", [|32; 32|]
         ]
     for configured, sourceName, sizes in cases do
         let source, _ = configured.ParameterSource.Value
@@ -1967,3 +2335,161 @@ let ``OnePool chains preserve their family and expand the immediate source`` sos
             Assert.Equal(Some (UMX.tag 2), rp.GetGenerationIntervalLast())
             Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
             Assert.Contains(rp.ParamMap.[ParamKeys.sourceExecutionIdKey], expectedSources))
+
+let private mixedSossSpans = [
+    ParamKeys.seedSossKey, ["1234"]
+    ParamKeys.partitionCountKey, ["2"]
+    ParamKeys.generationsPerSubsetKey, ["10"]
+    ParamKeys.generationsPerMergedSetKey, ["20"]
+]
+
+[<Fact>]
+let ``Standard to Soss requires each explicit transition setting`` () =
+    for key, _ in mixedSossSpans do
+        for invalid in [None; Some ["invalid"]; Some []] do
+            let spans = mixedSossSpans |> List.filter (fst >> (<>) key)
+            let spans = match invalid with None -> spans | Some values -> (key, values) :: spans
+            let config = continuationConfig (standardSource ()) 1 2 [] spans
+            let error = Assert.Throws<ArgumentException>(fun () -> EvoAppend.createSoss config |> ignore)
+            Assert.Contains(key, error.Message)
+    for key in [ParamKeys.partitionCountKey; ParamKeys.generationsPerSubsetKey; ParamKeys.generationsPerMergedSetKey] do
+        let spans = mixedSossSpans |> List.map (fun (k, v) -> k, if k = key then ["0"] else v)
+        Assert.Throws<ArgumentException>(fun () ->
+            continuationConfig (standardSource ()) 1 2 [] spans |> EvoAppend.createSoss |> ignore) |> ignore
+
+[<Fact>]
+let ``MixedFamilyChain presets branch and select within the source family`` () =
+    let select (configured: run) _ (candidates: runParameters[]) =
+        match configured.ParameterSource |> Option.bind (snd >> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey)) with
+        | Some (_, [count]) -> candidates |> Array.sortBy (fun rp -> rp.GetId()) |> Array.take (int count)
+        | _ -> candidates
+    let cases = [
+        GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.MixedFamilyChain.TestStandardAppendSossCondense(), true, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.MixedFamilyChain.TestStandardCondenseSossAppend(), true, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.MixedFamilyChain.TestSossAppendStandardCondense(), false, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.MixedFamilyChain.TestSossCondenseStandardAppend(), false, Array.create 8 32
+    ]
+    for configured, soss, sizes in cases do
+        Assert.Equal("MixedFamilyChain", %configured.DatabaseName)
+        Assert.Equal("SorterSgd.RunCfg.p32.Test.OnePool", %configured.ProjectName)
+        Assert.NotEqual<string>(configured.ExecuteFunctionName, (fst configured.ParameterSource.Value).ExecuteFunctionName)
+        Assert.Equal((if soss then ExecuteFunctionNames.soss else ExecuteFunctionNames.standard), configured.ExecuteFunctionName)
+        let generated = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
+        Assert.Equal<int[]>(sizes, generated |> Array.map (fun rp -> int (rp.GetSorterCountPerPool().Value)) |> Array.sort)
+        for rp in generated do
+            Assert.Equal(Some 1, rp.GetSourceGenerationInterval())
+            if soss then
+                for key, values in mixedSossSpans do Assert.Equal(List.exactlyOne values, rp.ParamMap.[key])
+            else Assert.Equal(Some 10<adjustCeLengthFrequency>, rp.GetAdjustCeLengthFrequency())
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Mixed family Setup converts members and execution needs only destination data`` toSoss =
+    let sourceRun = (if toSoss then standardSource () else singleSource ()) |> withSetupSpans [
+        ParamKeys.mutationModKey, ["0"]
+        ParamKeys.sorterCountPerPoolKey, ["2"]
+        ParamKeys.sorterCountPerPoolSetKey, ["2"]
+    ]
+    let sourceHost = runHost.Create sourceRun 1
+    let sourceRp = sourceHost.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
+    let generation = GenIntervalConfig.getSampleAtIndex sourceHost.GenSaveIntervals.Value 1 |> Option.get
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 1)
+                |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
+    let originalMembers = [| for _ in 1..2 -> spMember_Standard.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 3) (UMX.tag 0) None None 0<generationNumber> |]
+    let originalPool = sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "mixed") (D1 0) originalMembers 150<ceLength> (UMX.tag 0)
+    let original = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [originalPool])
+    let fullTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
+                        [|sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>); sortableBoolArray.create(Array.create 32 true, 32<sortingWidth>)|] |> sortableTests.Bools
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let evaluations = PoolRunner_Standard.evaluatePoolSet fullTests prefix sorterEvalType.V2 true (UMX.tag false) original
+    let evaluated = original |> SorterPoolSet_Standard.updateSorterEvals evaluations
+    let sourcePool = if toSoss then sorterPoolSet.Standard evaluated else SorterPoolSet_Soss.fromStandard evaluated |> sorterPoolSet.Soss
+    let sourceMemory = MemoryDb(sourceHost.QueryParamsFromRunParams)
+    sourceMemory.SavedParameters <- [|sourceRp|]
+    let sourceDb = sourceMemory :> IGeneSortDb
+    let persist mode query value = sourceDb.saveAsync mode query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
+    persist geneSortDataMode.Project (queryParams.createForRun sourceRun.DatabaseName sourceRun.ProjectName sourceRun.RunName) (outputData.Run sourceRun)
+    let sourceQuery = sourceHost.QueryParamsFromRunParams (sourceRp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "") |> Option.get
+    persist geneSortDataMode.Results sourceQuery (outputData.SorterPoolSet sourcePool)
+    persist geneSortDataMode.Setup
+        (sourceHost.QueryParamsFromRunParams (sourceRp.WithGenerationCurrent(Some (UMX.tag 0))) (geneSortDataType.SortableTestsWithPrefix "") |> Option.get)
+        (outputData.SortableTestsWithPrefix(fullTests, [||]))
+    let destination =
+        let config = evoContinuationConfig.create {
+            ProjectName = UMX.tag "Mixed.Test"; DatabaseName = UMX.tag "Mixed"; RunName = UMX.tag "Transition"
+            SetupQueryCatalogName = if toSoss then QueryCatalogNamesSetup.sossMsuf32Seed else QueryCatalogNamesSetup.sorterSgdMsufStandard
+            RunQueryCatalogName = if toSoss then QueryCatalogNamesRun.sorterSgdMsufSossAppend else QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            Source = sourceSelection sourceRun 1 []
+            ExecutionParameterSpans = [ParamKeys.generationIntervalLastKey, ["2"]; ParamKeys.adjustCeLengthFrequencyKey, ["10"]] @ (if toSoss then mixedSossSpans else [])
+        }
+        if toSoss then EvoAppend.createSoss config else EvoAppend.createStandard config
+    let initialHost = runHost.Create destination 1
+    let memory = MemoryDb(initialHost.QueryParamsFromRunParams)
+    let host = initialHost.WithRunDb memory
+    let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
+    use cts = new CancellationTokenSource()
+    let updated = EvoAppendSetup.prepare sourceDb host rp (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith
+    let imported = Utils.loadSetupOutputData host.RunDb updated (geneSortDataType.SorterPoolSet "") |> Async.RunSynchronously |> Result.defaultWith failwith
+    let ids =
+        if toSoss then
+            let converted = imported |> OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
+            Assert.Equal(original.SorterPoolSetId, converted.SorterPoolSetId)
+            let pool = converted.SorterPools.[originalPool.SorterPoolId]
+            Assert.All(pool.SorterPoolMembers, fun m -> Assert.Empty(m.SorterEvalMap))
+            pool.SorterPoolMembers |> Seq.map (fun m -> m.SorterPoolMemberId) |> Set.ofSeq
+        else
+            let converted = imported |> OutputData.asSorterPoolSetStandard |> Result.defaultWith failwith
+            Assert.Equal(original.SorterPoolSetId, converted.SorterPoolSetId)
+            let pool = converted.SorterPools.[originalPool.SorterPoolId]
+            Assert.All(pool.SorterPoolMembers, fun m -> Assert.True(m.SorterEval.IsSome))
+            pool.SorterPoolMembers |> Seq.map (fun m -> m.SorterPoolMemberId) |> Set.ofSeq
+    Assert.True((ids = (originalMembers |> Array.map (fun m -> m.SorterPoolMemberId) |> Set.ofArray)))
+    Assert.Equal(string %sourceQuery.Id, updated.ParamMap.[ParamKeys.sourcePoolFileIdKey])
+    let unconvertedQuery = queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (updated.GetRepl()) (geneSortDataType.SorterPoolSet "") sourceQuery.Id
+    Assert.NotEqual<string>(string %unconvertedQuery.Id, updated.ParamMap.[ParamKeys.setupSorterPoolSetIdKey])
+    sourceMemory.Reads.Clear()
+    let shortIntervals = { Name = "mixed-test"; Min = generation; MaxCount = Some 3; Scale = 1.0; Method = Constant 1 }
+    let execute = if toSoss then SgdEx_Soss.evaluateEvolutionRunSoss else SgdEx_Standard.evaluateEvolutionRunStandard
+    let makeMutator _ = async {
+        return msceRandMutate.create rngFactory.LcgFactory (indelRates.create (0.1, 0.0, 0.0)) (UMX.tag true)
+                   GeneSort.Model.Sorting.V1.mutatorVariant.V2
+               |> GeneSort.Model.Sorting.Simple.V1.simpleSorterModelMutator.SmmMsceRandMutate |> Ok
+    }
+    let finished = execute makeMutator host.RunDb shortIntervals shortIntervals updated (UMX.tag false) cts None
+                   |> Async.RunSynchronously |> Result.defaultWith failwith
+    Assert.Equal(Some true, finished.GetRunFinished())
+    Assert.Equal(Some (UMX.tag (GenIntervalConfig.getSampleAtIndex shortIntervals 2 |> Option.get)), finished.GetGenerationCurrent())
+    Assert.Empty(sourceMemory.Reads)
+
+[<Fact>]
+let ``OnePool Soss condense branches each selected source into four destination mutations`` () =
+    let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Continuation.TestSossCondense ()
+    let select _ _ (candidates: runParameters[]) =
+        candidates |> Array.filter (fun rp -> List.contains (int (rp.GetMutationMod().Value)) [1; 3])
+    let runs = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
+    Assert.Equal(8, runs.Length)
+    Assert.Equal(8, runs |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
+    let groups = runs |> Array.groupBy (fun rp -> rp.ParamMap.[ParamKeys.sourceExecutionIdKey])
+    Assert.Equal(2, groups.Length)
+    for _, branches in groups do
+        Assert.Equal<Set<int>>(set [0; 1; 2; 3], branches |> Array.map (fun rp -> int (rp.GetMutationMod().Value)) |> Set.ofArray)
+        Assert.Single(branches |> Array.map (fun rp -> rp.GetSourceMutationMod()) |> Array.distinct) |> ignore
+        for rp in branches do
+            Assert.Contains(int (rp.GetSourceMutationMod().Value), [1; 3])
+            Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
+            Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool())
+
+[<Fact>]
+let ``Source mutation selection uses the immediate source rather than its ancestry`` () =
+    let source = appendFrom (standardSource ()) 1 2 [] [ParamKeys.mutationModKey, ["7"; "8"]]
+    let config = continuationConfig source 2 3
+                    [ParamKeys.sourceMutationModKey, ["7"]]
+                    [ParamKeys.mutationModKey, ["9"; "10"]]
+    let run = EvoAppend.createStandard config
+    let branches = RunParameterGeneration.generate run 0<replNumber> 1<replNumber>
+    Assert.NotEmpty(branches)
+    Assert.All(branches, fun rp ->
+        Assert.Equal(Some (UMX.tag 7), rp.GetSourceMutationMod())
+        Assert.Equal(Some source.RunName, rp.GetSourceRunName())
+        Assert.Contains(int (rp.GetMutationMod().Value), [9; 10]))

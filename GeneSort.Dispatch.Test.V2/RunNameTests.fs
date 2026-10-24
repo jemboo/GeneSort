@@ -18,7 +18,7 @@ let ``Project names follow the hierarchy above the database module`` () =
         [ "SorterSgd.RunCfg.p32.Msuf4a.Standard", SorterSgd.RunCfg.p32.Msuf4a.Standard.Pool_32.Test
           "SorterSgd.RunCfg.p32.Msuf4a.Standard_append", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Test
           "SorterSgd.RunCfg.p32.Msuf4a.Standard_append", SorterSgd.RunCfg.p32.Msuf4a.Standard_append.Pool_128.V1
-          "SorterSgd.RunCfg.p32.Msuf4a.Soss_condense", SorterSgd.RunCfg.p32.Msuf4a.Soss_condense.Pool_128_condense.Test
+          "SorterSgd.RunCfg.p32.Test.OnePool", SorterSgd.RunCfg.p32.Test.OnePool.Continuation.TestSossCondense
           "SorterSgd.RunCfg.p32.Msrs4a.MutationRate", SorterSgd.RunCfg.p32.Msrs4a.MutationRate.VarModR_32.Test
           "SorterEval.RunCfg", SorterEval.RunCfg.Standard.Test
           "SorterMutate.RunCfg", SorterMutate.RunCfg.Prefix.Mssi

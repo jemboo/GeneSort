@@ -8,10 +8,28 @@ open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Parameters
 
-/// Apply branch settings once when loading imported Setup, never when resuming Results.
+/// Convert checkpoints during Setup and apply branch settings when loading imported pools.
 module EvoAppendPools =
+    /// Convert during Setup; Standard selection must never rank partial Soss evaluations.
+    let convertForSetup executionFunction tests prefix (source: sorterPoolSet) =
+        match executionFunction, source with
+        | ExecuteFunctionNames.soss, sorterPoolSet.Standard standard ->
+            SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss
+        | ExecuteFunctionNames.standard, sorterPoolSet.Soss soss ->
+            let pools = soss.SorterPools |> Map.values |> Seq.map (fun pool ->
+                let members = pool.SorterPoolMembers |> Seq.map (fun m ->
+                    spMember_Standard.create m.SorterPoolMemberId m.SorterModel m.MutationIndex m.MutationMod
+                        m.SorterMutationSource None m.Birthday) |> Seq.toArray
+                sorterPool_Standard.create pool.SorterPoolId pool.ParentSorterPoolId pool.Name pool.SorterPoolTag
+                    members pool.RawCeLength pool.MutationMod)
+            let converted = sorterPoolSet_Standard.create soss.SorterPoolSetId soss.GenerationNumber soss.LatticeBounds (Some pools)
+            let evaluations = PoolRunner_Standard.evaluatePoolSet tests prefix sorterEvalType.V2 true (UMX.tag false) converted
+            converted |> SorterPoolSet_Standard.updateSorterEvals evaluations |> sorterPoolSet.Standard
+        | _ -> source
+
     let private branch (rp: runParameters) (originals: 'pool array) bounds getModifier derive retag =
         if not (Map.containsKey ParamKeys.sourcePoolFileIdKey rp.ParamMap) then Ok None
         else

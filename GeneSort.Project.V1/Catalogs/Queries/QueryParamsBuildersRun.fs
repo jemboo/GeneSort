@@ -239,6 +239,10 @@ module QueryParamsBuildersRun =
                         |> Map.add ParamKeys.sourceRunNameKey %sourceRun
                         |> Map.add ParamKeys.sourceGenerationIntervalKey (string sourceInterval)
                         |> Map.add ParamKeys.sourceExecutionIdKey sourceExecutionId
+                        |> fun properties ->
+                            match rp.GetSourceMutationMod() with
+                            | Some modifier -> Map.add ParamKeys.sourceMutationModKey (string %modifier) properties
+                            | None -> properties
                     return queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties)
                 }
 

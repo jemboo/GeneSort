@@ -59,8 +59,8 @@ module OrthoPara64 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
 
@@ -100,8 +100,8 @@ module OrthoPara64 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
 
@@ -141,8 +141,8 @@ module OrthoPara64 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
 
@@ -184,7 +184,7 @@ module OrthoPara128 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )

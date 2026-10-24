@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.Test.V2.WorkflowFixtures
 
 open FSharp.UMX
+open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1
@@ -136,8 +137,8 @@ let standardSource () =
         }
     } {
         MakerNames = EvolutionMakerNames.prefix
-        GenSaveIntervalsName = "expInterval100_L50ss"
-        GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+        GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+        GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
     } |> run.SgdRun
 
 let sossSource (modifiers: int list) =
@@ -177,8 +178,8 @@ let sossSource (modifiers: int list) =
         }
     } {
         MakerNames = EvolutionMakerNames.sossPrefix
-        GenSaveIntervalsName = "expInterval100_L50ss"
-        GenSaveSubIntervalsName = "uniformInterval2"
+        GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval2
     } |> run.SgdRun
 
 let withSetupSpans overrides (source: run) =

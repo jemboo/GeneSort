@@ -11,24 +11,33 @@ open GeneSort.Project.V1.Parameters
 
 /// Named inputs for constructing a continuation source.
 type evoContinuationSourceArgs = {
-    Run: run
+    SourceRun: run
     GenerationInterval: int
-    ParameterSpans: (string * string list) list
+    SourceMutationMods: int list
+    SelectedSorterPoolCount: int
 }
 
 type evoContinuationSource =
     private {
         _run: run
         _generationInterval: int
-        _parameterSpans: (string * string list) list
+        _sourceMutationMods: int list
+        _selectedSorterPoolCount: int
     }
 
-    member this.Run = this._run
+    member this.SourceRun = this._run
     member this.GenerationInterval = this._generationInterval
-    member this.ParameterSpans = this._parameterSpans
+    member this.SourceMutationMods = this._sourceMutationMods
+    member this.SelectedSorterPoolCount = this._selectedSorterPoolCount
 
     static member public create (args: evoContinuationSourceArgs) : evoContinuationSource =
-        { _run = args.Run; _generationInterval = args.GenerationInterval; _parameterSpans = args.ParameterSpans }
+        if args.SourceMutationMods.IsEmpty || List.distinct args.SourceMutationMods <> args.SourceMutationMods then
+            invalidArg "SourceMutationMods" "SourceMutationMods must contain distinct mutation values."
+        if args.SelectedSorterPoolCount <= 0 then
+            invalidArg "SelectedSorterPoolCount" "SelectedSorterPoolCount must be positive."
+        { _run = args.SourceRun; _generationInterval = args.GenerationInterval
+          _sourceMutationMods = args.SourceMutationMods; _selectedSorterPoolCount = args.SelectedSorterPoolCount }
+
 
 /// Named inputs for constructing a continuation configuration.
 type evoContinuationConfigArgs = {
@@ -73,18 +82,34 @@ module internal EvoContinuation =
     /// Select source executions independently, then branch each into the execution spans.
     /// Unspecified execution settings are inherited from each selected source.
     let create expectedExecutionFunction (config: evoContinuationConfig) : run =
-        let source = config.Source.Run
-        if source.ExecuteFunctionName <> expectedExecutionFunction then
-            invalidArg "Source" (sprintf "This workflow requires a %s source." expectedExecutionFunction)
+        let source = config.Source.SourceRun
+        if not (List.contains source.ExecuteFunctionName [ExecuteFunctionNames.standard; ExecuteFunctionNames.soss]) then
+            invalidArg "Source" "Continuation requires a Standard or Soss source."
+        if source.ExecuteFunctionName <> expectedExecutionFunction && expectedExecutionFunction = ExecuteFunctionNames.soss then
+            for key in [ParamKeys.seedSossKey; ParamKeys.partitionCountKey; ParamKeys.generationsPerSubsetKey; ParamKeys.generationsPerMergedSetKey] do
+                match config.ExecutionParameterSpans |> List.tryFind (fst >> (=) key) with
+                | Some (_, values) when not values.IsEmpty && values |> List.forall (fun value ->
+                    if key = ParamKeys.seedSossKey then System.UInt64.TryParse value |> fst
+                    else match System.Int32.TryParse value with true, n -> n > 0 | _ -> false) -> ()
+                | _ -> invalidArg "ExecutionParameterSpans" (sprintf "Standard to Soss requires explicit valid %s values (counts and durations must be positive)." key)
         if config.Source.GenerationInterval < 0 then
             invalidArg "Source" "Source interval must be nonnegative."
-        for spans in [config.Source.ParameterSpans; config.ExecutionParameterSpans] do
-            if spans |> List.exists (snd >> List.isEmpty) then
-                invalidArg "ParameterSpans" "Parameter spans must have at least one value."
-            if spans |> List.map fst |> List.distinct |> List.length <> List.length spans then
-                invalidArg "ParameterSpans" "Parameter keys must be unique within each span list."
+        let executionSpans = config.ExecutionParameterSpans
+        if executionSpans |> List.exists (snd >> List.isEmpty) then
+            invalidArg "ExecutionParameterSpans" "Parameter spans must have at least one value."
+        if executionSpans |> List.map fst |> List.distinct |> List.length <> List.length executionSpans then
+            invalidArg "ExecutionParameterSpans" "Parameter keys must be unique within each span list."
+        let sourceOptions = RunParameterGeneration.effectiveSpans source
+        for key, values in config.ExecutionParameterSpans do
+            if key <> ParamKeys.mutationModKey then
+                if values.Length <> 1 then
+                    invalidArg "ExecutionParameterSpans" (sprintf "%s override must contain exactly one value; only MutationMod can expand executions." key)
+                match Map.tryFind key sourceOptions with
+                | Some sourceValues when sourceValues.Length <> 1 ->
+                    invalidArg "ExecutionParameterSpans" (sprintf "%s has multiple source values and must be inherited, not overridden." key)
+                | _ -> ()
         let reserved =
-            [ParamKeys.idKey; ParamKeys.replKey; ParamKeys.sourceExecutionIdKey
+            [ParamKeys.idKey; ParamKeys.replKey; ParamKeys.selectedSorterPoolCountKey; ParamKeys.sourceExecutionIdKey; ParamKeys.sourceMutationModKey
              ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey
              ParamKeys.sourceGenerationIntervalKey
              ParamKeys.sourcePoolFileIdKey; ParamKeys.sourceTestsFileIdKey]
@@ -118,7 +143,7 @@ module internal EvoContinuation =
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             }
             Execution = {
-                FunctionName = source.ExecuteFunctionName
+                FunctionName = expectedExecutionFunction
                 ParameterSpans = config.ExecutionParameterSpans @ [
                     ParamKeys.sourceProjectNameKey, [%source.ProjectName]
                     ParamKeys.sourceDbNameKey, [%source.DatabaseName]
@@ -134,4 +159,7 @@ module internal EvoContinuation =
             GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
         }
         |> run.SgdRun
-        |> Run.withParameterSource source config.Source.ParameterSpans
+        |> Run.withParameterSource source [
+            ParamKeys.sourceMutationModKey, config.Source.SourceMutationMods |> List.map string
+            ParamKeys.selectedSorterPoolCountKey, [string config.Source.SelectedSorterPoolCount]
+        ]

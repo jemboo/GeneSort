@@ -3,12 +3,9 @@ namespace GeneSort.Dispatch.V1.SorterSgd
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Parameters
 
-/// Continue each matching source execution without ranking sources.
+/// Continue selected source executions using the shared continuation contract.
 module EvoAppend =
     let private create executionFunction (config: evoContinuationConfig) =
-        if config.Source.ParameterSpans @ config.ExecutionParameterSpans
-           |> List.exists (fst >> (=) ParamKeys.selectedSorterPoolCountKey) then
-            invalidArg "SelectedSorterPoolCount" "Use EvoCondense.createStandard or EvoCondense.createSoss for ranked source selection."
         EvoContinuation.create executionFunction config
 
     let createStandard config = create ExecuteFunctionNames.standard config

@@ -20,57 +20,6 @@ open GeneSort.Dispatch.V1.SorterSgd
 
 
 
-module Pool_4 =
-
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Debug ()  : run =
-        let names = RunNaming.create()
-        let parameterSpansSetup =
-            [
-                (ParamKeys.sorterCountPerPoolKey, [4] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 2] |> List.map string)
-            ]
-        let parameterSpansRun =
-            [
-                (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [2;] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [20;] |> List.map string)
-                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
-                (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
-                (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
-                (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
-                (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
-                (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-            ]
-        run.SgdRun (
-            SgdRun.create {
-                DatabaseName = names.DatabaseName
-                ProjectName = names.ProjectName
-                RunName = names.RunName
-                Description = "Soss rate comparison for Msuf32p4a"
-                AllowOverwrite = false
-                Setup = {
-                    FunctionName = SetupCatalogNames.standard
-                    ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
-                }
-                Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
-                    ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
-                }
-            } {
-                MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "uniformInterval2"
-            }
-        )
-
 module Pool_32 =
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -85,7 +34,7 @@ module Pool_32 =
         let parameterSpansRun =
             [
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [4;] |> List.map string)
+                (ParamKeys.partitionCountKey, [1; 4; 8;] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
                 (ParamKeys.generationsPerMergedSetKey, [100;] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
@@ -117,159 +66,11 @@ module Pool_32 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "uniformInterval10"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.uniformInterval10
             }
         )
 
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Test_null ()  : run =
-        let names = RunNaming.create()
-        let parameterSpansSetup =
-            [
-                (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
-            ]
-        let parameterSpansRun =
-            [
-                (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [1] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [99] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [99;] |> List.map string)
-                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [13] |> List.map string)
-                (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
-                (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
-                (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
-                (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
-                (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-            ]
-        run.SgdRun (
-            SgdRun.create {
-                DatabaseName = names.DatabaseName
-                ProjectName = names.ProjectName
-                RunName = names.RunName
-                Description = "Soss rate comparison for Msuf32p4a"
-                AllowOverwrite = false
-                Setup = {
-                    FunctionName = SetupCatalogNames.standard
-                    ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
-                }
-                Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
-                    ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
-                }
-            } {
-                MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "uniformInterval5"
-            }
-        )
-
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let V1 ()  : run =
-        let names = RunNaming.create()
-        let parameterSpansSetup =
-            [
-                (ParamKeys.sorterCountPerPoolKey, [32] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
-                (ParamKeys.mutationModKey, [0] |> List.map string)
-            ]
-        let parameterSpansRun =
-            [
-                (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [4] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [100] |> List.map string)
-                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [3] |> List.map string)
-                (ParamKeys.paraRateKey,    [0.85; 0.95; 1.05; 1.15;] |> List.map string)
-                (ParamKeys.selfSymRateKey, [0.75; 1.25; 1.5; 1.75;]  |> List.map string)
-                (ParamKeys.seedModificationRateKey, [0.020; 0.030; 0.040; 0.050;] |> List.map string)
-                (ParamKeys.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
-                (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
-            ]
-        run.SgdRun (
-            SgdRun.create {
-                DatabaseName = names.DatabaseName
-                ProjectName = names.ProjectName
-                RunName = names.RunName
-                Description = "Soss rate comparison for Msuf32p4a"
-                AllowOverwrite = false
-                Setup = {
-                    FunctionName = SetupCatalogNames.standard
-                    ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
-                }
-                Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
-                    ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
-                }
-            } {
-                MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
-            }
-        )
-
-module Pool_128 =
-
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Test ()  : run =
-        let names = RunNaming.create()
-        let parameterSpansSetup =
-            [
-                (ParamKeys.sorterCountPerPoolKey, [128] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
-            ]
-        let parameterSpansRun =
-            [
-                (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [4] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [100] |> List.map string)
-                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
-                (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
-                (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
-                (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
-                (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
-                (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
-            ]
-        run.SgdRun (
-            SgdRun.create {
-                DatabaseName = names.DatabaseName
-                ProjectName = names.ProjectName
-                RunName = names.RunName
-                Description = "Soss rate comparison for Msuf32p4a"
-                AllowOverwrite = false
-                Setup = {
-                    FunctionName = SetupCatalogNames.standard
-                    ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
-                }
-                Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
-                    ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
-                }
-            } {
-                MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "uniformInterval10"
-            }
-        )
 
 module Pool_512 =
 
@@ -317,7 +118,7 @@ module Pool_512 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )

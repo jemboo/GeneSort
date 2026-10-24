@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Core
+namespace GeneSort.Core
 
 open System
 open System.Collections.Generic
@@ -221,6 +221,84 @@ module GenIntervalConfig =
 
 
 
+/// Shared names for the built-in generation interval configurations.
+module GenIntervalNames =
+
+    [<Literal>]
+    let uniformInterval1 = "uniformInterval1"
+
+    [<Literal>]
+    let uniformInterval2 = "uniformInterval2"
+
+    [<Literal>]
+    let uniformInterval5 = "uniformInterval5"
+
+    [<Literal>]
+    let uniformInterval10 = "uniformInterval10"
+
+    [<Literal>]
+    let uniformInterval100 = "uniformInterval100"
+
+    [<Literal>]
+    let uniformInterval500 = "uniformInterval500"
+
+    [<Literal>]
+    let uniformInterval1000 = "uniformInterval1000"
+
+    [<Literal>]
+    let summaryInterval_C_1p5C = "summaryInterval_C.1p5C"
+
+    [<Literal>]
+    let summaryInterval_C_2C = "summaryInterval_C.2C"
+
+    [<Literal>]
+    let summaryInterval_C_5C = "summaryInterval_C.5C"
+
+    [<Literal>]
+    let summaryInterval_C_K = "summaryInterval_C.K"
+
+    [<Literal>]
+    let summaryInterval_C_5K = "summaryInterval_C.5K"
+
+    [<Literal>]
+    let emptyInterval = "emptyInterval"
+
+    [<Literal>]
+    let uniformInterval5_L5 = "uniformInterval5_L5"
+
+    [<Literal>]
+    let uniformInterval5_L10 = "uniformInterval5_L10"
+
+    [<Literal>]
+    let expInterval25_L5 = "expInterval25_L5"
+
+    [<Literal>]
+    let expInterval25_L20 = "expInterval25_L20"
+
+    [<Literal>]
+    let expInterval50_L10 = "expInterval50_L10"
+
+    [<Literal>]
+    let expInterval100_L10 = "expInterval100_L10"
+
+    [<Literal>]
+    let expInterval100_L50 = "expInterval100_L50"
+
+    [<Literal>]
+    let expInterval100_L50s = "expInterval100_L50s"
+
+    [<Literal>]
+    let expInterval100_L50ss = "expInterval100_L50ss"
+
+    [<Literal>]
+    let periodic_LinearBurst = "periodic_LinearBurst"
+
+    [<Literal>]
+    let periodic_DecayReset = "periodic_DecayReset"
+
+    [<Literal>]
+    let prefixed_PeriodicBurst = "prefixed_PeriodicBurst"
+
 module GenIntervalRegistry =
 
     let private createConfig name min maxCount scale method = {
@@ -261,13 +339,13 @@ module GenIntervalRegistry =
         //uniformInterval500           : [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000]
         //uniformInterval1000          : [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000]
         
-        add (createConfig "uniformInterval1" 1 noMaxCount scale1 (Constant 1))
-        add (createConfig "uniformInterval2" 1 noMaxCount scale2 (Constant 1))
-        add (createConfig "uniformInterval5" 1 noMaxCount scale5 (Constant 1))
-        add (createConfig "uniformInterval10" 1 noMaxCount scale10 (Constant 1))
-        add (createConfig "uniformInterval100" 1 noMaxCount scale100 (Constant 1))
-        add (createConfig "uniformInterval500" 1 noMaxCount scale500 (Constant 1))
-        add (createConfig "uniformInterval1000" 1 noMaxCount scale1000 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval1 1 noMaxCount scale1 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval2 1 noMaxCount scale2 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval5 1 noMaxCount scale5 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval10 1 noMaxCount scale10 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval100 1 noMaxCount scale100 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval500 1 noMaxCount scale500 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval1000 1 noMaxCount scale1000 (Constant 1))
 
 
        // summaryInterval_C.1p5C       : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 24, 25, 27, 28, 30, 31, 33, 35, 36, 38, 40, 42, 
@@ -290,18 +368,18 @@ module GenIntervalRegistry =
         //summaryInterval_C.5C         : [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 15, 16, 18, 19, 21, 23, 25, 27, 29, 31, 33, 36, 38, 41, 43, 46, 49, 52, 55]
         //summaryInterval_C.K          : [1, 2, 3, 4, 5, 7, 8, 9, 11, 12, 14, 15, 17, 19, 21, 23, 25, 27, 29, 32, 34, 37, 40, 42, 46, 49, 52, 56, 59, 63]
         //summaryInterval_C.5K         : [1, 2, 3, 4, 5, 7, 8, 10, 11, 13, 15, 17, 19, 21, 24, 26, 29, 32, 35, 38, 42, 46, 50, 54, 59, 64, 70, 75, 82, 88]
-        add (createConfig "summaryInterval_C.1p5C" 1 noMaxCount scale1 (Exponential (0.02, 1)))
-        add (createConfig "summaryInterval_C.2C" 1 noMaxCount scale1 (Exponential (0.03, 1)))
-        add (createConfig "summaryInterval_C.5C" 1 noMaxCount scale1 (Exponential (0.041, 1)))
-        add (createConfig "summaryInterval_C.K" 1 noMaxCount scale1 (Exponential (0.05, 1)))
-        add (createConfig "summaryInterval_C.5K" 1 noMaxCount scale1 (Exponential (0.07, 1)))
+        add (createConfig GenIntervalNames.summaryInterval_C_1p5C 1 noMaxCount scale1 (Exponential (0.02, 1)))
+        add (createConfig GenIntervalNames.summaryInterval_C_2C 1 noMaxCount scale1 (Exponential (0.03, 1)))
+        add (createConfig GenIntervalNames.summaryInterval_C_5C 1 noMaxCount scale1 (Exponential (0.041, 1)))
+        add (createConfig GenIntervalNames.summaryInterval_C_K 1 noMaxCount scale1 (Exponential (0.05, 1)))
+        add (createConfig GenIntervalNames.summaryInterval_C_5K 1 noMaxCount scale1 (Exponential (0.07, 1)))
 
         //emptyInterval                : [<empty>]
         //uniformInterval5_L5          : [5, 10, 15, 20, 25]
         //uniformInterval5_L10         : [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-        add (createConfig "emptyInterval" 0 maxCount0 scale1 (Constant 1))
-        add (createConfig "uniformInterval5_L5" 1 maxCount5 scale5 (Constant 1))
-        add (createConfig "uniformInterval5_L10" 1 maxCount10 scale5 (Constant 1))
+        add (createConfig GenIntervalNames.emptyInterval 0 maxCount0 scale1 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval5_L5 1 maxCount5 scale5 (Constant 1))
+        add (createConfig GenIntervalNames.uniformInterval5_L10 1 maxCount10 scale5 (Constant 1))
 
         //expInterval25_L5             : [25, 65, 125, 215, 350]
         //expInterval25_L20            : [25, 55, 94, 145, 211, 296, 408, 552, 741, 985, 1304, 1717, 2255, 2954, 3862, 5044, 6579, 8575, 11171, 14544]
@@ -312,20 +390,20 @@ module GenIntervalRegistry =
         //expInterval100_L50ss         : [100, 250, 430, 646,  905, 1216, 1589, 2037, 2575, 3220, 3994, 4923, 6037, 7374, 8979, 10905, 13216, 15990, 19317, 23311, 28103, 33854, 
         //                                40755, 49036, 58973, 70897, 85207]
         
-        add (createConfig "expInterval25_L5" 25 maxCount5 scale1 (Exponential (0.5, 40)))
-        add (createConfig "expInterval25_L20" 25 maxCount20 scale1 (Exponential (0.3, 30)))
-        add (createConfig "expInterval50_L10" 50 maxCount10 scale1 (Exponential (0.5, 75)))
-        add (createConfig "expInterval100_L10" 100 maxCount10 scale1 (Exponential (0.5, 150)))
-        add (createConfig "expInterval100_L50" 100 maxCount50 scale1 (Exponential (0.5, 150)))
-        add (createConfig "expInterval100_L50s" 100 maxCount50 scale1 (Exponential (0.3, 150)))
-        add (createConfig "expInterval100_L50ss" 100 maxCount50 scale1 (Exponential (0.2, 150)))
+        add (createConfig GenIntervalNames.expInterval25_L5 25 maxCount5 scale1 (Exponential (0.5, 40)))
+        add (createConfig GenIntervalNames.expInterval25_L20 25 maxCount20 scale1 (Exponential (0.3, 30)))
+        add (createConfig GenIntervalNames.expInterval50_L10 50 maxCount10 scale1 (Exponential (0.5, 75)))
+        add (createConfig GenIntervalNames.expInterval100_L10 100 maxCount10 scale1 (Exponential (0.5, 150)))
+        add (createConfig GenIntervalNames.expInterval100_L50 100 maxCount50 scale1 (Exponential (0.5, 150)))
+        add (createConfig GenIntervalNames.expInterval100_L50s 100 maxCount50 scale1 (Exponential (0.3, 150)))
+        add (createConfig GenIntervalNames.expInterval100_L50ss 100 maxCount50 scale1 (Exponential (0.2, 150)))
 
         //periodic_LinearBurst         : [1, 3, 5, 7, 9, 10, 12, 14, 16, 18, 19, 21, 23, 25, 27, 28, 30, 32, 34, 36]
         //periodic_DecayReset          : [5, 10, 15, 25, 30, 40, 45, 50, 55, 65, 70, 80, 85, 90, 95, 105, 110, 120, 125, 130]
         //prefixed_PeriodicBurst       : [1, 11, 21, 31, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56]
-        add (createConfig "periodic_LinearBurst" 1 maxCount50 scale1 (Cyclic (Constant 2, 5)))
-        add (createConfig "periodic_DecayReset" 1 maxCount50 scale5 (Cyclic (Exponential (0.2, 1), 6)))
-        add (createConfig "prefixed_PeriodicBurst" 1 maxCount50 scale1 (Prefixed (5, Constant 10, Cyclic (Constant 1, 5))))
+        add (createConfig GenIntervalNames.periodic_LinearBurst 1 maxCount50 scale1 (Cyclic (Constant 2, 5)))
+        add (createConfig GenIntervalNames.periodic_DecayReset 1 maxCount50 scale5 (Cyclic (Exponential (0.2, 1), 6)))
+        add (createConfig GenIntervalNames.prefixed_PeriodicBurst 1 maxCount50 scale1 (Prefixed (5, Constant 10, Cyclic (Constant 1, 5))))
 
         dict
 

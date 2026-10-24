@@ -2,25 +2,91 @@ module GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_condense
 
 open System.Runtime.CompilerServices
 open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
 
-module Pool_128_condense =
+
+module Pool_X =
+
+    let partitionCount = 4
+    let sorterCount = 32
+    let splitCount = 16
+    let seletctionCount = 16
+    let poolCount = splitCount * seletctionCount
+    let generationsPerSubset = 20
+    let generationsPerMergedSet = 20
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Test () : run =
+    let Base ()  : run =
         let names = RunNaming.create()
-        let sourceParameterSpans = [
-            ParamKeys.selectedSorterPoolCountKey, [2] |> List.map string
-            ParamKeys.mutationModKey, [0 .. 3] |> List.map string
-        ]
-        let executionParameterSpans = [
-            ParamKeys.generationIntervalLastKey, [1] |> List.map string
-        ]
+        let parameterSpansSetup =
+            [
+                (ParamKeys.sorterCountPerPoolKey, [sorterCount] |>  List.map string)
+                (ParamKeys.sorterCountPerPoolSetKey, [sorterCount] |> List.map string)
+                (ParamKeys.mutationModKey, [0 .. (poolCount - 1)] |> List.map string)
+            ]
+        let parameterSpansRun =
+            [
+                (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                (ParamKeys.partitionCountKey, [partitionCount;] |> List.map string)
+                (ParamKeys.generationsPerSubsetKey, [generationsPerSubset] |> List.map string)
+                (ParamKeys.generationsPerMergedSetKey, [generationsPerMergedSet] |> List.map string)
+                (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                (ParamKeys.paraRateKey,    [1.15;] |> List.map string)
+                (ParamKeys.selfSymRateKey, [1.75;]  |> List.map string)
+                (ParamKeys.seedModificationRateKey, [0.020;] |> List.map string)
+                (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
+                (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
+            ]
+        run.SgdRun (
+            SgdRun.create {
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
+                Description = "SossBase for Msuf32p4a"
+                AllowOverwrite = false
+                Setup = {
+                    FunctionName = SetupCatalogNames.standard
+                    ParameterSpans = parameterSpansSetup
+                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                }
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.soss
+                    ParameterSpans = parameterSpansRun
+                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                }
+            } {
+                MakerNames = EvolutionMakerNames.sossPrefix
+                GenSaveIntervalsName = GenIntervalNames.uniformInterval100
+                GenSaveSubIntervalsName = GenIntervalNames.uniformInterval10
+            }
+        )
+
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let Step1 () : run =
+        let names = RunNaming.create()
+        // Select seletctionCount winners within each source PartitionCount, then
+        // split each winner: poolCount executions per PartitionCount.
         evoContinuationConfig.create {
             ProjectName = names.ProjectName
             DatabaseName = names.DatabaseName
@@ -28,10 +94,108 @@ module Pool_128_condense =
             SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
             Source = evoContinuationSource.create {
-                Run = Soss.Pool_128.Test ()
+                SourceRun = Base ()
                 GenerationInterval = 0
-                ParameterSpans = sourceParameterSpans
+                SourceMutationMods = [0 .. (poolCount - 1)]
+                SelectedSorterPoolCount = seletctionCount
             }
-            ExecutionParameterSpans = executionParameterSpans
+            ExecutionParameterSpans = [
+                ParamKeys.generationIntervalLastKey, [1] |> List.map string
+                (ParamKeys.mutationModKey, [0 .. (splitCount - 1)] |> List.map string)
+            ]
+        }
+        |> EvoCondense.createSoss
+
+
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let Step2 () : run =
+        let names = RunNaming.create()
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            Source = evoContinuationSource.create {
+                SourceRun = Step1 ()
+                GenerationInterval = 1
+                SourceMutationMods = [0 .. (splitCount - 1)]
+                SelectedSorterPoolCount = seletctionCount
+            }
+            ExecutionParameterSpans = [
+                ParamKeys.generationIntervalLastKey, [2] |> List.map string
+                (ParamKeys.mutationModKey, [0 .. (splitCount - 1)] |> List.map string)
+            ]
+        }
+        |> EvoCondense.createSoss
+
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let Step3 () : run =
+        let names = RunNaming.create()
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            Source = evoContinuationSource.create {
+                SourceRun = Step2 ()
+                GenerationInterval = 2
+                SourceMutationMods = [0 .. (splitCount - 1)]
+                SelectedSorterPoolCount = seletctionCount
+            }
+            ExecutionParameterSpans = [
+                ParamKeys.generationIntervalLastKey, [3] |> List.map string
+                (ParamKeys.mutationModKey, [0 .. (splitCount - 1)] |> List.map string)
+            ]
+        }
+        |> EvoCondense.createSoss
+
+
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let Step4 () : run =
+        let names = RunNaming.create()
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            Source = evoContinuationSource.create {
+                SourceRun = Step3 ()
+                GenerationInterval = 3
+                SourceMutationMods = [0 .. (splitCount - 1)]
+                SelectedSorterPoolCount = seletctionCount
+            }
+            ExecutionParameterSpans = [
+                ParamKeys.generationIntervalLastKey, [4] |> List.map string
+                (ParamKeys.mutationModKey, [0 .. (splitCount - 1)] |> List.map string)
+            ]
+        }
+        |> EvoCondense.createSoss
+
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let Step5 () : run =
+        let names = RunNaming.create()
+        evoContinuationConfig.create {
+            ProjectName = names.ProjectName
+            DatabaseName = names.DatabaseName
+            RunName = names.RunName
+            SetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            Source = evoContinuationSource.create {
+                SourceRun = Step4 ()
+                GenerationInterval = 4
+                SourceMutationMods = [0 .. (splitCount - 1)]
+                SelectedSorterPoolCount = seletctionCount
+            }
+            ExecutionParameterSpans = [
+                ParamKeys.generationIntervalLastKey, [5] |> List.map string
+                (ParamKeys.mutationModKey, [0 .. (splitCount - 1)] |> List.map string)
+            ]
         }
         |> EvoCondense.createSoss

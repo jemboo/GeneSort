@@ -354,6 +354,9 @@ type parameterSet<'kind> =
     member this.GetSourceRunName() =
         this.paramMap.TryFind ParamKeys.sourceRunNameKey |> Option.map UMX.tag<runName>
 
+    member this.GetSourceMutationMod() =
+        ParamKeys.tryGetInt ParamKeys.sourceMutationModKey this.paramMap |> Option.map UMX.tag<mutationMod>
+
     member this.GetStageLength() =
         ParamKeys.tryGetInt ParamKeys.stageLengthKey this.paramMap
         |> Option.map UMX.tag<stageLength>
@@ -612,6 +615,9 @@ type parameterSet<'kind> =
 
     member this.WithSourceRunName(value: string<runName> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceRunNameKey (value |> Option.map UmxExt.stringToRaw) }
+
+    member this.WithSourceMutationMod(value: int<mutationMod> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceMutationModKey (value |> Option.map UmxExt.intToRaw) }
 
     member this.WithStageLength(sl: int<stageLength> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.stageLengthKey (sl |> Option.map UmxExt.intToRaw) }

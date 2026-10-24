@@ -59,8 +59,8 @@ module PoolSelSz128 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
 
@@ -98,8 +98,8 @@ module Sz_2048_Of_4096 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
 
@@ -137,7 +137,7 @@ module PoolsSelSzTest_2_vs_256 =
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
-                GenSaveIntervalsName = "expInterval100_L50ss"
-                GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+                GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+                GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )

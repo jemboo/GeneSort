@@ -4,6 +4,7 @@ open FSharp.UMX
 open MessagePack
 open MessagePack.FSharp
 open MessagePack.Resolvers
+open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 
@@ -133,8 +134,8 @@ module RunDto =
             SgdRun (
                 SgdRun.create config {
                     MakerNames = makerNames
-                    GenSaveIntervalsName = (saveIntervals |> Option.defaultValue "expInterval100_L50ss")
-                    GenSaveSubIntervalsName = (saveSubIntervals |> Option.defaultValue "summaryInterval_C.1p5C")
+                    GenSaveIntervalsName = (saveIntervals |> Option.defaultValue GenIntervalNames.expInterval100_L50ss)
+                    GenSaveSubIntervalsName = (saveSubIntervals |> Option.defaultValue GenIntervalNames.summaryInterval_C_1p5C)
                 }
             )
         match dto.ParameterSource with

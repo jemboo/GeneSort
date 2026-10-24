@@ -9,21 +9,49 @@ workflow folders. Project names derived from these modules include `RunCfg`.
 runs with one pool of 32 sorters for each mutation value 0–3. Run the desired base through
 setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
 `TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
-Append tests use source mutation 0 and branch into mutation values 0–2 at capacities
-32 and 64, preserving one pool in each of six runs. Condense tests rank all four
+All OnePool configurations use 32 total sorters and one pool per pool set.
+Append tests use source mutation 0 and branch into mutation values 0–2,
+preserving one pool of 32 in each of three runs. Condense tests rank all four
 source mutation values and select the best two per replica. Both continuation workflows finish at interval 1, using the base's
 save schedule; selection and copying happen before execution as usual.
+
+Continuation sources require explicit `SourceMutationMods: int list` and
+`SelectedSorterPoolCount: int` arguments, alongside `SourceRun` and `GenerationInterval`.
+There is no arbitrary source filter array. The selected count is per source
+parameter combination and replica; repeated mutation values from different source
+executions remain separate candidates. Selecting every candidate continues them all
+without ranking. `SourceRunName` is populated from `SourceRun`. `MutationMod` in execution
+spans specifies destination variants. `TestSossCondense` branches each of its two
+selected sources into mutations 0–3, producing eight runs with one pool of 32 each.
+Continuation parameters and summaries record `SourceMutationMod` separately from
+the destination `MutationMod`.
+
+Only `MutationMod` can contain multiple execution values. Other execution overrides
+must contain one value and can replace only a single-valued source setting (or add
+a new setting, such as the required Standard-to-Soss settings). A source sweep must
+be inherited. These rules also apply to settings inherited through earlier steps.
+For `Msuf4a.Soss_condense.Pool_X`, both Step1 and Step2 select two candidates and
+expand each into two mutations, producing four executions per partition count.
 
 Each family also has `TestStandardAppendCondense` / `TestSossAppendCondense`
 and `TestStandardCondenseAppend` / `TestSossCondenseAppend`:
 
-- Append → Condense selects the best two of the three size-64 Append candidates.
-- Condense → Append branches both selected winners into sizes 64 and 128,
+- Append → Condense selects the best two of the three size-32 Append candidates.
+- Condense → Append continues all resulting executions at size 32,
   preserving their mutation values and one pool per execution.
 
 These chains import their immediate source's interval-1 checkpoint and finish at
-interval 2. Standard sources stay Standard and Soss sources stay Soss. The suite
-now has ten configurations and 36 executions for replica 0. The runner discovers
+interval 2. `SameFamilyChain` keeps Standard sources Standard and Soss sources Soss.
+`MixedFamilyChain` adds `TestStandardAppendSossCondense`, `TestStandardCondenseSossAppend`,
+`TestSossAppendStandardCondense`, and `TestSossCondenseStandardAppend`. These select
+using the source family's scores, then convert the selected checkpoints during Setup.
+Standard to Soss explicitly supplies `SeedSoss`, `PartitionCount`, `GenerationsPerSubset`,
+and `GenerationsPerMergedSet` in execution spans. Soss to Standard supplies
+`AdjustCeLengthFrequency` and evaluates converted members against the full test set
+during Setup, so Standard parent selection never uses partial subset scores.
+Converted Setup pool files have separate identities from unchanged copies; execution
+needs only destination Setup data. The suite now has fourteen configurations and
+52 executions for replica 0. The runner discovers
 the dependency order automatically; verification discovers all continuations,
 checks their immediate source members, sizes, and selections, and includes their
 reports in the combined output. Configuration discovery does not require existing
@@ -53,10 +81,21 @@ spans. Condense candidates and selection count come from its source spans, and
 the source checkpoint generation is resolved from its source interval and the
 source run's save schedule. Candidate scores are ranked independently against
 the saved selections, so changing these configurations requires no audit edits.
+Condense ranks source pools separately within every combination of source settings
+(and replica), excluding mutation and provenance. The selection count applies to
+each group; execution mutation variants then expand each selected source while
+inheriting its settings. Scores and Soss selection subsets are compared only within
+a group.
 After verification, the script combines the current configurations' summary
 reports into `Data/Results/Report/OnePool_SummaryReport.txt` under the OnePool
 database. This tab-delimited file has one header with `RunName` first. Columns
 shared by Standard and Soss are aligned by name; unavailable fields are blank.
+The audit checks `MutationMod` against each execution and `SourceMutationMod`
+against its immediate source (blank for base runs). It independently expands the
+execution spans for every selected source, including inherited mutation values.
+Before replacing the combined file, it reads it back and compares all rows,
+including duplicates, with the verified individual reports. Missing, extra, or
+changed rows fail verification.
 The file is replaced on each successful run. Inputs are resolved from current run
 parameters, so older reports and the combined file itself are never included.
 Use `-MaxParallel 4` to change concurrency, `-ListOnly` to preview the order without

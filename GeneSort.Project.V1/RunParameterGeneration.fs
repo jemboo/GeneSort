@@ -8,6 +8,21 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 
 module RunParameterGeneration =
+    /// Effective declared options, including settings inherited through continuations.
+    let rec effectiveSpans (configured: run) =
+        let inherited = configured.ParameterSource |> Option.map (fst >> effectiveSpans) |> Option.defaultValue Map.empty
+        configured.SetupParameterSpans @ configured.RunParameterSpans
+        |> List.fold (fun spans (key, values) -> Map.add key values spans) inherited
+
+    /// Mutation variants compete within the same source settings, regardless of ancestry.
+    let sourceCombinationKey source (parameters: runParameters) =
+        effectiveSpans source |> Map.toList
+        |> List.filter (fun (key, _) ->
+            key <> ParamKeys.mutationModKey && key <> ParamKeys.selectedSorterPoolCountKey
+            && key <> ParamKeys.idKey && not (key.StartsWith("Source"))
+            && not (List.contains key SetupFileReferences.keys))
+        |> List.map (fun (key, _) -> key, Map.tryFind key parameters.ParamMap)
+
     /// Pair every run span combination with every enhanced setup combination within the same replica.
     let rec generateWithBindingsAndSourceSelection
             (selectSources: run -> run -> runParameters[] -> runParameters[])
@@ -27,16 +42,14 @@ module RunParameterGeneration =
                    | Some (source, spans) ->
                        let sourceParameters = generateWithSourceSelection selectSources source repl next
                        let filters = spans |> List.filter (fst >> (<>) ParamKeys.selectedSorterPoolCountKey)
+                                           |> List.map (fun (key, values) -> ParamKeys.sourceParameterKey key, values)
                        if spans |> List.exists (fst >> (=) ParamKeys.selectedSorterPoolCountKey) then
                            let requested = filters |> List.find (fst >> (=) ParamKeys.mutationModKey) |> snd
                            let available =
-                               sourceParameters
-                               |> Array.filter (fun parameters ->
-                                   filters |> List.forall (fun (key, values) ->
-                                       key = ParamKeys.mutationModKey ||
-                                       (Map.tryFind key parameters.ParamMap |> Option.exists (fun value -> List.contains value values))))
-                               |> Array.choose (fun parameters -> Map.tryFind ParamKeys.mutationModKey parameters.ParamMap)
-                               |> Set.ofArray
+                               effectiveSpans source |> Map.tryFind ParamKeys.mutationModKey
+                               |> Option.defaultWith (fun () ->
+                                   sourceParameters |> Array.choose (fun rp -> Map.tryFind ParamKeys.mutationModKey rp.ParamMap) |> Array.toList)
+                               |> Set.ofList
                            if requested |> List.exists (fun value -> not (Set.contains value available)) then
                                invalidOp (sprintf "Source MutationMod values must be a subset of the available values for replica %d." replica)
                        let selected =
@@ -45,17 +58,26 @@ module RunParameterGeneration =
                                filters |> List.forall (fun (key, values) ->
                                    Map.tryFind key parameters.ParamMap |> Option.exists (fun value -> List.contains value values)))
                        if Array.isEmpty selected then invalidOp "No source executions match Source.ParameterSpans."
+                       match spans |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey) with
+                       | Some (_, [count]) ->
+                           let selectedIds = selected |> Array.map (fun rp -> rp.GetId()) |> Set.ofArray
+                           for combination, group in sourceParameters |> Array.groupBy (sourceCombinationKey source) do
+                               let matchingCount = group |> Array.filter (fun rp -> Set.contains (rp.GetId()) selectedIds) |> Array.length
+                               if matchingCount < int count then
+                                   invalidOp (sprintf "Source combination %A has %d matching executions; SelectedSorterPoolCount requires %s." combination matchingCount count)
+                       | _ -> ()
                        selectSources configured source selected |> Array.map (fun parameters ->
                            let excluded =
                                [ParamKeys.idKey; ParamKeys.sourceExecutionIdKey
                                 ParamKeys.sourcePoolFileIdKey; ParamKeys.sourceTestsFileIdKey
-                                ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey
+                                ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey; ParamKeys.sourceMutationModKey
                                 ParamKeys.sourceGenerationIntervalKey; ParamKeys.generationFirstKey; ParamKeys.selectedSorterPoolCountKey]
                                @ SetupFileReferences.keys
                            let inherited =
                                parameters.ParamMap
                                |> fun map -> List.fold (fun map key -> Map.remove key map) map excluded
                                |> Map.add ParamKeys.sourceExecutionIdKey (string %(parameters.GetId().Value))
+                               |> Map.add ParamKeys.sourceMutationModKey (string %(parameters.GetMutationMod().Value))
                            setupParameters.create inherited)
                for setup in setups do
                    let references =
@@ -105,10 +127,14 @@ module RunParameterGeneration =
         let enhanceSetup = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
         generateWithBindingsAndSourceSelection selectSources runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica
 
-    let private unrankedSources (configured: run) _ candidates =
+    let private unrankedSources (configured: run) source candidates =
         let spans = configured.ParameterSource |> Option.map snd |> Option.defaultValue []
-        if spans |> List.exists (fst >> (=) ParamKeys.selectedSorterPoolCountKey) then
-            invalidOp "Condense parameter generation requires source checkpoint access. Use runHost.MakeRunParameters."
+        match spans |> List.tryFind (fst >> (=) ParamKeys.selectedSorterPoolCountKey) with
+        | Some (_, [count]) ->
+            for _, group in candidates |> Array.groupBy (sourceCombinationKey source) do
+                if group.Length <> int count then
+                    invalidOp "Ranked source selection requires source checkpoint access. Use runHost.MakeRunParameters."
+        | _ -> ()
         candidates
 
     let generateWithBindings runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica =

@@ -5,6 +5,7 @@ open System.Threading
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting.Sortable
+open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Soss
@@ -43,7 +44,7 @@ module EvoAppendSetup =
                 | [||] -> Error "The selected source execution has no saved parameters."
                 | _ -> Error "Duplicate saved parameters for the selected source execution."
 
-    /// Copy one source checkpoint and its tests, without regenerating or evaluating either.
+    /// Copy one source checkpoint and its tests, converting families during Setup when needed.
     /// SourceExecutionId selects the immediate saved source execution.
     let prepare (sourceDb: IGeneSortDb) (host: runHost) (rp: runParameters)
                 _allowOverwrite (cts: CancellationTokenSource) progress =
@@ -61,9 +62,8 @@ module EvoAppendSetup =
             do!
                 match sourceRun.ExecuteFunctionName, sourceRun.RunQueryCatalogName with
                 | ExecuteFunctionNames.soss, (QueryCatalogNamesRun.sorterSgdMsufSoss | QueryCatalogNamesRun.sorterSgdMsufSossAppend)
-                | ExecuteFunctionNames.standard, (QueryCatalogNamesRun.sorterSgdMsufStandard | QueryCatalogNamesRun.sorterSgdMsufStandardAppend)
-                    when sourceRun.ExecuteFunctionName = host.Run.ExecuteFunctionName -> Ok ()
-                | _ -> Error "Append source must use the same Standard or Soss execution family as the destination."
+                | ExecuteFunctionNames.standard, (QueryCatalogNamesRun.sorterSgdMsufStandard | QueryCatalogNamesRun.sorterSgdMsufStandardAppend) -> Ok ()
+                | _ -> Error "Append source must use a supported Standard or Soss workflow."
             let! intervalName = sourceRun.GenSaveIntervalsName |> Result.ofOption "Source run has no generation interval configuration."
             let! intervals =
                 match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue intervalName with
@@ -108,10 +108,15 @@ module EvoAppendSetup =
                               |> Result.ofOption "Cannot build source tests query."
             let testsQuery = QueryParams.forSetup sourceParameters testsQuery
             let! testsData = sourceDb.loadAsync geneSortDataMode.Setup testsQuery
-            let! tests, _ = OutputData.asSortableTestsWithPrefix testsData
+            let! tests, ces = OutputData.asSortableTestsWithPrefix testsData
             let! width = rp.GetSortingWidth() |> Result.ofOption "Missing SortingWidth."
             do! if SortableTests.getSortingWidth tests = width then Ok () else Error "Source test width does not match the destination."
-            let destinationPool = queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (Some repl) (geneSortDataType.SorterPoolSet "") poolQuery.Id
+            let converting = sourceRun.ExecuteFunctionName <> host.Run.ExecuteFunctionName
+            let destinationPool =
+                if converting then
+                    queryParams.create host.Run.DatabaseName host.Run.ProjectName (Some repl) None (geneSortDataType.SorterPoolSet "")
+                        [|"SourceFileId", string %poolQuery.Id; "ExecutionFunction", host.Run.ExecuteFunctionName|]
+                else queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (Some repl) (geneSortDataType.SorterPoolSet "") poolQuery.Id
             let destinationTests = queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (Some repl) (geneSortDataType.SortableTestsWithPrefix "") testsQuery.Id
             let updated =
                 rp.ParamMap
@@ -123,7 +128,12 @@ module EvoAppendSetup =
                 |> fun value -> value.WithGenerationCurrent(Some poolGeneration).WithGenerationFirst(Some poolGeneration).WithRunFinished(Some false)
             do! checkCancellation cts.Token
             do! copyOnce host.RunDb destinationTests testsData cts.Token
-            do! copyOnce host.RunDb destinationPool poolData cts.Token
+            let! destinationExists = host.RunDb.doesOutPutDataExist geneSortDataMode.Setup destinationPool
+            if not destinationExists then
+                let! sourcePool = OutputData.asSorterPoolSet poolData
+                let converted = EvoAppendPools.convertForSetup host.Run.ExecuteFunctionName tests
+                                    (ceBlock.create (UMX.tag Guid.Empty) width ces) sourcePool
+                do! copyOnce host.RunDb destinationPool (outputData.SorterPoolSet converted) cts.Token
             OpsUtils.report progress (sprintf "Imported %s/%s, interval %d (generation %d) into Setup." %sourceProject %sourceDatabase interval importedGeneration)
             return updated
         }

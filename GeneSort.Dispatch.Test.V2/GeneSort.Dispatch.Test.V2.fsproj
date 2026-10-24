@@ -19,6 +19,8 @@
     <Compile Include="SetupOutputTests.fs" />
     <Compile Include="RunParameterExpansionTests.fs" />
     <Compile Include="RunNameTests.fs" />
+    <Compile Include="../scripts/OnePoolAudit/Verification.fs" Link="OnePoolAuditVerification.fs" />
+    <Compile Include="OnePoolAuditTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

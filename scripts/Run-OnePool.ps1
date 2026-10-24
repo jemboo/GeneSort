@@ -28,7 +28,7 @@ try {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     if ($ListOnly) { exit 0 }
 
-    Write-Host 'Verifying Append pool sizes and Condense source selections...'
+    Write-Host 'Verifying pool sizes, source selections, mutation expansion, and the combined summary...'
     & dotnet $audit --combine
     exit $LASTEXITCODE
 }

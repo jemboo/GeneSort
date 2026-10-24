@@ -12,14 +12,10 @@ open GeneSort.Dispatch.V1.SorterSgd
 [<MethodImpl(MethodImplOptions.NoInlining)>]
 let Test () : run =
     let names = RunNaming.create()
-    let sourceParameterSpans =
-        [
-            ParamKeys.mutationModKey, [0] |> List.map string
-        ]
     let executionParameterSpans =
         [
             ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128; 256] |> List.map string
+            ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string
             ParamKeys.paraRateKey,    [1.25;] |> List.map string
             ParamKeys.selfSymRateKey, [2.25;]  |> List.map string
             ParamKeys.generationIntervalLastKey, [1] |> List.map string
@@ -31,9 +27,10 @@ let Test () : run =
         SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
         RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
         Source = evoContinuationSource.create {
-            Run = Standard.Pool_32.Test ()
+            SourceRun = Standard.Pool_32.Test ()
             GenerationInterval = 0
-            ParameterSpans = sourceParameterSpans
+            SourceMutationMods = [0]
+            SelectedSorterPoolCount = 1
         }
         ExecutionParameterSpans = executionParameterSpans
     }
@@ -46,10 +43,6 @@ module Pool_128 =
     let V1 () : run =
         let names = RunNaming.create()
 
-        let sourceParameterSpans =
-            [
-                ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-            ]
         let executionParameterSpans =
             [
                 ParamKeys.mutationModKey, [0; 1] |> List.map string
@@ -63,9 +56,10 @@ module Pool_128 =
             SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
             Source = evoContinuationSource.create {
-                Run = Test ()
+                SourceRun = Test ()
                 GenerationInterval = 1
-                ParameterSpans = sourceParameterSpans
+                SourceMutationMods = [0 .. 2]
+                SelectedSorterPoolCount = 3
             }
             ExecutionParameterSpans = executionParameterSpans
         }
@@ -76,10 +70,6 @@ module Pool_512 =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let V1 () : run =
         let names = RunNaming.create()
-        let sourceParameterSpans =
-            [
-                ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-            ]
         let executionParameterSpans =
             [
                 ParamKeys.mutationModKey, [0; 1] |> List.map string
@@ -93,9 +83,10 @@ module Pool_512 =
             SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
             Source = evoContinuationSource.create {
-                Run = Test ()
+                SourceRun = Test ()
                 GenerationInterval = 1
-                ParameterSpans = sourceParameterSpans
+                SourceMutationMods = [0 .. 2]
+                SelectedSorterPoolCount = 3
             }
             ExecutionParameterSpans = executionParameterSpans
         }

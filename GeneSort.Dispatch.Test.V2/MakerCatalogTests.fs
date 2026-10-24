@@ -61,8 +61,8 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
         }
     } {
         MakerNames = names
-        GenSaveIntervalsName = "expInterval100_L50ss"
-        GenSaveSubIntervalsName = "summaryInterval_C.1p5C"
+        GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
+        GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
     }
     |> run.SgdRun
 

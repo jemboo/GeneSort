@@ -206,6 +206,8 @@ module ParamKeys =
     [<Literal>]
     let sourceGenerationIntervalKey = "SourceGenerationInterval"
     [<Literal>]
+    let sourceMutationModKey = "SourceMutationMod"
+    [<Literal>]
     let sourcePoolFileIdKey = "SourcePoolFileId"
     [<Literal>]
     let sourceProjectNameKey = "SourceProjectName"
@@ -219,3 +221,9 @@ module ParamKeys =
     let startingReplKey = "StartingRepl"
     [<Literal>]
     let textReportNameKey = "TextReportName"
+
+    /// Resolve a source filter against the immediate source's own parameters.
+    let sourceParameterKey = function
+        | key when key = sourceMutationModKey -> mutationModKey
+        | key when key = sourceRunNameKey -> runNameKey
+        | key -> key

@@ -16,11 +16,6 @@ module Pool_32_condense =
     let Test () : run =
         let names = RunNaming.create()
         // Rank only these source MutationMods during preparation.
-        let sourceParameterSpans =
-            [
-                ParamKeys.selectedSorterPoolCountKey, [2] |> List.map string
-                ParamKeys.mutationModKey, [0 .. 3] |> List.map string
-            ]
         let executionParameterSpans =
             [
                 ParamKeys.generationIntervalLastKey, [3] |> List.map string
@@ -32,9 +27,10 @@ module Pool_32_condense =
             SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
             Source = evoContinuationSource.create {
-                Run = Standard.Pool_32.Test ()
+                SourceRun = Standard.Pool_32.Test ()
                 GenerationInterval = 2
-                ParameterSpans = sourceParameterSpans
+                SourceMutationMods = [0 .. 3]
+                SelectedSorterPoolCount = 2
             }
             ExecutionParameterSpans = executionParameterSpans
         }

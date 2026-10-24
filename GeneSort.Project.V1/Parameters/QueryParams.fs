@@ -139,8 +139,13 @@ module QueryParams =
         match sourceKey |> Option.bind (fun key -> Map.tryFind key parameters.ParamMap) with
         | None -> query
         | Some value ->
-            queryParams.createForImportedFile query.DbName query.ProjectName (parameters.GetRepl()) query.OutputDataType
-                (System.Guid.Parse value |> UMX.tag)
+            let imported = queryParams.createForImportedFile query.DbName query.ProjectName (parameters.GetRepl()) query.OutputDataType
+                                (System.Guid.Parse value |> UMX.tag)
+            // Converted pools have their own Setup identity; provenance still records the original source file.
+            let referenceKey = SetupFileReferences.keyForOutputType query.OutputDataType
+            match Map.tryFind referenceKey parameters.ParamMap with
+            | Some id -> { imported with id = System.Guid.Parse id |> UMX.tag }
+            | None -> imported
 
     // Creates a dataTableRecord from the Properties only, treating each of them as keys.
     let makeDataTableRecord (qp: queryParams) : GeneSort.Core.dataTableRecord =
