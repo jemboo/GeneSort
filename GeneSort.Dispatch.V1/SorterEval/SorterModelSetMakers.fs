@@ -7,6 +7,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 
@@ -29,7 +30,8 @@ module SorterModelSetMakers =
                 host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                 |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
 
-            let modelGen = CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
+            let! modelGen = CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
+                            |> SeedSorterModelGeneration.applyParameters rp
             let baseFirstIdx = (%repl * %totalSorterCount) |> UMX.tag<sorterCount>
 
             let modelSet = SorterModelGen.makeSorterModelSetFromIndexSpan (Guid.Empty |> UMX.tag) baseFirstIdx totalSorterCount modelGen

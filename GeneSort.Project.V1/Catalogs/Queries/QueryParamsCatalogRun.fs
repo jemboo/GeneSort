@@ -83,6 +83,10 @@ module QueryParamsCatalogRun =
                     | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _
                     | QueryCatalogNamesRun.sortableTestPrefix, geneSortDataType.SortableTests _ -> []
                     | _ -> SetupFileReferences.fromRunParameters parameters
+                let references =
+                    references @
+                        ([ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
+                         |> List.choose (fun key -> Map.tryFind key parameters.ParamMap |> Option.map (fun value -> key, value)))
                 if List.isEmpty references then query
                 else
                     let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties

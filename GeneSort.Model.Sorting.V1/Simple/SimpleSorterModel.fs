@@ -24,6 +24,15 @@ type simpleSorterModel =
 
 
 module SimpleSorterModel =
+
+    /// Number of entries in the model's underlying array, before expanding to comparison elements.
+    let getLength (model: simpleSorterModel) : int =
+        match model with
+        | Msce model -> model.CeCodes.Length
+        | Mssi model -> model.Perm_Sis.Length
+        | Msrs model -> model.Perm_Rss.Length
+        | Msuf4 model -> model.TwoOrbitUnfolder4s.Length
+        | Msuf6 model -> model.TwoOrbitUnfolder6s.Length
     
     let getId (model: simpleSorterModel) : Guid<sorterModelId> =
         match model with

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -22,8 +22,15 @@
     <Compile Include="Simple\Uf6\Msuf6RandGenDto.fs" />
     <Compile Include="Simple\Uf6\Msuf6RandMutateDto.fs" />
     <Compile Include="Simple\SimpleSorterModelDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelRDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelSDto.fs" />
     <Compile Include="Simple\SimpleSorterModelGenDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelRGenDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelSGenDto.fs" />
+    <Compile Include="SorterModelGenDto.fs" />
     <Compile Include="Simple\SimpleSorterModelMutateDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelRMutatorDto.fs" />
+    <Compile Include="Simple\SimpleSorterModelSMutatorDto.fs" />
     <Compile Include="SorterModelDto.fs" />
     <Compile Include="SorterModelSetDto.fs" />
     <Compile Include="Program.fs" />

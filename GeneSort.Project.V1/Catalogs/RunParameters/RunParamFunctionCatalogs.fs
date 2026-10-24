@@ -121,6 +121,12 @@ module RunParamEnhancerBuilders =
                     let value = setup.ParamMap.TryFind key
                                 |> Option.defaultWith (fun () -> invalidOp (sprintf "Prefix evaluation setup is missing '%s'." key))
                     Map.add key value map) rp.ParamMap
+                |> fun map ->
+                    [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey]
+                    |> List.fold (fun map key ->
+                        match setup.ParamMap.TryFind key with
+                        | Some value -> Map.add key value map
+                        | None -> map) map
                 |> runParameters.create
         let qp = queryParamsForRun context rp
         let prefixLibId = rp.GetPrefixLibId().Value
@@ -220,16 +226,32 @@ module RunParamEnhancerBuilders =
                 true
                 None
 
+        let private combineSetup (context: runParamEnhancerContext) (parameters: runParameters) =
+            match context.SetupParameters with
+            | None -> parameters
+            | Some setup ->
+                Map.fold (fun map key value -> Map.add key value map) setup.ParamMap parameters.ParamMap
+                |> runParameters.create
+
         /// Combine the seed setup with the independently varied evolution settings.
         let msuf32FromSetup : runParamEnhancerBuilder =
-            fun context parameters ->
-                let combined =
-                    match context.SetupParameters with
-                    | None -> parameters
-                    | Some setup ->
-                        Map.fold (fun map key value -> Map.add key value map) setup.ParamMap parameters.ParamMap
-                        |> runParameters.create
+            fun context parameters -> msuf32MutationRate context (combineSetup context parameters)
+
+        /// Supply the SimpleR mutation default before execution IDs are calculated.
+        let msuf32RFromSetup : runParamEnhancerBuilder = fun context parameters ->
+            let combined = combineSetup context parameters
+            if Map.containsKey ParamKeys.activationProbabilityKey combined.ParamMap then
+                invalidArg "parameters" "SimpleR execution uses AMax; ActivationProbability belongs to SimpleS."
+            match combined.GetAMax() with
+            | Some maximum when maximum >= 0 -> ()
+            | _ -> invalidArg "parameters" "SimpleR execution requires a nonnegative integer AMax from setup."
+            let combined =
+                if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
+                else combined.WithActivatorMutationRate(Some 0.1)
+            match combined.GetActivatorMutationRate() with
+            | Some rate when System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
                 msuf32MutationRate context combined
+            | _ -> invalidArg "parameters" "SimpleR execution requires a finite ActivatorMutationRate between 0 and 1."
 
         let msrs32MutationRate =
             fromGlobalSorterCount
@@ -301,6 +323,10 @@ module RunParamBuilderNames =
         [<Literal>]
         let evoMsuf32 = "sgd-evo-msuf32"
         [<Literal>]
+        let evoMsuf32R = "sgd-evo-msuf32-r"
+        [<Literal>]
+        let sossMsuf32R = "sgd-soss-msuf32-r"
+        [<Literal>]
         let msrs32MutationRate = "sgd-msrs32-mutation-rate"
         [<Literal>]
         let msrs32MutationRateMax = "sgd-msrs32-mutation-rate-max"
@@ -331,6 +357,8 @@ module RunParamBuilders =
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msuf32MutationRate RunParamEnhancerBuilders.Sgd.msuf32MutationRate |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sossMsuf32 RunParamEnhancerBuilders.Sgd.msuf32FromSetup |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.evoMsuf32 RunParamEnhancerBuilders.Sgd.msuf32FromSetup |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.evoMsuf32R RunParamEnhancerBuilders.Sgd.msuf32RFromSetup |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sossMsuf32R RunParamEnhancerBuilders.Sgd.msuf32RFromSetup |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRate RunParamEnhancerBuilders.Sgd.msrs32MutationRate |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRateMax RunParamEnhancerBuilders.Sgd.msrs32MutationRateMax |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msuf624p3bMutationRate RunParamEnhancerBuilders.Sgd.msuf624p3bMutationRate |> ignore

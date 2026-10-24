@@ -93,7 +93,7 @@ module Utils =
         }
 
     /// Dynamically discovers and yields contiguous slices lazily as an Async sequence generator.
-    /// Uses GenIntervalConfig.getSamplesWithMinBound without artificially capping sequence length.
+    /// Stops at the configured horizon even when another run has saved later slices.
     let loadAvailableOutputData<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: geneSortDataType)
@@ -104,8 +104,14 @@ module Utils =
             (cts: CancellationToken)
             (log: string -> unit) : Async<seq<'T>> =
         async {
+            let lastGeneration =
+                rp.GetGenerationIntervalLast()
+                |> Option.map (fun interval ->
+                    GenIntervalConfig.getSampleAtIndex saveConfig (int interval)
+                    |> Option.defaultWith (fun () -> invalidArg "rp" "Invalid final generation interval."))
             let genSequence =
                 GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
+                |> Seq.takeWhile (fun generation -> lastGeneration |> Option.forall (fun last -> generation <= last))
                 |> Seq.filter (fun generation ->
                     rp.GetGenerationFirst() |> Option.forall (fun first -> generation > %first))
             let rec discoverLazy (gens: int seq) = seq {

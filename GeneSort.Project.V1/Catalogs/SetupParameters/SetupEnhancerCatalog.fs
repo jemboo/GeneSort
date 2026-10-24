@@ -35,6 +35,10 @@ module SetupEnhancerFunctionNames =
     let sossMsuf32 = "setup-enhancer.soss-msuf32"
     [<Literal>]
     let standardMsuf32 = "setup-enhancer.standard-msuf32"
+    [<Literal>]
+    let standardMsuf32R = "setup-enhancer.standard-msuf32-r"
+    [<Literal>]
+    let sossMsuf32R = "setup-enhancer.soss-msuf32-r"
 
 /// Setup enhancers supply file references for the associated run parameters.
 module SetupEnhancerCatalog =
@@ -86,6 +90,20 @@ module SetupEnhancerCatalog =
     let standardMsuf32 : setupEnhancerFunction = fun context parameters ->
         sossMsuf32 context parameters |> sorterSgd context
 
+    /// SimpleR defaults apply before queries are built, so AMax participates in seed identity.
+    let private withSimpleR (enhancer: setupEnhancerFunction) : setupEnhancerFunction = fun context parameters ->
+        if Map.containsKey ParamKeys.activationProbabilityKey parameters.ParamMap then
+            invalidArg "parameters" "SimpleR setup uses AMax; ActivationProbability belongs to SimpleS."
+        let parameters =
+            if Map.containsKey ParamKeys.aMaxKey parameters.ParamMap then parameters
+            else parameters.WithAMax(Some 3)
+        match parameters.GetAMax() with
+        | Some maximum when maximum >= 0 -> enhancer context parameters
+        | _ -> invalidArg "parameters" "SimpleR setup requires a nonnegative integer AMax."
+
+    let standardMsuf32R = withSimpleR standardMsuf32
+    let sossMsuf32R = withSimpleR sossMsuf32
+
     let private syncRoot = obj ()
     let mutable private functions =
         Map.ofList [
@@ -97,6 +115,8 @@ module SetupEnhancerCatalog =
             SetupEnhancerFunctionNames.sorterSgd, sorterSgd
             SetupEnhancerFunctionNames.sossMsuf32, sossMsuf32
             SetupEnhancerFunctionNames.standardMsuf32, standardMsuf32
+            SetupEnhancerFunctionNames.standardMsuf32R, standardMsuf32R
+            SetupEnhancerFunctionNames.sossMsuf32R, sossMsuf32R
         ]
 
     let register name (enhancer: setupEnhancerFunction) =

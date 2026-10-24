@@ -16,6 +16,7 @@ open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
@@ -88,21 +89,23 @@ module SorterMutateExecutor =
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = MutatorParams.toModelMutator
+            let! sorterModelMutator = MutatorParams.toModelMutator
                                             modificationRate
                                             mutatorPrams
+                                        |> MutatorMakers.applyParameters rp
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
 
@@ -189,20 +192,22 @@ module SorterMutateExecutor =
                                         parentSorterSetEval.SorterEvals   
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         mrgLibid.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = MutatorParams.toModelMutator
+            let! sorterModelMutator = MutatorParams.toModelMutator
                                             modificationRate
                                             mutatorPrams
+                                        |> MutatorMakers.applyParameters rp
 
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]
@@ -291,20 +296,22 @@ module SorterMutateExecutor =
                                         parentSorterSetEval.SorterEvals   
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         pfxLibid.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let sorterModelMutator = MutatorParams.toModelMutator
+            let! sorterModelMutator = MutatorParams.toModelMutator
                                             modificationRate
                                             mutatorPrams
+                                        |> MutatorMakers.applyParameters rp
 
 
             let childIndexes = [| 0 .. (%sorterChildCount - 1) |]

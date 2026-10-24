@@ -66,6 +66,7 @@
     <Compile Include="ReportOps.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Test.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Standard.fs" />
+    <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\SimpleR.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Standard_append.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Standard_condense.fs" />
     <Compile Include="SorterSgd\RunCfg\p32\Msuf4a\Soss.fs" />

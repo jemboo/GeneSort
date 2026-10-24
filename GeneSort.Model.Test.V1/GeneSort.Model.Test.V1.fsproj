@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <Compile Include="Tests.fs" />
+    <Compile Include="SimpleSorterModelRTests.fs" />
+    <Compile Include="SimpleSorterModelSTests.fs" />
+    <Compile Include="SimpleSorterModelRGenTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

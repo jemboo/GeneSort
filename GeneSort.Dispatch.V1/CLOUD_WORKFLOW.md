@@ -10,6 +10,95 @@ runs with one pool of 32 sorters for each mutation value 0–3. Run the desired 
 setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
 `TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
 All OnePool configurations use 32 total sorters and one pool per pool set.
+
+`OnePool.SimpleR` adds `Standard`, `Soss`, `StandardAppend`, and `SossCondense`.
+Edit its `aMax` and `activatorMutationRate` settings to configure these tests.
+The existing OnePool runner discovers them automatically. StandardAppend continues
+all four base executions; SossCondense selects two source pools and expands each
+into mutation variants 0 and 1. Each resulting execution has one pool of 32.
+
+For SimpleR in dispatch, add `ParamKeys.aMaxKey` (`AMax`, a nonnegative integer)
+to setup spans and `ParamKeys.activatorMutationRateKey` (`ActivatorMutationRate`,
+a finite probability from 0 to 1) to execution spans. Keep the underlying
+`SimpleSorterModelType` such as `Msuf4`. AMax opts into SimpleR generation;
+without either activation setting the existing Simple behavior is unchanged. Seed activators are uniform
+in `[-AMax, AMax]`. Each selected mutation steps an activator by +/-1, clamped to
+those bounds. Append and Condense inherit both settings; changing AMax requires
+new seeds, while the activator mutation rate may be overridden for execution.
+The values participate in file identities and appear in summary metadata.
+
+`SorterSgd.RunCfg.p32.Msuf4a.SimpleR` provides `Standard.Test`,
+`Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`. Each execution
+has one pool of 32, with mutation variants 0–3. Test runs use 10 generations;
+the rate sweeps use 100 generations and cross AMax values 1, 3, 7 with activator
+mutation rates 0.05, 0.1, 0.2 (36 executions per replica).
+The `standardMsuf32R` / `sossMsuf32R` setup enhancer entries default AMax to 3;
+the `evoMsuf32R` / `sossMsuf32R` execution enhancers default activator mutation
+rate to 0.1. Explicit spans override these defaults. Invalid activation settings
+are rejected during parameter preparation. These presets use the existing prefix
+seed-evaluation and sortable-test catalogs; prepare `SorterEval.RunCfg.Prefix.Width32`
+and `SortableTests.RunCfg.Prefix.Width32` before setup. Automatic naming produces
+project `SorterSgd.RunCfg.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
+and run names matching the preset functions.
+Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleR`; it prepares
+the prerequisites, runs replica 0, resumes completed work, regenerates reports,
+and verifies the sweep, pool sizes, activation settings and every generation.
+The aggregate is saved as `Reports/Msuf4a_SimpleR_SummaryReport.txt` under the
+SimpleR project folder, with `Workflow` identifying the Standard/Soss databases.
+Use `scripts/Compare-Msuf4aSimpleR.ps1 -ReportPath <path>` for endpoint and
+trajectory comparisons across AMax and activator rates. The four mutation
+variants share a seed replica; these results are exploratory rather than a
+comparison across independent seed replicas.
+
+`OnePool.SimpleS` provides `StandardS`, `SossS`, `StandardAppendS`, and
+`SossCondenseS`, with the same pool counts and continuation structure as SimpleR.
+Its `activationProbability` defaults to 0.5 and `activatorMutationRate` to 0.1.
+Distinct run names identify these runs in the combined report.
+
+For SimpleS, set `ParamKeys.activationProbabilityKey` (`ActivationProbability`)
+in setup instead of `AMax`, and supply `ActivatorMutationRate` in execution.
+Both probabilities must be finite and between 0 and 1. Generation initializes
+each boolean independently; only true entries contribute to the sorter.
+Mutation flips each boolean at the configured rate. CE insertion/deletion keeps
+activators aligned with their entries, with inserted entries initially false
+before activator mutation. `AMax` and `ActivationProbability` are mutually
+exclusive. Continuations inherit the model family and settings; execution uses
+the prepared models rather than generating activators again. The OnePool audit
+checks model family, activator lengths, and report metadata for both families.
+
+`OnePool.Controlled` compares Simple, SimpleR, and SimpleS under Standard and
+Soss, with 5 replicas, mutation variants 0–1, and 100 generations. Run just this
+experiment with `scripts/Run-OnePool.ps1 -ControlledOnly`. The ordinary full
+OnePool script includes it as well, using its configured replica count.
+
+`ControlledSeedAMax` opts into deterministic, unselected random seeds generated
+during setup instead of importing ranked seed evaluations. Underlying generator,
+replica, and model index determine seed model IDs, independently of workflow,
+mutation variant, and representation. All three families share the underlying
+models. R draws uniform integers in [-3,3]; S copies the exact positive-entry mask
+from those draws (nominal activation probability 3/7). Both use activator mutation
+rate 0.1, which means bounded integer steps for R and flips for S. This controls
+initial activity, not the later probability of changing active status.
+
+`MatchedStandardS` and `MatchedSossS` add S comparisons at mutation rate
+`0.1 / 7` against the same `StandardR` and `SossR` baselines. For uniformly
+distributed R activators, only 0 -> 1 and 1 -> 0 flip activity, each with
+probability `0.1 / 2`, giving an expected flip rate of about 1.43% per entry.
+These runs reuse the exact seed masks, replicas, mutation variants and schedule.
+The match is for the initial uniform distribution (also the neutral random
+walk's stationary distribution); selection can change R's boundary occupancy
+and therefore its later effective flip rate. It does not guarantee equal
+realized flip counts throughout evolution.
+
+The audit compares the saved underlying model DTOs and R/S masks, checks all
+100 generations per evaluation subset, and verifies every expected execution.
+Controlled-only output is `OnePool_Controlled_SummaryReport.txt` in the base
+OnePool report folder. `scripts/Compare-OnePoolControlled.ps1 -ReportPath <path>`
+summarizes endpoint metrics and paired differences after averaging the mutation
+variants within each replica. Standard reports generations 0–99 and Soss 1–100;
+compare model families within each workflow. Prefix test data is shared at
+replica zero; the five experimental replicas vary the seed models.
+
 Append tests use source mutation 0 and branch into mutation values 0–2,
 preserving one pool of 32 in each of three runs. Condense tests rank all four
 source mutation values and select the best two per replica. Both continuation workflows finish at interval 1, using the base's

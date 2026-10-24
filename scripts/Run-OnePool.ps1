@@ -3,6 +3,8 @@ param(
     [ValidateRange(1, 1024)]
     [int] $MaxParallel = 8,
     [switch] $ListOnly,
+    [switch] $ControlledOnly,
+    [switch] $Msuf4aSimpleR,
     [switch] $NoBuild
 )
 
@@ -13,6 +15,7 @@ $auditProject = Join-Path $PSScriptRoot 'OnePoolAudit/OnePoolAudit.fsproj'
 $audit = Join-Path $PSScriptRoot 'OnePoolAudit/bin/Debug/net10.0/OnePoolAudit.dll'
 
 try {
+    if ($ControlledOnly -and $Msuf4aSimpleR) { throw 'Choose either -ControlledOnly or -Msuf4aSimpleR.' }
     if (-not $NoBuild) {
         & dotnet build $project --configuration Debug --verbosity quiet -m:1
         if ($LASTEXITCODE -ne 0) { throw "OnePool runner build failed (exit $LASTEXITCODE)." }
@@ -24,12 +27,17 @@ try {
 
     $runnerArgs = @([string] $MaxParallel)
     if ($ListOnly) { $runnerArgs = @('--list') + $runnerArgs }
+    if ($ControlledOnly) { $runnerArgs = @('--controlled') + $runnerArgs }
+    if ($Msuf4aSimpleR) { $runnerArgs = @('--msuf4r') + $runnerArgs }
     & dotnet $runner @runnerArgs
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     if ($ListOnly) { exit 0 }
 
     Write-Host 'Verifying pool sizes, source selections, mutation expansion, and the combined summary...'
-    & dotnet $audit --combine
+    $auditArgs = @('--combine')
+    if ($ControlledOnly) { $auditArgs += '--controlled' }
+    if ($Msuf4aSimpleR) { $auditArgs += '--msuf4r' }
+    & dotnet $audit @auditArgs
     exit $LASTEXITCODE
 }
 catch {

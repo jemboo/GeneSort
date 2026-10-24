@@ -68,3 +68,12 @@ module QueryParamsCatalogSetup =
         let builder = lookup name
         fun project database parameters outputType ->
             builder project database (SetupFileReferences.withoutReferences parameters) outputType
+            |> Option.map (fun query ->
+                let properties =
+                    [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
+                    |> List.fold (fun map key ->
+                        match Map.tryFind key parameters.ParamMap with
+                        | Some value -> Map.add key value map
+                        | None -> map) query.Properties
+                if properties = query.Properties then query
+                else queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))

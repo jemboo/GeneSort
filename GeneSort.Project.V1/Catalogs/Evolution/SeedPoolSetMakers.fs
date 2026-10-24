@@ -67,12 +67,13 @@ module SeedPoolSetMakers =
                     simpleSorterModelType 
                     GeneSort.SortingOps.sorterEvalType.V2
 
-            let seedSorterModelGen = 
+            let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     sortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let sorterEvalSelection = 
                 SorterSelection.makeSelection 
@@ -150,12 +151,13 @@ module SeedPoolSetMakers =
 
 
 
-            let seedSorterModelGen = 
+            let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     mrgLibid.SortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let sorterEvalSelection = 
                 SorterSelection.makeSelection 
@@ -234,12 +236,13 @@ module SeedPoolSetMakers =
                     repl
                     simpleSorterModelType
 
-            let seedSorterModelGen = 
+            let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
                     pfxLibId.SortingWidth 
                     simpleSorterModelType
                     excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let sorterEvalSelection =
                 SorterSelection.makeSelection 
@@ -265,11 +268,22 @@ module SeedPoolSetMakers =
         }
 
 
+    let private buildSeed builder sources (rp: runParameters) =
+        if Map.containsKey ParamKeys.controlledSeedAMaxKey rp.ParamMap then
+            async {
+                return SeedSorterModelGeneration.makeControlledModelSet rp |> Result.map (fun models ->
+                    let labels = models.SorterModels |> Array.mapi (fun i model -> SorterModel.getId model, evalLabel.RankIndex i) |> Map.ofArray
+                    SorterPoolSet_Standard.fromSorterModelSet (UMX.tag (Guid.NewGuid()))
+                        1<sorterPoolCount> (rp.GetSorterCountPerPool().Value) 0<generationNumber> labels models
+                        (rp.GetMutationMod().Value) (latticeBounds.Dim1 1))
+            }
+        else builder sources rp
+
     let private wrapStandard builder sources rp =
-        builder sources rp |> Async.map (Result.map sorterPoolSet.Standard)
+        buildSeed builder sources rp |> Async.map (Result.map sorterPoolSet.Standard)
 
     let private wrapSoss builder sources rp =
-        builder sources rp
+        buildSeed builder sources rp
         |> Async.map (Result.map (GeneSort.Eval.V1.Sgd.Soss.SorterPoolSet_Soss.fromStandard >> sorterPoolSet.Soss))
 
     let createStandardSeedSorterPoolSetStandard sources rp = wrapStandard buildStandard sources rp

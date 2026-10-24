@@ -8,6 +8,7 @@ open GeneSort.Core
 open GeneSort.Core.Mp
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.Model.Sorting.V1.Simple
 open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
@@ -443,17 +444,31 @@ let ``seed catalogs produce the requested pool variant`` (name: string) (expectS
             .WithSeedSorterPoolSelectionType(Some (sorterSelectionType.GuidOrder 1<sorterCount>))
             .WithExcludeSelfCe(Some (UMX.tag<excludeSelfCe> true))
             .WithMutationMod(Some 0<mutationMod>)
-    let poolSet =
-        match SeedSorterPoolSetMakerCatalog.get name supplied parameters |> Async.RunSynchronously with
-        | Ok value -> value
-        | Error error -> failwith error
-    match poolSet with
-    | sorterPoolSet.Standard value ->
-        Assert.False(expectSoss)
-        Assert.Single(value.SorterPools) |> ignore
-    | sorterPoolSet.Soss value ->
-        Assert.True(expectSoss)
-        Assert.Single(value.SorterPools) |> ignore
+    for maximum, probability in [None, None; Some 3, None; None, Some 0.5] do
+        let poolSet =
+            match SeedSorterPoolSetMakerCatalog.get name supplied ((parameters.WithAMax maximum).WithActivationProbability probability) |> Async.RunSynchronously with
+            | Ok value -> value
+            | Error error -> failwith error
+        let models =
+            match poolSet with
+            | sorterPoolSet.Standard value ->
+                Assert.False(expectSoss)
+                Assert.Single(value.SorterPools) |> ignore
+                value.SorterPools |> Map.values |> Seq.collect (fun p -> p.SorterPoolMembers |> Seq.map (fun m -> m.SorterModel))
+            | sorterPoolSet.Soss value ->
+                Assert.True(expectSoss)
+                Assert.Single(value.SorterPools) |> ignore
+                value.SorterPools |> Map.values |> Seq.collect (fun p -> p.SorterPoolMembers |> Seq.map (fun m -> m.SorterModel))
+        Assert.All(models, fun model ->
+            match maximum, model with
+            | None, sorterModel.SimpleS paired when probability.IsSome ->
+                Assert.Equal(SimpleSorterModel.getLength paired.Model, paired.Activators.Length)
+            | None, sorterModel.Simple _ -> ()
+            | Some expected, sorterModel.SimpleR paired ->
+                Assert.Equal(expected, paired.AMax)
+                Assert.Equal(SimpleSorterModel.getLength paired.Model, paired.Activators.Length)
+                Assert.All(paired.Activators, fun value -> Assert.InRange(value, -expected, expected))
+            | _ -> failwith "Seed model family does not match AMax")
 
 [<Theory>]
 [<InlineData(true)>]

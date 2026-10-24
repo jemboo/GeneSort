@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1
+namespace GeneSort.Model.Sorting.V1
 
 open System
 open FSharp.UMX
@@ -39,21 +39,15 @@ type sorterModelSet =
 module SorterModelSet =
 
     let getSortingWidth (model: sorterModel) : int<sortingWidth> =
-        match model with
-        | Simple sms -> sms |> SimpleSorterModel.getSortingWidth
-        | Unknown -> failwith "Unknown sorterModel"
+        SorterModel.getSortingWidth model
 
 
     let getStageLength (model: sorterModel) : int<stageLength> =
-        match model with
-        | Simple sms -> sms |> SimpleSorterModel.getStageLength
-        | Unknown -> failwith "Unknown sorterModel"
+        SorterModel.getStageLength model
 
     
     let getId (model: sorterModel) : Guid<sorterModelId> =
-        match model with
-        | Simple sms -> sms |> SimpleSorterModel.getId
-        | Unknown -> failwith "Unknown sorterModel"
+        SorterModel.getId model
 
 
     let makeSorterSet (id:Guid<sorterSetId>) 

@@ -7,17 +7,20 @@ open GeneSort.Core
 type rngTypeDto =
     | Lcg = 0
     | Net = 1
+    | Smx = 2
 
 module RngTypeDto =
     let fromDomain (rngType: rngType) : rngTypeDto =
         match rngType with
         | Lcg -> rngTypeDto.Lcg
         | Net -> rngTypeDto.Net
+        | Smx -> rngTypeDto.Smx
     
     let toDomain (dto: rngTypeDto) : rngType =
         match dto with
         | rngTypeDto.Lcg -> Lcg
         | rngTypeDto.Net -> Net
+        | rngTypeDto.Smx -> Smx
         | _ -> failwith "Invalid rngTypeDto value"
 
 type rngFactoryDto = {

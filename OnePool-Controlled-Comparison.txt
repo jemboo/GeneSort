@@ -1,0 +1,91 @@
+Controlled OnePool comparison
+Endpoint metrics average equally sized pools. Soss uses Merge evaluations only.
+Paired comparisons average mutation variants within each replica first; replicas are the independent units.
+
+Standard
+StandardSimple: generation=99, executions=10, replicas=5, CEs=243.08125, stages=24.95000, score=270.52625, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=0, CEs=308.76875, stages=38.33750, score=350.94000, averageUnsorted=27.77600
+  After 10 reported generations: CEs=281.00313, stages=32.86563, score=317.15531, averageUnsorted=0.00000
+  After 20 reported generations: CEs=270.90625, stages=30.30625, score=304.24312, averageUnsorted=0.00000
+  After 50 reported generations: CEs=253.73125, stages=27.10625, score=283.54813, averageUnsorted=0.00000
+  After 100 reported generations: CEs=243.08125, stages=24.95000, score=270.52625, averageUnsorted=0.00000
+  Replica 0: CEs=246.75000, stages=25.75000, score=275.07500
+  Replica 1: CEs=235.46875, stages=24.10938, score=261.98906
+  Replica 2: CEs=247.81250, stages=26.20312, score=276.63594
+  Replica 3: CEs=242.04688, stages=23.64062, score=268.05156
+  Replica 4: CEs=243.32812, stages=25.04688, score=270.87969
+StandardR: generation=99, executions=10, replicas=5, CEs=247.94063, stages=25.58750, score=276.08688, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=0, CEs=305.31250, stages=37.83125, score=346.92687, averageUnsorted=962.81200
+  After 10 reported generations: CEs=285.38125, stages=33.35000, score=322.06625, averageUnsorted=0.00000
+  After 20 reported generations: CEs=272.18437, stages=30.64688, score=305.89594, averageUnsorted=0.00000
+  After 50 reported generations: CEs=256.96562, stages=27.56563, score=287.28781, averageUnsorted=0.00000
+  After 100 reported generations: CEs=247.94063, stages=25.58750, score=276.08688, averageUnsorted=0.00000
+  Replica 0: CEs=246.35938, stages=24.40625, score=273.20625
+  Replica 1: CEs=246.59375, stages=25.70312, score=274.86719
+  Replica 2: CEs=251.93750, stages=26.20312, score=280.76094
+  Replica 3: CEs=252.54688, stages=26.68750, score=281.90313
+  Replica 4: CEs=242.26562, stages=24.93750, score=269.69687
+CompareStandardS: generation=99, executions=10, replicas=5, CEs=256.54062, stages=27.66562, score=286.97281, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=0, CEs=305.31250, stages=37.83125, score=346.92687, averageUnsorted=962.81200
+  After 10 reported generations: CEs=287.46250, stages=33.65000, score=324.47750, averageUnsorted=0.00000
+  After 20 reported generations: CEs=277.53125, stages=31.79375, score=312.50437, averageUnsorted=0.00000
+  After 50 reported generations: CEs=264.59375, stages=29.41875, score=296.95437, averageUnsorted=0.00000
+  After 100 reported generations: CEs=256.54062, stages=27.66562, score=286.97281, averageUnsorted=0.00000
+  Replica 0: CEs=252.54688, stages=26.95312, score=282.19531
+  Replica 1: CEs=255.03125, stages=27.56250, score=285.35000
+  Replica 2: CEs=260.79688, stages=28.37500, score=292.00937
+  Replica 3: CEs=258.35938, stages=28.03125, score=289.19375
+  Replica 4: CEs=255.96875, stages=27.40625, score=286.11563
+  StandardR minus StandardSimple, CE: mean=4.85938, range=[-1.06250, 11.12500], lower in 2/5 replicas
+  StandardR minus StandardSimple, Stages: mean=0.63750, range=[-1.34375, 3.04688], lower in 2/5 replicas
+  StandardR minus StandardSimple, Score: mean=5.56063, range=[-1.86875, 13.85156], lower in 2/5 replicas
+  CompareStandardS minus StandardSimple, CE: mean=13.45937, range=[5.79688, 19.56250], lower in 0/5 replicas
+  CompareStandardS minus StandardSimple, Stages: mean=2.71563, range=[1.20312, 4.39062], lower in 0/5 replicas
+  CompareStandardS minus StandardSimple, Score: mean=16.44656, range=[7.12031, 23.36094], lower in 0/5 replicas
+  CompareStandardS minus StandardR, CE: mean=8.60000, range=[5.81250, 13.70312], lower in 0/5 replicas
+  CompareStandardS minus StandardR, Stages: mean=2.07812, range=[1.34375, 2.54688], lower in 0/5 replicas
+  CompareStandardS minus StandardR, Score: mean=10.88594, range=[7.29062, 16.41875], lower in 0/5 replicas
+
+Soss
+SossSimple: generation=100, executions=10, replicas=5, CEs=245.64687, stages=24.89688, score=273.03344, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=1, CEs=301.56563, stages=36.74063, score=341.98031, averageUnsorted=0.00000
+  After 10 reported generations: CEs=280.52500, stages=32.38437, score=316.14781, averageUnsorted=0.00000
+  After 20 reported generations: CEs=271.11563, stages=30.24063, score=304.38031, averageUnsorted=0.00000
+  After 50 reported generations: CEs=256.01875, stages=27.24687, score=285.99031, averageUnsorted=0.00000
+  After 100 reported generations: CEs=245.64687, stages=24.89688, score=273.03344, averageUnsorted=0.00000
+  Replica 0: CEs=246.12500, stages=25.48438, score=274.15781
+  Replica 1: CEs=243.90625, stages=24.75000, score=271.13125
+  Replica 2: CEs=248.46875, stages=25.48438, score=276.50156
+  Replica 3: CEs=242.48438, stages=23.50000, score=268.33438
+  Replica 4: CEs=247.25000, stages=25.26562, score=275.04219
+SossR: generation=100, executions=10, replicas=5, CEs=248.35625, stages=25.65312, score=276.57469, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=1, CEs=306.92102, stages=37.60681, score=348.28850, averageUnsorted=0.06300
+  After 10 reported generations: CEs=284.08438, stages=33.33750, score=320.75562, averageUnsorted=0.00600
+  After 20 reported generations: CEs=272.69063, stages=30.89062, score=306.67031, averageUnsorted=0.00000
+  After 50 reported generations: CEs=258.04375, stages=27.46250, score=288.25250, averageUnsorted=0.00600
+  After 100 reported generations: CEs=248.35625, stages=25.65312, score=276.57469, averageUnsorted=0.00000
+  Replica 0: CEs=249.07812, stages=24.67188, score=276.21719
+  Replica 1: CEs=250.03125, stages=26.18750, score=278.83750
+  Replica 2: CEs=249.78125, stages=26.84375, score=279.30938
+  Replica 3: CEs=251.46875, stages=25.07812, score=279.05469
+  Replica 4: CEs=241.42188, stages=25.48438, score=269.45469
+CompareSossS: generation=100, executions=10, replicas=5, CEs=258.20625, stages=28.03750, score=289.04750, averageUnsorted=0.00000, poolsWithFailures=0
+  Initial generation=1, CEs=306.91515, stages=38.11916, score=348.84623, averageUnsorted=0.03200
+  After 10 reported generations: CEs=286.64062, stages=33.62188, score=323.62469, averageUnsorted=0.00000
+  After 20 reported generations: CEs=277.19375, stages=31.65312, score=312.01219, averageUnsorted=0.01900
+  After 50 reported generations: CEs=265.06250, stages=29.56250, score=297.58125, averageUnsorted=0.00600
+  After 100 reported generations: CEs=258.20625, stages=28.03750, score=289.04750, averageUnsorted=0.00000
+  Replica 0: CEs=252.21875, stages=26.71875, score=281.60938
+  Replica 1: CEs=259.23438, stages=28.65625, score=290.75625
+  Replica 2: CEs=259.46875, stages=28.35938, score=290.66406
+  Replica 3: CEs=262.00000, stages=28.29688, score=293.12656
+  Replica 4: CEs=258.10938, stages=28.15625, score=289.08125
+  SossR minus SossSimple, CE: mean=2.70938, range=[-5.82812, 8.98438], lower in 1/5 replicas
+  SossR minus SossSimple, Stages: mean=0.75625, range=[-0.81250, 1.57812], lower in 1/5 replicas
+  SossR minus SossSimple, Score: mean=3.54125, range=[-5.58750, 10.72031], lower in 1/5 replicas
+  CompareSossS minus SossSimple, CE: mean=12.55937, range=[6.09375, 19.51562], lower in 0/5 replicas
+  CompareSossS minus SossSimple, Stages: mean=3.14062, range=[1.23438, 4.79688], lower in 0/5 replicas
+  CompareSossS minus SossSimple, Score: mean=16.01406, range=[7.45156, 24.79219], lower in 0/5 replicas
+  CompareSossS minus SossR, CE: mean=9.85000, range=[3.14062, 16.68750], lower in 0/5 replicas
+  CompareSossS minus SossR, Stages: mean=2.38437, range=[1.51562, 3.21875], lower in 0/5 replicas
+  CompareSossS minus SossR, Score: mean=12.47281, range=[5.39219, 19.62656], lower in 0/5 replicas

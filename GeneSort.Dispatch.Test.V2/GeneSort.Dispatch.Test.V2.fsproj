@@ -11,6 +11,7 @@
     <Compile Include="Tests.fs" />
     <Compile Include="WorkflowFixtures.fs" />
     <Compile Include="MakerCatalogTests.fs" />
+    <Compile Include="SimpleRRunConfigTests.fs" />
     <Compile Include="SetupCatalogTests.fs" />
     <Compile Include="SgdCheckpointTests.fs" />
     <Compile Include="WorkflowPhaseTests.fs" />

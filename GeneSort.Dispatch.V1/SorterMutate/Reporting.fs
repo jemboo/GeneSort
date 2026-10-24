@@ -13,7 +13,9 @@ open GeneSort.Eval.V1
 open GeneSort.Eval.V1.Bins
 open GeneSort.Eval.V1.Sgd.Bins.Standard
 open GeneSort.Project.V1
+open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.OpsUtils
@@ -210,32 +212,33 @@ module Reporting =
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
-                                            excludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                            mutVariant
+            let baseMutator =
+                match rp.GetMutatorParams() with
+                | Some configured -> MutatorParams.toModelMutator modificationRate configured
+                | None ->
+                    SimpleSorterModelMutator.getMsceModelMutator (RngFactory.create rngType)
+                        excludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                        (rp.GetMutatorVariant() |> Option.defaultValue mutatorVariant.V1)
+                    |> sorterModelMutator.Simple
+            let! sorterModelMutator = MutatorMakers.applyParameters rp baseMutator
 
             let parentMutantMap = 
-                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                    SorterModelMutator.makeMutantIdToParentIdMap
                                         sorterModelMutator
-                                        simpleSorterModels
+                                        parentSorterModelSet.SorterModels
                                         %sorterChildCount
                                         mutationMod
 
@@ -328,32 +331,33 @@ module Reporting =
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         mrgLibId.SortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
-                                            excludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                            mutatorVariant.V1
+            let baseMutator =
+                match rp.GetMutatorParams() with
+                | Some configured -> MutatorParams.toModelMutator modificationRate configured
+                | None ->
+                    SimpleSorterModelMutator.getMsceModelMutator (RngFactory.create rngType)
+                        excludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                        (rp.GetMutatorVariant() |> Option.defaultValue mutatorVariant.V1)
+                    |> sorterModelMutator.Simple
+            let! sorterModelMutator = MutatorMakers.applyParameters rp baseMutator
 
             let parentMutantMap = 
-                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                    SorterModelMutator.makeMutantIdToParentIdMap
                                         sorterModelMutator
-                                        simpleSorterModels
+                                        parentSorterModelSet.SorterModels
                                         %sorterChildCount
                                         mutationMod
 
@@ -427,32 +431,33 @@ module Reporting =
                                         parentSorterSetEval.SorterEvals
                                         parentSorterSetEval.SorterTestId
 
-            let (parentSorterModelGen: sorterModelGen) = 
+            let! (parentSorterModelGen: sorterModelGen) =
                 CommonSorterEval.getSimpleUniformSorterModelGen 
                                         rngType 
                                         sortingWidth 
                                         simpleSorterModelType
                                         excludeSelfCe
+                |> SeedSorterModelGeneration.applyParameters rp
 
             let parentSorterModelSet = _sorterEvalSelection.MakeSorterModelSet
                                             (Guid.Empty |> UMX.tag)
                                             parentSorterModelGen
 
-            let simpleSorterModels = parentSorterModelSet.SorterModels |> Array.map (SorterModel.asSimpleSorterModel)
 
-            let sorterModelMutator = SimpleSorterModelMutator.getMsceModelMutator
-                                            (rngType |> RngFactory.create)
-                                            excludeSelfCe
-                                            modificationRate
-                                            mutationRate
-                                            insertionRate
-                                            deletionRate
-                                            mutatorVariant.V1
+            let baseMutator =
+                match rp.GetMutatorParams() with
+                | Some configured -> MutatorParams.toModelMutator modificationRate configured
+                | None ->
+                    SimpleSorterModelMutator.getMsceModelMutator (RngFactory.create rngType)
+                        excludeSelfCe modificationRate mutationRate insertionRate deletionRate
+                        (rp.GetMutatorVariant() |> Option.defaultValue mutatorVariant.V1)
+                    |> sorterModelMutator.Simple
+            let! sorterModelMutator = MutatorMakers.applyParameters rp baseMutator
 
             let parentMutantMap = 
-                    SimpleSorterModelMutator.makeMutantIdToParentIdMap
+                    SorterModelMutator.makeMutantIdToParentIdMap
                                         sorterModelMutator
-                                        simpleSorterModels
+                                        parentSorterModelSet.SorterModels
                                         %sorterChildCount
                                         mutationMod
 

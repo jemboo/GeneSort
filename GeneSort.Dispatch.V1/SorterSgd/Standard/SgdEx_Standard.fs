@@ -158,8 +158,12 @@ module SgdEx_Standard =
                 do! checkCancellation cts.Token
                 
                 log "Making sorterModelMutator..."
+                do! (activeSeedPoolSet: sorterPoolSet_Standard).SorterPools |> Map.values
+                    |> Seq.collect (fun pool -> pool.SorterPoolMembers)
+                    |> Seq.map (fun memberValue -> memberValue.SorterModel)
+                    |> MutatorMakers.validateModels activeRp
                 let! (sSmm: simpleSorterModelMutator) = makeMutator activeRp
-                let (sorterModelMutator: sorterModelMutator) = sSmm |> sorterModelMutator.Simple
+                let! sorterModelMutator = sSmm |> sorterModelMutator.Simple |> MutatorMakers.applyParameters activeRp
 
                 log "Executing unified evolution run..."
                 let! (finalRunResult: sorterPoolSet_Standard) =

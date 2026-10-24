@@ -13,8 +13,7 @@ open GeneSort.Dispatch.V1
 let identity (configured: run) =
     %configured.ProjectName, %configured.DatabaseName, %configured.RunName
 
-let orderedRuns () =
-    let moduleName = "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+let orderedRuns moduleName =
     let presets = typeof<runHost>.Assembly.GetType(moduleName, true)
     let runs =
         typeof<runHost>.Assembly.GetTypes()
@@ -52,7 +51,8 @@ let execute maxParallel includeSummary configured =
     let host = runHost.Create configured maxParallel
     use cts = new CancellationTokenSource()
     let progress = Some { new IProgress<string> with member _.Report message = printfn "%s" message }
-    let minReplica, maxReplica = 0<replNumber>, 1<replNumber>
+    let maxReplica = if %configured.DatabaseName = "Controlled" then SorterSgd.RunCfg.p32.Test.OnePool.Controlled.replicaCount else 1
+    let minReplica, maxReplica = 0<replNumber>, UMX.tag<replNumber> maxReplica
     printfn "\n=== %s / %s / %s ===" %configured.ProjectName %configured.DatabaseName %configured.RunName
     printfn "Setup"
     // Keep persisted completion/checkpoint state when resuming an interrupted batch.
@@ -82,6 +82,10 @@ let execute maxParallel includeSummary configured =
 [<EntryPoint>]
 let main argv =
     try
+        let controlledOnly = Array.contains "--controlled" argv
+        let msuf4r = Array.contains "--msuf4r" argv
+        if msuf4r && controlledOnly then invalidArg "argv" "Choose either --controlled or --msuf4r."
+        let argv = argv |> Array.filter (fun arg -> arg <> "--controlled" && arg <> "--msuf4r")
         let listOnly, maxParallel =
             match argv with
             | [| parallelism |] -> false, int parallelism
@@ -90,12 +94,14 @@ let main argv =
         if maxParallel < 1 then invalidArg "MaxParallel" "Must be positive."
         MessagePackSetup.configure ()
         ProjectCatalogs.registerAll ()
-        let runs = orderedRuns ()
+        let moduleName = if msuf4r then "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.SimpleR" else "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+        let runs = orderedRuns moduleName |> List.filter (fun run -> not controlledOnly || %run.DatabaseName = "Controlled")
+        let runs = if msuf4r then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
         let prerequisites = [
             SortableTests.RunCfg.Prefix.Width32 ()
             SorterEval.RunCfg.Prefix.Width32 ()
         ]
-        printfn "OnePool: %d configurations; replica 0; projects root: %s" runs.Length (RunHost.projectsRoot ())
+        printfn "%s: %d configurations; projects root: %s" moduleName runs.Length (RunHost.projectsRoot ())
         for configured in prerequisites do
             if listOnly then
                 printfn "Prerequisite %s / %s / %s: setup -> execute"

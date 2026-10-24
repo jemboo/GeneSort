@@ -8,8 +8,45 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Model.Sorting.Simple.V1
 open GeneSort.Model.Sorting.Simple.V1.SimpleSorterModelMutator
+open GeneSort.Model.Sorting.V1.Simple
 
 module MutatorMakers =
+
+    let validateModels (rp: runParameters) (models: sorterModel seq) =
+        let mismatch = models |> Seq.exists (fun model ->
+            match rp.GetAMax(), model with
+            | None, sorterModel.SimpleS _ -> rp.GetActivationProbability().IsNone
+            | _, _ when Map.containsKey ParamKeys.activationProbabilityKey rp.ParamMap -> true
+            | Some maximum, sorterModel.SimpleR paired -> maximum <> paired.AMax
+            | None, sorterModel.SimpleR _ -> true
+            | Some _, _ -> true
+            | None, _ -> false)
+        if mismatch then Error "AMax and the model family must match the prepared source models; changing AMax requires new seed models."
+        else Ok ()
+
+    /// Wrap the configured model mutator without changing the underlying mutation settings.
+    let applyParameters (rp: runParameters) (mutator: sorterModelMutator) =
+        if Map.containsKey ParamKeys.activationProbabilityKey rp.ParamMap then
+            if Map.containsKey ParamKeys.aMaxKey rp.ParamMap then Error "ActivationProbability and AMax cannot be combined."
+            else
+                match rp.GetActivationProbability(), rp.GetActivatorMutationRate(), mutator with
+                | Some probability, Some rate, sorterModelMutator.Simple underlying
+                    when System.Double.IsFinite probability && probability >= 0.0 && probability <= 1.0
+                         && System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
+                    simpleSorterModelSMutator.create underlying rate |> sorterModelMutator.SimpleS |> Ok
+                | _ -> Error "SimpleS requires an underlying Simple mutator and finite ActivationProbability and ActivatorMutationRate between 0 and 1."
+        else
+            match Map.containsKey ParamKeys.aMaxKey rp.ParamMap, Map.containsKey ParamKeys.activatorMutationRateKey rp.ParamMap with
+            | false, false -> Ok mutator
+            | false, true -> Error "ActivatorMutationRate requires AMax or ActivationProbability."
+            | true, _ ->
+                match rp.GetAMax(), rp.GetActivatorMutationRate(), mutator with
+                | Some maximum, Some rate, sorterModelMutator.Simple underlying
+                    when maximum >= 0 && System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
+                    simpleSorterModelRMutator.create underlying rate |> sorterModelMutator.SimpleR |> Ok
+                | Some maximum, _, _ when maximum < 0 -> Error "AMax must be a nonnegative integer."
+                | None, _, _ -> Error "AMax must be a nonnegative integer."
+                | _ -> Error "SimpleR requires an underlying Simple mutator and a finite ActivatorMutationRate between 0 and 1."
 
     let makeSimpleSorterModelMutator (rp: runParameters) : Async<Result<simpleSorterModelMutator, string>> =
             async {

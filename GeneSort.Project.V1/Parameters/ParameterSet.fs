@@ -25,6 +25,22 @@ type parameterSet<'kind> =
 
     member this.ParamMap with get() : Map<string,string> = this.paramMap
 
+    member this.GetActivationProbability() = ParamKeys.tryGetFloat ParamKeys.activationProbabilityKey this.paramMap
+
+    member this.WithActivationProbability(value: float option) =
+        { paramMap = ParamKeys.addOrRemove ParamKeys.activationProbabilityKey
+                        (value |> Option.map (fun v -> v.ToString("R", CultureInfo.InvariantCulture))) this.paramMap }
+    member this.GetAMax() = ParamKeys.tryGetInt ParamKeys.aMaxKey this.paramMap
+
+    member this.GetActivatorMutationRate() = ParamKeys.tryGetFloat ParamKeys.activatorMutationRateKey this.paramMap
+
+    member this.WithAMax(value: int option) =
+        { paramMap = ParamKeys.addOrRemove ParamKeys.aMaxKey (value |> Option.map string) this.paramMap }
+
+    member this.WithActivatorMutationRate(value: float option) =
+        { paramMap = ParamKeys.addOrRemove ParamKeys.activatorMutationRateKey
+                        (value |> Option.map (fun v -> v.ToString("R", CultureInfo.InvariantCulture))) this.paramMap }
+
     // ============================================================
     // Getters
     // ============================================================

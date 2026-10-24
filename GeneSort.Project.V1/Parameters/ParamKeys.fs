@@ -48,6 +48,16 @@ module ParamKeys =
     [<Literal>]
     let adjustCeLengthFrequencyKey = "AdjustCeLengthFrequency"
     [<Literal>]
+    let activationProbabilityKey = "ActivationProbability"
+
+    [<Literal>]
+    let controlledSeedAMaxKey = "ControlledSeedAMax"
+
+    [<Literal>]
+    let aMaxKey = "AMax"
+    [<Literal>]
+    let activatorMutationRateKey = "ActivatorMutationRate"
+    [<Literal>]
     let ceLengthKey = "CeLength"
     [<Literal>]
     let codeModKey = "CodeModKey"
