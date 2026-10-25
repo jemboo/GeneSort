@@ -68,7 +68,7 @@ module Standard =
         let parameterSpansSetup =
             [
                 (ParamKeys.sorterCountPerPoolKey, [32; 64] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
+                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
@@ -80,7 +80,7 @@ module Standard =
             ]
         let parameterSpansRun =
             [
-                (ParamKeys.generationIntervalLastKey, [9] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [4] |> List.map string)
                 (ParamKeys.adjustCeLengthFrequencyKey, [100] |> List.map string)
                 (ParamKeys.activatorMutationRateKey, [0.0; 0.01; 0.02; 0.03] |> List.map string)
             ]
