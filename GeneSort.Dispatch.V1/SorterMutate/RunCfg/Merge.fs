@@ -6,6 +6,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Project.V1
@@ -14,34 +15,38 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterMutate
 
 module Merge =
-
-    let seedSorterPoolSelectionType =
-            (ParamKeys.seedSorterPoolSelectionTypeKey,
-            [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
-
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Msce ()  : run =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msceModelType
-                rngTypeLcg
-                dataFormatInt8v512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                mergeLib_Merge32s
-                (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msceParamsR5 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -70,17 +75,26 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                mssiModelType
-                rngTypeLcg
-                dataFormatInt8v512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                mergeLib_Merge32s
-                (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.mssiParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -109,17 +123,26 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msrsModelType
-                rngTypeLcg
-                dataFormatInt8v512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                mergeLib_Merge32s
-                (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msrsParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -148,17 +171,26 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msuf4ModelType
-                rngTypeLcg
-                dataFormatInt8v512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                mergeLib_Merge32s
-                (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msuf4ParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {

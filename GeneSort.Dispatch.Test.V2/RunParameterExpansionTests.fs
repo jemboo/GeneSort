@@ -17,7 +17,7 @@ open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Dispatch.V1.SorterEval
 
 [<Fact>]
-let ``prefix evaluation combines split spans without setup ID linkage`` () =
+let ``prefix evaluation combines split spans with reusable setup references`` () =
     for configured in [WorkflowFixtures.prefixEvaluation 24; WorkflowFixtures.prefixEvaluation 32] do
         let host = runHost.Create configured 1
         let setups = host.MakeSetupParameters 0<replNumber> 1<replNumber>
@@ -31,8 +31,8 @@ let ``prefix evaluation combines split spans without setup ID linkage`` () =
                         ParamKeys.sortableDataFormatKey; ParamKeys.sorterCountKey] do
                 Assert.Equal(setup.ParamMap.[key], parameters.ParamMap.[key])
             Assert.Equal(Some (setup.GetPrefixLibId().Value.SortingWidth), parameters.GetSortingWidth())
-            Assert.Empty(SetupFileReferences.fromSetupParameters setup)
-            Assert.Empty(SetupFileReferences.fromRunParameters parameters)
+            Assert.NotEmpty(SetupFileReferences.fromSetupParameters setup)
+            Assert.NotEmpty(SetupFileReferences.fromRunParameters parameters)
             for outputType in [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""] do
                 let prepared = host.QueryParamsFromSetupParams setup outputType |> Option.get
                 let loaded = host.QueryParamsFromRunParams parameters outputType |> Option.get

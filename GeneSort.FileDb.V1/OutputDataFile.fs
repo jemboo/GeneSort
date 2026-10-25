@@ -46,15 +46,17 @@ module OutputDataFile =
         let pathToRootFolder =
             Path.Combine(%pathToRootFolder, GeneSortDataMode.toFolderName effectiveMode)
             |> UMX.tag<pathToRootFolder>
+        // Setup references address one immutable file within the database, across all replicas.
+        let replString = if effectiveMode = geneSortDataMode.Setup then "" else replString
         match outputDataType with
         | geneSortDataType.Run runName ->
             let folderPath = Path.Combine(%pathToRootFolder, "Run", %runName)
             UMX.tag<fullPathToFolder> folderPath
         | geneSortDataType.RunParameters _   ->
-            Path.Combine(%pathToRootFolder, "Run", outputDataType |> GeneSortDataType.toFolderName, replString) 
+            Path.Combine(%pathToRootFolder, "Run", outputDataType |> GeneSortDataType.toFolderName, replString)
             |> UMX.tag<fullPathToFolder>
-        | _ -> 
-            Path.Combine(%pathToRootFolder, outputDataType |> GeneSortDataType.toFolderName, replString) 
+        | _ ->
+            Path.Combine(%pathToRootFolder, outputDataType |> GeneSortDataType.toFolderName, replString)
             |> UMX.tag<fullPathToFolder>
 
     let makeOutputDataName (queryParams: queryParams) : string =
@@ -69,7 +71,7 @@ module OutputDataFile =
             (queryParams: queryParams) : string<fullPathToFile> =
         let fileNameWithExtension =
             match queryParams.OutputDataType with
-            | geneSortDataType.TextReport reportName -> 
+            | geneSortDataType.TextReport reportName ->
                 sprintf "%s.txt" (string %queryParams.Id)
             | _ -> makeOutputDataName queryParams + ".msgpack"
         let outputDataFolder = getPathToOutputDataFolder pathToRootFolder dataMode queryParams.ReplAsString queryParams.OutputDataType
@@ -213,6 +215,10 @@ module OutputDataFile =
 
         async {
             let filePath = getFullOutputDataFilePath pathToProjectFolder dataMode queryParams
+            let sharedSetup =
+                match queryParams.OutputDataType with
+                | geneSortDataType.Run _ | geneSortDataType.RunParameters _ -> false
+                | _ -> dataMode = geneSortDataMode.Setup
             let directory = Path.GetDirectoryName %filePath
             let dirRes =
                 try
@@ -223,45 +229,58 @@ module OutputDataFile =
             match dirRes with
             | Error err -> return Error err
             | Ok () ->
-                if (not %allowOverwrite) && File.Exists %filePath then
+                if sharedSetup && File.Exists %filePath then
+                    return Ok ()
+                elif (not %allowOverwrite) && File.Exists %filePath then
                     return Error "Overwrite not allowed"
                 else
+                    // Publish Setup atomically: concurrent processes cannot overwrite a shared source
+                    // or observe a partially serialized file.
+                    let writePath = if sharedSetup then %filePath + "." + Guid.NewGuid().ToString("N") + ".tmp" else %filePath
                     try
-                        use stream = new FileStream(%filePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
-                        do!
-                            match outputData with
-                            | outputData.RunParameters r ->
-                                serializeDto stream r RunParametersDto.fromDomain
-                            | outputData.SorterPoolSet ss ->
-                                serializeDto stream ss SorterPoolSetDto.fromDomain
-                            | outputData.SorterPoolSetSummarySet ss ->
-                                serializeDto stream ss SpSummarySetDto.fromDomain
-                            | outputData.SorterSet ss ->
-                                serializeDto stream ss SorterSetDto.fromDomain
-                            | outputData.SorterModelSet models ->
-                                serializeDto stream models SorterModelSetDto.fromDomain
-                            | outputData.SortableTests sts ->
-                                 serializeDto stream sts SortableTestsDto.fromDomain
-                            | outputData.SortableTestsWithPrefix (tests, prefix) ->
-                                serializeDto stream (tests, prefix) SortableTestsWithPrefixDto.fromDomain
-                            | outputData.SorterSetEval sse ->
-                                serializeDto stream sse SorterSetEvalDto.fromDomain                         
-                            | outputData.SorterPoolBinsSetSeries sse ->
-                                serializeDto stream sse SorterPoolBinsSetSeriesDto.fromDomain
-                            | outputData.SorterPoolSetHistory sse ->
-                                serializeDto stream sse SpshDto.fromDomain
-                            | outputData.Run p ->
-                                serializeDto stream p RunDto.fromDomain
-                            | outputData.TextReport dataTableReport ->
-                                async {
-                                    dataTableReport.SaveToStream stream
-                                    let textBytes = Encoding.UTF8.GetBytes("")
-                                    do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
-                                }
-                        return Ok ()
-                    with e -> 
-                        let detailedError = buildDetailedMessage e
-                        return Error (sprintf "Error saving file %s:\n%s" %filePath detailedError)
+                        try
+                            use stream = new FileStream(writePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
+                            do!
+                                match outputData with
+                                | outputData.RunParameters r ->
+                                    serializeDto stream r RunParametersDto.fromDomain
+                                | outputData.SorterPoolSet ss ->
+                                    serializeDto stream ss SorterPoolSetDto.fromDomain
+                                | outputData.SorterPoolSetSummarySet ss ->
+                                    serializeDto stream ss SpSummarySetDto.fromDomain
+                                | outputData.SorterSet ss ->
+                                    serializeDto stream ss SorterSetDto.fromDomain
+                                | outputData.SorterModelSet models ->
+                                    serializeDto stream models SorterModelSetDto.fromDomain
+                                | outputData.SortableTests sts ->
+                                     serializeDto stream sts SortableTestsDto.fromDomain
+                                | outputData.SortableTestsWithPrefix (tests, prefix) ->
+                                    serializeDto stream (tests, prefix) SortableTestsWithPrefixDto.fromDomain
+                                | outputData.SorterSetEval sse ->
+                                    serializeDto stream sse SorterSetEvalDto.fromDomain
+                                | outputData.SorterPoolBinsSetSeries sse ->
+                                    serializeDto stream sse SorterPoolBinsSetSeriesDto.fromDomain
+                                | outputData.SorterPoolSetHistory sse ->
+                                    serializeDto stream sse SpshDto.fromDomain
+                                | outputData.Run p ->
+                                    serializeDto stream p RunDto.fromDomain
+                                | outputData.TextReport dataTableReport ->
+                                    async {
+                                        dataTableReport.SaveToStream stream
+                                        let textBytes = Encoding.UTF8.GetBytes("")
+                                        do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
+                                    }
+                            do! stream.FlushAsync() |> Async.AwaitTask
+                            stream.Dispose()
+                            if sharedSetup then
+                                try File.Move(writePath, %filePath, false)
+                                with :? IOException when File.Exists %filePath -> ()
+                            return Ok ()
+                        with e ->
+                            let detailedError = buildDetailedMessage e
+                            return Error (sprintf "Error saving file %s:\n%s" %filePath detailedError)
+                    finally
+                        if writePath <> %filePath && File.Exists writePath then File.Delete writePath
         }
 
 
@@ -345,27 +364,27 @@ module OutputDataFile =
             // 1. Resolve replication range
             let start = defaultArg minRepl 0<replNumber>
             let stop = defaultArg maxRepl start
-        
+
             let repls = [| %start .. (%stop - 1) |] |> Array.map UMX.tag<replNumber>
-        
-            progress |> Option.iter (fun p -> 
+
+            progress |> Option.iter (fun p ->
                 p.Report(sprintf "Starting bulk load for %d replicates (Range: %d to %d)" repls.Length %start %stop))
 
             // 2. Map replicates to your existing async function
-            let! allResults = 
-                repls 
-                |> Array.map (fun r -> 
+            let! allResults =
+                repls
+                |> Array.map (fun r ->
                     getProjectRunParametersForReplAsync rootFolder runName (Some r) ct progress)
                 |> Async.Parallel
 
             // 3. Aggregate Results
-            let successes = 
-                allResults 
-                |> Array.choose (function Ok rps -> Some rps | _ -> None) 
+            let successes =
+                allResults
+                |> Array.choose (function Ok rps -> Some rps | _ -> None)
                 |> Array.concat
 
-            let errors = 
-                allResults 
+            let errors =
+                allResults
                 |> Array.choose (function Error msg -> Some msg | _ -> None)
 
             // 4. Final Reporting
@@ -374,7 +393,7 @@ module OutputDataFile =
                 progress |> Option.iter (fun p -> p.Report errorMsg)
                 return Error errorMsg
             else
-                progress |> Option.iter (fun p -> 
+                progress |> Option.iter (fun p ->
                     p.Report(sprintf "Bulk load complete. Total parameters loaded: %d" successes.Length))
                 return Ok successes
         }

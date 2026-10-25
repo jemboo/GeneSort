@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
@@ -12,8 +13,8 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.CommonParams
 
 module Merge =
 
@@ -21,16 +22,26 @@ module Merge =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test () : run =
         let names = RunNaming.create()
-        let parameterSpans =
+        let parameterSpansSetup =
             [
-                rngTypeLcg
-                mergeLib_Merge32s
-                dataFormatInt8v512
-                withMsuf4
-                noSuffixSuffixType
-                sorterEvalTypeV2
-                smallSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.sorterCountKey, [100] |> List.map string)
             ]
+        let parameterSpansRun = []
         run.SimpleRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
@@ -40,13 +51,13 @@ module Merge =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansRun
                     QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.merge
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                 }
@@ -56,17 +67,24 @@ module Merge =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Small () : run =
         let names = RunNaming.create()
-        let parameterSpans =
+        let parameterSpansSetup =
             [
-                rngTypeLcg
-                dataFormatInt8v512
-                withMsuf4
-                noSuffixSuffixType
-                sorterEvalTypeV2
-                smallMergeSortingWidths
-                allMergeDimensions
-                extraLargeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.mergeLibIdKey,
+                    [ for width in [16; 18; 24; 32; 36; 48; 64] do
+                        for dimension in [2; 3; 4; 6; 8] do
+                            if width % dimension = 0 then
+                                yield mergeLibId.create (UMX.tag width) (UMX.tag dimension) sorterLibVariant.VariantA ]
+                    |> List.map MergeLibId.toString)
+                (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
+        let parameterSpansRun = []
         run.SimpleRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
@@ -76,13 +94,13 @@ module Merge =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansRun
                     QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.merge
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                 }
@@ -92,17 +110,24 @@ module Merge =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let MediumLd () : run =
         let names = RunNaming.create()
-        let parameterSpans =
+        let parameterSpansSetup =
             [
-                rngTypeLcg
-                dataFormatInt8v512
-                withMsuf4
-                noSuffixSuffixType
-                sorterEvalTypeV2
-                mediumMergeSortingWidths
-                lowMergeDimensions
-                largeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.mergeLibIdKey,
+                    [ for width in [96; 128] do
+                        for dimension in [2; 3; 4] do
+                            if width % dimension = 0 then
+                                yield mergeLibId.create (UMX.tag width) (UMX.tag dimension) sorterLibVariant.VariantA ]
+                    |> List.map MergeLibId.toString)
+                (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
+        let parameterSpansRun = []
         run.SimpleRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
@@ -112,13 +137,13 @@ module Merge =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansRun
                     QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.merge
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                 }
@@ -128,17 +153,21 @@ module Merge =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let MediumHd () : run =
         let names = RunNaming.create()
-        let parameterSpans =
+        let parameterSpansSetup =
             [
-                rngTypeLcg
-                dataFormatInt8v512
-                noSuffixSuffixType
-                withMsuf4
-                sorterEvalTypeV2
-                sortingWidth96
-                mergeDimension6
-                largeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.mergeLibIdKey,
+                    [mergeLibId.create 96<sortingWidth> 6<mergeDimension> sorterLibVariant.VariantA]
+                    |> List.map MergeLibId.toString)
+                (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
+        let parameterSpansRun = []
         run.SimpleRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
@@ -148,13 +177,13 @@ module Merge =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansRun
                     QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.merge
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                 }
@@ -164,17 +193,22 @@ module Merge =
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let LargeLd () : run =
         let names = RunNaming.create()
-        let parameterSpans =
+        let parameterSpansSetup =
             [
-                rngTypeLcg
-                dataFormatInt8v512
-                noSuffixSuffixType
-                withMsuf4
-                sorterEvalTypeV2
-                largeMergeSortingWidths
-                mergeDimension2
-                largeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.mergeSuffixTypeKey, [mergeSuffixType.NoSuffix] |> List.map MergeSuffixType.toString)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.mergeLibIdKey,
+                    [ for width in [192; 256; 512] do
+                        yield mergeLibId.create (UMX.tag width) 2<mergeDimension> sorterLibVariant.VariantA ]
+                    |> List.map MergeLibId.toString)
+                (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
+        let parameterSpansRun = []
         run.SimpleRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
@@ -184,13 +218,13 @@ module Merge =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansRun
                     QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
                 }
                 Setup = {
                     FunctionName = SetupCatalogNames.merge
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
                 }

@@ -3,6 +3,7 @@ namespace GeneSort.Dispatch.V1.SorterEval
 open System
 open FSharp.UMX
 open FsToolkit.ErrorHandling
+open GeneSort.Core
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sorter
 open GeneSort.SortingLib.Sorter
@@ -24,10 +25,9 @@ module SortableTestsMakers =
         asyncResult {
             let! query =
                 host.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
-                |> Result.requireSome "Failed to create QueryParams for SortableTestsWithPrefix."
-            let! tests, prefix = makeTests rp
-            return! host.RunDb.saveAsync geneSortDataMode.Setup query
-                        (outputData.SortableTestsWithPrefix (tests, prefix)) allowOverwrite
+                |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
+            return! SetupArtifacts.saveOnce host.RunDb (QueryParams.forSetup rp query) (fun () ->
+                makeTests rp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
         }
 
     let makeStandardTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =

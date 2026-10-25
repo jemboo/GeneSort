@@ -30,12 +30,13 @@ module SorterModelSetMakers =
                 host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                 |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
 
-            let! modelGen = CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
-                            |> SeedSorterModelGeneration.applyParameters rp
-            let baseFirstIdx = (%repl * %totalSorterCount) |> UMX.tag<sorterCount>
-
-            let modelSet = SorterModelGen.makeSorterModelSetFromIndexSpan (Guid.Empty |> UMX.tag) baseFirstIdx totalSorterCount modelGen
-            return! host.RunDb.saveAsync geneSortDataMode.Setup query (outputData.SorterModelSet modelSet) allowOverwrite
+            return! SetupArtifacts.saveOnce host.RunDb (QueryParams.forSetup rp query) (fun () -> asyncResult {
+                let! modelGen = CommonSorterEval.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
+                                |> SeedSorterModelGeneration.applyParameters rp
+                let baseFirstIdx = (%repl * %totalSorterCount) |> UMX.tag<sorterCount>
+                let modelSet = SorterModelGen.makeSorterModelSetFromIndexSpan (Guid.Empty |> UMX.tag) baseFirstIdx totalSorterCount modelGen
+                return outputData.SorterModelSet modelSet
+            })
           with error ->
             return! Error (sprintf "Failed to generate or save SorterModelSet: %s" error.Message)
         }

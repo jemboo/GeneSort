@@ -82,7 +82,6 @@ module RunParameterGeneration =
                for setup in setups do
                    let references =
                        if configured.ParameterSource.IsSome
-                          || configured.RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
                           || configured.RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32 then []
                        else SetupOutputs.referencesFor configured setup
                    let context = runParamEnhancerContext.createForSetup runQuery configured setup
@@ -112,6 +111,16 @@ module RunParameterGeneration =
                                    |> runParameters.create
                                else enhanced
                            |> SetupFileReferences.attach references
+                       // Resolve identities from the fully enhanced maker inputs. Execution-only
+                       // parameters never enter these identities; continuations record imports in Setup.
+                       let enhanced =
+                           if configured.ParameterSource.IsSome then enhanced
+                           else
+                               [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""; geneSortDataType.SorterPoolSet ""]
+                               |> List.choose (fun output ->
+                                   SetupArtifactQueries.tryCreate configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName enhanced output
+                                   |> Option.map (fun query -> SetupFileReferences.keyForOutputType output, string query.Id))
+                               |> List.fold (fun (rp: runParameters) (key, value) -> runParameters.create (rp.ParamMap.Add(key, value))) enhanced
                        let query =
                            runQuery enhanced (geneSortDataType.Run configured.RunName)
                            |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"

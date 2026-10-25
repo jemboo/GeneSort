@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
 open GeneSort.Project.V1
@@ -13,35 +14,34 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Dispatch.V1.SorterMutate
 
 
 module Prefix =
-
-    let seedSorterPoolSelectionType =
-            (ParamKeys.seedSorterPoolSelectionTypeKey,
-            [ sorterSelectionType.ValueSpan 5<sorterCount>;] |> List.map SorterSelectionType.toString)
-
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Msce ()  : run =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msceModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsce 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msceParamsR5 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -70,17 +70,21 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                mssiModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMssi 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.mssiParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -109,17 +113,21 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msrsModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsrs 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msrsParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -148,17 +156,21 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                msuf4ModelType
-                rngTypeLcg
-                dataFomatBitv512
-                sorterEvalTypeV2
-                seedSorterPoolSelectionType
-                sorterEvalMeasure_CestM_noScw
-                prefixLib_Prefix32_4
-                (mutatorSpansMsuf4 32<sortingWidth> mutatorVariant.V1 rngType.Lcg)
-                modificationRate03
-                testChildCount
-                mutationMod1
+                (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
+                (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
+                (ParamKeys.mutatorParamsKey,
+                 [MutatorParams.msuf4ParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 |> List.map MutatorParams.toString)
+                (ParamKeys.modificationRateKey, [0.03] |> List.map string)
+                (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
+                (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {

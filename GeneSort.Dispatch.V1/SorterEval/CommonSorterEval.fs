@@ -6,7 +6,6 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
-open GeneSort.Dispatch.V1.CommonParams
 open GeneSort.Model.Sorting.Simple.V1
 
 

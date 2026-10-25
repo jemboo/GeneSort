@@ -20,7 +20,7 @@
     <Compile Include="OpsUtils.fs" />
     <Compile Include="ParamOps.fs" />
     <Compile Include="RunNaming.fs" />
-    <Compile Include="CommonParams.fs" />
+    <Compile Include="SetupArtifacts.fs" />
     <Compile Include="SorterSgd\Utils.fs" />
     <Compile Include="SorterSgd\EvoAppendPools.fs" />
     <Compile Include="SorterSgd\Standard\EvoOrch_Standard.fs" />

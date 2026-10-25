@@ -62,7 +62,8 @@ module SetupEnhancerCatalog =
 
     let noOp : setupEnhancerFunction = fun _ parameters -> parameters
     let sortableTests : setupEnhancerFunction = noOp
-    let sorterEvalPrefix : setupEnhancerFunction = noOp
+    let sorterEvalPrefix : setupEnhancerFunction =
+        withFileReferences [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     let sorterEval : setupEnhancerFunction =
         withFileReferences [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     let sorterMutate : setupEnhancerFunction = sorterEval

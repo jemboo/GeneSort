@@ -112,10 +112,10 @@ let ``evolution test setup is persisted once and reused across generations`` fai
         return if failure = "maker" then Error "maker failed" else Ok (tests, prefix)
     }
     let first = Utils.loadOrCreateSortableTestsWithPrefix makeTests db parameters |> Async.RunSynchronously
-    if List.contains failure ["query"; "maker"; "save"] then
+    if List.contains failure ["query"; "maker"; "save"; "load"; "type"] then
         Assert.True(Result.isError first)
         Assert.Equal((if failure = "query" then 0 else 1), creations)
-        Assert.Equal((if failure = "save" then 1 else 0), saves)
+        Assert.Equal((if List.contains failure ["save"; "load"; "type"] then 1 else 0), saves)
     else
         Assert.True(Result.isOk first)
         let resumed = parameters.WithGenerationCurrent(Some 42<generationNumber>)

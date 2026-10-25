@@ -346,17 +346,19 @@ module SorterMutateExecutor =
                 let! query =
                     host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
-                let! modelStream = makeModels rp
-                let models =
-                    modelStream
-                    |> Seq.map (fun model -> cts.Token.ThrowIfCancellationRequested(); model)
-                    |> Seq.toArray
-                let rawCeLength =
-                    if Array.isEmpty models then 0<ceLength>
-                    else models |> Array.map SorterModel.getCeLength |> Array.max
-                let modelSet = sorterModelSet.create (UMX.tag %query.Id) models rawCeLength
-                do! checkCancellation cts.Token
-                return! host.RunDb.saveAsync geneSortDataMode.Setup query (outputData.SorterModelSet modelSet) allowOverwrite
+                return! SetupArtifacts.saveOnce host.RunDb (QueryParams.forSetup rp query) (fun () -> asyncResult {
+                    let! modelStream = makeModels rp
+                    let models =
+                        modelStream
+                        |> Seq.map (fun model -> cts.Token.ThrowIfCancellationRequested(); model)
+                        |> Seq.toArray
+                    let rawCeLength =
+                        if Array.isEmpty models then 0<ceLength>
+                        else models |> Array.map SorterModel.getCeLength |> Array.max
+                    let modelSet = sorterModelSet.create (UMX.tag %query.Id) models rawCeLength
+                    do! checkCancellation cts.Token
+                    return outputData.SorterModelSet modelSet
+                })
             with error ->
                 return! Error (sprintf "Failed to generate or save mutant SorterModelSet: %s" error.Message)
         }

@@ -36,20 +36,29 @@ let ``Msuf4a SimpleS presets expand distinct executions with boolean models and 
     let host = runHost.Create configured 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber>
     let executions = host.MakeRunParameters 0<replNumber> 1<replNumber>
-    Assert.Equal((if sweep then 12 else 4), setup.Length)
-    Assert.Equal((if sweep then 36 else 4), executions.Length)
+    let spanCount spans = spans |> List.fold (fun count (_, values: string list) -> count * values.Length) 1
+    let values key fallback spans = spans |> List.tryFind (fst >> (=) key) |> Option.map snd |> Option.defaultValue fallback
+    let setupCount = spanCount configured.SetupParameterSpans
+    Assert.Equal(setupCount, setup.Length)
+    Assert.Equal(setupCount * spanCount configured.RunParameterSpans, executions.Length)
     Assert.Equal(executions.Length, executions |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
     let probabilities = setup |> Array.map (fun sp -> sp.GetActivationProbability().Value) |> Set.ofArray
-    Assert.Equal<Set<float>>((if sweep then set [0.25; 0.5; 0.75] else set [0.5]), probabilities)
+    let expectedProbabilities = configured.SetupParameterSpans |> values ParamKeys.activationProbabilityKey ["0.5"] |> List.map float |> Set.ofList
+    Assert.Equal<Set<float>>(expectedProbabilities, probabilities)
     let rates = executions |> Array.map (fun rp -> rp.GetActivatorMutationRate().Value) |> Set.ofArray
-    Assert.Equal<Set<float>>((if sweep then set [0.05; 0.1; 0.2] else set [0.1]), rates)
+    let expectedRates = configured.RunParameterSpans |> values ParamKeys.activatorMutationRateKey ["0.1"] |> List.map float |> Set.ofList
+    Assert.Equal<Set<float>>(expectedRates, rates)
     let seedIds = setup |> Array.map (fun sp -> (host.QueryParamsFromSetupParams sp (geneSortDataType.SorterPoolSet "")).Value.Id)
     Assert.Equal(setup.Length, seedIds |> Array.distinct |> Array.length)
+    let poolSizes = configured.SetupParameterSpans |> values ParamKeys.sorterCountPerPoolKey [] |> List.map int
+    let poolTotals = configured.SetupParameterSpans |> values ParamKeys.sorterCountPerPoolSetKey [] |> List.map int
+    let lastIntervals = configured.RunParameterSpans |> values ParamKeys.generationIntervalLastKey [] |> List.map int
     for rp in executions do
-        Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
-        Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool())
+        Assert.Contains(int (rp.GetSorterCountPerPool().Value), poolSizes)
+        Assert.Contains(int (rp.GetSorterCountPerPoolSet().Value), poolTotals)
+        Assert.Equal(int (rp.GetSorterCountPerPoolSet().Value) / int (rp.GetSorterCountPerPool().Value), int (rp.GetSorterPoolCount().Value))
         Assert.Equal(Some simpleSorterModelType.Msuf4, rp.GetSimpleSorterModelType())
-        Assert.Equal(Some (UMX.tag (if sweep then 9 else 0)), rp.GetGenerationIntervalLast())
+        Assert.Contains(int (rp.GetGenerationIntervalLast().Value), lastIntervals)
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
         Assert.Equal(Some query.Id, rp.GetId())
         let generator =

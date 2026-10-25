@@ -17,17 +17,10 @@ open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 
 module EvoAppendSetup =
-    let private copyGate = new SemaphoreSlim(1, 1)
-
     let private copyOnce (db: IGeneSortDb) query data (ct: CancellationToken) =
         async {
-            do! copyGate.WaitAsync(ct) |> Async.AwaitTask
-            try
-                let! exists = db.doesOutPutDataExist geneSortDataMode.Setup query
-                if exists then return Ok ()
-                else return! db.saveAsync geneSortDataMode.Setup query data (UMX.tag false)
-            finally
-                copyGate.Release() |> ignore
+            ct.ThrowIfCancellationRequested()
+            return! SetupArtifacts.saveOnce db query (fun () -> async { return Ok data })
         }
 
     let private selectSourceParameters (destination: runParameters) (candidates: runParameters array) =
@@ -114,8 +107,10 @@ module EvoAppendSetup =
             let converting = sourceRun.ExecuteFunctionName <> host.Run.ExecuteFunctionName
             let destinationPool =
                 if converting then
-                    queryParams.create host.Run.DatabaseName host.Run.ProjectName (Some repl) None (geneSortDataType.SorterPoolSet "")
-                        [|"SourceFileId", string %poolQuery.Id; "ExecutionFunction", host.Run.ExecuteFunctionName|]
+                    queryParams.create host.Run.DatabaseName host.Run.ProjectName None None (geneSortDataType.SorterPoolSet "")
+                        [|"SourceFileId", string %poolQuery.Id
+                          "SourceTestsFileId", string %testsQuery.Id
+                          "ExecutionFunction", host.Run.ExecuteFunctionName|]
                 else queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (Some repl) (geneSortDataType.SorterPoolSet "") poolQuery.Id
             let destinationTests = queryParams.createForImportedFile host.Run.DatabaseName host.Run.ProjectName (Some repl) (geneSortDataType.SortableTestsWithPrefix "") testsQuery.Id
             let updated =

@@ -2,14 +2,17 @@ namespace GeneSort.Dispatch.V1.SortableTests.RunCfg
 
 open System.Runtime.CompilerServices
 open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open CommonParams
 
 
 
@@ -20,8 +23,10 @@ module PrefixTest =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                dataFomatBitv512
-                prefixLib_Prefix24_3a
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -52,8 +57,15 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                dataFomatBitv512
-                prefixLib_Prefix24s
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.prefixLibIdKey,
+                 [
+                     prefixLibId.create 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA
+                     prefixLibId.create 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixB
+                     prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
+                     prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixB
+                 ]
+                 |> List.map PrefixLibId.toString)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -82,8 +94,10 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                dataFomatBitv512
-                prefixLib_Prefix32_4
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
+                (ParamKeys.prefixLibIdKey,
+                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 |> List.map PrefixLibId.toString)
             ]
         run.SimpleRun (
             SimpleRun.create {

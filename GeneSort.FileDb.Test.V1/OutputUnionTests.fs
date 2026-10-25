@@ -739,7 +739,8 @@ module OutputUnionTests =
                 Assert.True((db.loadIfFoundAsync mode qp |> Async.RunSynchronously).IsNone)
                 db.saveAsync mode qp original (UMX.tag false) |> Async.RunSynchronously |> Fixtures.unwrap
                 let path = OutputDataFile.getFullOutputDataFilePath folder mode qp |> UMX.untag
-                Assert.Equal(Path.Combine(%folder, GeneSortDataMode.toFolderName mode, "SorterPoolSet", "0", string %qp.Id + ".msgpack"), path)
+                let replicaFolder = if mode = geneSortDataMode.Setup then "" else "0"
+                Assert.Equal(Path.Combine(%folder, GeneSortDataMode.toFolderName mode, "SorterPoolSet", replicaFolder, string %qp.Id + ".msgpack"), path)
                 Assert.True(File.Exists path)
                 Assert.True(db.doesOutPutDataExist mode qp |> Async.RunSynchronously)
                 let loaded = db.loadAsync mode qp |> Async.RunSynchronously |> Fixtures.unwrap

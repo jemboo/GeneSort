@@ -2,14 +2,17 @@ namespace GeneSort.Dispatch.V1.SortableTests.RunCfg
 
 open System.Runtime.CompilerServices
 open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.SortingLib.Sorter
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open CommonParams
 
 
 module Merge =
@@ -20,8 +23,15 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                mergeLib_Merge32s
-                dataFormatInt8v512
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
             ]
         run.SimpleRun (
             SimpleRun.create {

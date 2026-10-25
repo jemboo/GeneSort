@@ -12,8 +12,8 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
+open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.CommonParams
 
 
 module Standard =
@@ -24,11 +24,13 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                rngTypeLcg
-                sorterEvalTypeV2
-                sortingWidth16
-                withMsuf4
-                largeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.sortingWidthKey, [16] |> List.map string)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -57,11 +59,13 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                rngTypeLcg
-                sorterEvalTypeV2
-                smallSortingWidths
-                withMsuf4
-                extraLargeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.sortingWidthKey, [4; 5; 6; 7; 8; 9; 10; 11; 12] |> List.map string)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {
@@ -90,11 +94,13 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
-                rngTypeLcg
-                sorterEvalTypeV2
-                mediumSortingWidths
-                withMsuf4
-                extraLargeSorterCount
+                (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
+                (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
+                (ParamKeys.sortingWidthKey, [14; 16; 18; 20; 22] |> List.map string)
+                (ParamKeys.simpleSorterModelTypeKey,
+                 [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
+                 |> List.map SimpleSorterModelType.toString)
+                (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
         run.SimpleRun (
             SimpleRun.create {

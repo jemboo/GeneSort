@@ -18,6 +18,8 @@
     <Compile Include="Parameters\SetupFileReferences.fs" />
     <Compile Include="Parameters\QueryParams.fs" />
     <Compile Include="Catalogs\Queries\Common.fs" />
+    <Compile Include="Catalogs\Queries\QueryCatalogNamesSetup.fs" />
+    <Compile Include="Catalogs\Queries\SetupArtifactQueries.fs" />
 	<Compile Include="Catalogs\Queries\QueryParamsCatalogSetup.fs" />
 	<Compile Include="Catalogs\Queries\QueryParamsBuildersSetup.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsCatalogRun.fs" />

@@ -123,36 +123,104 @@ module Test =
             let aMax = 3
             let activatorMutationRate = 0.10
 
-            let private createBase (names: runNames) (source: run) =
-                SgdRun.create {
-                    DatabaseName = names.DatabaseName
-                    ProjectName = names.ProjectName
-                    RunName = names.RunName
-                    Description = "OnePool SimpleR generation and evolution"
-                    AllowOverwrite = false
-                    Setup = {
-                        FunctionName = source.SetupFunctionName
-                        ParameterSpans = source.SetupParameterSpans @ [ParamKeys.aMaxKey, [string aMax]]
-                        QueryCatalogName = source.SetupQueryCatalogName
-                        EnhancerFunctionName = source.SetupEnhancerFunctionName
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let Standard () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.aMaxKey, [aMax] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "OnePool SimpleR generation and evolution"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
                     }
-                    Execution = {
-                        FunctionName = source.ExecuteFunctionName
-                        ParameterSpans = source.RunParameterSpans @ [ParamKeys.activatorMutationRateKey, [string activatorMutationRate]]
-                        QueryCatalogName = source.RunQueryCatalogName
-                        EnhancerFunctionName = source.RunEnhancerFunctionName
-                    }
-                } {
-                    MakerNames = source.MakerNames.Value
-                    GenSaveIntervalsName = source.GenSaveIntervalsName.Value
-                    GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
-                } |> run.SgdRun
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let Standard () : run = createBase (RunNaming.create()) (TestStandard ())
-
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let Soss () : run = createBase (RunNaming.create()) (TestSoss ())
+            let Soss () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                        (ParamKeys.aMaxKey, [aMax] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "OnePool SimpleR generation and evolution"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
             let StandardAppend () : run =
@@ -199,36 +267,104 @@ module Test =
             let activationProbability = 0.5
             let activatorMutationRate = 0.10
 
-            let private createBase (names: runNames) (source: run) =
-                SgdRun.create {
-                    DatabaseName = names.DatabaseName
-                    ProjectName = names.ProjectName
-                    RunName = names.RunName
-                    Description = "OnePool SimpleS generation and evolution"
-                    AllowOverwrite = false
-                    Setup = {
-                        FunctionName = source.SetupFunctionName
-                        ParameterSpans = source.SetupParameterSpans @ [ParamKeys.activationProbabilityKey, [string activationProbability]]
-                        QueryCatalogName = source.SetupQueryCatalogName
-                        EnhancerFunctionName = source.SetupEnhancerFunctionName
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let StandardS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "OnePool SimpleS generation and evolution"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
                     }
-                    Execution = {
-                        FunctionName = source.ExecuteFunctionName
-                        ParameterSpans = source.RunParameterSpans @ [ParamKeys.activatorMutationRateKey, [string activatorMutationRate]]
-                        QueryCatalogName = source.RunQueryCatalogName
-                        EnhancerFunctionName = source.RunEnhancerFunctionName
-                    }
-                } {
-                    MakerNames = source.MakerNames.Value
-                    GenSaveIntervalsName = source.GenSaveIntervalsName.Value
-                    GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
-                } |> run.SgdRun
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let StandardS () : run = createBase (RunNaming.create()) (TestStandard ())
-
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let SossS () : run = createBase (RunNaming.create()) (TestSoss ())
+            let SossS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "OnePool SimpleS generation and evolution"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
             let StandardAppendS () : run =
@@ -281,61 +417,405 @@ module Test =
             // This matches the uniform seed distribution, not an arbitrary evolved distribution.
             let matchedFlipRate = activatorMutationRate / float (2 * aMax + 1)
 
-            let private create (names: runNames) soss family mutationRate =
-                let source = if soss then TestSoss() else TestStandard()
-                let excluded = [ParamKeys.mutationModKey; ParamKeys.generationIntervalLastKey]
-                let clean spans = spans |> List.filter (fun (key, _) -> not (List.contains key excluded))
-                let activation =
-                    match family with
-                    | "R" -> [ParamKeys.aMaxKey, [string aMax]]
-                    | "S" -> [ParamKeys.activationProbabilityKey, [string activationProbability]]
-                    | _ -> []
-                SgdRun.create {
-                    ProjectName = names.ProjectName
-                    DatabaseName = names.DatabaseName
-                    RunName = names.RunName
-                    Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
-                    AllowOverwrite = false
-                    Setup = {
-                        FunctionName = source.SetupFunctionName
-                        ParameterSpans = clean source.SetupParameterSpans @ activation @ [
-                            ParamKeys.controlledSeedAMaxKey, [string aMax]
-                            ParamKeys.mutationModKey, ["0"; "1"]
-                        ]
-                        QueryCatalogName = source.SetupQueryCatalogName
-                        EnhancerFunctionName = source.SetupEnhancerFunctionName
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let StandardSimple () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
                     }
-                    Execution = {
-                        FunctionName = source.ExecuteFunctionName
-                        ParameterSpans = clean source.RunParameterSpans @ [
-                            ParamKeys.generationIntervalLastKey, [string (generationCount / 10 - 1)]
-                        ] @ (if family = "" then [] else [ParamKeys.activatorMutationRateKey, [string mutationRate]])
-                        QueryCatalogName = source.RunQueryCatalogName
-                        EnhancerFunctionName = source.RunEnhancerFunctionName
-                    }
-                } {
-                    MakerNames = source.MakerNames.Value
-                    GenSaveIntervalsName = source.GenSaveIntervalsName.Value
-                    GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
-                } |> run.SgdRun
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let StandardSimple () = create (RunNaming.create()) false "" activatorMutationRate
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let StandardR () = create (RunNaming.create()) false "R" activatorMutationRate
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let CompareStandardS () = create (RunNaming.create()) false "S" activatorMutationRate
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let SossSimple () = create (RunNaming.create()) true "" activatorMutationRate
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let SossR () = create (RunNaming.create()) true "R" activatorMutationRate
-            [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let CompareSossS () = create (RunNaming.create()) true "S" activatorMutationRate
+            let StandardR () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.aMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
 
             [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let MatchedStandardS () = create (RunNaming.create()) false "S" matchedFlipRate
+            let CompareStandardS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
+
             [<MethodImpl(MethodImplOptions.NoInlining)>]
-            let MatchedSossS () = create (RunNaming.create()) true "S" matchedFlipRate
+            let SossSimple () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
+
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let SossR () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.aMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
+
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let CompareSossS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
+
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let MatchedStandardS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [matchedFlipRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.standard
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.prefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
+
+            [<MethodImpl(MethodImplOptions.NoInlining)>]
+            let MatchedSossS () : run =
+                let names = RunNaming.create()
+                let parameterSpansSetup =
+                    [
+                        (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                        (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                        (ParamKeys.activationProbabilityKey, [activationProbability] |> List.map string)
+                        (ParamKeys.controlledSeedAMaxKey, [aMax] |> List.map string)
+                        (ParamKeys.mutationModKey, [0; 1] |> List.map string)
+                    ]
+                let parameterSpansRun =
+                    [
+                        (ParamKeys.seedSossKey, [1234UL] |> List.map string)
+                        (ParamKeys.partitionCountKey, [2] |> List.map string)
+                        (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
+                        (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
+                        (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
+                        (ParamKeys.paraRateKey, [1.15] |> List.map string)
+                        (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
+                        (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
+                        (ParamKeys.modificationRateKey, [0.035] |> List.map string)
+                        (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
+                        (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
+                        (ParamKeys.activatorMutationRateKey, [matchedFlipRate] |> List.map string)
+                    ]
+                run.SgdRun (
+                    SgdRun.create {
+                        DatabaseName = names.DatabaseName
+                        ProjectName = names.ProjectName
+                        RunName = names.RunName
+                        Description = "Paired OnePool comparison: common underlying seeds and matched R/S activation masks"
+                        AllowOverwrite = false
+                        Setup = {
+                            FunctionName = SetupCatalogNames.standard
+                            ParameterSpans = parameterSpansSetup
+                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        }
+                        Execution = {
+                            FunctionName = ExecuteFunctionNames.soss
+                            ParameterSpans = parameterSpansRun
+                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        }
+                    } {
+                        MakerNames = EvolutionMakerNames.sossPrefix
+                        GenSaveIntervalsName = GenIntervalNames.uniformInterval10
+                        GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
+                    }
+                )
 
         module Continuation =
 

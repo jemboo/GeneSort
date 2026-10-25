@@ -335,7 +335,7 @@ let ``Pool 4 debug generates split parameters and completes setup and execution`
     Assert.True(setup.GetPartitionCount().IsNone)
     Assert.Equal(Some 2<partitionCount>, rp.GetPartitionCount())
     Assert.True(rp.GetAdjustCeLengthFrequency().IsNone)
-    Assert.Empty(SetupFileReferences.fromRunParameters rp)
+    Assert.NotEmpty(SetupFileReferences.fromRunParameters rp)
     Assert.Empty(SetupFileReferences.fromSetupParameters setup)
     // Use tiny in-memory inputs to exercise the complete phase boundary without external databases.
     let memory = MemoryDb(host.QueryParamsFromRunParams)
@@ -538,8 +538,10 @@ let ``Soss resume replaces legacy length caches before parent and survivor selec
         let memory = MemoryDb()
         let db = memory :> IGeneSortDb
         let query gen kind = db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some gen)) kind |> Option.get
-        let save mode gen kind value = db.saveAsync mode (query gen kind) value (UMX.tag false)
-                                       |> Async.RunSynchronously |> Result.defaultWith failwith
+        let save mode gen kind value =
+            let query = query gen kind
+            let query = if mode = geneSortDataMode.Setup then QueryParams.forSetup rp query else query
+            db.saveAsync mode query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
         save geneSortDataMode.Setup 0<generationNumber> (geneSortDataType.SortableTestsWithPrefix "") (outputData.SortableTestsWithPrefix(tests, [||]))
         save geneSortDataMode.Results (UMX.tag generation) (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss restored))
         use cts = new CancellationTokenSource()
@@ -862,7 +864,9 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
     let query (db: IGeneSortDb) (generation: int) kind =
         db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) kind |> Option.get
     let saveValue (db: IGeneSortDb) mode generation kind value =
-        db.saveAsync mode (query db generation kind) value (UMX.tag false)
+        let query = query db generation kind
+        let query = if mode = geneSortDataMode.Setup then QueryParams.forSetup rp query else query
+        db.saveAsync mode query value (UMX.tag false)
         |> Async.RunSynchronously |> Result.defaultWith failwith
     let saveCheckpoint db (value: sorterPoolSet_Soss) =
         saveValue db geneSortDataMode.Results (int value.GenerationNumber) (geneSortDataType.SorterPoolSet "")
@@ -952,7 +956,9 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
     let query (db: IGeneSortDb) (generation: int) kind =
         db.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) kind |> Option.get
     let saveValue (db: IGeneSortDb) mode generation kind value =
-        db.saveAsync mode (query db generation kind) value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
+        let query = query db generation kind
+        let query = if mode = geneSortDataMode.Setup then QueryParams.forSetup rp query else query
+        db.saveAsync mode query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
     let load (db: IGeneSortDb) generation kind =
         db.loadAsync geneSortDataMode.Results (query db generation kind) |> Async.RunSynchronously |> Result.defaultWith failwith
     let initialize db =
@@ -1262,7 +1268,7 @@ let ``Repeated append branches share immutable setup without growing parameter h
                 Assert.Equal(metadataBefore.Id, metadataAfter.Id)
                 let setupQuery =
                     host.QueryParamsFromRunParams updated (geneSortDataType.SorterPoolSet "") |> Option.get |> QueryParams.forSetup updated
-                let expectedId = GuidUtils.guidFromObjs [box %nextRun.ProjectName; box %checkpointQuery.Id] |> UMX.tag<queryParamsId>
+                let expectedId = checkpointQuery.Id
                 Assert.Equal(expectedId, setupQuery.Id)
                 updated)
         Assert.Equal(2, memory.Writes.Count)
@@ -1280,7 +1286,7 @@ let ``Repeated append branches share immutable setup without growing parameter h
 [<Theory>]
 [<InlineData(true)>]
 [<InlineData(false)>]
-let ``Append source branching shares setup in replica folders`` soss =
+let ``Append source branching shares one database copy of each checkpoint and test file`` soss =
     GeneSort.Core.Mp.MessagePackSetup.configure()
     let root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "GeneSort-append-" + Guid.NewGuid().ToString("N"))
     let makeDb (configured: run) =
@@ -1373,8 +1379,9 @@ let ``Append source branching shares setup in replica folders`` soss =
                      |> Async.RunSynchronously |> Result.defaultWith failwith
         Assert.Equal(expectedCount, loaded.Length)
         let files = System.IO.Directory.GetFiles(System.IO.Path.Combine(destinationRoot, "Setup"), "*.msgpack", System.IO.SearchOption.AllDirectories)
-        Assert.Equal(12, files.Length)
-        Assert.All(files, fun path -> Assert.Contains(System.IO.Directory.GetParent(path).Name, [|"0"; "1"|]))
+        Assert.Equal(sourceParameters.Length + 1, files.Length)
+        Assert.Single(loaded |> Array.map (fun rp -> rp.GetSetupSortableTestsWithPrefixId()) |> Array.distinct) |> ignore
+        Assert.All(files, fun path -> Assert.Contains(System.IO.Directory.GetParent(path).Name, [|"SorterPoolSet"; "SortableTestsWithPrefix"|]))
         Assert.All(loaded |> Array.groupBy (fun rp -> rp.GetRepl(), rp.ParamMap.[ParamKeys.setupSorterPoolSetIdKey]),
             fun (_, branches) -> Assert.Equal(16, branches.Length))
         for rp in loaded do

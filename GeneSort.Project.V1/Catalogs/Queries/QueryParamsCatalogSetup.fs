@@ -4,41 +4,6 @@ open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 
-/// Stable names for setup query builders, independent of the run query registry.
-module QueryCatalogNamesSetup =
-    [<Literal>]
-    let sorterSgdUf6MutationRate = "sorter-sgd.uf6-mutation-rate"
-    [<Literal>]
-    let sorterSgdMsrsOrthoPara = "sorter-sgd.msrs-ortho-para"
-    [<Literal>]
-    let sorterSgdMssiOrthoPara = "sorter-sgd.mssi-ortho-para"
-    [<Literal>]
-    let sorterSgdMsufStandard = "sorter-sgd.msuf-standard"
-    [<Literal>]
-    let sorterSgdMsufSoss = "sorter-sgd.msuf-soss"
-    [<Literal>]
-    let sossMsuf32Seed = "sorter-sgd.soss-msuf32-seed"
-    [<Literal>]
-    let sorterSgdMsrs32MutationRate = "sorter-sgd.msrs32-mutation-rate"
-    [<Literal>]
-    let sorterSgdMsrsPoolModComp = "sorter-sgd.msrs-pool-mod-comp"
-    [<Literal>]
-    let sortableTestMerge = "sortable-test.merge"
-    [<Literal>]
-    let sortableTestPrefix = "sortable-test.prefix"
-    [<Literal>]
-    let sorterEvalStandard = "sorter-eval.standard"
-    [<Literal>]
-    let sorterEvalMerge = "sorter-eval.merge"
-    [<Literal>]
-    let sorterEvalPrefix = "sorter-eval.prefix"
-    [<Literal>]
-    let sorterMutateStandard = "sorter-mutate.standard"
-    [<Literal>]
-    let sorterMutateMerge = "sorter-mutate.merge"
-    [<Literal>]
-    let sorterMutatePrefix = "sorter-mutate.prefix"
-
 /// Process-wide catalog of query parameter builders, addressed by stable names stored in runs.
 module QueryParamsCatalogSetup =
 
@@ -67,13 +32,16 @@ module QueryParamsCatalogSetup =
     let get name : setupQueryParamsCatalogBuilder =
         let builder = lookup name
         fun project database parameters outputType ->
-            builder project database (SetupFileReferences.withoutReferences parameters) outputType
-            |> Option.map (fun query ->
-                let properties =
-                    [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
-                    |> List.fold (fun map key ->
-                        match Map.tryFind key parameters.ParamMap with
-                        | Some value -> Map.add key value map
-                        | None -> map) query.Properties
-                if properties = query.Properties then query
-                else queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))
+            match SetupArtifactQueries.tryCreate name project database (runParameters.create parameters.ParamMap) outputType with
+            | Some query -> Some query
+            | None ->
+                builder project database (SetupFileReferences.withoutReferences parameters) outputType
+                |> Option.map (fun query ->
+                    let properties =
+                        [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
+                        |> List.fold (fun map key ->
+                            match Map.tryFind key parameters.ParamMap with
+                            | Some value -> Map.add key value map
+                            | None -> map) query.Properties
+                    if properties = query.Properties then query
+                    else queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))

@@ -13,6 +13,7 @@ open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
+open GeneSort.Dispatch.V1
 
 module Utils =
 
@@ -46,15 +47,9 @@ module Utils =
             let! query =
                 genDb.makeQueryParamsFromRunParams setupRp (geneSortDataType.SortableTestsWithPrefix "")
                 |> Result.ofOption "Failed to create QueryParams for Setup SortableTestsWithPrefix."
-            let! exists = genDb.doesOutPutDataExist geneSortDataMode.Setup query
-            if exists then
-                let! savedTests = genDb.loadAsync geneSortDataMode.Setup query
-                return! OutputData.asSortableTestsWithPrefix savedTests
-            else
-                let! (tests, prefix) = makeTests setupRp
-                do! genDb.saveAsync geneSortDataMode.Setup query
-                        (outputData.SortableTestsWithPrefix (tests, prefix)) (UMX.tag<allowOverwrite> false)
-                return tests, prefix
+            let! saved = SetupArtifacts.getOrCreate genDb (QueryParams.forSetup rp query) (fun () ->
+                makeTests setupRp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
+            return! OutputData.asSortableTestsWithPrefix saved
         }
 
     /// Helper to evaluate one generation step asynchronously without accumulating history.

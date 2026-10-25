@@ -23,6 +23,7 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 open GeneSort.Project.Mp.V1
+open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
@@ -132,7 +133,7 @@ let ``host generates independent setup and run combinations using their own quer
     Assert.Equal(12, runParameters.Length)
     Assert.Equal(4, setupParameters.Length)
     for rp in runParameters do
-        Assert.False(rp.ParamMap.ContainsKey "SetupOnly")
+        Assert.Contains(rp.ParamMap.["SetupOnly"], [|"one"; "two"|])
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
         Assert.Equal("run", query.Properties.["Phase"])
         Assert.Equal(Some query.Id, rp.GetId())
@@ -477,15 +478,24 @@ let ``workflows reject incompatible seeds before evaluating or saving`` (sossWor
     let standard = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) None
     let seed = if sossWorkflow then sorterPoolSet.Standard standard else SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss
     let creator _ = async { return Ok seed }
+    let database =
+        { new IGeneSortDb with
+            member _.databaseName = UMX.tag "test"
+            member _.makeQueryParamsFromRunParams _ output = Some (queryParams.create (UMX.tag "test") (UMX.tag "test") None None output [||])
+            member _.doesOutPutDataExist _ _ = async { return false }
+            member _.saveAsync _ _ _ _ = failwith "An incompatible seed must not be saved"
+            member _.loadAsync _ _ = failwith "No saved seed exists"
+            member _.loadIfFoundAsync _ _ = failwith "Unexpected load"
+            member _.getRunParameters _ _ _ _ _ = failwith "Unexpected parameter read" }
     let result =
         if sossWorkflow then
             GeneSort.Dispatch.V1.SorterSgd.Soss.SgdEx_Soss.initializeAndSaveSeedPoolSet
-                creator Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
+                creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
                 Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
             |> Async.RunSynchronously |> Result.map ignore
         else
             GeneSort.Dispatch.V1.SorterSgd.Standard.SgdEx_Standard.initializeAndSaveSeedPoolSet
-                creator Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
+                creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
                 Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
             |> Async.RunSynchronously |> Result.map ignore
     Assert.Contains((if sossWorkflow then "Expected a Soss" else "Expected a Standard"), errorOf result)

@@ -8,10 +8,10 @@ open GeneSort.SortingLib.Sorter
 open GeneSort.SortingOps
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Parameters
 open GeneSort.Db.V1
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.CommonParams
 
 
 module SorterEvalDbs =
@@ -53,6 +53,14 @@ module SorterEvalDbs =
         let private sourceRun = SorterEval.RunCfg.Prefix.Width32 ()
         let projectName = sourceRun.ProjectName
 
+        let sorterCount =
+            sourceRun.SetupParameterSpans
+            |> List.find (fst >> (=) ParamKeys.sorterCountKey)
+            |> snd
+            |> List.exactlyOne
+            |> int
+            |> UMX.tag<sorterCount>
+
         let dbName = sourceRun.DatabaseName
         let dbFolder = 
                 $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
@@ -87,7 +95,7 @@ module SorterEvalDbs =
                             : Async<Result<sorterSetEval, string>> =
         let qp = Standard.makeQueryParams 
                         (0 |> UMX.tag<replNumber>) 
-                        _rngTypeLcg
+                        rngType.Lcg
                         sortingWidth 
                         simpleSorterModelType 
                         sorterEvalType
@@ -106,7 +114,7 @@ module SorterEvalDbs =
 
         let qp = Merge.makeQueryParams 
                         repl 
-                        _rngTypeLcg
+                        rngType.Lcg
                         mrgLibId
                         simpleSorterModelType
                         sortableDataFormat.Int8Vector512
@@ -127,12 +135,11 @@ module SorterEvalDbs =
 
         let qp = Prefix.makeQueryParams 
                         repl
-                        _rngTypeLcg
+                        rngType.Lcg
                         pfxLibId 
                         simpleSorterModelType
                         sortableDataFormat.BitVector512
-                        // The prefix evaluation source specs use largeSorterCount.
-                        (snd largeSorterCount |> List.exactlyOne |> int |> UMX.tag<sorterCount>)
+                        Prefix.sorterCount
                         sorterEvalType.V2
                         (geneSortDataType.SorterSetEval "")
         async {

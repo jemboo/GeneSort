@@ -37,7 +37,7 @@ module SgdEx_Soss =
             (UMX.cast<partitionCount, sortableTestsCount> partitionCount) sortableTests
 
     /// Creates, evaluates, and saves the initial pool as Setup when no saved pool exists
-    let initializeAndSaveSeedPoolSet 
+    let initializeAndSaveSeedPoolSet
             (sorterPoolSetCreator: runParameters -> Async<Result<sorterPoolSet, string>>)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
@@ -48,37 +48,35 @@ module SgdEx_Soss =
             (log: string -> unit) : Async<Result<sorterPoolSet_Soss, string>> =
 
         asyncResult {
-            let evalType = sorterEvalType.V2
-            log "No saved checkpoint or Setup pool found. Creating initial seedSorterPoolSet..."
-            let! seedPoolSet = sorterPoolSetCreator rp
-            let! seedSossPoolSet = SorterPoolSet.asSoss seedPoolSet
-            
-            let computedEvals = 
-                seedSossPoolSet 
-                |> PoolRunner_Soss.evaluatePoolSet
-                    sortableTests 
-                    prefix
-                    evalType
-                    true // reEvaluateParents
-                    (false |> UMX.tag<collectNewSortableTests>)
-                // These tests cover the full set, so this is the merged Soss evaluation.
-                |> Map.map (fun _ evaluation ->
-                    SorterEval.withSortableTestsSubsetId CommonSgdSoss.mergedSubsetId evaluation)
-            
-            let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
-            let evaluatedSeedSet =
-                seedSossPoolSet
-                |> SorterPoolSet_Soss.updateSorterEvals computedEvals
-                |> SorterPoolSet_Soss.withSelectionMeasure selectionMeasure
-
-            // Save the evaluated initial pool for reuse when no Results checkpoint exists
-            let! qpSsrr = 
+            let! query =
                 genDb.makeQueryParamsFromRunParams rp (geneSortDataType.SorterPoolSet "")
-                |> Result.ofOption "Failed to create QueryParams for seedSorterRunResult."   
-            do! genDb.saveAsync geneSortDataMode.Setup qpSsrr (evaluatedSeedSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) (false |> UMX.tag<allowOverwrite>)
-            log (sprintf "Initial seedSorterPoolSet saved as Setup at generation %d." %evaluatedSeedSet.GenerationNumber)
+                |> Result.ofOption "Failed to create QueryParams for initial Setup pool."
+            let! saved = SetupArtifacts.getOrCreate genDb (QueryParams.forSetup rp query) (fun () -> asyncResult {
+                let evalType = sorterEvalType.V2
+                log "No saved checkpoint or Setup pool found. Creating initial seedSorterPoolSet..."
+                let! seedPoolSet = sorterPoolSetCreator rp
+                let! seedSossPoolSet = SorterPoolSet.asSoss seedPoolSet
 
-            return evaluatedSeedSet
+                let computedEvals =
+                    seedSossPoolSet
+                    |> PoolRunner_Soss.evaluatePoolSet
+                        sortableTests
+                        prefix
+                        evalType
+                        true // reEvaluateParents
+                        (false |> UMX.tag<collectNewSortableTests>)
+                    // These tests cover the full set, so this is the merged Soss evaluation.
+                    |> Map.map (fun _ evaluation ->
+                        SorterEval.withSortableTestsSubsetId CommonSgdSoss.mergedSubsetId evaluation)
+
+                let! selectionMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+                let evaluatedSeedSet =
+                    seedSossPoolSet
+                    |> SorterPoolSet_Soss.updateSorterEvals computedEvals
+                    |> SorterPoolSet_Soss.withSelectionMeasure selectionMeasure
+                return evaluatedSeedSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet
+            })
+            return! OutputData.asSorterPoolSetSoss saved
         }
 
 
@@ -105,6 +103,7 @@ module SgdEx_Soss =
                 let! query =
                     genDb.makeQueryParamsFromRunParams initRp (geneSortDataType.SorterPoolSet "")
                     |> Result.ofOption "Failed to create QueryParams for initial Setup sorterPoolSet."
+                let query = QueryParams.forSetup rp query
                 let! exists = genDb.doesOutPutDataExist geneSortDataMode.Setup query
                 if exists then
                     let! saved = genDb.loadAsync geneSortDataMode.Setup query
@@ -136,7 +135,7 @@ module SgdEx_Soss =
             (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
 
         let log (msg: string) =
-                OpsUtils.report progress 
+                OpsUtils.report progress
                     (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
 
         asyncResult {
@@ -147,8 +146,8 @@ module SgdEx_Soss =
                 do! if %partitionCount > 0 then Ok () else Error "PartitionCount must be greater than zero."
 
                 log "Loading saved Setup SortableTestsWithPrefix..."
-                let! sWidth = 
-                    rp.GetSortingWidth() 
+                let! sWidth =
+                    rp.GetSortingWidth()
                     |> Result.ofOption "Missing sorting width."
                 let! (sortableTests, ces) = Utils.loadSortableTestsWithPrefix genDb rp
                 let! seedSoss =
@@ -175,9 +174,9 @@ module SgdEx_Soss =
                 let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSetSoss saveIntervals genDb rp
 
                 // 2. Resume Results or load the initial pool prepared by setup
-                let! (activeSeedPoolSet, activeRp) = 
+                let! (activeSeedPoolSet, activeRp) =
                     match highestPoolSetOpt with
-                    | None -> 
+                    | None ->
                         asyncResult {
                             let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
                             let! setupData = Utils.loadSetupOutputData genDb initRp (geneSortDataType.SorterPoolSet "")
@@ -195,7 +194,7 @@ module SgdEx_Soss =
                         }
 
                 do! checkCancellation cts.Token
-                
+
                 log "Making sorterModelMutator..."
                 do! (activeSeedPoolSet: sorterPoolSet_Soss).SorterPools |> Map.values
                     |> Seq.collect (fun pool -> pool.SorterPoolMembers)
@@ -241,8 +240,8 @@ module SgdEx_Soss =
                 log "evaluateEvolutionRun completed."
                 return activeRp.WithGenerationCurrent(Some finalRunResult.GenerationNumber).WithRunFinished(Some true)
 
-            with e -> 
+            with e ->
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
-                log errorMsg 
+                log errorMsg
                 return! Error errorMsg
         } |> Async.map (OpsUtils.logResult progress log)

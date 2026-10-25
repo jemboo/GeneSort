@@ -88,10 +88,10 @@ type queryParams =
 
 
 
-    /// Imported setup files are identified only by destination project and source file.
-    static member createForImportedFile dbName projectName repl outputType (sourceFileId: Guid<queryParamsId>) =
-        let query = queryParams.create dbName projectName repl None outputType [| "SourceFileId", string %sourceFileId |]
-        { query with id = GuidUtils.guidFromObjs [box %projectName; box %sourceFileId] |> UMX.tag<queryParamsId> }
+    /// Preserve source identity across copies and continuation chains. Storage is database-local.
+    static member createForImportedFile dbName projectName _repl outputType (sourceFileId: Guid<queryParamsId>) =
+        let query = queryParams.create dbName projectName None None outputType [| "SourceFileId", string %sourceFileId |]
+        { query with id = sourceFileId }
 
     static member createFromMap
             (dbName:         string<databaseName>)
@@ -129,23 +129,38 @@ type queryParams =
 
 module QueryParams = 
 
+    /// A saved setup reference is sufficient to locate a file in the owning database.
+    let trySetupReference database project (parameters: runParameters) outputType =
+        let key =
+            match outputType with
+            | geneSortDataType.SorterModelSet _ | geneSortDataType.SortableTestsWithPrefix _
+            | geneSortDataType.SorterPoolSet _ -> Some (SetupFileReferences.keyForOutputType outputType)
+            | _ -> None
+        key |> Option.bind (fun key ->
+            parameters.ParamMap.TryFind key |> Option.map (fun value ->
+                let query = queryParams.create database project None None outputType [||]
+                { query with id = System.Guid.Parse value |> UMX.tag }))
+
     /// Resolve imported Setup independently of the current execution settings and generation.
     let forSetup (parameters: runParameters) (query: queryParams) =
-        let sourceKey =
-            match query.OutputDataType with
-            | geneSortDataType.SorterPoolSet _ -> Some ParamKeys.sourcePoolFileIdKey
-            | geneSortDataType.SortableTestsWithPrefix _ -> Some ParamKeys.sourceTestsFileIdKey
-            | _ -> None
-        match sourceKey |> Option.bind (fun key -> Map.tryFind key parameters.ParamMap) with
-        | None -> query
-        | Some value ->
-            let imported = queryParams.createForImportedFile query.DbName query.ProjectName (parameters.GetRepl()) query.OutputDataType
-                                (System.Guid.Parse value |> UMX.tag)
-            // Converted pools have their own Setup identity; provenance still records the original source file.
-            let referenceKey = SetupFileReferences.keyForOutputType query.OutputDataType
-            match Map.tryFind referenceKey parameters.ParamMap with
-            | Some id -> { imported with id = System.Guid.Parse id |> UMX.tag }
-            | None -> imported
+        match trySetupReference query.DbName query.ProjectName parameters query.OutputDataType with
+        | Some referenced -> referenced
+        | None ->
+            let sourceKey =
+                match query.OutputDataType with
+                | geneSortDataType.SorterPoolSet _ -> Some ParamKeys.sourcePoolFileIdKey
+                | geneSortDataType.SortableTestsWithPrefix _ -> Some ParamKeys.sourceTestsFileIdKey
+                | _ -> None
+            match sourceKey |> Option.bind (fun key -> Map.tryFind key parameters.ParamMap) with
+            | None -> query
+            | Some value ->
+                let imported = queryParams.createForImportedFile query.DbName query.ProjectName (parameters.GetRepl()) query.OutputDataType
+                                    (System.Guid.Parse value |> UMX.tag)
+                // Converted pools have their own Setup identity; provenance still records the original source file.
+                let referenceKey = SetupFileReferences.keyForOutputType query.OutputDataType
+                match Map.tryFind referenceKey parameters.ParamMap with
+                | Some id -> { imported with id = System.Guid.Parse id |> UMX.tag }
+                | None -> imported
 
     // Creates a dataTableRecord from the Properties only, treating each of them as keys.
     let makeDataTableRecord (qp: queryParams) : GeneSort.Core.dataTableRecord =

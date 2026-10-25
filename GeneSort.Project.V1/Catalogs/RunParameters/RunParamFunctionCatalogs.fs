@@ -63,6 +63,14 @@ module RunParamEnhancerBuilders =
     let private queryParamsForRun (context: runParamEnhancerContext) (rp: runParameters) =
         context.QueryParamsFromRunParams rp (geneSortDataType.Run context.Run.RunName) |> Option.get
 
+    let private inheritSetup (context: runParamEnhancerContext) (rp: runParameters) =
+        match context.SetupParameters with
+        | None -> rp
+        | Some setup ->
+            (SetupFileReferences.withoutReferences setup).ParamMap
+            |> Map.fold (fun map key value -> if Map.containsKey key map then map else Map.add key value map) rp.ParamMap
+            |> runParameters.create
+
     let sortableTests (context: runParamEnhancerContext) (rp: runParameters) =
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
@@ -71,6 +79,7 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     let sorterEvalStandard (context: runParamEnhancerContext) (rp: runParameters) =
+        let rp = inheritSetup context rp
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
@@ -81,6 +90,7 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     let sorterMutateStandard (context: runParamEnhancerContext) (rp: runParameters) =
+        let rp = inheritSetup context rp
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
@@ -90,6 +100,7 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     let sorterMutateStandardFormat (context: runParamEnhancerContext) (rp: runParameters) =
+        let rp = inheritSetup context rp
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
@@ -99,6 +110,15 @@ module RunParamEnhancerBuilders =
             .WithId(Some qp.Id)
 
     let sorterEvalMerge (context: runParamEnhancerContext) (rp: runParameters) =
+        // Each execution consumes its paired setup; only execution spans add new combinations.
+        let rp =
+            match context.SetupParameters with
+            | None -> rp
+            | Some setup ->
+                (SetupFileReferences.withoutReferences setup).ParamMap
+                |> Map.fold (fun map key value ->
+                    if Map.containsKey key map then map else Map.add key value map) rp.ParamMap
+                |> runParameters.create
         let qp = queryParamsForRun context rp
         let mergeLibId = rp.GetMergeLibId().Value
         rp.WithDatabaseName(Some context.Run.DatabaseName)
