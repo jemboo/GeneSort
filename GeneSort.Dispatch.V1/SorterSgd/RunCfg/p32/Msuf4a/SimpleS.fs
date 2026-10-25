@@ -67,22 +67,22 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpansSetup =
             [
-                (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [32; 64] |> List.map string)
                 (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 1] |> List.map string)
+                (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
                 (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
                 (ParamKeys.modificationRateKey, [0.035] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
-                (ParamKeys.activationProbabilityKey, [0.70; 0.80; 0.90; 0.99] |> List.map string)
+                (ParamKeys.activationProbabilityKey, [0.825; 0.875; 0.925; 0.95] |> List.map string)
             ]
         let parameterSpansRun =
             [
-                (ParamKeys.generationIntervalLastKey, [19] |> List.map string)
-                (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
-                (ParamKeys.activatorMutationRateKey, [0.0; 0.03; 0.06; 0.09] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [9] |> List.map string)
+                (ParamKeys.adjustCeLengthFrequencyKey, [100] |> List.map string)
+                (ParamKeys.activatorMutationRateKey, [0.0; 0.01; 0.02; 0.03] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
@@ -109,6 +109,8 @@ module Standard =
                 GenSaveSubIntervalsName = GenIntervalNames.uniformInterval10
             }
         )
+
+
 
 module Soss =
 
