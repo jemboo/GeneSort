@@ -327,16 +327,9 @@ module SorterPool_Standard =
         let pool = pool |> withSelectionMeasure measure
         let filterUnsorted = SorterEvalFunctions.getFilterUnsortedFlag measure
 
-        let filter1 =
-            pool.SorterPoolMembers
-            // Step 1: Handle filtering of unsorted elements if required by the measure rules
-            |> Seq.filter (fun spm ->
-                if %filterUnsorted then
-                    match spm.SorterEval with
-                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
-                    | None -> false // Unevaluated members cannot verify if they are fully sorted
-                else true
-            )
+        let recovering, filter1 =
+            pool.SorterPoolMembers |> Seq.toArray
+            |> SorterPoolPruning.candidates %filterUnsorted pool.RawCeLength (fun spm -> spm.SorterEval)
 
         // if the hashes are the same, then prioritize the older member
         let birthdaySort =
@@ -366,7 +359,7 @@ module SorterPool_Standard =
                 // If prioritizing OLD members: higher mutation index comes first (so we negate it).
                 let tieBreaker = if %prioritizeNewMutants then mIndexRaw else -mIndexRaw
                 
-                (score, tieBreaker)
+                (SorterPoolPruning.recoveryRank recovering spm.SorterEval, score, tieBreaker)
             )
             // Step 4: Take the best up to the designated pruned size limit
             |> Seq.truncate targetSize
@@ -401,15 +394,9 @@ module SorterPool_Standard =
         let initialCount = initialMembers.Length
 
         // --- Step 1: Filter Unsorted ---
-        let filter1Members =
+        let recovering, filter1Members =
             initialMembers
-            |> Array.filter (fun spm ->
-                if %filterUnsorted then
-                    match spm.SorterEval with
-                    | Some eval -> eval |> SorterEval.getIsShortEnough pool.RawCeLength 
-                    | None -> false // Unevaluated members cannot verify if they are fully sorted
-                else true
-            )
+            |> SorterPoolPruning.candidates %filterUnsorted pool.RawCeLength (fun spm -> spm.SorterEval)
 
         let countAfterFilter1 = filter1Members.Length
 
@@ -455,7 +442,8 @@ module SorterPool_Standard =
         // --- Step 5: Ranking & Sorting ---
         let rankedMembers =
             scoredMembers
-            |> Array.sortBy (fun (score, tieBreaker, _) -> (score, tieBreaker))
+            |> Array.sortBy (fun (score, tieBreaker, spm) ->
+                (SorterPoolPruning.recoveryRank recovering spm.SorterEval, score, tieBreaker))
 
         // --- Step 6: Truncation (Pruning to Target Capacity) ---
         let truncatedSurvivors =

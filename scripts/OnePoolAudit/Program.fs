@@ -20,7 +20,7 @@ open OnePoolAuditVerification
 let unwrap computation = computation |> Async.RunSynchronously |> Result.defaultWith failwith
 let require condition message = if not condition then failwith message
 let mutable controlledOnly = false
-let mutable msuf4r = false
+let mutable msuf4Family: string option = None
 let replicaLimit (configured: run) =
     (if %configured.DatabaseName = "Controlled" then GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Controlled.replicaCount else 1) |> UMX.tag
 let parameters (host: runHost) =
@@ -100,7 +100,7 @@ let verifyPools soss (host: runHost) (expected: runParameters) (rp: runParameter
     for row in rows do
         require (int row.["SorterCountPerPool"] = size && int row.["SorterPoolCount"] = count)
             (sprintf "%s: summary differs from configured pool sizes." %host.Run.RunName)
-    if %host.Run.DatabaseName = "Controlled" || msuf4r then
+    if %host.Run.DatabaseName = "Controlled" || msuf4Family.IsSome then
         let intervals = match host with SgdRunHost sgd -> sgd.GenSaveIntervals | _ -> failwith "Expected an SGD host."
         let generations = GenIntervalConfig.getSampleAtIndex intervals (int (expected.GetGenerationIntervalLast().Value))
                           |> Option.defaultWith (fun () -> failwith "Invalid final generation interval.")
@@ -202,7 +202,10 @@ let audit soss configured =
         printfn "SELECTED %s sourceMutation=%d sourceId=%s setupMembersMatch=true" %host.Run.RunName (int (sourceRp.GetMutationMod().Value)) sourceId
 
 let currentRuns () =
-    let moduleName = if msuf4r then "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.SimpleR" else "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+    let moduleName =
+        match msuf4Family with
+        | Some family -> "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a." + family
+        | None -> "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
     let presets = typeof<runHost>.Assembly.GetType(moduleName, true)
     let runs =
         typeof<runHost>.Assembly.GetTypes()
@@ -252,7 +255,7 @@ let combineReports () =
         saved |> Array.sortBy (fun rp -> rp.GetId()) |> Array.collect (fun rp ->
             reportCount <- reportCount + 1
             report host rp |> Array.map (fun row ->
-                if msuf4r then row |> Map.add "Workflow" (%configured.DatabaseName) else row)))
+                if msuf4Family.IsSome then row |> Map.add "Workflow" (%configured.DatabaseName) else row)))
     // Standard and Soss reports have different columns; align their union by name.
     let headers =
         rows |> Seq.collect Map.keys |> Set.ofSeq |> Set.remove ParamKeys.runNameKey |> Set.toArray
@@ -264,8 +267,9 @@ let combineReports () =
     let baseRun = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.TestStandard()
     let filename = if controlledOnly then "OnePool_Controlled_SummaryReport.txt" else "OnePool_SummaryReport.txt"
     let path =
-        if msuf4r then Path.Combine(RunHost.projectsRoot(), %runs.[0].ProjectName, "Reports", "Msuf4a_SimpleR_SummaryReport.txt")
-        else Path.Combine(%(RunHost.makeDataFolder baseRun), "Results", "Report", filename)
+        match msuf4Family with
+        | Some family -> Path.Combine(RunHost.projectsRoot(), %runs.[0].ProjectName, "Reports", sprintf "Msuf4a_%s_SummaryReport.txt" family)
+        | None -> Path.Combine(%(RunHost.makeDataFolder baseRun), "Results", "Report", filename)
     Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
     // Replace only after the complete combined report has been written successfully.
     let temporaryPath = path + ".tmp"
@@ -283,10 +287,11 @@ let combineReports () =
 [<EntryPoint>]
 let main args =
     try
-        require (args |> Array.forall (fun arg -> arg = "--combine" || arg = "--controlled" || arg = "--msuf4r")) "Usage: OnePoolAudit [--combine] [--controlled|--msuf4r]"
+        require (args |> Array.forall (fun arg -> arg = "--combine" || arg = "--controlled" || arg = "--msuf4r" || arg = "--msuf4s")) "Usage: OnePoolAudit [--combine] [--controlled|--msuf4r|--msuf4s]"
         controlledOnly <- Array.contains "--controlled" args
-        msuf4r <- Array.contains "--msuf4r" args
-        require (not (controlledOnly && msuf4r)) "Choose either --controlled or --msuf4r."
+        let families = ["--msuf4r", "SimpleR"; "--msuf4s", "SimpleS"] |> List.filter (fun (flag, _) -> Array.contains flag args)
+        require (families.Length + (if controlledOnly then 1 else 0) <= 1) "Choose only one of --controlled, --msuf4r, or --msuf4s."
+        msuf4Family <- families |> List.tryHead |> Option.map snd
         MessagePackSetup.configure ()
         for configured in currentRuns () do
             match configured.ParameterSource with
@@ -299,9 +304,10 @@ let main args =
                     let configuredParameters = expected |> Array.find (fun candidate -> candidate.GetId() = rp.GetId())
                     verifyPools (configured.ExecuteFunctionName = ExecuteFunctionNames.soss) host configuredParameters rp |> ignore
         auditControlledSeeds ()
-        if msuf4r then
-            printfn "PASS: Msuf4a.SimpleR parameter sweep, pool sizes, bounded activators, generation coverage, final checkpoints, and summary metadata."
-        else
+        match msuf4Family with
+        | Some family ->
+            printfn "PASS: Msuf4a.%s parameter sweep, pool sizes, activators, generation coverage, final checkpoints, and summary metadata." family
+        | None ->
             printfn "PASS: Append sizes, Condense ranking, imported members, SimpleR activators and settings, final checkpoints, and current summary reports."
         if Array.contains "--combine" args then combineReports ()
         0

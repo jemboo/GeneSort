@@ -5,6 +5,7 @@ param(
     [switch] $ListOnly,
     [switch] $ControlledOnly,
     [switch] $Msuf4aSimpleR,
+    [switch] $Msuf4aSimpleS,
     [switch] $NoBuild
 )
 
@@ -15,7 +16,9 @@ $auditProject = Join-Path $PSScriptRoot 'OnePoolAudit/OnePoolAudit.fsproj'
 $audit = Join-Path $PSScriptRoot 'OnePoolAudit/bin/Debug/net10.0/OnePoolAudit.dll'
 
 try {
-    if ($ControlledOnly -and $Msuf4aSimpleR) { throw 'Choose either -ControlledOnly or -Msuf4aSimpleR.' }
+    if (@($ControlledOnly, $Msuf4aSimpleR, $Msuf4aSimpleS).Where({ $_ }).Count -gt 1) {
+        throw 'Choose only one of -ControlledOnly, -Msuf4aSimpleR, or -Msuf4aSimpleS.'
+    }
     if (-not $NoBuild) {
         & dotnet build $project --configuration Debug --verbosity quiet -m:1
         if ($LASTEXITCODE -ne 0) { throw "OnePool runner build failed (exit $LASTEXITCODE)." }
@@ -29,6 +32,7 @@ try {
     if ($ListOnly) { $runnerArgs = @('--list') + $runnerArgs }
     if ($ControlledOnly) { $runnerArgs = @('--controlled') + $runnerArgs }
     if ($Msuf4aSimpleR) { $runnerArgs = @('--msuf4r') + $runnerArgs }
+    if ($Msuf4aSimpleS) { $runnerArgs = @('--msuf4s') + $runnerArgs }
     & dotnet $runner @runnerArgs
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     if ($ListOnly) { exit 0 }
@@ -37,6 +41,7 @@ try {
     $auditArgs = @('--combine')
     if ($ControlledOnly) { $auditArgs += '--controlled' }
     if ($Msuf4aSimpleR) { $auditArgs += '--msuf4r' }
+    if ($Msuf4aSimpleS) { $auditArgs += '--msuf4s' }
     & dotnet $audit @auditArgs
     exit $LASTEXITCODE
 }

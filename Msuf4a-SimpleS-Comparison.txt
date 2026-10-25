@@ -1,0 +1,238 @@
+Msuf4a.SimpleS activation and mutation comparison, with SimpleR reference
+Averages across mutation variants of replica 0, not independent seed replicas. Soss uses Merge evaluations.
+Lower CEs, stages and score are better once sorting succeeds. These reports do not measure execution speed.
+S activation probability controls initial activity; its mutation rate is the probability of flipping each boolean.
+R initial activity is a/(2a+1); its initial expected flip probability is mutation rate/(2a+1).
+These sweeps share prefix prerequisites and evolution settings, but do not match initial masks or effective flip rates.
+SimpleS source: C:\Projects\SorterSgd.RunCfg.p32.Msuf4a.SimpleS\Reports\Msuf4a_SimpleS_SummaryReport.txt
+SimpleR source: C:\Projects\SorterSgd.RunCfg.p32.Msuf4a.SimpleR\Reports\Msuf4a_SimpleR_SummaryReport.txt
+
+SimpleS Standard
+Test: generation=9, executions=4, CEs=280.23438, stages=32.42969, score=315.90703, unsorted=0.00000
+ActivationProbability=0.25, rate=0.05: executions=4, CEs=253.44531, stages=27.39844, score=283.58359, scoreRange=[272.26563,289.33750], poolsWithFailures=0
+  Reported generation 1: CEs=295.34375, stages=37.06250, score=336.11250, unsorted=3551.94000
+  Reported generation 10: CEs=307.24889, stages=37.66630, score=348.68181, unsorted=0.00000
+  Reported generation 20: CEs=291.14844, stages=35.14063, score=329.80313, unsorted=0.00000
+  Reported generation 50: CEs=268.27344, stages=30.11719, score=301.40234, unsorted=0.00000
+  Reported generation 100: CEs=253.44531, stages=27.39844, score=283.58359, unsorted=0.00000
+  MutationMod=0: CEs=244.59375, stages=25.15625, score=272.26562499999994, unsorted=0.00
+  MutationMod=1: CEs=257.78125, stages=28.68750, score=289.33749999999998, unsorted=0.00
+  MutationMod=2: CEs=254.12500, stages=27.25000, score=284.10000000000002, unsorted=0.00
+  MutationMod=3: CEs=257.28125, stages=28.50000, score=288.63124999999997, unsorted=0.00
+ActivationProbability=0.25, rate=0.10: executions=4, CEs=263.01563, stages=28.98438, score=294.89844, scoreRange=[288.15000,309.93750], poolsWithFailures=0
+  Reported generation 1: CEs=295.34375, stages=37.06250, score=336.11250, unsorted=3551.94000
+  Reported generation 10: CEs=301.31250, stages=36.42500, score=341.38000, unsorted=0.00000
+  Reported generation 20: CEs=295.09375, stages=34.69531, score=333.25859, unsorted=0.00000
+  Reported generation 50: CEs=279.48438, stages=32.30469, score=315.01953, unsorted=0.00000
+  Reported generation 100: CEs=263.01563, stages=28.98438, score=294.89844, unsorted=0.00000
+  MutationMod=0: CEs=259.84375, stages=28.03125, score=290.67812500000002, unsorted=0.00
+  MutationMod=1: CEs=276.59375, stages=30.31250, score=309.93750000000006, unsorted=0.00
+  MutationMod=2: CEs=256.93750, stages=28.37500, score=288.15000000000003, unsorted=0.00
+  MutationMod=3: CEs=258.68750, stages=29.21875, score=290.82812500000006, unsorted=0.00
+ActivationProbability=0.25, rate=0.20: executions=4, CEs=265.52344, stages=29.21094, score=297.65547, scoreRange=[291.98750,306.13438], poolsWithFailures=0
+  Reported generation 1: CEs=295.34375, stages=37.06250, score=336.11250, unsorted=3551.94000
+  Reported generation 10: CEs=303.56250, stages=36.84375, score=344.09063, unsorted=0.00000
+  Reported generation 20: CEs=286.96094, stages=33.40625, score=323.70781, unsorted=0.00000
+  Reported generation 50: CEs=271.93750, stages=30.50000, score=305.48750, unsorted=0.00000
+  Reported generation 100: CEs=265.52344, stages=29.21094, score=297.65547, unsorted=0.00000
+  MutationMod=0: CEs=260.84375, stages=28.31250, score=291.98749999999995, unsorted=0.00
+  MutationMod=1: CEs=267.75000, stages=29.18750, score=299.85625000000005, unsorted=0.00
+  MutationMod=2: CEs=260.12500, stages=29.56250, score=292.64374999999995, unsorted=0.00
+  MutationMod=3: CEs=273.37500, stages=29.78125, score=306.13437499999992, unsorted=0.00
+ActivationProbability=0.5, rate=0.05: executions=4, CEs=248.33594, stages=26.44531, score=277.42578, scoreRange=[273.90625,279.39063], poolsWithFailures=0
+  Reported generation 1: CEs=309.81250, stages=38.71875, score=352.40313, unsorted=411.50000
+  Reported generation 10: CEs=278.98438, stages=32.56250, score=314.80313, unsorted=0.00000
+  Reported generation 20: CEs=266.95313, stages=30.40625, score=300.40000, unsorted=0.00000
+  Reported generation 50: CEs=256.61719, stages=28.58594, score=288.06172, unsorted=0.00000
+  Reported generation 100: CEs=248.33594, stages=26.44531, score=277.42578, unsorted=0.00000
+  MutationMod=0: CEs=245.03125, stages=26.25000, score=273.90625000000006, unsorted=0.00
+  MutationMod=1: CEs=249.43750, stages=26.18750, score=278.24375000000003, unsorted=0.00
+  MutationMod=2: CEs=250.34375, stages=26.40625, score=279.39062500000006, unsorted=0.00
+  MutationMod=3: CEs=248.53125, stages=26.93750, score=278.16250000000002, unsorted=0.00
+ActivationProbability=0.5, rate=0.10: executions=4, CEs=246.89844, stages=26.30469, score=275.83359, scoreRange=[270.56875,286.21563], poolsWithFailures=0
+  Reported generation 1: CEs=309.81250, stages=38.71875, score=352.40313, unsorted=411.50000
+  Reported generation 10: CEs=280.23438, stages=32.42969, score=315.90703, unsorted=0.00000
+  Reported generation 20: CEs=268.81250, stages=31.05469, score=302.97266, unsorted=0.00000
+  Reported generation 50: CEs=258.12500, stages=28.66406, score=289.65547, unsorted=0.00000
+  Reported generation 100: CEs=246.89844, stages=26.30469, score=275.83359, unsorted=0.00000
+  MutationMod=0: CEs=244.40625, stages=25.62500, score=272.59375000000006, unsorted=0.00
+  MutationMod=1: CEs=241.62500, stages=26.31250, score=270.56875000000002, unsorted=0.00
+  MutationMod=2: CEs=255.65625, stages=27.78125, score=286.21562499999999, unsorted=0.00
+  MutationMod=3: CEs=245.90625, stages=25.50000, score=273.95624999999995, unsorted=0.00
+ActivationProbability=0.5, rate=0.20: executions=4, CEs=258.80469, stages=28.76563, score=290.44688, scoreRange=[287.44063,296.35625], poolsWithFailures=0
+  Reported generation 1: CEs=309.81250, stages=38.71875, score=352.40313, unsorted=411.50000
+  Reported generation 10: CEs=283.21875, stages=33.55469, score=320.12891, unsorted=0.00000
+  Reported generation 20: CEs=273.36719, stages=32.14063, score=308.72188, unsorted=0.00000
+  Reported generation 50: CEs=264.60938, stages=30.10156, score=297.72109, unsorted=0.00000
+  Reported generation 100: CEs=258.80469, stages=28.76563, score=290.44688, unsorted=0.00000
+  MutationMod=0: CEs=257.43750, stages=28.59375, score=288.89062499999994, unsorted=0.00
+  MutationMod=1: CEs=257.40625, stages=28.81250, score=289.09999999999997, unsorted=0.00
+  MutationMod=2: CEs=255.78125, stages=28.78125, score=287.44062500000001, unsorted=0.00
+  MutationMod=3: CEs=264.59375, stages=28.87500, score=296.35624999999999, unsorted=0.00
+ActivationProbability=0.75, rate=0.05: executions=4, CEs=244.28906, stages=25.71875, score=272.57969, scoreRange=[268.49063,277.58750], poolsWithFailures=0
+  Reported generation 1: CEs=306.75000, stages=38.62500, score=349.23750, unsorted=115.75000
+  Reported generation 10: CEs=278.29688, stages=32.75781, score=314.33047, unsorted=0.00000
+  Reported generation 20: CEs=269.18750, stages=30.46094, score=302.69453, unsorted=0.00000
+  Reported generation 50: CEs=256.31250, stages=28.06250, score=287.18125, unsorted=0.00000
+  Reported generation 100: CEs=244.28906, stages=25.71875, score=272.57969, unsorted=0.00000
+  MutationMod=0: CEs=240.75000, stages=25.21875, score=268.49062500000002, unsorted=0.00
+  MutationMod=1: CEs=249.46875, stages=25.56250, score=277.58750000000003, unsorted=0.00
+  MutationMod=2: CEs=243.75000, stages=25.93750, score=272.28125, unsorted=0.00
+  MutationMod=3: CEs=243.18750, stages=26.15625, score=271.95937500000002, unsorted=0.00
+ActivationProbability=0.75, rate=0.10: executions=4, CEs=249.43750, stages=26.42188, score=278.50156, scoreRange=[273.46875,285.18750], poolsWithFailures=0
+  Reported generation 1: CEs=306.75000, stages=38.62500, score=349.23750, unsorted=115.75000
+  Reported generation 10: CEs=279.67969, stages=32.75781, score=315.71328, unsorted=0.00000
+  Reported generation 20: CEs=271.86719, stages=31.22656, score=306.21641, unsorted=0.00000
+  Reported generation 50: CEs=258.03906, stages=28.77344, score=289.68984, unsorted=0.00000
+  Reported generation 100: CEs=249.43750, stages=26.42188, score=278.50156, unsorted=0.00000
+  MutationMod=0: CEs=244.93750, stages=25.93750, score=273.46875000000006, unsorted=0.00
+  MutationMod=1: CEs=248.12500, stages=26.65625, score=277.44687500000003, unsorted=0.00
+  MutationMod=2: CEs=249.06250, stages=26.21875, score=277.9031250000001, unsorted=0.00
+  MutationMod=3: CEs=255.62500, stages=26.87500, score=285.1875, unsorted=0.00
+ActivationProbability=0.75, rate=0.20: executions=4, CEs=257.69531, stages=28.88281, score=289.46641, scoreRange=[288.33438,291.35000], poolsWithFailures=0
+  Reported generation 1: CEs=306.75000, stages=38.62500, score=349.23750, unsorted=115.75000
+  Reported generation 10: CEs=280.99219, stages=33.64063, score=317.99688, unsorted=0.00000
+  Reported generation 20: CEs=271.98438, stages=31.53125, score=306.66875, unsorted=0.00000
+  Reported generation 50: CEs=264.00000, stages=29.79688, score=296.77656, unsorted=0.00000
+  Reported generation 100: CEs=257.69531, stages=28.88281, score=289.46641, unsorted=0.00000
+  MutationMod=0: CEs=257.87500, stages=29.06250, score=289.84375, unsorted=0.00
+  MutationMod=1: CEs=256.78125, stages=28.68750, score=288.33750000000009, unsorted=0.00
+  MutationMod=2: CEs=259.65625, stages=28.81250, score=291.34999999999991, unsorted=0.00
+  MutationMod=3: CEs=256.46875, stages=28.96875, score=288.33437499999997, unsorted=0.00
+Best observed average score: ActivationProbability=0.75, rate=0.05, score=272.57969, CEs=244.28906, stages=25.71875
+Best rate at ActivationProbability=0.25: 0.05, score=283.58359
+Best rate at ActivationProbability=0.5: 0.10, score=275.83359
+Best rate at ActivationProbability=0.75: 0.05, score=272.57969
+
+SimpleS Soss
+Test: generation=10, executions=4, CEs=278.71875, stages=32.18750, score=314.12500, unsorted=0.00000
+ActivationProbability=0.25, rate=0.05: executions=4, CEs=252.03125, stages=27.39844, score=282.16953, scoreRange=[274.05313,290.92813], poolsWithFailures=0
+  Reported generation 1: CEs=303.88281, stages=39.22656, score=347.03203, unsorted=928.31250
+  Reported generation 10: CEs=304.99640, stages=37.25241, score=345.97404, unsorted=0.07750
+  Reported generation 20: CEs=290.32031, stages=34.82813, score=328.63125, unsorted=0.00000
+  Reported generation 50: CEs=267.98438, stages=29.85938, score=300.82969, unsorted=0.00000
+  Reported generation 100: CEs=252.03125, stages=27.39844, score=282.16953, unsorted=0.00000
+  MutationMod=0: CEs=245.96875, stages=25.53125, score=274.05312499999991, unsorted=0.00
+  MutationMod=1: CEs=259.75000, stages=28.34375, score=290.92812500000002, unsorted=0.00
+  MutationMod=2: CEs=250.28125, stages=28.25000, score=281.35624999999999, unsorted=0.00
+  MutationMod=3: CEs=252.12500, stages=27.46875, score=282.34062499999993, unsorted=0.00
+ActivationProbability=0.25, rate=0.10: executions=4, CEs=263.14844, stages=29.13281, score=295.19453, scoreRange=[287.72813,311.53750], poolsWithFailures=0
+  Reported generation 1: CEs=303.39063, stages=36.33594, score=343.36016, unsorted=234.90500
+  Reported generation 10: CEs=299.11979, stages=35.93021, score=338.64302, unsorted=0.01500
+  Reported generation 20: CEs=295.74479, stages=34.39844, score=333.58307, unsorted=0.04250
+  Reported generation 50: CEs=278.00781, stages=32.11719, score=313.33672, unsorted=0.01500
+  Reported generation 100: CEs=263.14844, stages=29.13281, score=295.19453, unsorted=0.00000
+  MutationMod=0: CEs=256.68750, stages=28.21875, score=287.72812499999998, unsorted=0.00
+  MutationMod=1: CEs=277.43750, stages=31.00000, score=311.53749999999997, unsorted=0.00
+  MutationMod=2: CEs=258.68750, stages=28.46875, score=290.00312499999995, unsorted=0.00
+  MutationMod=3: CEs=259.78125, stages=28.84375, score=291.50937500000003, unsorted=0.00
+ActivationProbability=0.25, rate=0.20: executions=4, CEs=263.21875, stages=29.23438, score=295.37656, scoreRange=[291.39375,298.13125], poolsWithFailures=0
+  Reported generation 1: CEs=307.27084, stages=37.00000, score=347.97083, unsorted=0.16750
+  Reported generation 10: CEs=301.65265, stages=36.50241, score=341.80529, unsorted=0.12500
+  Reported generation 20: CEs=285.49219, stages=32.86719, score=321.64609, unsorted=0.01500
+  Reported generation 50: CEs=270.35938, stages=30.71875, score=304.15000, unsorted=0.00000
+  Reported generation 100: CEs=263.21875, stages=29.23438, score=295.37656, unsorted=0.00000
+  MutationMod=0: CEs=259.90625, stages=28.62500, score=291.39375000000001, unsorted=0.00
+  MutationMod=1: CEs=266.09375, stages=29.12500, score=298.13124999999997, unsorted=0.00
+  MutationMod=2: CEs=262.50000, stages=29.09375, score=294.5031249999999, unsorted=0.00
+  MutationMod=3: CEs=264.37500, stages=30.09375, score=297.47812499999998, unsorted=0.00
+ActivationProbability=0.5, rate=0.05: executions=4, CEs=248.89063, stages=26.37500, score=277.90313, scoreRange=[275.44063,281.20313], poolsWithFailures=0
+  Reported generation 1: CEs=309.57058, stages=38.68052, score=352.11915, unsorted=0.06500
+  Reported generation 10: CEs=277.48438, stages=32.33594, score=313.05391, unsorted=0.00000
+  Reported generation 20: CEs=266.76563, stages=30.39844, score=300.20391, unsorted=0.00000
+  Reported generation 50: CEs=257.34375, stages=28.91406, score=289.14922, unsorted=0.00000
+  Reported generation 100: CEs=248.89063, stages=26.37500, score=277.90313, unsorted=0.00000
+  MutationMod=0: CEs=246.53125, stages=26.28125, score=275.44062500000001, unsorted=0.00
+  MutationMod=1: CEs=248.06250, stages=26.03125, score=276.69687499999998, unsorted=0.00
+  MutationMod=2: CEs=248.81250, stages=26.78125, score=278.27187500000002, unsorted=0.00
+  MutationMod=3: CEs=252.15625, stages=26.40625, score=281.20312500000006, unsorted=0.00
+ActivationProbability=0.5, rate=0.10: executions=4, CEs=250.20313, stages=26.64063, score=279.50781, scoreRange=[273.09063,286.48438], poolsWithFailures=0
+  Reported generation 1: CEs=310.50880, stages=38.98351, score=353.39066, unsorted=0.08250
+  Reported generation 10: CEs=278.71875, stages=32.18750, score=314.12500, unsorted=0.00000
+  Reported generation 20: CEs=269.22656, stages=31.10156, score=303.43828, unsorted=0.00000
+  Reported generation 50: CEs=259.35938, stages=28.97656, score=291.23359, unsorted=0.00000
+  Reported generation 100: CEs=250.20313, stages=26.64063, score=279.50781, unsorted=0.00000
+  MutationMod=0: CEs=244.59375, stages=25.90625, score=273.09062499999999, unsorted=0.00
+  MutationMod=1: CEs=253.12500, stages=27.37500, score=283.23750000000001, unsorted=0.00
+  MutationMod=2: CEs=256.06250, stages=27.65625, score=286.484375, unsorted=0.00
+  MutationMod=3: CEs=247.03125, stages=25.62500, score=275.21875, unsorted=0.00
+ActivationProbability=0.5, rate=0.20: executions=4, CEs=260.06250, stages=29.18750, score=292.16875, scoreRange=[287.52500,295.40625], poolsWithFailures=0
+  Reported generation 1: CEs=307.98401, stages=38.40160, score=350.22576, unsorted=0.06250
+  Reported generation 10: CEs=281.39063, stages=33.71875, score=318.48125, unsorted=0.01500
+  Reported generation 20: CEs=273.53125, stages=32.28125, score=309.04063, unsorted=0.00000
+  Reported generation 50: CEs=264.94531, stages=30.32031, score=298.29766, unsorted=0.00000
+  Reported generation 100: CEs=260.06250, stages=29.18750, score=292.16875, unsorted=0.00000
+  MutationMod=0: CEs=259.87500, stages=28.81250, score=291.56874999999997, unsorted=0.00
+  MutationMod=1: CEs=262.00000, stages=29.25000, score=294.17499999999995, unsorted=0.00
+  MutationMod=2: CEs=255.62500, stages=29.00000, score=287.52499999999998, unsorted=0.00
+  MutationMod=3: CEs=262.75000, stages=29.68750, score=295.40625, unsorted=0.00
+ActivationProbability=0.75, rate=0.05: executions=4, CEs=246.77344, stages=26.57031, score=276.00078, scoreRange=[268.79375,285.25000], poolsWithFailures=0
+  Reported generation 1: CEs=300.80469, stages=37.14063, score=341.65938, unsorted=0.00000
+  Reported generation 10: CEs=277.82031, stages=32.42969, score=313.49297, unsorted=0.00000
+  Reported generation 20: CEs=269.07813, stages=30.33594, score=302.44766, unsorted=0.00000
+  Reported generation 50: CEs=256.88281, stages=28.24219, score=287.94922, unsorted=0.00000
+  Reported generation 100: CEs=246.77344, stages=26.57031, score=276.00078, unsorted=0.00000
+  MutationMod=0: CEs=240.81250, stages=25.43750, score=268.79375000000005, unsorted=0.00
+  MutationMod=1: CEs=248.18750, stages=26.78125, score=277.64687500000002, unsorted=0.00
+  MutationMod=2: CEs=243.78125, stages=25.93750, score=272.31250000000006, unsorted=0.00
+  MutationMod=3: CEs=254.31250, stages=28.12500, score=285.25, unsorted=0.00
+ActivationProbability=0.75, rate=0.10: executions=4, CEs=249.87500, stages=26.37500, score=278.88750, scoreRange=[273.39688,284.07500], poolsWithFailures=0
+  Reported generation 1: CEs=300.41406, stages=36.64063, score=340.71875, unsorted=0.00000
+  Reported generation 10: CEs=278.43750, stages=32.63281, score=314.33359, unsorted=0.00000
+  Reported generation 20: CEs=272.31250, stages=31.03125, score=306.44688, unsorted=0.00000
+  Reported generation 50: CEs=259.60156, stages=28.63281, score=291.09766, unsorted=0.00000
+  Reported generation 100: CEs=249.87500, stages=26.37500, score=278.88750, unsorted=0.00000
+  MutationMod=0: CEs=244.96875, stages=25.84375, score=273.39687500000002, unsorted=0.00
+  MutationMod=1: CEs=250.25000, stages=26.84375, score=279.7781250000001, unsorted=0.00
+  MutationMod=2: CEs=249.56250, stages=26.12500, score=278.30000000000001, unsorted=0.00
+  MutationMod=3: CEs=254.71875, stages=26.68750, score=284.07500000000005, unsorted=0.00
+ActivationProbability=0.75, rate=0.20: executions=4, CEs=258.51563, stages=28.83594, score=290.23516, scoreRange=[287.06875,291.78438], poolsWithFailures=0
+  Reported generation 1: CEs=299.71875, stages=36.84375, score=340.24688, unsorted=0.00000
+  Reported generation 10: CEs=281.09375, stages=33.55469, score=318.00391, unsorted=0.00000
+  Reported generation 20: CEs=272.63281, stages=31.92188, score=307.74688, unsorted=0.00000
+  Reported generation 50: CEs=263.21094, stages=29.80469, score=295.99609, unsorted=0.00000
+  Reported generation 100: CEs=258.51563, stages=28.83594, score=290.23516, unsorted=0.00000
+  MutationMod=0: CEs=259.90625, stages=28.90625, score=291.70312500000006, unsorted=0.00
+  MutationMod=1: CEs=258.65625, stages=28.84375, score=290.38437500000003, unsorted=0.00
+  MutationMod=2: CEs=260.12500, stages=28.78125, score=291.78437499999995, unsorted=0.00
+  MutationMod=3: CEs=255.37500, stages=28.81250, score=287.06875000000002, unsorted=0.00
+Best observed average score: ActivationProbability=0.75, rate=0.05, score=276.00078, CEs=246.77344, stages=26.57031
+Best rate at ActivationProbability=0.25: 0.05, score=282.16953
+Best rate at ActivationProbability=0.5: 0.05, score=277.90313
+Best rate at ActivationProbability=0.75: 0.05, score=276.00078
+
+SimpleR Standard
+Test: generation=9, executions=4, CEs=281.46094, stages=33.35938, score=318.15625, unsorted=0.00000
+AMax=1, rate=0.05: executions=4, CEs=248.65625, stages=26.60938, score=277.92656, scoreRange=[270.55938,282.51563], poolsWithFailures=0
+AMax=1, rate=0.10: executions=4, CEs=251.34375, stages=27.02344, score=281.06953, scoreRange=[277.49375,287.30625], poolsWithFailures=0
+AMax=1, rate=0.20: executions=4, CEs=254.62500, stages=27.98438, score=285.40781, scoreRange=[275.54063,294.05938], poolsWithFailures=0
+AMax=3, rate=0.05: executions=4, CEs=245.79688, stages=25.62500, score=273.98438, scoreRange=[266.84063,278.99063], poolsWithFailures=0
+AMax=3, rate=0.10: executions=4, CEs=244.21875, stages=25.45313, score=272.21719, scoreRange=[260.80000,278.11563], poolsWithFailures=0
+AMax=3, rate=0.20: executions=4, CEs=243.94531, stages=25.32031, score=271.79766, scoreRange=[270.74063,272.84688], poolsWithFailures=0
+AMax=7, rate=0.05: executions=4, CEs=244.61719, stages=25.10156, score=272.22891, scoreRange=[267.23125,277.03438], poolsWithFailures=0
+AMax=7, rate=0.10: executions=4, CEs=245.56250, stages=25.96094, score=274.11953, scoreRange=[271.42500,276.64688], poolsWithFailures=0
+AMax=7, rate=0.20: executions=4, CEs=245.71875, stages=25.64844, score=273.93203, scoreRange=[268.29063,278.92500], poolsWithFailures=0
+Best observed average score: AMax=3, rate=0.20, score=271.79766, CEs=243.94531, stages=25.32031
+Best rate at AMax=1: 0.05, score=277.92656
+Best rate at AMax=3: 0.20, score=271.79766
+Best rate at AMax=7: 0.05, score=272.22891
+
+SimpleR Soss
+Test: generation=10, executions=4, CEs=280.12500, stages=32.94531, score=316.36484, unsorted=0.01500
+AMax=1, rate=0.05: executions=4, CEs=249.71875, stages=26.68750, score=279.07500, scoreRange=[270.63125,283.03438], poolsWithFailures=0
+AMax=1, rate=0.10: executions=4, CEs=251.14844, stages=26.85156, score=280.68516, scoreRange=[275.88750,286.61563], poolsWithFailures=0
+AMax=1, rate=0.20: executions=4, CEs=257.96094, stages=27.89063, score=288.64063, scoreRange=[282.12813,293.94375], poolsWithFailures=0
+AMax=3, rate=0.05: executions=4, CEs=244.30469, stages=25.50781, score=272.36328, scoreRange=[265.41563,279.53438], poolsWithFailures=0
+AMax=3, rate=0.10: executions=4, CEs=241.53906, stages=25.21875, score=269.27969, scoreRange=[261.00625,276.88438], poolsWithFailures=0
+AMax=3, rate=0.20: executions=4, CEs=247.96875, stages=25.67188, score=276.20781, scoreRange=[271.61250,278.04375], poolsWithFailures=0
+AMax=7, rate=0.05: executions=4, CEs=242.25781, stages=24.93750, score=269.68906, scoreRange=[263.73750,276.30938], poolsWithFailures=0
+AMax=7, rate=0.10: executions=4, CEs=241.96094, stages=23.72656, score=268.06016, scoreRange=[260.55313,276.12813], poolsWithFailures=0
+AMax=7, rate=0.20: executions=4, CEs=244.09375, stages=25.92969, score=272.61641, scoreRange=[271.50313,273.65000], poolsWithFailures=0
+Best observed average score: AMax=7, rate=0.10, score=268.06016, CEs=241.96094, stages=23.72656
+Best rate at AMax=1: 0.05, score=279.07500
+Best rate at AMax=3: 0.10, score=269.27969
+Best rate at AMax=7: 0.10, score=268.06016
+
+SimpleS versus SimpleR: best observed settings per workflow
+Standard: S p=0.75, rate=0.05; R AMax=3, rate=0.2; S minus R: CEs=0.34375 (0.14%), stages=0.39844 (1.57%), score=0.78203 (0.29%)
+Soss: S p=0.75, rate=0.05; R AMax=7, rate=0.1; S minus R: CEs=4.81250 (1.99%), stages=2.84375 (11.99%), score=7.94063 (2.96%)

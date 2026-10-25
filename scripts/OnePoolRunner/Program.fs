@@ -84,8 +84,10 @@ let main argv =
     try
         let controlledOnly = Array.contains "--controlled" argv
         let msuf4r = Array.contains "--msuf4r" argv
-        if msuf4r && controlledOnly then invalidArg "argv" "Choose either --controlled or --msuf4r."
-        let argv = argv |> Array.filter (fun arg -> arg <> "--controlled" && arg <> "--msuf4r")
+        let msuf4s = Array.contains "--msuf4s" argv
+        if [controlledOnly; msuf4r; msuf4s] |> List.filter id |> List.length > 1 then
+            invalidArg "argv" "Choose only one of --controlled, --msuf4r, or --msuf4s."
+        let argv = argv |> Array.filter (fun arg -> arg <> "--controlled" && arg <> "--msuf4r" && arg <> "--msuf4s")
         let listOnly, maxParallel =
             match argv with
             | [| parallelism |] -> false, int parallelism
@@ -94,9 +96,11 @@ let main argv =
         if maxParallel < 1 then invalidArg "MaxParallel" "Must be positive."
         MessagePackSetup.configure ()
         ProjectCatalogs.registerAll ()
-        let moduleName = if msuf4r then "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.SimpleR" else "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+        let moduleName =
+            if msuf4r || msuf4s then "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a." + (if msuf4r then "SimpleR" else "SimpleS")
+            else "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
         let runs = orderedRuns moduleName |> List.filter (fun run -> not controlledOnly || %run.DatabaseName = "Controlled")
-        let runs = if msuf4r then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
+        let runs = if msuf4r || msuf4s then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
         let prerequisites = [
             SortableTests.RunCfg.Prefix.Width32 ()
             SorterEval.RunCfg.Prefix.Width32 ()

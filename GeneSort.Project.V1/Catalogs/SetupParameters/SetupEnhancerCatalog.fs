@@ -39,6 +39,10 @@ module SetupEnhancerFunctionNames =
     let standardMsuf32R = "setup-enhancer.standard-msuf32-r"
     [<Literal>]
     let sossMsuf32R = "setup-enhancer.soss-msuf32-r"
+    [<Literal>]
+    let standardMsuf32S = "setup-enhancer.standard-msuf32-s"
+    [<Literal>]
+    let sossMsuf32S = "setup-enhancer.soss-msuf32-s"
 
 /// Setup enhancers supply file references for the associated run parameters.
 module SetupEnhancerCatalog =
@@ -104,6 +108,21 @@ module SetupEnhancerCatalog =
     let standardMsuf32R = withSimpleR standardMsuf32
     let sossMsuf32R = withSimpleR sossMsuf32
 
+    /// Apply the boolean activation default before creating seed file references.
+    let private withSimpleS (enhancer: setupEnhancerFunction) : setupEnhancerFunction = fun context parameters ->
+        if Map.containsKey ParamKeys.aMaxKey parameters.ParamMap then
+            invalidArg "parameters" "SimpleS setup uses ActivationProbability; AMax belongs to SimpleR."
+        let parameters =
+            if Map.containsKey ParamKeys.activationProbabilityKey parameters.ParamMap then parameters
+            else parameters.WithActivationProbability(Some 0.5)
+        match parameters.GetActivationProbability() with
+        | Some probability when System.Double.IsFinite probability && probability >= 0.0 && probability <= 1.0 ->
+            enhancer context parameters
+        | _ -> invalidArg "parameters" "SimpleS setup requires a finite ActivationProbability between 0 and 1."
+
+    let standardMsuf32S = withSimpleS standardMsuf32
+    let sossMsuf32S = withSimpleS sossMsuf32
+
     let private syncRoot = obj ()
     let mutable private functions =
         Map.ofList [
@@ -117,6 +136,8 @@ module SetupEnhancerCatalog =
             SetupEnhancerFunctionNames.standardMsuf32, standardMsuf32
             SetupEnhancerFunctionNames.standardMsuf32R, standardMsuf32R
             SetupEnhancerFunctionNames.sossMsuf32R, sossMsuf32R
+            SetupEnhancerFunctionNames.standardMsuf32S, standardMsuf32S
+            SetupEnhancerFunctionNames.sossMsuf32S, sossMsuf32S
         ]
 
     let register name (enhancer: setupEnhancerFunction) =

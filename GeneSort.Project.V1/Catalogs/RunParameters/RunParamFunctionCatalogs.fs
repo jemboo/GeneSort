@@ -253,6 +253,22 @@ module RunParamEnhancerBuilders =
                 msuf32MutationRate context combined
             | _ -> invalidArg "parameters" "SimpleR execution requires a finite ActivatorMutationRate between 0 and 1."
 
+        /// Supply the SimpleS flip-rate default before execution IDs are calculated.
+        let msuf32SFromSetup : runParamEnhancerBuilder = fun context parameters ->
+            let combined = combineSetup context parameters
+            if Map.containsKey ParamKeys.aMaxKey combined.ParamMap then
+                invalidArg "parameters" "SimpleS execution uses ActivationProbability; AMax belongs to SimpleR."
+            match combined.GetActivationProbability() with
+            | Some probability when System.Double.IsFinite probability && probability >= 0.0 && probability <= 1.0 -> ()
+            | _ -> invalidArg "parameters" "SimpleS execution requires a finite ActivationProbability between 0 and 1 from setup."
+            let combined =
+                if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
+                else combined.WithActivatorMutationRate(Some 0.1)
+            match combined.GetActivatorMutationRate() with
+            | Some rate when System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
+                msuf32MutationRate context combined
+            | _ -> invalidArg "parameters" "SimpleS execution requires a finite ActivatorMutationRate between 0 and 1."
+
         let msrs32MutationRate =
             fromGlobalSorterCount
                 (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
@@ -327,6 +343,10 @@ module RunParamBuilderNames =
         [<Literal>]
         let sossMsuf32R = "sgd-soss-msuf32-r"
         [<Literal>]
+        let evoMsuf32S = "sgd-evo-msuf32-s"
+        [<Literal>]
+        let sossMsuf32S = "sgd-soss-msuf32-s"
+        [<Literal>]
         let msrs32MutationRate = "sgd-msrs32-mutation-rate"
         [<Literal>]
         let msrs32MutationRateMax = "sgd-msrs32-mutation-rate-max"
@@ -359,6 +379,8 @@ module RunParamBuilders =
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.evoMsuf32 RunParamEnhancerBuilders.Sgd.msuf32FromSetup |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.evoMsuf32R RunParamEnhancerBuilders.Sgd.msuf32RFromSetup |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sossMsuf32R RunParamEnhancerBuilders.Sgd.msuf32RFromSetup |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.evoMsuf32S RunParamEnhancerBuilders.Sgd.msuf32SFromSetup |> ignore
+                RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.sossMsuf32S RunParamEnhancerBuilders.Sgd.msuf32SFromSetup |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRate RunParamEnhancerBuilders.Sgd.msrs32MutationRate |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msrs32MutationRateMax RunParamEnhancerBuilders.Sgd.msrs32MutationRateMax |> ignore
                 RunParamEnhancerBuilders.register RunParamBuilderNames.Enhancer.msuf624p3bMutationRate RunParamEnhancerBuilders.Sgd.msuf624p3bMutationRate |> ignore

@@ -70,6 +70,9 @@ module Reporting =
 
                 log (sprintf "Discovered and processed %d %s slice(s)." recordCount reportNameTag)
 
+                if accumulatedDetails.Count = 0 then
+                    return! Error (sprintf "%s contains no report rows across %d saved slices. Check whether the execution's sorter pools are empty." reportNameTag recordCount)
+
                 // 3. Prepare target metadata and QueryParams
                 let reportName = reportNameTag |> UMX.tag<textReportName>
                 let finalRp = rp.WithGenerationCurrent(Some lastGen )

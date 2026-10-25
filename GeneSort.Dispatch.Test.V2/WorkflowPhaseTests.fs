@@ -200,6 +200,33 @@ let ``Report discovery respects a short run horizon when longer results exist`` 
     Assert.Single(load 0) |> ignore
     Assert.Equal(2, (load 1).Length)
 
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Summary reporting rejects saved slices with no report rows`` soss =
+    let memory = MemoryDb()
+    let db = memory :> IGeneSortDb
+    let configured = if soss then singleSource () else standardSource ()
+    let host = (runHost.Create configured 1).WithRunDb(db)
+    let generation = GenIntervalConfig.getSampleAtIndex host.GenSaveIntervals.Value 0 |> Option.get
+    let summary =
+        if soss then
+            let poolSet = sorterPoolSet_Soss.create (UMX.tag Guid.Empty) (UMX.tag generation) (Dim1 1) None
+            spSummarySet_Soss.create (UMX.tag Guid.Empty) (UMX.tag generation) [|SorterPoolSetSummary_Soss.fromPoolSet poolSet|]
+            |> spSummarySet.Soss
+        else
+            let poolSet = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) (UMX.tag generation) (Dim1 1) None
+            spSummarySet_Standard.create (UMX.tag Guid.Empty) (UMX.tag generation) [|SorterPoolSetSummary_Standard.fromPoolSet poolSet|]
+            |> spSummarySet.Standard
+    save db geneSortDataMode.Results generation (geneSortDataType.SorterPoolSetSummarySet "") (outputData.SorterPoolSetSummarySet summary)
+    let rp = parameters.WithGenerationFirst(Some (UMX.tag 0)).WithGenerationIntervalLast(Some (UMX.tag 0))
+    use cts = new CancellationTokenSource()
+    let result = Reporting.summaryReportExecutor.Execute host rp (UMX.tag true) cts None |> Async.RunSynchronously
+    match result with
+    | Ok _ -> failwith "An empty summary was reported as successful."
+    | Error message -> Assert.Contains("no report rows", message)
+    Assert.DoesNotContain(memory.Writes, fun (_, kind) -> kind = geneSortDataType.TextReport (UMX.tag "SummaryReport"))
+
 let private verifySavedSossReport (db: IGeneSortDb) (rp: runParameters) (generation: int)
                                   partitions prefix (expectedSubset: string) hasSummary =
     GeneSort.Core.Mp.MessagePackSetup.configure()

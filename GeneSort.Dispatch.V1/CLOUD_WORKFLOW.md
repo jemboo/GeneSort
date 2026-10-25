@@ -50,6 +50,33 @@ trajectory comparisons across AMax and activator rates. The four mutation
 variants share a seed replica; these results are exploratory rather than a
 comparison across independent seed replicas.
 
+`SorterSgd.RunCfg.p32.Msuf4a.SimpleS` mirrors the four SimpleR presets:
+`Standard.Test`, `Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`.
+The test presets use 10 generations and catalog defaults of ActivationProbability
+0.5 and ActivatorMutationRate 0.1. The 100-generation sweeps cross activation
+probabilities 0.25, 0.5, 0.75 with mutation rates 0.05, 0.1, 0.2 and mutation
+variants 0–3 (36 executions per replica). Every execution has one pool of 32.
+Setup entries `standardMsuf32S` / `sossMsuf32S` and execution entries
+`evoMsuf32S` / `sossMsuf32S` supply and validate the boolean activation settings.
+Both probabilities accept 0 through 1; AMax is rejected. The project is
+`SorterSgd.RunCfg.p32.Msuf4a.SimpleS`, with databases `Standard` and `Soss`.
+These use the same prefix prerequisites as SimpleR. Equal mutation-rate values
+do not imply equal effective activation flip rates between R and S.
+Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleS`; it performs
+setup, execution, summary reporting, and verification for replica 0. The combined
+report is `Reports/Msuf4a_SimpleS_SummaryReport.txt` under the SimpleS project,
+with `Workflow` distinguishing Standard and Soss. Compare the completed sweeps
+using `scripts/Compare-Msuf4aSimpleS.ps1 -ReportPath <SimpleS report> -SimpleRReportPath <SimpleR report>`.
+The comparison includes endpoints, SimpleS trajectories, and the best observed
+settings in each family. It uses the four mutation variants of one seed replica;
+the activation masks and effective flip rates are not matched between families.
+Strict pool pruning normally rejects unsorted candidates. If that would leave no
+evaluated candidates, Standard and Soss retain the best imperfect candidates,
+ranking unsorted-case count before the configured size score. Strict filtering
+resumes as soon as a candidate passes it. This allows sparse initial activation
+settings to recover without changing the configured measure. Summary reporting
+rejects saved slices that contain no report rows.
+
 `OnePool.SimpleS` provides `StandardS`, `SossS`, `StandardAppendS`, and
 `SossCondenseS`, with the same pool counts and continuation structure as SimpleR.
 Its `activationProbability` defaults to 0.5 and `activatorMutationRate` to 0.1.
