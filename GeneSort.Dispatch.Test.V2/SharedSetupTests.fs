@@ -86,8 +86,8 @@ let ``parallel setup shares files across executions replicas and hosts and execu
         host.SetupExecutor.Execute host rp (UMX.tag true) cts None |> Async.RunSynchronously |> get |> ignore
         let finished = host.ExecuteFunction host.ExecutionContext rp (UMX.tag false) cts None |> Async.RunSynchronously |> get
         Assert.Equal(Some true, finished.GetRunFinished())
-    Assert.Equal<string[]>(files, storage.Files())
-    Assert.Equal<DateTime[]>(stamps, files |> Array.map File.GetLastWriteTimeUtc)
+    Assert.Equal<string>(files :> seq<string>, storage.Files() :> seq<string>)
+    Assert.Equal<DateTime>(stamps :> seq<DateTime>, files |> Array.map File.GetLastWriteTimeUtc :> seq<DateTime>)
     // Execution needs no generator settings to resolve a recorded setup reference.
     let recorded = SetupFileReferences.fromRunParameters parameters.[0] |> Map.ofList |> runParameters.create
     for output in [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""] do

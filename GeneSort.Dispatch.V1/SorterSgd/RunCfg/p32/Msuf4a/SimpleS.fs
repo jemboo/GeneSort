@@ -130,7 +130,7 @@ module Soss =
                 (ParamKeys.partitionCountKey, [2] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
                 (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [19] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
@@ -170,25 +170,25 @@ module Soss =
         let names = RunNaming.create()
         let parameterSpansSetup =
             [
-                (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [64] |> List.map string)
                 (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
-                (ParamKeys.mutationModKey, [0 .. 1] |> List.map string)
-                (ParamKeys.activationProbabilityKey, [0.0; 0.25; 0.5; 0.75] |> List.map string)
+                (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
+                (ParamKeys.activationProbabilityKey, [0.95] |> List.map string)
             ]
         let parameterSpansRun =
             [
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [2] |> List.map string)
-                (ParamKeys.generationsPerSubsetKey, [10] |> List.map string)
-                (ParamKeys.generationsPerMergedSetKey, [20] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [9] |> List.map string)
+                (ParamKeys.partitionCountKey, [8] |> List.map string)
+                (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
+                (ParamKeys.generationsPerMergedSetKey, [100;] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
                 (ParamKeys.seedModificationRateKey, [0.020] |> List.map string)
                 (ParamKeys.modificationRateKey, [0.035] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
-                (ParamKeys.activatorMutationRateKey, [0.0; 0.05; 0.1; 0.2] |> List.map string)
+                (ParamKeys.activatorMutationRateKey, [0.01;] |> List.map string)
             ]
         run.SgdRun (
             SgdRun.create {
