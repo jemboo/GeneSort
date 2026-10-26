@@ -2441,7 +2441,7 @@ let ``OnePool chains preserve their family and expand the immediate source`` sos
         Assert.Equal(source.ExecuteFunctionName, configured.ExecuteFunctionName)
         let expectedSources = generate source |> Array.map (fun rp -> string (rp.GetId().Value)) |> Set.ofArray
         let expanded = generate configured
-        Assert.Equal<int[]>(sizes, expanded |> Array.map (fun rp -> int (rp.GetSorterCountPerPool().Value)) |> Array.sort)
+        Assert.Equal<int>(sizes, expanded |> Array.map (fun rp -> int (rp.GetSorterCountPerPool().Value)) |> Array.sort)
         Assert.Equal(expanded.Length, expanded |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
         Assert.All(expanded, fun rp ->
             Assert.Equal(Some 1, rp.GetSourceGenerationInterval())
@@ -2488,7 +2488,7 @@ let ``MixedFamilyChain presets branch and select within the source family`` () =
         Assert.NotEqual<string>(configured.ExecuteFunctionName, (fst configured.ParameterSource.Value).ExecuteFunctionName)
         Assert.Equal((if soss then ExecuteFunctionNames.soss else ExecuteFunctionNames.standard), configured.ExecuteFunctionName)
         let generated = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
-        Assert.Equal<int[]>(sizes, generated |> Array.map (fun rp -> int (rp.GetSorterCountPerPool().Value)) |> Array.sort)
+        Assert.Equal<int>(sizes, generated |> Array.map (fun rp -> int (rp.GetSorterCountPerPool().Value)) |> Array.sort)
         for rp in generated do
             Assert.Equal(Some 1, rp.GetSourceGenerationInterval())
             if soss then
