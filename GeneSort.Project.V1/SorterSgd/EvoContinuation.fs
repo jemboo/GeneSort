@@ -1,4 +1,4 @@
-namespace GeneSort.Dispatch.V1.SorterSgd
+namespace GeneSort.Project.V1.SorterSgd
 
 open FSharp.UMX
 open GeneSort.Project.V1
@@ -19,23 +19,30 @@ type evoContinuationSourceArgs = {
 
 type evoContinuationSource =
     private {
-        _run: run
+        _run: sgdRun
         _generationInterval: int
         _sourceMutationMods: int list
         _selectedSorterPoolCount: int
     }
 
-    member this.SourceRun = this._run
+    member this.SourceRun = run.SgdRun this._run
+    member internal this.SourceSgdRun = this._run
     member this.GenerationInterval = this._generationInterval
     member this.SourceMutationMods = this._sourceMutationMods
     member this.SelectedSorterPoolCount = this._selectedSorterPoolCount
 
     static member public create (args: evoContinuationSourceArgs) : evoContinuationSource =
+        let source =
+            match args.SourceRun with
+            | run.SgdRun source when List.contains (SgdRun.executeFunctionName source) [ExecuteFunctionNames.standard; ExecuteFunctionNames.soss] -> source
+            | _ -> invalidArg "SourceRun" "Continuation requires a Standard or Soss SGD source run."
+        if args.GenerationInterval < 0 then
+            invalidArg "GenerationInterval" "Source generation interval must be nonnegative."
         if args.SourceMutationMods.IsEmpty || List.distinct args.SourceMutationMods <> args.SourceMutationMods then
             invalidArg "SourceMutationMods" "SourceMutationMods must contain distinct mutation values."
         if args.SelectedSorterPoolCount <= 0 then
             invalidArg "SelectedSorterPoolCount" "SelectedSorterPoolCount must be positive."
-        { _run = args.SourceRun; _generationInterval = args.GenerationInterval
+        { _run = source; _generationInterval = args.GenerationInterval
           _sourceMutationMods = args.SourceMutationMods; _selectedSorterPoolCount = args.SelectedSorterPoolCount }
 
 
@@ -83,8 +90,7 @@ module internal EvoContinuation =
     /// Unspecified execution settings are inherited from each selected source.
     let create expectedExecutionFunction (config: evoContinuationConfig) : run =
         let source = config.Source.SourceRun
-        if not (List.contains source.ExecuteFunctionName [ExecuteFunctionNames.standard; ExecuteFunctionNames.soss]) then
-            invalidArg "Source" "Continuation requires a Standard or Soss source."
+        let sourceSgd = config.Source.SourceSgdRun
         if source.ExecuteFunctionName <> expectedExecutionFunction && expectedExecutionFunction = ExecuteFunctionNames.soss then
             for key in [ParamKeys.seedSossKey; ParamKeys.partitionCountKey; ParamKeys.generationsPerSubsetKey; ParamKeys.generationsPerMergedSetKey] do
                 match config.ExecutionParameterSpans |> List.tryFind (fst >> (=) key) with
@@ -92,8 +98,6 @@ module internal EvoContinuation =
                     if key = ParamKeys.seedSossKey then System.UInt64.TryParse value |> fst
                     else match System.Int32.TryParse value with true, n -> n > 0 | _ -> false) -> ()
                 | _ -> invalidArg "ExecutionParameterSpans" (sprintf "Standard to Soss requires explicit valid %s values (counts and durations must be positive)." key)
-        if config.Source.GenerationInterval < 0 then
-            invalidArg "Source" "Source interval must be nonnegative."
         let executionSpans = config.ExecutionParameterSpans
         if executionSpans |> List.exists (snd >> List.isEmpty) then
             invalidArg "ExecutionParameterSpans" "Parameter spans must have at least one value."
@@ -154,9 +158,9 @@ module internal EvoContinuation =
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
             }
         } {
-            MakerNames = source.MakerNames.Value
-            GenSaveIntervalsName = source.GenSaveIntervalsName.Value
-            GenSaveSubIntervalsName = source.GenSaveSubIntervalsName.Value
+            MakerNames = SgdRun.makerNames sourceSgd
+            GenSaveIntervalsName = SgdRun.genSaveIntervalsName sourceSgd
+            GenSaveSubIntervalsName = SgdRun.genSaveSubIntervalsName sourceSgd
         }
         |> run.SgdRun
         |> Run.withParameterSource source [

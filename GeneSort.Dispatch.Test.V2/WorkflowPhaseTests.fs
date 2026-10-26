@@ -22,6 +22,7 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTests
@@ -110,6 +111,9 @@ let ``Continuation workflows use explicitly configured query catalogs`` () =
         Assert.Equal(config.SetupQueryCatalogName, configured.SetupQueryCatalogName)
         Assert.Equal(config.RunQueryCatalogName, configured.RunQueryCatalogName)
         Assert.Equal(source.ExecuteFunctionName, configured.ExecuteFunctionName)
+        Assert.Equal<evolutionMakerNames option>(source.MakerNames, configured.MakerNames)
+        Assert.Equal<string option>(source.GenSaveIntervalsName, configured.GenSaveIntervalsName)
+        Assert.Equal<string option>(source.GenSaveSubIntervalsName, configured.GenSaveSubIntervalsName)
 
 [<Fact>]
 let ``Continuation workflows require Soss transition settings and share explicit selection`` () =
@@ -2083,6 +2087,36 @@ let ``Continuation refuses overriding a multiplexed inherited source setting`` (
     Assert.Equal(4, (RunParameterGeneration.generate first 0<replNumber> 1<replNumber>).Length)
     let error = Assert.Throws<ArgumentException>(fun () -> appendFrom first 2 3 [] [ParamKeys.paraRateKey, ["1.3"]] |> ignore)
     Assert.Contains("must be inherited", error.Message)
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Continuation source validates its generation interval at construction`` soss =
+    let source = if soss then sossSource [0] else standardSource ()
+    let error = Assert.Throws<ArgumentException>(fun () -> sourceSelection source -1 [] |> ignore)
+    Assert.Equal("GenerationInterval", error.ParamName)
+    Assert.Contains("nonnegative", error.Message)
+    let selected = sourceSelection source 0 []
+    Assert.Equal(0, selected.GenerationInterval)
+    Assert.Equal<run>(source, selected.SourceRun)
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Continuation source rejects a simple run with an evolution function name`` soss =
+    let source = if soss then sossSource [0] else standardSource ()
+    let simple = run.SimpleRun source.BaseRun
+    let error = Assert.Throws<ArgumentException>(fun () -> sourceSelection simple 0 [] |> ignore)
+    Assert.Equal("SourceRun", error.ParamName)
+    Assert.Contains("Standard or Soss SGD source run", error.Message)
+
+[<Fact>]
+let ``Continuation source rejects an unsupported SGD execution family at construction`` () =
+    let dto = GeneSort.Project.Mp.V1.RunDto.fromDomain (standardSource ())
+    let source = GeneSort.Project.Mp.V1.RunDto.toDomain { dto with ExecuteFunctionName = ExecuteFunctionNames.sorterEval }
+    let error = Assert.Throws<ArgumentException>(fun () -> sourceSelection source 0 [] |> ignore)
+    Assert.Equal("SourceRun", error.ParamName)
+    Assert.Contains("Standard or Soss SGD source run", error.Message)
 
 [<Fact>]
 let ``Continuation source exposes only required typed selection fields`` () =

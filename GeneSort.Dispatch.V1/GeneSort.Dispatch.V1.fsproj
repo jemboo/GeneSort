@@ -57,9 +57,6 @@
     <Compile Include="SorterSgd\FileEvolutionSetupSources.fs" />
     <Compile Include="SorterSgd\Reporting.fs" />
     <Compile Include="SorterSgd\EvoAppendSetup.fs" />
-    <Compile Include="SorterSgd\EvoContinuation.fs" />
-    <Compile Include="SorterSgd\EvoAppend.fs" />
-    <Compile Include="SorterSgd\EvoCondense.fs" />
     <Compile Include="SorterSgd\SorterSgdSetup.fs" />
     <Compile Include="SetupExecutorCatalog.fs" />
     <Compile Include="ProjectOps.fs" />
@@ -109,6 +106,7 @@
     <ProjectReference Include="..\GeneSort.Model.Sortable.V1\GeneSort.Model.Sortable.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sorting.Mp.V1\GeneSort.Model.Sorting.Mp.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Model.Sorting.V1\GeneSort.Model.Sorting.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Project.V1\GeneSort.Project.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Sorting.Mp\GeneSort.Sorting.Mp.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingLib\GeneSort.SortingLib.fsproj" />
     <ProjectReference Include="..\GeneSort.SortingOps.Mp\GeneSort.SortingOps.Mp.fsproj" />

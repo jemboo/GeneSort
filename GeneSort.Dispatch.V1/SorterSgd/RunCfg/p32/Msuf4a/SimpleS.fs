@@ -181,7 +181,7 @@ module Soss =
                 (ParamKeys.partitionCountKey, [8] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
                 (ParamKeys.generationsPerMergedSetKey, [100;] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [19] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75] |> List.map string)

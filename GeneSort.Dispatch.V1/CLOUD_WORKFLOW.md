@@ -384,10 +384,11 @@ the spec alone does not copy source data.
 `Standard_append` uses `EvoAppend.createStandard`; `Soss_append` uses
 `EvoAppend.createSoss`; `Standard_condense` uses `EvoCondense.createStandard`.
 Each run definition supplies `SetupQueryCatalogName` and `RunQueryCatalogName`
-explicitly. Constructors do not infer query catalogs from the source. The two append
-entry points reject ranked selection settings; condense owns selection-count validation
-and validates the selected execution family. Shared continuation construction and validation live in
-the internal `EvoContinuation` module.
+explicitly. Constructors do not infer query catalogs from the source. These builders
+and their configuration types live in `GeneSort.Project.V1.SorterSgd`, with shared
+construction and validation in the internal `EvoContinuation` module. Append and
+Condense both use explicit source mutation and selection-count settings. Dispatch
+owns the run presets and performs source selection and copying during setup.
 
 `Soss_condense.Pool_128_condense.Test` uses `EvoCondense.createSoss`, explicitly specifying
 the Soss seed setup and Soss append execution query catalogs. It ranks mutations

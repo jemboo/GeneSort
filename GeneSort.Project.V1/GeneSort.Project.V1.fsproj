@@ -46,6 +46,9 @@
     <Compile Include="Catalogs\ProjectCatalogs.fs" />
     <Compile Include="SetupOutputs.fs" />
     <Compile Include="RunParameterGeneration.fs" />
+    <Compile Include="SorterSgd\EvoContinuation.fs" />
+    <Compile Include="SorterSgd\EvoAppend.fs" />
+    <Compile Include="SorterSgd\EvoCondense.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

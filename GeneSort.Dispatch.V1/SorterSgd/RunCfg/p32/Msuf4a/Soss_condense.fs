@@ -15,9 +15,9 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd
 
 
 

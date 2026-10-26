@@ -5,8 +5,8 @@ open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd
 
 
 
