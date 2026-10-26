@@ -100,7 +100,8 @@ let private configure runValues setupValues outputTypes setupQuery =
         let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
         Assert.Equal(setup.GetRepl(), rp.GetRepl())
         Assert.True(rp.GetSetupParametersId().IsSome)
-        rp.ParamMap |> Map.add "SeenSetup" setup.ParamMap.["S"] |> runParameters.create) |> ignore
+        let enhanced = rp.ParamMap |> Map.add "SeenSetup" setup.ParamMap.["S"] |> runParameters.create
+        enhanced.WithRunName(Some context.Run.RunName)) |> ignore
     let configured =
         SimpleRun.create {
             DatabaseName = UMX.tag "db"
@@ -222,9 +223,14 @@ let ``initialization persists the entire expanded product with distinct file que
         member _.loadIfFoundAsync _ _ = failwith "Unexpected read"
         member _.doesOutPutDataExist _ _ = failwith "Unexpected read"
         member _.getRunParameters _ _ _ _ _ = failwith "Unexpected read"
-        member _.makeQueryParamsFromRunParams _ _ = failwith "Unexpected query" }
+        member _.makeQueryParamsFromRunParams _ _ = failwith "Unexpected query"
+      interface IRunParameterStore with
+        member _.saveRunParameterSetAsync prepared _ _ = async {
+            for entry in prepared.Entries do writes.Add entry
+            return Ok () } }
     let result = ParamOps.initRunAndParamFiles db None configured 0<replNumber> 1<replNumber> (UMX.tag false)
                      (RunParameterGeneration.generate configured) |> Async.RunSynchronously
-    Assert.Equal(Ok (), result)
+    Assert.True(Result.isOk result, sprintf "%A" result)
     Assert.Equal(6, writes.Count)
     Assert.Equal(6, writes |> Seq.map (fun (q, _) -> q.Id) |> Seq.distinct |> Seq.length)
+    Assert.All(writes, fun (_, parameters) -> Assert.Equal(Some configured.RunName, parameters.GetRunName()))

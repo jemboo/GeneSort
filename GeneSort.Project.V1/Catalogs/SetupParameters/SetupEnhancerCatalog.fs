@@ -10,6 +10,7 @@ open GeneSort.Eval.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 
 type setupEnhancerContext = {
     Run: run
@@ -72,12 +73,10 @@ module SetupEnhancerCatalog =
 
     /// Seed-pool settings need no execution-only mutation or partition settings.
     let sossMsuf32 : setupEnhancerFunction = fun _ parameters ->
-        let perPool = parameters.GetSorterCountPerPool()
-                      |> Option.defaultWith (fun () -> invalidOp "Soss setup requires SorterCountPerPool.")
-        let total = parameters.GetSorterCountPerPoolSet()
-                    |> Option.defaultWith (fun () -> invalidOp "Soss setup requires SorterCountPerPoolSet.")
-        if int perPool <= 0 || int total <= 0 || int total % int perPool <> 0 then
-            invalidArg "parameters" "The total sorter count must be positive and divisible by the positive per-pool count."
+        parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.seedPool "Setup"
+        |> ParameterValidation.ensureValid "parameters"
+        let perPool = parameters.GetSorterCountPerPool().Value
+        let total = parameters.GetSorterCountPerPoolSet().Value
         let prefix = prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA
         parameters.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
                   .WithGenerationCurrent(Some 0<generationNumber>)
@@ -93,6 +92,8 @@ module SetupEnhancerCatalog =
 
     /// Standard seed queries include the full parameter settings and their setup references.
     let standardMsuf32 : setupEnhancerFunction = fun context parameters ->
+        parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.msufSetup
+        |> ParameterValidation.ensureValid "parameters"
         sossMsuf32 context parameters |> sorterSgd context
 
     /// SimpleR defaults apply before queries are built, so AMax participates in seed identity.
@@ -102,9 +103,8 @@ module SetupEnhancerCatalog =
         let parameters =
             if Map.containsKey ParamKeys.aMaxKey parameters.ParamMap then parameters
             else parameters.WithAMax(Some 3)
-        match parameters.GetAMax() with
-        | Some maximum when maximum >= 0 -> enhancer context parameters
-        | _ -> invalidArg "parameters" "SimpleR setup requires a nonnegative integer AMax."
+        ParameterValidation.validateValues [ParamKeys.aMaxKey] parameters.ParamMap |> ParameterValidation.ensureValid "parameters"
+        enhancer context parameters
 
     let standardMsuf32R = withSimpleR standardMsuf32
     let sossMsuf32R = withSimpleR sossMsuf32
@@ -116,10 +116,8 @@ module SetupEnhancerCatalog =
         let parameters =
             if Map.containsKey ParamKeys.activationProbabilityKey parameters.ParamMap then parameters
             else parameters.WithActivationProbability(Some 0.5)
-        match parameters.GetActivationProbability() with
-        | Some probability when System.Double.IsFinite probability && probability >= 0.0 && probability <= 1.0 ->
-            enhancer context parameters
-        | _ -> invalidArg "parameters" "SimpleS setup requires a finite ActivationProbability between 0 and 1."
+        ParameterValidation.validateValues [ParamKeys.activationProbabilityKey] parameters.ParamMap |> ParameterValidation.ensureValid "parameters"
+        enhancer context parameters
 
     let standardMsuf32S = withSimpleS standardMsuf32
     let sossMsuf32S = withSimpleS sossMsuf32

@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="OutputUnionTests.fs" />
     <Compile Include="RunDefinitionFileTests.fs" />
+    <Compile Include="RunParameterFileTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />

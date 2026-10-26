@@ -1,0 +1,143 @@
+namespace GeneSort.Project.V1.Parameters
+
+open System
+open System.Globalization
+open GeneSort.Core
+open GeneSort.Model.Sorting.V1
+
+type validationIssue =
+    private { field: string; message: string }
+    member this.Field = this.field
+    member this.Message = this.message
+    static member create field message = { field = field; message = message }
+
+type internal valueRule =
+    | Integer of minimum: int
+    | Number of minimum: float * maximum: float option
+    | Choice of string list
+    | Text
+
+/// Value shape exposed to editors; the validation rules remain the authority for valid input.
+type parameterValueKind =
+    | Integer = 0
+    | Number = 1
+    | Choice = 2
+    | Text = 3
+
+/// A parameter's meaning and value constraints, independent of any editor.
+type parameterRule =
+    private { key: string; description: string; rule: valueRule }
+    member this.Key = this.key
+    member this.Description = this.description
+    member this.Choices = match this.rule with Choice values -> List.toArray values | _ -> [||]
+    member this.ValueKind =
+        match this.rule with
+        | Integer _ -> parameterValueKind.Integer
+        | Number _ -> parameterValueKind.Number
+        | Choice _ -> parameterValueKind.Choice
+        | Text -> parameterValueKind.Text
+    member this.Minimum =
+        match this.rule with Integer minimum -> Some (float minimum) | Number (minimum, _) -> Some minimum | _ -> None
+    member this.Maximum =
+        match this.rule with Integer _ -> Some (float Int32.MaxValue) | Number (_, maximum) -> maximum | _ -> None
+    member internal this.Rule = this.rule
+    static member internal create key description rule = { key = key; description = description; rule = rule }
+
+module ParameterValidation =
+    let private rules =
+        [
+            parameterRule.create ParamKeys.sorterCountPerPoolKey "Positive number of sorters in each pool." (Integer 1)
+            parameterRule.create ParamKeys.sorterCountPerPoolSetKey "Positive total number of sorters in the pool set." (Integer 1)
+            parameterRule.create ParamKeys.codeModKey "Nonempty configuration label used in query identity." Text
+            parameterRule.create ParamKeys.adjustCeLengthFrequencyKey "Positive generation frequency for adjusting comparator length." (Integer 1)
+            parameterRule.create ParamKeys.generationIntervalLastKey "Nonnegative zero-based index into the generation save schedule." (Integer 0)
+            parameterRule.create ParamKeys.paraRateKey "Nonnegative parallel weight; values above 1 are allowed." (Number (0.0, None))
+            parameterRule.create ParamKeys.selfSymRateKey "Nonnegative self-symmetry weight; values above 1 are allowed." (Number (0.0, None))
+            parameterRule.create ParamKeys.mutationModKey "Nonnegative mutation variant used in query identity and seeding." (Integer 0)
+            parameterRule.create ParamKeys.seedModificationRateKey "Finite seed modification probability, from 0 to 1." (Number (0.0, Some 1.0))
+            parameterRule.create ParamKeys.modificationRateKey "Finite modification probability, from 0 to 1." (Number (0.0, Some 1.0))
+            parameterRule.create ParamKeys.mutatorVariantKey "Mutation algorithm: V1, V2 or V3." (Choice ([mutatorVariant.V1; mutatorVariant.V2; mutatorVariant.V3] |> List.map MutatorVariant.toString))
+            parameterRule.create ParamKeys.aMaxKey "Nonnegative integer activator bound." (Integer 0)
+            parameterRule.create ParamKeys.activationProbabilityKey "Finite activation probability, from 0 to 1." (Number (0.0, Some 1.0))
+            parameterRule.create ParamKeys.activatorMutationRateKey "Finite activator mutation probability, from 0 to 1." (Number (0.0, Some 1.0))
+        ] |> List.map (fun rule -> rule.Key, rule) |> Map.ofList
+
+    let describe key = Map.find key rules
+    let private parseInteger (value: string) = Int32.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture)
+    let tryInteger value = match parseInteger value with true, number -> Some number | _ -> None
+
+    /// Return a canonical value for duplicate detection; leave unregistered parameters to their own workflows.
+    let validateValue key value =
+        match Map.tryFind key rules with
+        | None -> Ok value
+        | Some spec ->
+            let valid, canonical =
+                match spec.Rule with
+                | Integer minimum ->
+                    let ok, number = parseInteger value
+                    ok && number >= minimum, string number
+                | Number (minimum, maximum) ->
+                    let ok, number = Double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture)
+                    ok && Double.IsFinite number && number >= minimum && (maximum |> Option.forall (fun max -> number <= max)),
+                    (if number = 0.0 then "0" else number.ToString("R", CultureInfo.InvariantCulture))
+                | Choice choices -> List.contains value choices, value
+                | Text -> not (String.IsNullOrWhiteSpace value), value
+            if valid then Ok canonical else Error (sprintf "Invalid value '%s'. %s" value spec.Description)
+
+    let private field phase key = if String.IsNullOrEmpty phase then key else phase + "." + key
+
+    let validateSpans phase (spans: (string * string list) list) =
+        let issues = ResizeArray<validationIssue>()
+        let seen = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
+        for index, (key, values) in List.indexed spans do
+            let location = sprintf "%s[%d].%s" phase (index + 1) key
+            let add message = issues.Add(validationIssue.create location message)
+            if String.IsNullOrWhiteSpace key then add "Enter a parameter key."
+            if not (seen.Add key) then add "This parameter is listed more than once in this phase."
+            let canonical = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
+            for value in values do
+                match validateValue key value with
+                | Error message -> add message
+                | Ok normalized when not (canonical.Add normalized) -> add (sprintf "Value '%s' is duplicated." value)
+                | Ok _ -> ()
+        issues.ToArray()
+
+    let requireKeys phase keys spans =
+        keys |> List.choose (fun key ->
+            if spans |> List.exists (fst >> (=) key) then None
+            else Some (validationIssue.create (field phase key) "This parameter is required.")) |> List.toArray
+
+    /// Check only the requested runtime values; other workflows may have additional parameters.
+    let validateValues keys (parameters: Map<string, string>) =
+        keys |> List.choose (fun key ->
+            match Map.tryFind key parameters with
+            | None -> Some (validationIssue.create key "This parameter is required.")
+            | Some value ->
+                match validateValue key value with
+                | Ok _ -> None
+                | Error message -> Some (validationIssue.create key message)) |> List.toArray
+
+    let ofMap parameters = parameters |> Map.toList |> List.map (fun (key, value) -> key, [value])
+
+    /// Check every declared pool-size combination without expanding unrelated parameters.
+    let poolSizes phase spans =
+        let positiveIntegers key =
+            spans |> List.filter (fst >> (=) key) |> List.collect snd
+            |> List.choose (fun value -> match parseInteger value with true, number when number > 0 -> Some number | _ -> None)
+        [| for size in positiveIntegers ParamKeys.sorterCountPerPoolKey do
+               for total in positiveIntegers ParamKeys.sorterCountPerPoolSetKey do
+                   if total % size <> 0 then
+                       yield validationIssue.create (field phase ParamKeys.sorterCountPerPoolSetKey)
+                           (sprintf "Total %d is not divisible by per-pool count %d." total size) |]
+
+    let intervalIndex (config: genIntervalConfig) index =
+        if index < 0 || (config.MaxCount |> Option.exists (fun count -> index >= count)) then
+            Error (sprintf "Index %d is outside schedule '%s'." index config.Name)
+        else Ok ()
+
+    let toResult (issues: validationIssue[]) =
+        if Array.isEmpty issues then Ok ()
+        else Error (issues |> Array.map (fun issue -> issue.Field + ": " + issue.Message) |> String.concat "\n")
+
+    let ensureValid argument issues =
+        match toResult issues with Ok () -> () | Error message -> invalidArg argument message

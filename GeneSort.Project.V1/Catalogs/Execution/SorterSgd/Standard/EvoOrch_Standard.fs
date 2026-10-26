@@ -14,6 +14,7 @@ open GeneSort.Eval.V1.Sgd.Bins.Standard
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 open GeneSort.Project.V1.Storage
 
 
@@ -40,6 +41,7 @@ module EvoOrch_Standard =
         asyncResult {
             let evalType = sorterEvalType.V2
             // Mandatory parameters
+            do! ParameterValidation.validateValues SgdParameterValidation.standardEvolutionKeys rp.ParamMap |> ParameterValidation.toResult
             let! genIntervalLast = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing generationIntervalLast."
             let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
             let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
@@ -47,7 +49,6 @@ module EvoOrch_Standard =
             let! selectedSorterCountPerPool = rp.GetSelectedSorterCountPerPool() |> Result.ofOption "Missing selectedSorterCountPerPool."
             let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
             let! adjustCeLengthFrequency = rp.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
-            do! if %adjustCeLengthFrequency > 0 then Ok () else Error "AdjustCeLengthFrequency must be greater than zero."
             let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
             let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
             let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
@@ -58,6 +59,7 @@ module EvoOrch_Standard =
             let optSorterPoolExpansionRate = rp.GetSorterPoolExpansionRate()
             let optSorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals()
             let optPoolMeasure = rp.GetSorterPoolMeasure()
+            do! ParameterValidation.intervalIndex saveIntervals %genIntervalLast
             let genStart = initialPoolSet.GenerationNumber
             let! targetGenInt =
                 GenIntervalConfig.getSampleAtIndex saveIntervals %genIntervalLast

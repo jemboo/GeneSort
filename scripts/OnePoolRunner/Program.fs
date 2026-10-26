@@ -56,17 +56,8 @@ let execute maxParallel includeSummary configured =
     let minReplica, maxReplica = 0<replNumber>, UMX.tag<replNumber> maxReplica
     printfn "\n=== %s / %s / %s ===" %configured.ProjectName %configured.DatabaseName %configured.RunName
     printfn "Setup"
-    // Keep persisted completion/checkpoint state when resuming an interrupted batch.
-    let newParameters =
-        host.MakeRunParameters minReplica maxReplica
-        |> Array.filter (fun parameters ->
-            let query =
-                host.QueryParamsFromRunParams parameters (geneSortDataType.RunParameters configured.RunName)
-                |> Option.defaultWith (fun () -> failwith "Could not build the run-parameter query.")
-            host.RunDb.doesOutPutDataExist geneSortDataMode.Project query
-            |> Async.RunSynchronously |> not)
-    ParamOps.initRunAndParamFiles host.RunDb progress host.Run minReplica maxReplica
-        host.AllowOverwrite (fun _ _ -> newParameters)
+    // Resume the complete expected set while preserving saved completion/checkpoint state.
+    ParamOps.resumeRunAndParamFiles host.RunDb progress host.Run minReplica maxReplica host.MakeRunParameters
     |> Async.RunSynchronously
     |> Result.defaultWith (fun error -> failwithf "Initialize parameters: %s" error)
     ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts progress host maxParallel

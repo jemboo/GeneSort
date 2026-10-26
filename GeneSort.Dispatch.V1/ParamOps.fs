@@ -1,79 +1,23 @@
 namespace GeneSort.Dispatch.V1
-open System
+
 open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
-open GeneSort.Project.V1.Catalogs.Queries
-open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Runtime
 open GeneSort.Project.V1.Storage
-open GeneSort.Project.V1.Runtime.OpsUtils
 
+/// Dispatch supplies its source-aware generator; Project owns preparation and publication.
 module ParamOps =
+    let initRunAndParamFiles db progress configured (minReplica: int<replNumber>) (maxReplica: int<replNumber>) (allowOverwrite: bool<allowOverwrite>) makeRunParameters =
+        RunPreparation.initializeAsync db progress {
+            Run = configured
+            FirstReplica = int minReplica
+            ReplicaCount = int maxReplica - int minReplica
+        } (if %allowOverwrite then runParameterWriteMode.Replace else runParameterWriteMode.CreateNew) makeRunParameters
 
-    let saveParametersFiles
-            (db: IGeneSortDb)
-            (queryParamsBuilder: runQueryParamsBuilder)
-            (runParameterArray: runParameters[])
-            (allowOverwrite: bool<allowOverwrite>) 
-            (progress: IProgress<string> option): Async<Result<unit, string>> =
-        async {
-            try
-                report progress (sprintf "%s Saving RunParameter files in %s" (StringUtils.getTimestampString()) %db.databaseName)
-
-                let saveResults = 
-                    runParameterArray
-                    |> Array.map (fun rp -> 
-                        let runName = rp.GetRunName() |> Option.defaultValue ("UnknownRun" |> UMX.tag<runName>)
-                        let queryParamsOpt = queryParamsBuilder rp (geneSortDataType.RunParameters runName)
-                        match queryParamsOpt with
-                        | Some qp -> db.saveAsync geneSortDataMode.Project qp (outputData.RunParameters rp) allowOverwrite
-                        | None -> async { return Error (sprintf "Failed to create query parameters for run parameters: %A" rp) })
-                    |> Async.Parallel
-
-                return! saveResults
-                    |> Async.map (fun results ->
-                        results
-                        |> Array.tryFind (function Error _ -> true | Ok _ -> false)
-                        |> function
-                            | Some (Error err) -> Error err
-                            | _ -> Ok ())
-
-            with
-            | e ->
-                let msg = sprintf "%s Failed to save RunParameter files in %s: %s" 
-                                        (StringUtils.getTimestampString()) 
-                                        %db.databaseName
-                                        e.Message
-                report progress msg
-                return Error msg
-        }
-
-
-    let initRunAndParamFiles
-        (db: IGeneSortDb)
-        (progress: IProgress<string> option)
-        (run: run)
-        (minReplica: int<replNumber>)
-        (maxReplica: int<replNumber>)
-        (allowOverwrite: bool<allowOverwrite>)
-        (makeRunParameters: int<replNumber> -> int<replNumber> -> runParameters[]) : Async<Result<unit, string>> =
-        async {
-            try
-                let runParametersArray = makeRunParameters minReplica maxReplica
-                report progress (sprintf "%s Saving run file: %s" (StringUtils.getTimestampString()) %run.DatabaseName)
-                let queryParams = queryParams.createForRun run.DatabaseName run.ProjectName run.RunName
-                let! saveProjRes = db.saveAsync geneSortDataMode.Project queryParams (run |> outputData.Run) (true |> UMX.tag<allowOverwrite>)
-                match saveProjRes with
-                | Error err -> return Error err
-                | Ok () ->
-                    report progress (sprintf "%s Saving run parameters files: (%d)" (StringUtils.getTimestampString()) runParametersArray.Length)
-                    return! saveParametersFiles 
-                                db
-                                (QueryParamsCatalogRun.get run.RunQueryCatalogName run.ProjectName run.DatabaseName)
-                                runParametersArray 
-                                allowOverwrite progress
-            with e ->
-                let errorMsg = sprintf "Failed to initialize project files: %s\n" e.Message
-                report progress errorMsg
-                return Error errorMsg
-        }
+    let resumeRunAndParamFiles db progress configured (minReplica: int<replNumber>) (maxReplica: int<replNumber>) makeRunParameters =
+        RunPreparation.initializeAsync db progress {
+            Run = configured
+            FirstReplica = int minReplica
+            ReplicaCount = int maxReplica - int minReplica
+        } runParameterWriteMode.Resume makeRunParameters

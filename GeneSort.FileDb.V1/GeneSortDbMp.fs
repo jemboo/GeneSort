@@ -11,6 +11,7 @@ open GeneSort.Project.V1.Storage
 
 
 type private DbMessage =
+    | SaveParameterSet of runParameterSet * runParameterWriteMode * IProgress<string> option * AsyncReplyChannel<Result<unit, string>>
     | Save of string<pathToRootFolder> * geneSortDataMode * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
     | Load of string<pathToRootFolder> * geneSortDataMode * queryParams * AsyncReplyChannel<Result<outputData, string>>
     | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
@@ -32,6 +33,9 @@ type GeneSortDbMp(
             async {
                 let! msg = inbox.Receive()
                 match msg with
+                | SaveParameterSet (prepared, mode, progress, replyChannel) ->
+                    let! res = RunFileStorage.publishAsync rootFolder prepared mode progress |> Async.AwaitTask
+                    replyChannel.Reply res
                 | Save (projectFolder, dataMode, queryParams, data, allowOverwrite, replyChannel) ->
                     let! res = OutputDataFile.saveToFileAsync projectFolder dataMode queryParams data allowOverwrite
                     replyChannel.Reply res
@@ -47,6 +51,10 @@ type GeneSortDbMp(
     )
 
     member _.RootFolder = rootFolder
+
+    interface IRunParameterStore with
+        member _.saveRunParameterSetAsync prepared mode progress =
+            mailbox.PostAndAsyncReply(fun reply -> SaveParameterSet(prepared, mode, progress, reply))
 
     interface IGeneSortDb with
         member _.databaseName

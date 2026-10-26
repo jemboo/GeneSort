@@ -11,15 +11,11 @@ public partial class RunEditorView : UserControl
 {
     private RunEditorViewModel Model => (RunEditorViewModel)DataContext;
     public RunEditorView() => InitializeComponent();
-    private bool DiscardChanges() => !Model.IsDirty || MessageBox.Show(Window.GetWindow(this),
+    private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageBox.Show(Window.GetWindow(this),
         "Discard the unsaved run definition changes?", "Run editor", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
     private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
     private void Validate_Click(object sender, RoutedEventArgs e) => Model.Validate();
-    private void AddSetup_Click(object sender, RoutedEventArgs e) => Model.SetupParameters.Add(new());
-    private void AddExecution_Click(object sender, RoutedEventArgs e) => Model.ExecutionParameters.Add(new());
-    private void RemoveSetup_Click(object sender, RoutedEventArgs e) { if (SetupGrid.SelectedItem is ParameterRow row) Model.SetupParameters.Remove(row); }
-    private void RemoveExecution_Click(object sender, RoutedEventArgs e) { if (ExecutionGrid.SelectedItem is ParameterRow row) Model.ExecutionParameters.Remove(row); }
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFolderDialog { Title = "Choose the folder containing your GeneSort projects" };
@@ -34,6 +30,7 @@ public partial class RunEditorView : UserControl
     }
     private async void Save_Click(object sender, RoutedEventArgs e)
     {
+        if (!Model.CanSave) return;
         var configured = Model.Validate();
         if (configured is null) return;
         await PerformAsync(async () =>
@@ -43,6 +40,28 @@ public partial class RunEditorView : UserControl
             if (overwrite && MessageBox.Show(Window.GetWindow(this), $"Replace this run definition?\n\n{path}",
                     "Save run", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             await Model.SaveAsync(configured, overwrite);
+        });
+    }
+    private async void RefreshParameters_Click(object sender, RoutedEventArgs e)
+    {
+        await PerformAsync(() => Model.LoadRunParametersAsync());
+    }
+    private async void Generate_Click(object sender, RoutedEventArgs e)
+    {
+        await PerformAsync(async () =>
+        {
+            var prepared = await Model.PrepareGenerationAsync();
+            if (prepared is null) return;
+            var replace = prepared.RequiresReplacement;
+            if (replace && MessageBox.Show(Window.GetWindow(this),
+                    $"Save this definition and replace all {prepared.ExistingFileCount:N0} existing RunParameter files for '{prepared.Run.RunName}' with the {prepared.FileCount:N0} prepared files?\n\n" +
+                    $"Old parameter files, including replicas outside the new range, will be removed.\n\n{prepared.ParameterFolder}",
+                    "Generate RunParameters", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                Model.Status = "Generation cancelled. Existing files were kept.";
+                return;
+            }
+            await Model.GenerateParametersAsync(prepared, replace);
         });
     }
     private async Task PerformAsync(Func<Task> action)

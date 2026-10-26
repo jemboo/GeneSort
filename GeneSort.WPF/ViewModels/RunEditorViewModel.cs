@@ -1,68 +1,16 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
 using GeneSort.FileDb.V1;
 using GeneSort.Project.V1;
 using GeneSort.Project.V1.Editing;
+using GeneSort.Project.V1.Runtime;
+using GeneSort.Project.V1.Workflows;
 
 namespace GeneSort.WPF.ViewModels;
-
-public sealed class ParameterRow : INotifyPropertyChanged
-{
-    private string key = "";
-    private string values = "";
-    public string Key { get => key; set { key = value; Changed(); } }
-    public string Values { get => values; set { values = value; Changed(); } }
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void Changed([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new(name));
-    public parameterDraft Snapshot() => parameterDraft.create(Key, ParseValues(Values));
-    public static string FormatValues(IEnumerable<string> values) => string.Join(", ", values.Select(value =>
-        value != value.Trim() || value.IndexOfAny([',', '"', '\r', '\n']) >= 0
-            ? "\"" + value.Replace("\"", "\"\"") + "\"" : value));
-
-    private static string[] ParseValues(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return [];
-        var values = new List<string>();
-        var index = 0;
-        while (true)
-        {
-            while (index < text.Length && char.IsWhiteSpace(text[index])) index++;
-            if (index < text.Length && text[index] == '"')
-            {
-                index++;
-                var value = new StringBuilder();
-                var closed = false;
-                while (index < text.Length)
-                {
-                    var ch = text[index++];
-                    if (ch != '"') { value.Append(ch); continue; }
-                    if (index < text.Length && text[index] == '"') { value.Append('"'); index++; continue; }
-                    closed = true;
-                    break;
-                }
-                while (index < text.Length && char.IsWhiteSpace(text[index])) index++;
-                if (!closed || (index < text.Length && text[index] != ','))
-                    throw new FormatException("Close quoted values with a double quote, then separate values with commas.");
-                values.Add(value.ToString());
-            }
-            else
-            {
-                var start = index;
-                while (index < text.Length && text[index] != ',') index++;
-                var value = text[start..index].Trim();
-                if (value.Contains('"')) throw new FormatException("Wrap values containing quotes in double quotes, and double each inner quote.");
-                values.Add(value);
-            }
-            if (index == text.Length) break;
-            index++;
-        }
-        return values.ToArray();
-    }
-}
 
 /// Only presentation state lives here. Workflow choices and validation belong to Project.
 public sealed class RunEditorViewModel : INotifyPropertyChanged
@@ -70,7 +18,9 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private string projectName = "", databaseName = "", runName = "", description = "";
     private string saveIntervals = "", summaryIntervals = "", projectsFolder = "";
     private string status = "New definition. Choose a projects folder before saving.";
+    private string firstReplica = "0", replicaCount = "1";
     private bool allowOverwrite, isDirty, isBusy, loading;
+    private run? validatedRun;
     private readonly HashSet<ParameterRow> observedRows = [];
 
     public string WorkflowName => RunEditor.workflowName;
@@ -78,11 +28,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public catalogChoice[] Catalogs { get; } = RunEditor.catalogChoices();
     public catalogChoice[] Intervals { get; } = RunEditor.intervals();
     public parameterDescription[] Parameters { get; } = RunEditor.parameters();
-    public string[] SetupKeys => Parameters.Select(spec => spec.Key).ToArray();
-    public string[] ExecutionKeys => Parameters.Where(spec => spec.ExecutionAllowed).Select(spec => spec.Key).ToArray();
-    public ObservableCollection<ParameterRow> SetupParameters { get; } = [];
-    public ObservableCollection<ParameterRow> ExecutionParameters { get; } = [];
+    public ParameterSectionViewModel SetupSection { get; }
+    public ParameterSectionViewModel ExecutionSection { get; }
+    public ObservableCollection<ParameterRow> SetupParameters => SetupSection.Rows;
+    public ObservableCollection<ParameterRow> ExecutionParameters => ExecutionSection.Rows;
     public ObservableCollection<string> Issues { get; } = [];
+    public RunParameterListViewModel RunParameterList { get; } = new();
 
     public string ProjectName { get => projectName; set => Edit(ref projectName, value); }
     public string DatabaseName { get => databaseName; set => Edit(ref databaseName, value); }
@@ -91,12 +42,85 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool AllowOverwrite { get => allowOverwrite; set => Edit(ref allowOverwrite, value); }
     public string SaveIntervals { get => saveIntervals; set => Edit(ref saveIntervals, value); }
     public string SummaryIntervals { get => summaryIntervals; set => Edit(ref summaryIntervals, value); }
-    public string ProjectsFolder { get => projectsFolder; set => Edit(ref projectsFolder, value); }
-    public bool IsDirty { get => isDirty; private set { isDirty = value; Changed(); Changed(nameof(DirtyLabel)); } }
-    public string DirtyLabel => IsDirty ? "Unsaved changes" : "";
-    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); } }
+    public string ProjectsFolder
+    {
+        get => projectsFolder;
+        set
+        {
+            if (projectsFolder == value) return;
+            projectsFolder = value;
+            Changed();
+            if (!loading)
+            {
+                IsDirty = true;
+                RunParameterList.Clear();
+                Status = "Projects folder changed. Validate the definition if needed, then save.";
+            }
+            Changed(nameof(Destination));
+            SaveStateChanged(); GenerationChanged();
+        }
+    }
+    public bool IsDirty { get => isDirty; private set { isDirty = value; Changed(); Changed(nameof(DirtyLabel)); Changed(nameof(HasUnsavedChanges)); } }
+    public bool HasPendingParameter => SetupSection.IsAdding || ExecutionSection.IsAdding;
+    public bool HasUnsavedChanges => IsDirty || HasPendingParameter;
+    public string DirtyLabel => HasPendingParameter ? "Finish adding the parameter, or cancel" : IsDirty ? "Unsaved changes" : "";
+    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); SaveStateChanged(); GenerationChanged(); } }
     public bool IsReady => !IsBusy;
     public string Status { get => status; set { status = value; Changed(); } }
+    public string FirstReplica { get => firstReplica; set => EditGeneration(ref firstReplica, value); }
+    public string ReplicaCount { get => replicaCount; set => EditGeneration(ref replicaCount, value); }
+    public string GenerationPreview => GenerationDetails().Text;
+    public bool CanGenerateParameters => !IsBusy && GenerationDetails().Valid;
+    private bool HasProjectsFolder => !string.IsNullOrWhiteSpace(ProjectsFolder)
+        && Path.IsPathFullyQualified(ProjectsFolder) && Directory.Exists(ProjectsFolder);
+    public bool CanSave => !IsBusy && !HasPendingParameter && validatedRun is not null && HasProjectsFolder;
+    public string SaveHint => !HasProjectsFolder ? "Select an existing projects folder first."
+        : HasPendingParameter ? "Add or cancel the pending parameter first."
+        : validatedRun is null ? "Validate the current definition before saving." : "Save the validated run definition.";
+    public bool CanLoadRunParameters => !IsBusy && !HasPendingParameter && HasProjectsFolder && RunEditor.build(Snapshot()).IsOk;
+
+    private void SaveStateChanged()
+    {
+        Changed(nameof(CanSave)); Changed(nameof(SaveHint));
+    }
+
+    private runPreparationArgs PreparationArgs(run configured)
+    {
+        if (!int.TryParse(FirstReplica, NumberStyles.Integer, CultureInfo.InvariantCulture, out var first))
+            throw new ArgumentException("Enter a whole number for First replica.");
+        if (!int.TryParse(ReplicaCount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var count))
+            throw new ArgumentException("Enter a whole number for Replica count.");
+        return new runPreparationArgs { Run = configured, FirstReplica = first, ReplicaCount = count };
+    }
+    private (bool Valid, string Text) GenerationDetails()
+    {
+        if (HasPendingParameter) return (false, "Add or cancel the pending parameter first.");
+        if (!HasProjectsFolder) return (false, "Select an existing projects folder first.");
+        var result = RunEditor.build(Snapshot());
+        if (!result.IsOk) return (false, "Correct the run definition to preview its parameter files.");
+        try
+        {
+            var args = PreparationArgs(result.ResultValue);
+            var count = RunPreparation.count(args);
+            if (count <= 0) return (false, "No RunParameter files would be generated.");
+            if (count > int.MaxValue) return (false, "This sweep produces too many files. Reduce the parameter choices or replica count.");
+            var folder = RunParameterFiles.folderFor(ProjectsFolder, args.Run);
+            return (true, $"{count:N0} RunParameter files · replicas {args.FirstReplica}–{(long)args.FirstReplica + args.ReplicaCount - 1}\n{folder}");
+        }
+        catch (ArgumentException error) { return (false, error.Message); }
+    }
+    private void EditGeneration(ref string field, string value, [CallerMemberName] string? name = null)
+    {
+        if (field == value) return;
+        field = value;
+        Changed(name);
+        GenerationChanged();
+    }
+    private void GenerationChanged()
+    {
+        Changed(nameof(GenerationPreview)); Changed(nameof(CanGenerateParameters));
+        Changed(nameof(CanLoadRunParameters));
+    }
     public string Destination
     {
         get
@@ -107,13 +131,17 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 if (!built.IsOk || string.IsNullOrWhiteSpace(ProjectsFolder)) return "Choose valid names and a projects folder to see the destination.";
                 return RunDefinitionFiles.pathFor(ProjectsFolder, built.ResultValue);
             }
-            catch (FormatException) { return "Correct the parameter values before saving."; }
             catch (ArgumentException) { return "Choose an absolute projects folder."; }
         }
     }
 
     public RunEditorViewModel()
     {
+        SetupSection = new("Setup parameters", Parameters);
+        ExecutionSection = new("Execution overrides", Parameters.Where(spec => spec.ExecutionAllowed).ToArray(),
+            key => SetupParameters.FirstOrDefault(row => row.Key == key)?.Snapshot().Values);
+        SetupSection.PropertyChanged += SectionChanged;
+        ExecutionSection.PropertyChanged += SectionChanged;
         SetupParameters.CollectionChanged += RowsChanged;
         ExecutionParameters.CollectionChanged += RowsChanged;
         Apply(RunEditor.newDraft());
@@ -132,9 +160,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (loading) return;
         IsDirty = true;
+        validatedRun = null;
+        RunParameterList.Clear();
         Issues.Clear();
-        Status = "Definition changed. Validate or save when ready.";
+        Status = "Definition changed. Validate before saving.";
+        SaveStateChanged();
         Changed(nameof(Destination));
+        GenerationChanged();
     }
     private void RowsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -143,66 +175,88 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         observedRows.Clear();
         foreach (var row in SetupParameters.Concat(ExecutionParameters))
             if (observedRows.Add(row)) row.PropertyChanged += RowChanged;
+        ExecutionSection.RefreshInheritance();
         MarkEdited();
     }
-    private void RowChanged(object? sender, PropertyChangedEventArgs e) => MarkEdited();
+    private void RowChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ParameterRow.Values)) return;
+        ExecutionSection.RefreshInheritance();
+        MarkEdited();
+    }
+    private void SectionChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ParameterSectionViewModel.IsAdding)) return;
+        Changed(nameof(HasPendingParameter)); Changed(nameof(HasUnsavedChanges)); Changed(nameof(DirtyLabel));
+        SaveStateChanged();
+        GenerationChanged();
+        if (!loading)
+        {
+            Issues.Clear();
+            Status = HasPendingParameter ? "Choose a parameter and its values, then Add or Cancel."
+                : "Parameter panel closed. Validate or save when ready.";
+        }
+    }
 
     public runDraft Snapshot() => runDraft.create(new runDraftArgs
     {
         ProjectName = ProjectName, DatabaseName = DatabaseName, RunName = RunName,
         Description = Description, AllowOverwrite = AllowOverwrite,
         GenSaveIntervalsName = SaveIntervals, GenSaveSubIntervalsName = SummaryIntervals,
-        SetupParameters = SnapshotRows("Setup", SetupParameters),
-        ExecutionParameters = SnapshotRows("Execution", ExecutionParameters)
+        SetupParameters = SetupParameters.Select(row => row.Snapshot()).ToArray(),
+        ExecutionParameters = ExecutionParameters.Select(row => row.Snapshot()).ToArray()
     });
-
-    private static parameterDraft[] SnapshotRows(string phase, IEnumerable<ParameterRow> rows) => rows.Select((row, index) =>
-    {
-        try { return row.Snapshot(); }
-        catch (FormatException error) { throw new FormatException($"{phase}[{index + 1}].{row.Key}: {error.Message}"); }
-    }).ToArray();
 
     private void Apply(runDraft draft)
     {
         loading = true;
         try
         {
+            SetupSection.CancelAdd(); ExecutionSection.CancelAdd();
+            FirstReplica = "0"; ReplicaCount = "1";
             ProjectName = draft.ProjectName; DatabaseName = draft.DatabaseName; RunName = draft.RunName;
             Description = draft.Description; AllowOverwrite = draft.AllowOverwrite;
             SaveIntervals = draft.GenSaveIntervalsName; SummaryIntervals = draft.GenSaveSubIntervalsName;
             SetupParameters.Clear(); ExecutionParameters.Clear();
             foreach (var row in draft.SetupParameters)
-                SetupParameters.Add(new() { Key = row.Key, Values = ParameterRow.FormatValues(row.Values) });
+                SetupParameters.Add(new(row.Key, row.Values));
             foreach (var row in draft.ExecutionParameters)
-                ExecutionParameters.Add(new() { Key = row.Key, Values = ParameterRow.FormatValues(row.Values) });
+                ExecutionParameters.Add(new(row.Key, row.Values));
             Issues.Clear(); IsDirty = false;
+            validatedRun = null;
+            RunParameterList.Clear();
         }
         finally { loading = false; }
         Changed(nameof(Destination));
+        SaveStateChanged();
+        GenerationChanged();
     }
 
     public void New()
     {
         Apply(RunEditor.newDraft());
-        Status = "New definition. Edit its names and parameters, then save.";
+        Status = "New definition. Select a projects folder and validate before saving.";
     }
 
     public run? Validate()
     {
+        validatedRun = null;
+        SaveStateChanged();
         Issues.Clear();
-        runDraft draft;
-        try { draft = Snapshot(); }
-        catch (FormatException error)
+        if (HasPendingParameter)
         {
-            Issues.Add(error.Message);
-            Status = "Correct the parameter text before saving.";
+            Issues.Add("Add or cancel the pending parameter before validating or saving.");
+            Status = "Finish the Add parameter panel first.";
             return null;
         }
-        var result = RunEditor.build(draft);
+        var result = RunEditor.build(Snapshot());
         if (result.IsOk)
         {
-            Status = "Definition is valid. Saving does not start setup or execution.";
-            return result.ResultValue;
+            validatedRun = result.ResultValue;
+            SaveStateChanged();
+            Status = HasProjectsFolder ? "Definition is valid. Ready to save."
+                : "Definition is valid. Select an existing projects folder to enable Save.";
+            return validatedRun;
         }
         foreach (var issue in result.ErrorValue) Issues.Add($"{issue.Field}: {issue.Message}");
         Status = $"Fix {Issues.Count} validation issue(s) before saving.";
@@ -220,14 +274,58 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         ProjectsFolder = root?.Value ?? "";
         loading = false;
         Changed(nameof(Destination));
+        GenerationChanged();
         Validate();
         if (Issues.Count == 0) Status = $"Opened {path}";
+        if (HasProjectsFolder && Issues.Count == 0) await LoadRunParametersAsync(false);
     }
 
     public async Task SaveAsync(run configured, bool overwrite)
     {
+        if (HasPendingParameter || validatedRun is null || !Equals(configured, validatedRun) || !HasProjectsFolder)
+            throw new InvalidOperationException("Select an existing projects folder and validate the current definition before saving.");
         var path = await RunDefinitionFiles.saveAsync(ProjectsFolder, configured, overwrite);
         IsDirty = false;
         Status = $"Saved {path}";
+    }
+
+    public async Task<preparedRunFiles?> PrepareGenerationAsync()
+    {
+        var configured = Validate();
+        if (configured is null) return null;
+        var args = PreparationArgs(configured);
+        Status = "Preparing RunParameter files…";
+        return await RunParameterFiles.prepareAsync(ProjectsFolder, args);
+    }
+
+    public async Task GenerateParametersAsync(preparedRunFiles prepared, bool replace)
+    {
+        if (HasPendingParameter) throw new InvalidOperationException("Add or cancel the pending parameter before generating.");
+        var progress = new Progress<string>(message => Status = message);
+        await RunParameterFiles.generateAsync(prepared, replace, progress);
+        IsDirty = false;
+        Status = $"Saved the run definition and {prepared.FileCount:N0} RunParameter files to {prepared.ParameterFolder}";
+        await LoadRunParametersAsync(false);
+        GenerationChanged();
+    }
+
+    public async Task LoadRunParametersAsync(bool updateStatus = true)
+    {
+        RunParameterList.Clear("Loading saved RunParameters…", preserveSort: true);
+        try
+        {
+            if (!HasProjectsFolder) throw new InvalidOperationException("Select an existing projects folder first.");
+            var configured = RunEditor.build(Snapshot());
+            if (!configured.IsOk) throw new InvalidOperationException("Correct the run definition before loading its saved parameters.");
+            var rows = await RunParameterFiles.loadAllAsync(ProjectsFolder, configured.ResultValue);
+            RunParameterList.SetParameters(rows);
+            if (updateStatus) Status = $"Loaded {rows.Length:N0} saved RunParameters for {RunName}.";
+        }
+        catch (Exception error)
+        {
+            var message = $"Could not load saved RunParameters: {error.GetBaseException().Message}";
+            RunParameterList.Clear(message);
+            Status = updateStatus ? message : $"{Status}\n{message}";
+        }
     }
 }

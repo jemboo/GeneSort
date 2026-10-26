@@ -18,7 +18,7 @@ public partial class MainWindow : Window
         {
             if (model.RunEditor.IsBusy)
                 e.Cancel = true;
-            else if (model.RunEditor.IsDirty && MessageBox.Show(this,
+            else if (model.RunEditor.HasUnsavedChanges && MessageBox.Show(this,
                 "Discard the unsaved run definition changes?", "Run editor",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 e.Cancel = true;

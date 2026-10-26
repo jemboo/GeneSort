@@ -13,22 +13,8 @@ open GeneSort.Project.Mp.V1
 /// Read/write run definitions using the same DTO and database layout as dispatch.
 /// Saving a definition never generates parameters or starts setup/execution.
 module RunDefinitionFiles =
-    let private checkIdentity (configured: run) =
-        let issues =
-            [| RunIdentity.validate "ProjectName" %configured.ProjectName
-               RunIdentity.validate "DatabaseName" %configured.DatabaseName
-               RunIdentity.validate "RunName" %configured.RunName |]
-            |> Array.concat
-        if issues.Length > 0 then
-            invalidArg "configured" (issues |> Array.map (fun issue -> issue.Field + ": " + issue.Message) |> String.concat "\n")
-
     let pathFor (projectsFolder: string) (configured: run) =
-        checkIdentity configured
-        if String.IsNullOrWhiteSpace projectsFolder || not (Path.IsPathFullyQualified projectsFolder) then
-            invalidArg "projectsFolder" "Choose an absolute projects folder."
-        let root = Path.Combine(Path.GetFullPath projectsFolder, %configured.ProjectName, %configured.DatabaseName, "Data")
-        OutputDataFile.getFullOutputDataFilePath (UMX.tag root) geneSortDataMode.Project
-            (queryParams.createForRun configured.DatabaseName configured.ProjectName configured.RunName) |> UMX.untag
+        RunFileStorage.dataRoot projectsFolder configured |> fun root -> RunFileStorage.paths root configured |> fst
 
     let loadAsync (path: string) = task {
         MessagePackSetup.configure ()
@@ -51,17 +37,6 @@ module RunDefinitionFiles =
             with :? ArgumentException -> None
 
     let saveAsync (projectsFolder: string) (configured: run) (overwrite: bool) = task {
-        let path = pathFor projectsFolder configured
-        MessagePackSetup.configure ()
-        // Serialize before touching the destination, then publish a complete file atomically.
-        let bytes = MessagePackSerializer.Serialize(RunDto.fromDomain configured)
-        let folder = Path.GetDirectoryName path
-        Directory.CreateDirectory folder |> ignore
-        let temporary = Path.Combine(folder, ".run-" + Guid.NewGuid().ToString("N") + ".tmp")
-        try
-            do! File.WriteAllBytesAsync(temporary, bytes)
-            File.Move(temporary, path, overwrite)
-            return path
-        finally
-            if File.Exists temporary then File.Delete temporary
+        let root = RunFileStorage.dataRoot projectsFolder configured
+        return! RunFileStorage.saveDefinitionAsync root configured overwrite
     }

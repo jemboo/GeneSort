@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <Compile Include="OutputDataFile.fs" />
+    <Compile Include="RunFileStorage.fs" />
     <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="RunDefinitionFiles.fs" />
+    <Compile Include="RunParameterFiles.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

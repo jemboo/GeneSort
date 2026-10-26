@@ -10,6 +10,7 @@ open GeneSort.Eval.V1
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.SorterSgd
 
 /// Context available to a run parameter enhancer without depending on dispatch infrastructure.
 type runParamEnhancerContext =
@@ -239,12 +240,16 @@ module RunParamEnhancerBuilders =
                 setGenerationCurrent
                 modificationRate
 
-        let msuf32MutationRate =
+        let msuf32MutationRate : runParamEnhancerBuilder = fun context parameters ->
+            parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.msufExecution
+            |> ParameterValidation.ensureValid "parameters"
             fromSorterPoolSet
                 (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msuf4 true))
                 true
                 true
                 None
+                context
+                parameters
 
         let private combineSetup (context: runParamEnhancerContext) (parameters: runParameters) =
             match context.SetupParameters with
@@ -262,32 +267,24 @@ module RunParamEnhancerBuilders =
             let combined = combineSetup context parameters
             if Map.containsKey ParamKeys.activationProbabilityKey combined.ParamMap then
                 invalidArg "parameters" "SimpleR execution uses AMax; ActivationProbability belongs to SimpleS."
-            match combined.GetAMax() with
-            | Some maximum when maximum >= 0 -> ()
-            | _ -> invalidArg "parameters" "SimpleR execution requires a nonnegative integer AMax from setup."
+            ParameterValidation.validateValues [ParamKeys.aMaxKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
             let combined =
                 if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
                 else combined.WithActivatorMutationRate(Some 0.1)
-            match combined.GetActivatorMutationRate() with
-            | Some rate when System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
-                msuf32MutationRate context combined
-            | _ -> invalidArg "parameters" "SimpleR execution requires a finite ActivatorMutationRate between 0 and 1."
+            ParameterValidation.validateValues [ParamKeys.activatorMutationRateKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
+            msuf32MutationRate context combined
 
         /// Supply the SimpleS flip-rate default before execution IDs are calculated.
         let msuf32SFromSetup : runParamEnhancerBuilder = fun context parameters ->
             let combined = combineSetup context parameters
             if Map.containsKey ParamKeys.aMaxKey combined.ParamMap then
                 invalidArg "parameters" "SimpleS execution uses ActivationProbability; AMax belongs to SimpleR."
-            match combined.GetActivationProbability() with
-            | Some probability when System.Double.IsFinite probability && probability >= 0.0 && probability <= 1.0 -> ()
-            | _ -> invalidArg "parameters" "SimpleS execution requires a finite ActivationProbability between 0 and 1 from setup."
+            ParameterValidation.validateValues [ParamKeys.activationProbabilityKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
             let combined =
                 if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
                 else combined.WithActivatorMutationRate(Some 0.1)
-            match combined.GetActivatorMutationRate() with
-            | Some rate when System.Double.IsFinite rate && rate >= 0.0 && rate <= 1.0 ->
-                msuf32MutationRate context combined
-            | _ -> invalidArg "parameters" "SimpleS execution requires a finite ActivatorMutationRate between 0 and 1."
+            ParameterValidation.validateValues [ParamKeys.activatorMutationRateKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
+            msuf32MutationRate context combined
 
         let msrs32MutationRate =
             fromGlobalSorterCount
