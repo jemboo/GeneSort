@@ -8,6 +8,7 @@ open GeneSort.Core
 open GeneSort.Core.Mp
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs
+open GeneSort.Project.V1.Catalogs.Reports
 open GeneSort.Dispatch.V1
 
 let identity (configured: run) =

@@ -11,7 +11,8 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SortableTests
 open GeneSort.Dispatch.V1.SorterEval

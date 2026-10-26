@@ -5,8 +5,8 @@ open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
-open OpsUtils
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Runtime.OpsUtils
 
 module ParamOps =
 

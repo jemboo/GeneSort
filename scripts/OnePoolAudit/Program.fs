@@ -4,18 +4,17 @@ open System
 open System.IO
 open System.Reflection
 open FSharp.UMX
+open OnePoolAuditVerification
 open GeneSort.Core
 open GeneSort.Core.Mp
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
-open GeneSort.Project.V1.Catalogs.Evolution
-open OnePoolAuditVerification
 
 let unwrap computation = computation |> Async.RunSynchronously |> Result.defaultWith failwith
 let require condition message = if not condition then failwith message

@@ -9,12 +9,15 @@ open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Runtime
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Execution
+open GeneSort.Project.V1.Catalogs.Reports
 open GeneSort.Dispatch.V1
 
 let private createHostWithSaveResult saveResult finished execute =
     let name = Guid.NewGuid().ToString()
-    ExecuteFunctionCatalog.register name execute
+    ExecuteFunctionCatalog.register name (SimpleExecution execute)
     QueryParamsCatalogRun.register name (fun project database rp dataType ->
         Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
     QueryParamsCatalogSetup.register name (fun project database sp dataType ->
@@ -56,6 +59,27 @@ let private createHostWithSaveResult saveResult finished execute =
 let private createHost finished execute = createHostWithSaveResult (Ok ()) finished execute
 
 [<Fact>]
+let ``execution binds storage once and rebinding preserves previously prepared functions`` () =
+    let bindings = ResizeArray<IGeneSortDb>()
+    let used = ResizeArray<IGeneSortDb>()
+    let bind (storage: runStorage) : runFunction =
+        bindings.Add storage.RunDb
+        fun rp _ _ _ -> async { used.Add storage.RunDb; return Ok rp }
+    let original, _ = createHost false bind
+    let replacement, _ = createHost false (fun _ rp _ _ _ -> async { return Ok rp })
+    let previousExecute = original.ExecuteFunction
+    let updated = original.WithRunDb replacement.RunDb
+    Assert.Equal(3, bindings.Count)
+    let parameters = runParameters.create Map.empty
+    use cts = new CancellationTokenSource()
+    for execute in [previousExecute; updated.ExecuteFunction; updated.ExecuteFunction] do
+        execute parameters (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    Assert.Equal(3, bindings.Count)
+    Assert.Same(original.RunDb, used.[0])
+    Assert.Same(replacement.RunDb, used.[1])
+    Assert.Same(replacement.RunDb, used.[2])
+
+[<Fact>]
 let ``failed parameter persistence is reported as a batch failure`` () =
     let host, _ = createHostWithSaveResult (Error "Storage unavailable") false (fun _ rp _ _ _ -> async { return Ok rp })
     use cts = new CancellationTokenSource()
@@ -68,13 +92,12 @@ let ``failed parameter persistence is reported as a batch failure`` () =
 let ``reports include completed runs without invoking execution or saving run state`` () =
     let host, writes = createHost true (fun _ _ _ _ _ -> failwith "Run execution must not happen")
     let mutable reportCalls = 0
-    let report =
-        { new IRunParamsExecutor with
-            member _.Execute _ rp _ _ _ = async {
+    let report : runFunction =
+        fun rp _ _ _ -> async {
                 reportCalls <- reportCalls + 1
                 Assert.Equal(Some true, rp.GetRunFinished())
                 return Ok (rp.WithRunFinished(Some false))
-            } }
+            }
     use cts = new CancellationTokenSource()
     let result = ProjectOps.executeReportRuns (UMX.tag 0) (UMX.tag 1) (UMX.tag false) cts None host report 1 |> Async.RunSynchronously
     match result with
@@ -89,14 +112,13 @@ let ``reports include completed runs without invoking execution or saving run st
 let ``setup phase never invokes execution`` setupFails =
     let calls = ResizeArray<string>()
     let host, writes = createHost false (fun _ rp _ _ _ -> async { calls.Add "run"; return Ok (rp.WithRunFinished(Some true)) })
-    let setup =
-        { new IRunParamsExecutor with
-            member _.Execute _ rp _ _ _ = async {
+    let setup : runFunction =
+        fun rp _ _ _ -> async {
                 calls.Add "setup"
                 return if setupFails then Error "Setup failed" else Ok rp
-            } }
+            }
     use cts = new CancellationTokenSource()
-    SetupExecutorCatalog.register host.Run.ExecuteFunctionName (fun _ -> setup)
+    SetupExecutorCatalog.register host.Run.ExecuteFunctionName (fun _ _ _ -> setup)
     let result = ProjectOps.executeSetupRuns (UMX.tag 0) (UMX.tag 1) (UMX.tag false) cts None host 1 |> Async.RunSynchronously
     if setupFails then
         match result with | Ok [|Failure _|] -> () | other -> failwithf "Expected setup failure, got %A" other
@@ -159,7 +181,7 @@ let ``built-in hosts resolve setup for every execution family`` () =
 
 [<Fact>]
 let ``setup executor catalog rejects blank and duplicate names`` () =
-    let builder _ = RunParamsExecutor.hostExecutor
+    let builder _ _ _ : runFunction = fun rp _ _ _ -> async { return Ok rp }
     Assert.Throws<ArgumentException>(fun () -> SetupExecutorCatalog.register " " builder) |> ignore
     Assert.Throws<InvalidOperationException>(fun () ->
         SetupExecutorCatalog.register GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval builder) |> ignore

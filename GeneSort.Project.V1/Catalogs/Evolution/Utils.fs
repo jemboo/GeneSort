@@ -1,0 +1,252 @@
+namespace GeneSort.Project.V1.Catalogs.Evolution
+
+open System.Threading
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Eval.V1.Sgd
+open GeneSort.Eval.V1.Sgd.Soss
+open GeneSort.Eval.V1.Sgd.Standard
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup
+
+module Utils =
+
+    /// Initial pools may start at an imported generation; test inputs are stored at zero.
+    let loadSetupOutputData (genDb: IGeneSortDb) (rp: runParameters) dataType =
+        asyncResult {
+            let initialGeneration =
+                match dataType with
+                | geneSortDataType.SorterPoolSet _ -> rp.GetGenerationFirst() |> Option.defaultValue (UMX.tag 0)
+                | _ -> UMX.tag 0
+            let setupRp = rp.WithGenerationCurrent(Some initialGeneration)
+            let! query =
+                genDb.makeQueryParamsFromRunParams setupRp dataType
+                |> Result.ofOption "Failed to create QueryParams for evolution Setup."
+            return! genDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp query)
+        }
+
+    let loadSortableTestsWithPrefix genDb rp =
+        asyncResult {
+            let! saved = loadSetupOutputData genDb rp (geneSortDataType.SortableTestsWithPrefix "")
+            return! OutputData.asSortableTestsWithPrefix saved
+        }
+
+    /// Reuses run setup across checkpoints, or creates and persists it before evolution.
+    let loadOrCreateSortableTestsWithPrefix
+            (makeTests: runParameters -> Async<Result<sortableTests * ce array, string>>)
+            (genDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<sortableTests * ce array, string>> =
+        asyncResult {
+            let setupRp = rp.WithGenerationCurrent(Some (UMX.tag<generationNumber> 0))
+            let! query =
+                genDb.makeQueryParamsFromRunParams setupRp (geneSortDataType.SortableTestsWithPrefix "")
+                |> Result.ofOption "Failed to create QueryParams for Setup SortableTestsWithPrefix."
+            let! saved = SetupArtifacts.getOrCreate genDb (QueryParams.forSetup rp query) (fun () ->
+                makeTests setupRp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
+            return! OutputData.asSortableTestsWithPrefix saved
+        }
+
+    /// Helper to evaluate one generation step asynchronously without accumulating history.
+    let private tryLoadOutputDataForGen<'T>
+            (extractFn: outputData -> Result<'T, string>)
+            (dataType: geneSortDataType)
+            (generationalDb: IGeneSortDb)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit)
+            (genInt: int) : Async<Result<'T option, string>> =
+
+        asyncResult {
+            do! checkCancellation cts
+            let currentGen = %genInt : int<generationNumber>
+            let sliceRp = rp.WithGenerationCurrent(Some currentGen)
+
+            match generationalDb.makeQueryParamsFromRunParams sliceRp dataType with
+            | None -> 
+                log (sprintf "Failed to make query params at generation %d. Stopping search." genInt)
+                return None
+            | Some qpSlice ->
+                let! loadedDataOpt = generationalDb.loadIfFoundAsync geneSortDataMode.Results qpSlice
+                match loadedDataOpt with
+                | None ->
+                    log (sprintf "No file found for Gen %d. Sequence complete." genInt)
+                    return None
+                | Some outData ->
+                    match extractFn outData with
+                    | Ok sliceResult ->
+                        log (sprintf "Successfully loaded slice for Gen %d." genInt)
+                        return Some sliceResult
+                    | Error err ->
+                        log (sprintf "Failed to parse data at Gen %d (%s). Ending search sequence." genInt err)
+                        return None
+        }
+
+    /// Dynamically discovers and yields contiguous slices lazily as an Async sequence generator.
+    /// Stops at the configured horizon even when another run has saved later slices.
+    let loadAvailableOutputData<'T>
+            (extractFn: outputData -> Result<'T, string>)
+            (dataType: geneSortDataType)
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<'T>> =
+        async {
+            let lastGeneration =
+                rp.GetGenerationIntervalLast()
+                |> Option.map (fun interval ->
+                    GenIntervalConfig.getSampleAtIndex saveConfig (int interval)
+                    |> Option.defaultWith (fun () -> invalidArg "rp" "Invalid final generation interval."))
+            let genSequence =
+                GenIntervalConfig.getSamplesWithMinBound saveConfig %startingGen
+                |> Seq.takeWhile (fun generation -> lastGeneration |> Option.forall (fun last -> generation <= last))
+                |> Seq.filter (fun generation ->
+                    rp.GetGenerationFirst() |> Option.forall (fun first -> generation > %first))
+            let rec discoverLazy (gens: int seq) = seq {
+                match Seq.tryHead gens with
+                | None -> ()
+                | Some currentGenInt ->
+                    let stepAsync = tryLoadOutputDataForGen extractFn dataType generationalDb rp cts log currentGenInt
+                    match Async.RunSynchronously stepAsync with
+                    | Ok (Some slice) -> 
+                        yield slice
+                        yield! discoverLazy (Seq.tail gens)
+                    | Ok None -> ()
+                    | Error _ -> ()
+            }
+
+            return discoverLazy genSequence
+        }
+
+    let loadAvailableSorterPoolSets
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<sorterPoolSet>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolSet 
+            (geneSortDataType.SorterPoolSet "") 
+            saveConfig generationalDb startingGen rp cts log
+
+
+    let loadAvailableSorterPoolSetSummarySets
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<spSummarySet>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolSetSummarySet 
+            (geneSortDataType.SorterPoolSetSummarySet "") 
+            saveConfig generationalDb startingGen rp cts log
+
+
+    let loadAvailableSorterPoolSetHistories
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<spsh>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolSetHistory 
+            (geneSortDataType.SorterPoolSetHistory "") 
+            saveConfig generationalDb startingGen rp cts log
+
+
+    let loadAvailableSorterPoolBins
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (startingGen: int<generationNumber>)
+            (rp: runParameters)
+            (cts: CancellationToken)
+            (log: string -> unit) : Async<seq<sorterPoolBinsSetSeries>> =
+        loadAvailableOutputData
+            OutputData.asSorterPoolBinsSetSeries 
+            (geneSortDataType.SorterPoolBinsSetSeries "") 
+            saveConfig generationalDb startingGen rp cts log
+
+
+
+    /// Optimized search to locate and load ONLY the slice with the highest generation number.
+    /// Uses fast file-existence probes to skip expensive MessagePack deserialization.
+    /// Loads and extracts a specific output data slice at the highest saved generation.
+    let loadOutputDataWithHighestGenerationNumber<'T>
+            (extractFn: outputData -> Result<'T, string>)
+            (dataType: geneSortDataType)
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<'T option, string>> =
+        async {
+            let targetCount = defaultArg saveConfig.MaxCount 200
+            let intervals =
+                IntSampleMethod.generate saveConfig.Method saveConfig.Min targetCount
+                |> Seq.map (fun gen -> int (ceil (float gen * saveConfig.Scale)))
+                |> Seq.toArray
+                |> Array.map (fun gen -> %gen : int<generationNumber>)
+                // An imported initial pool lives only in Setup. Results start after it.
+                |> Array.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
+
+            let getQueryParams index =
+                let currentGen = intervals.[index]
+                let wrp = rp.WithGenerationCurrent(Some currentGen)
+                generationalDb.makeQueryParamsFromRunParams wrp dataType
+
+            // Saved generations need not be contiguous: earlier checkpoints may
+            // have been removed or only a retained checkpoint may be available.
+            // Probe newest first, deserializing only the first existing result.
+            let rec findHighestExistingIndex index =
+                async {
+                    if index < 0 then return None
+                    else
+                        match getQueryParams index with
+                        | None -> return! findHighestExistingIndex (index - 1)
+                        | Some qp ->
+                            let! exists = generationalDb.doesOutPutDataExist geneSortDataMode.Results qp
+                            if exists then return Some index
+                            else return! findHighestExistingIndex (index - 1)
+                }
+
+            if intervals.Length = 0 then return Ok None
+            else
+                let! highestIndexOpt = findHighestExistingIndex (intervals.Length - 1)
+                match highestIndexOpt with
+                | None -> return Ok None
+                | Some idx ->
+                    match getQueryParams idx with
+                    | None -> return Error "Failed to create query parameters for the highest saved generation."
+                    | Some qp ->
+                        let! rawDataOpt = generationalDb.loadIfFoundAsync geneSortDataMode.Results qp
+                        match rawDataOpt with
+                        | None -> return Ok None
+                        | Some rawData -> return extractFn rawData |> Result.map Some
+        }
+
+    /// Ergonomic 1-liner wrapper for SorterRunResult.
+    let loadHighestGenSorterPoolSet
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<sorterPoolSet_Standard option, string>> =
+        loadOutputDataWithHighestGenerationNumber
+            OutputData.asSorterPoolSetStandard
+            (geneSortDataType.SorterPoolSet "")
+            saveConfig generationalDb rp
+
+    let loadHighestGenSorterPoolSetSoss
+            (saveConfig: genIntervalConfig)
+            (generationalDb: IGeneSortDb)
+            (rp: runParameters) : Async<Result<GeneSort.Eval.V1.Sgd.Soss.sorterPoolSet_Soss option, string>> =
+        loadOutputDataWithHighestGenerationNumber
+            OutputData.asSorterPoolSetSoss
+            (geneSortDataType.SorterPoolSet "")
+            saveConfig generationalDb rp

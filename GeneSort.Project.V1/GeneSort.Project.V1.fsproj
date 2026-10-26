@@ -33,12 +33,14 @@
     <Compile Include="Catalogs\RunParameters\RunParamFunctionCatalogs.fs" />
     <Compile Include="Catalogs\SetupParameters\SetupEnhancerCatalog.fs" />
     <Compile Include="OutputData.fs" />
+    <Compile Include="Storage\IGeneSortDb.fs" />
     <Compile Include="Catalogs\Evolution\EvolutionSetupSources.fs" />
     <Compile Include="Catalogs\Evolution\SeedSorterModelGeneration.fs" />
     <Compile Include="Catalogs\Evolution\EvolutionTestMakers.fs" />
     <Compile Include="Catalogs\Evolution\SeedPoolSetMakers.fs" />
     <Compile Include="Catalogs\Evolution\MutatorMakers.fs" />
     <Compile Include="Catalogs\Evolution\MakerCatalogs.fs" />
+    <Compile Include="Runtime\RunFunctions.fs" />
     <Compile Include="Catalogs\Setup\SetupTypes.fs" />
     <Compile Include="Catalogs\SorterModelSet\SorterModelSetCatalog.fs" />
     <Compile Include="Catalogs\SortableTestsWithPrefix\SortableTestsWithPrefixCatalog.fs" />
@@ -49,6 +51,32 @@
     <Compile Include="SorterSgd\EvoContinuation.fs" />
     <Compile Include="SorterSgd\EvoAppend.fs" />
     <Compile Include="SorterSgd\EvoCondense.fs" />
+    <Compile Include="Runtime\RunIntervals.fs" />
+    <Compile Include="Runtime\OpsUtils.fs" />
+    <Compile Include="Storage\SetupArtifacts.fs" />
+    <Compile Include="Catalogs\Evolution\Utils.fs" />
+    <Compile Include="Catalogs\Evolution\EvoAppendPools.fs" />
+    <Compile Include="Catalogs\Execution\SorterSgd\Standard\EvoOrch_Standard.fs" />
+    <Compile Include="Catalogs\Execution\SorterSgd\Standard\SgdEx_Standard.fs" />
+    <Compile Include="Catalogs\Execution\SorterSgd\Soss\EvoOrch_Soss.fs" />
+    <Compile Include="Catalogs\Execution\SorterSgd\Soss\SgdEx_Soss.fs" />
+    <Compile Include="Catalogs\Execution\SortableTests\SortableTestsExecution.fs" />
+    <Compile Include="Catalogs\Execution\SorterEval\SorterEvalExecution.fs" />
+    <Compile Include="Catalogs\Execution\SorterMutate\SorterMutateExecution.fs" />
+    <Compile Include="Catalogs\Execution\ExecuteFunctionCatalog.fs" />
+    <Compile Include="Catalogs\Setup\SetupExecution.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\EvoCondenseSelection.fs" />
+    <Compile Include="Catalogs\Setup\SorterEval\SorterModelSetMakers.fs" />
+    <Compile Include="Catalogs\Setup\SorterEval\SortableTestsMakers.fs" />
+    <Compile Include="Catalogs\Setup\SorterEval\SorterEvalSetup.fs" />
+    <Compile Include="Catalogs\Setup\SorterMutate\SorterMutateSetup.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\EvoAppendSetup.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\SorterSgdSetup.fs" />
+    <Compile Include="Catalogs\Setup\SetupExecutorCatalog.fs" />
+    <Compile Include="Catalogs\Reports\SorterEval\Reporting.fs" />
+    <Compile Include="Catalogs\Reports\SorterMutate\Reporting.fs" />
+    <Compile Include="Catalogs\Reports\SorterSgd\Reporting.fs" />
+    <Compile Include="Catalogs\Reports\ReportCatalog.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

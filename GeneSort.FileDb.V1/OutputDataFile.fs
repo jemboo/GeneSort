@@ -23,7 +23,7 @@ open GeneSort.Eval.Mp.V1.Bins
 open GeneSort.Eval.Mp.V1.Sgd
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Storage
 open GeneSort.Project.Mp.V1
 
 [<Measure>] type fullPathToFolder

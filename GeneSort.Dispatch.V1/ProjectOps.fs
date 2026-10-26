@@ -6,8 +6,9 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
-open OpsUtils
+open GeneSort.Project.V1.Runtime
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Runtime.OpsUtils
 
 module ProjectOps =
 
@@ -69,7 +70,7 @@ module ProjectOps =
             (cts: CancellationTokenSource)
             (progress: IProgress<string> option)
             (host: runHost)
-            (executor: IRunParamsExecutor)
+            (executor: runFunction)
             (maxParallel: int) =
         asyncResult {
             let timer = System.Diagnostics.Stopwatch.StartNew()
@@ -91,7 +92,7 @@ module ProjectOps =
                     let! results = 
                         paramsArray 
                         |> Seq.map (runTask skipFinished persistParameters db runName host.QueryParamsFromRunParams
-                                            (RunParamsExecutor.execute executor host) allowOverwrite cts progress)
+                                            executor allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 
                     // Unified reporting logic
@@ -111,8 +112,8 @@ module ProjectOps =
         }
 
     /// Executes the run function resolved on the host.
-    let executeRuns minRepl maxRepl allowOverwrite cts progress host maxParallel =
-        executeBatch true true minRepl maxRepl allowOverwrite cts progress host RunParamsExecutor.hostExecutor maxParallel
+    let executeRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =
+        executeBatch true true minRepl maxRepl allowOverwrite cts progress host host.ExecuteFunction maxParallel
 
     /// Local preparation only. Persist all Setup artifacts before transferring Project and Setup.
     let executeSetupRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =

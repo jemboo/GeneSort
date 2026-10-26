@@ -19,13 +19,16 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.Reports
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Runtime
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Execution
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.Mp.V1
-open GeneSort.Db.V1
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd
 
 let private emptyParameters = runParameters.create Map.empty
 
@@ -147,7 +150,7 @@ let ``host generates independent setup and run combinations using their own quer
 let ``parameter refinement enhances every parameter combination`` () =
     let enhancerName = "tests.enhance-every-combination"
     RunParamEnhancerBuilders.register enhancerName (fun _ rp -> rp.WithRunFinished(Some false)) |> ignore
-    let dto = makeSimpleRun ExecuteFunctionNames.standard |> RunDto.fromDomain
+    let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
     let configuredRun = { dto with RunEnhancerFunctionName = enhancerName } |> RunDto.toDomain
     let host = runHost.Create configuredRun 1
     let inputs =
@@ -236,9 +239,9 @@ let ``simple run execution names persist and resolve on host creation`` name =
     let restored = makeSimpleRun name |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(name, restored.ExecuteFunctionName)
     let host = runHost.Create restored 1
-    Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
-    Assert.True(host.ExecutionContext.MakeMutator.IsNone)
-    Assert.True(host.ExecutionContext.GenSaveIntervals.IsNone)
+    match ExecuteFunctionCatalog.get name, host with
+    | SimpleExecution _, SimpleRunHost _ -> Assert.NotNull(host.ExecuteFunction)
+    | _ -> failwith "Expected a simple execution binding and host."
 
 [<Fact>]
 let ``simple host rejects unknown execution names`` () =
@@ -247,35 +250,28 @@ let ``simple host rejects unknown execution names`` () =
     Assert.Contains(name, error.Message)
 
 [<Fact>]
-let ``evaluation and mutation executors use the simple host configured function`` () =
+let ``simple hosts retain the configured execution function`` () =
     let name = Guid.NewGuid().ToString()
     let mutable calls = 0
-    ExecuteFunctionCatalog.register name (fun context rp _ _ _ -> async {
+    ExecuteFunctionCatalog.register name (SimpleExecution (fun context rp _ _ _ -> async {
         Assert.Equal("CatalogTests", %context.RunDb.databaseName)
         calls <- calls + 1
         return Ok rp
-    })
+    }))
     let host = runHost.Create (makeSimpleRun name) 1
     use cts = new System.Threading.CancellationTokenSource()
-    let executors = [
-        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.standardExecutor
-        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.mergeExecutor
-        GeneSort.Dispatch.V1.SorterEval.SorterEvalExecutor.prefixExecutor
-        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.standardExecutor
-        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.mergeExecutor
-        GeneSort.Dispatch.V1.SorterMutate.SorterMutateExecutor.prefixExecutor
-    ]
-    for executor in executors do
-        let result = executor.Execute host emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
+    for _ in 1..2 do
+        let result = host.ExecuteFunction emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
         Assert.Equal(Ok emptyParameters, result)
-    Assert.Equal(6, calls)
+    Assert.Equal(2, calls)
 
-[<Fact>]
-let ``evolution entry reports missing SGD context on simple runs`` () =
-    let host = runHost.Create (makeSimpleRun ExecuteFunctionNames.standard) 1
-    use cts = new System.Threading.CancellationTokenSource()
-    let result = host.ExecuteFunction host.ExecutionContext emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
-    Assert.Contains("SGD context", errorOf result)
+[<Theory>]
+[<InlineData("evolution.standard")>]
+[<InlineData("evolution.soss")>]
+let ``evolution entry rejects simple runs when binding the host`` name =
+    let error = Assert.Throws<ArgumentException>(fun () -> runHost.Create (makeSimpleRun name) 1 |> ignore)
+    Assert.Equal("run", error.ParamName)
+    Assert.Contains("requires an SgdRun", error.Message)
 
 [<Theory>]
 [<InlineData("evolution.standard")>]
@@ -285,22 +281,48 @@ let ``host resolves built-in evolution functions at creation`` name =
     Assert.Equal(name, configured.ExecuteFunctionName)
     Assert.Equal(name, SimpleRun.executeFunctionName configured.BaseRun)
     match runHost.Create configured 1 with
-    | SgdRunHost host -> Assert.Same(ExecuteFunctionCatalog.get name, host.ExecuteFunction)
+    | SgdRunHost host ->
+        match ExecuteFunctionCatalog.get name with
+        | SgdExecution _ -> Assert.NotNull(host.ExecuteFunction)
+        | _ -> failwith "Expected an SGD execution binding"
     | _ -> failwith "Expected SGD host"
+
+[<Fact>]
+let ``SGD execution binds required dependencies once before running`` () =
+    let name = Guid.NewGuid().ToString()
+    let mutable bindings = 0
+    let mutable executions = 0
+    ExecuteFunctionCatalog.register name (SgdExecution (fun storage dependencies ->
+        bindings <- bindings + 1
+        Assert.Equal(GenIntervalNames.expInterval100_L50ss, dependencies.GenSaveIntervals.Name)
+        Assert.Equal(GenIntervalNames.summaryInterval_C_1p5C, dependencies.GenSaveSubIntervals.Name)
+        Assert.NotNull(dependencies.MakeMutator)
+        fun rp _ _ _ -> async {
+            Assert.Equal("CatalogTests", %storage.RunDb.databaseName)
+            executions <- executions + 1
+            return Ok rp
+        }))
+    let host = runHost.Create (makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "Bound") 1
+    Assert.Equal(1, bindings)
+    use cts = new System.Threading.CancellationTokenSource()
+    for _ in 1..2 do
+        host.ExecuteFunction emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    Assert.Equal(1, bindings)
+    Assert.Equal(2, executions)
 
 [<Fact>]
 let ``execution uses the configured function regardless of executor label`` () =
     let name = Guid.NewGuid().ToString()
     let mutable calls = 0
-    ExecuteFunctionCatalog.register name (fun _ rp _ _ _ -> async {
+    ExecuteFunctionCatalog.register name (SimpleExecution (fun _ rp _ _ _ -> async {
         calls <- calls + 1
         return Ok rp
-    })
+    }))
     let configured = makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "CustomExecution"
     let host = runHost.Create configured 1
     use cts = new System.Threading.CancellationTokenSource()
     for _ in 1..2 do
-        let result = RunParamsExecutor.hostExecutor.Execute host emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
+        let result = host.ExecuteFunction emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously
         match result with
         | Ok rp -> Assert.Same(emptyParameters, rp)
         | Error error -> failwith error
@@ -489,12 +511,12 @@ let ``workflows reject incompatible seeds before evaluating or saving`` (sossWor
             member _.getRunParameters _ _ _ _ _ = failwith "Unexpected parameter read" }
     let result =
         if sossWorkflow then
-            GeneSort.Dispatch.V1.SorterSgd.Soss.SgdEx_Soss.initializeAndSaveSeedPoolSet
+            GeneSort.Project.V1.Catalogs.Execution.SorterSgd.Soss.SgdEx_Soss.initializeAndSaveSeedPoolSet
                 creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
                 Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
             |> Async.RunSynchronously |> Result.map ignore
         else
-            GeneSort.Dispatch.V1.SorterSgd.Standard.SgdEx_Standard.initializeAndSaveSeedPoolSet
+            GeneSort.Project.V1.Catalogs.Execution.SorterSgd.Standard.SgdEx_Standard.initializeAndSaveSeedPoolSet
                 creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
                 Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
             |> Async.RunSynchronously |> Result.map ignore
@@ -508,8 +530,65 @@ let ``project catalogs initialize together without dispatch dependencies`` () =
     MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel |> ignore
     let assembly = typeof<evolutionSetupSources>.Assembly
     Assert.Equal("GeneSort.Project.V1", assembly.GetName().Name)
+    Assert.Same(assembly, typeof<IGeneSortDb>.Assembly)
+    Assert.Same(assembly, typeof<executionBinding>.Assembly)
+    for catalog in [
+        "GeneSort.Project.V1.Catalogs.Execution.ExecuteFunctionCatalog"
+        "GeneSort.Project.V1.Catalogs.Setup.SetupExecutorCatalog"
+        "GeneSort.Project.V1.Catalogs.Reports.ReportCatalog"
+    ] do
+        Assert.NotNull(assembly.GetType(catalog))
     Assert.DoesNotContain(assembly.GetReferencedAssemblies(), fun reference ->
-        reference.Name = "GeneSort.Dispatch.V1" || reference.Name = "GeneSort.FileDb.V1" || reference.Name = "GeneSort.Db.V1")
+        reference.Name = "GeneSort.Dispatch.V1" || reference.Name = "GeneSort.FileDb.V1")
+
+[<Fact>]
+let ``Project report catalog uses supplied storage and run identity without a Dispatch host`` () =
+    let configured = makeSimpleRun ExecuteFunctionNames.sorterEval
+    let evaluation =
+        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<sortingWidth> 3<sortableCount>
+            (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
+            (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
+    let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
+    let reports = ResizeArray<dataTableReport>()
+    let mutable reads = 0
+    let database =
+        { new IGeneSortDb with
+            member _.databaseName = configured.DatabaseName
+            member _.makeQueryParamsFromRunParams _ _ = failwith "Use the supplied query builder."
+            member _.getRunParameters _ _ _ _ _ = failwith "No host or batch lookup is needed."
+            member _.doesOutPutDataExist _ _ = failwith "No existence probe is needed."
+            member _.loadIfFoundAsync _ _ = failwith "No optional load is needed."
+            member _.loadAsync mode _ = async {
+                Assert.Equal(geneSortDataMode.Results, mode)
+                reads <- reads + 1
+                return Ok (outputData.SorterSetEval evaluations)
+            }
+            member _.saveAsync mode _ output overwrite = async {
+                Assert.Equal(geneSortDataMode.Results, mode)
+                Assert.False(%overwrite)
+                match output with
+                | outputData.TextReport report -> reports.Add report
+                | _ -> failwith "Only a report should be saved."
+                return Ok ()
+            } }
+    let storage = runStorage.create {
+        RunDb = database
+        QueryParamsFromRunParams = fun _ dataType ->
+            Some (queryParams.create configured.DatabaseName configured.ProjectName None None dataType [||])
+    }
+    let suppliedSources = workflowSources.create {
+        OpenDatabase = fun _ _ _ -> failwith "Evaluation reporting must not open source databases."
+        Evolution = sources
+    }
+    let report = ReportCatalog.get ReportCatalog.sorterEvalFull suppliedSources configured storage
+    Assert.Equal(0, reads)
+    Assert.Empty(reports)
+    use cts = new System.Threading.CancellationTokenSource()
+    report emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    Assert.Equal(1, reads)
+    let saved = Assert.Single(reports)
+    let runNameIndex = saved.DataHeaders |> Array.findIndex ((=) "RunName")
+    Assert.Equal<string>(%configured.RunName, (Assert.Single(saved.DataRows)).Split('\t').[runNameIndex])
 
 [<Fact>]
 let ``merge test maker uses the supplied storage sources`` () =

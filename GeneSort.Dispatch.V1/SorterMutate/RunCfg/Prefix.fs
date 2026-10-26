@@ -17,7 +17,6 @@ open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.ParamBundles
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterMutate
 
 
 module Prefix =

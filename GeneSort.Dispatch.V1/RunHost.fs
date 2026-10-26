@@ -4,15 +4,17 @@ open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs
+open GeneSort.Project.V1.Catalogs.Execution
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Runtime
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup.SorterSgd
 open GeneSort.FileDb.V1
-open GeneSort.Dispatch.V1.SorterSgd
 
 module RunHost =
     /// Set independently on each machine; project/database identities remain unchanged.
@@ -26,17 +28,20 @@ module RunHost =
         System.IO.Path.Combine(projectsRoot (), %run.ProjectName, %run.DatabaseName, "Data")
         |> UMX.tag<pathToRootFolder>
 
-    let makeDatabase (run: run) : IGeneSortDb =
-        new GeneSortDbMp(makeDataFolder run, run.RunQueryCatalogName)
+    let openDatabase project database queryCatalog : IGeneSortDb =
+        let root = System.IO.Path.Combine(projectsRoot (), %project, %database, "Data") |> UMX.tag<pathToRootFolder>
+        new GeneSortDbMp(root, queryCatalog)
+
+    let makeDatabase (run: run) = openDatabase run.ProjectName run.DatabaseName run.RunQueryCatalogName
 
 type simpleRunHost = private {
-    projectDb: IGeneSortDb
+    storage: runStorage
     run: simpleRun
-    queryParamsFromRunParams: runQueryParamsBuilder
     queryParamsFromSetupParams: setupQueryParamsBuilder
     maxParallel: int
     setup: setupFunction option
-    executeFunction: executeFunction
+    bindExecution: runStorage -> runFunction
+    executeFunction: runFunction
     runEnhancer: runParamEnhancerBuilder
     setupEnhancer: setupEnhancerFunction
 }
@@ -65,9 +70,14 @@ type runHost =
     static member Create (run: run) (maxParallel: int) =
         ProjectCatalogs.registerAll ()
         let db = RunHost.makeDatabase run
+        let execution = ExecuteFunctionCatalog.get run.ExecuteFunctionName
 
-        let makeSimpleHost (simple: simpleRun) =
-            { projectDb = db
+        let makeSimpleHost (simple: simpleRun) bindExecution =
+            let storage = runStorage.create {
+                RunDb = db
+                QueryParamsFromRunParams = QueryParamsCatalogRun.get run.RunQueryCatalogName run.ProjectName run.DatabaseName
+            }
+            { storage = storage
               run = simple
               queryParamsFromSetupParams =
                   QueryParamsCatalogSetup.get
@@ -75,51 +85,60 @@ type runHost =
                         run.ProjectName 
                         run.DatabaseName
 
-              queryParamsFromRunParams =
-                  QueryParamsCatalogRun.get
-                      run.RunQueryCatalogName
-                      run.ProjectName
-                      run.DatabaseName
-
               maxParallel = maxParallel
               setup = None
-              executeFunction = ExecuteFunctionCatalog.get run.ExecuteFunctionName
+              bindExecution = bindExecution
+              executeFunction = bindExecution storage
               runEnhancer = RunParamEnhancerBuilders.get run.RunEnhancerFunctionName
               setupEnhancer = SetupEnhancerCatalog.get run.SetupEnhancerFunctionName }
 
-        let lookupInterval name =
-            match GenIntervalRegistry.genIntervalConfigsDict.TryGetValue name with
-            | true, interval -> interval
-            | _ -> failwithf "Sampling interval '%s' is not registered for run '%s'." name (%run.RunName)
+        let lookupInterval = RunIntervals.resolve run.RunName
 
         match run with
-        | run.SimpleRun value -> SimpleRunHost (makeSimpleHost value)
+        | run.SimpleRun value ->
+            match execution with
+            | SimpleExecution bind -> SimpleRunHost (makeSimpleHost value bind)
+            | SgdExecution _ -> invalidArg "run" (sprintf "Execute function '%s' requires an SgdRun with a mutator and generation intervals." run.ExecuteFunctionName)
         | run.SgdRun value ->
             let names = SgdRun.makerNames value
             let makeTests = SortableTestsMakerCatalog.get names.SortableTests
             let makeSeedPool = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet
             let makeMutator = MutatorMakerCatalog.get names.Mutator
-            let simpleHost = makeSimpleHost (SgdRun.baseRun value)
+            let dependencies = sgdExecution.create {
+                MakeMutator = makeMutator
+                GenSaveIntervals = SgdRun.genSaveIntervalsName value |> lookupInterval
+                GenSaveSubIntervals = SgdRun.genSaveSubIntervalsName value |> lookupInterval
+            }
+            let bind =
+                match execution with
+                | SimpleExecution bind -> bind
+                | SgdExecution bind -> fun storage -> bind storage dependencies
+            let simpleHost = makeSimpleHost (SgdRun.baseRun value) bind
             SgdRunHost {
                 simpleHost = simpleHost
                 run = value
-                genSaveIntervals = SgdRun.genSaveIntervalsName value |> lookupInterval
-                genSaveSubIntervals = SgdRun.genSaveSubIntervalsName value |> lookupInterval
+                genSaveIntervals = dependencies.GenSaveIntervals
+                genSaveSubIntervals = dependencies.GenSaveSubIntervals
                 makeSortableTests = makeTests
                 makeSeedPoolSet = makeSeedPool
                 makeMutator = makeMutator
             }
 
-    member this.RunDb =
+    member this.Storage =
         match this with
-        | SimpleRunHost host -> host.projectDb
-        | SgdRunHost host -> host.simpleHost.projectDb
+        | SimpleRunHost host -> host.storage
+        | SgdRunHost host -> host.simpleHost.storage
+
+    member this.RunDb = this.Storage.RunDb
 
     /// Uses an alternate storage implementation while preserving the resolved run configuration.
     member this.WithRunDb(db: IGeneSortDb) =
+        let replace (host: simpleRunHost) =
+            let storage = runStorage.create { RunDb = db; QueryParamsFromRunParams = host.storage.QueryParamsFromRunParams }
+            { host with storage = storage; executeFunction = host.bindExecution storage }
         match this with
-        | SimpleRunHost host -> SimpleRunHost { host with projectDb = db }
-        | SgdRunHost host -> SgdRunHost { host with simpleHost = { host.simpleHost with projectDb = db } }
+        | SimpleRunHost host -> SimpleRunHost (replace host)
+        | SgdRunHost host -> SgdRunHost { host with simpleHost = replace host.simpleHost }
 
     member this.Run =
         match this with
@@ -127,9 +146,7 @@ type runHost =
         | SgdRunHost host -> run.SgdRun host.run
 
     member this.QueryParamsFromRunParams =
-        match this with
-        | SimpleRunHost host -> host.queryParamsFromRunParams
-        | SgdRunHost host -> host.simpleHost.queryParamsFromRunParams
+        this.Storage.QueryParamsFromRunParams
 
     member this.QueryParamsFromSetupParams =
         match this with
@@ -148,15 +165,7 @@ type runHost =
 
     member this.AllowOverwrite = this.Run.AllowOverwrite |> UMX.tag<allowOverwrite>
 
-    member this.ExecutionContext : executeContext = {
-        RunDb = this.RunDb
-        QueryParamsFromRunParams = this.QueryParamsFromRunParams
-        MakeMutator = match this with SgdRunHost host -> Some host.MakeMutator | _ -> None
-        GenSaveIntervals = this.GenSaveIntervals
-        GenSaveSubIntervals = this.GenSaveSubIntervals
-    }
-
-    member this.ExecuteFunction : executeFunction =
+    member this.ExecuteFunction : runFunction =
         match this with
         | SimpleRunHost host -> host.executeFunction
         | SgdRunHost host -> host.simpleHost.executeFunction

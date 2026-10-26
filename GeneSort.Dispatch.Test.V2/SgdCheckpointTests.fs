@@ -12,8 +12,8 @@ open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
-open GeneSort.Dispatch.V1.SorterSgd
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Evolution
 
 [<Theory>]
 [<InlineData(false, -1)>]

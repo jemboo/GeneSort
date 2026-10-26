@@ -16,7 +16,8 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup.SorterEval
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterEval
@@ -76,15 +77,15 @@ let ``parallel setup shares files across executions replicas and hosts and execu
     Array.append parameters parameters
     |> Array.mapi (fun index rp ->
         let owner = if index % 2 = 0 then host else otherHost
-        owner.SetupExecutor.Execute owner rp (UMX.tag false) cts None)
+        owner.SetupExecutor rp (UMX.tag false) cts None)
     |> Async.Parallel |> Async.RunSynchronously |> Array.iter (get >> ignore)
     let files = storage.Files()
     Assert.Equal(5, files.Length)
     Assert.All(files, fun file -> Assert.DoesNotContain(string Path.DirectorySeparatorChar + "0" + string Path.DirectorySeparatorChar, file))
     let stamps = files |> Array.map File.GetLastWriteTimeUtc
     for rp in parameters do
-        host.SetupExecutor.Execute host rp (UMX.tag true) cts None |> Async.RunSynchronously |> get |> ignore
-        let finished = host.ExecuteFunction host.ExecutionContext rp (UMX.tag false) cts None |> Async.RunSynchronously |> get
+        host.SetupExecutor rp (UMX.tag true) cts None |> Async.RunSynchronously |> get |> ignore
+        let finished = host.ExecuteFunction rp (UMX.tag false) cts None |> Async.RunSynchronously |> get
         Assert.Equal(Some true, finished.GetRunFinished())
     Assert.Equal<string>(files :> seq<string>, storage.Files() :> seq<string>)
     Assert.Equal<DateTime>(stamps :> seq<DateTime>, files |> Array.map File.GetLastWriteTimeUtc :> seq<DateTime>)
@@ -119,7 +120,7 @@ let ``different model counts produce separate files with the requested contents`
     let original = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head |> SetupFileReferences.attach []
     for count in [2; 3] do
         let rp = original.WithSorterCount(Some (UMX.tag count))
-        SorterModelSetMakers.makeUniformSorterModelSet host (UMX.tag false) rp |> Async.RunSynchronously |> get
+        SorterModelSetMakers.makeUniformSorterModelSet host.Storage (UMX.tag false) rp |> Async.RunSynchronously |> get
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "") |> Option.get
         let models = host.RunDb.loadAsync geneSortDataMode.Setup query |> Async.RunSynchronously |> get |> OutputData.asSorterModelSet |> get
         Assert.Equal(count, models.SorterModels.Length)

@@ -9,7 +9,8 @@ open GeneSort.SortingOps
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Parameters
-open GeneSort.Db.V1
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 

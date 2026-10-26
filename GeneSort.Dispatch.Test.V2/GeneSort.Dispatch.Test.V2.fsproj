@@ -45,7 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneSort.Core\GeneSort.Core.fsproj" />
-    <ProjectReference Include="..\GeneSort.Db.V1\GeneSort.Db.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Project.V1\GeneSort.Project.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.Dispatch.V1\GeneSort.Dispatch.V1.fsproj" />
   </ItemGroup>
 

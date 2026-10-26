@@ -1,0 +1,164 @@
+namespace GeneSort.Project.V1.Catalogs.Reports.SorterEval
+
+open System
+open System.Threading
+open FSharp.UMX
+open FsToolkit.ErrorHandling
+open GeneSort.Core
+open GeneSort.Sorting
+open GeneSort.Sorting.Sortable
+open GeneSort.Sorting.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
+open GeneSort.Model.Sortable.V1
+open GeneSort.SortingOps
+open GeneSort.Eval.V1
+open GeneSort.Project.V1
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Runtime
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Runtime.OpsUtils
+
+module Reporting =
+
+    let makeFullReport 
+            (configured: run) (storage: runStorage)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log (msg: string) : unit = 
+            OpsUtils.report progress 
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Full Report for Run %s" (StringUtils.getTimestampString()) %runId)
+    
+                let! qpSorterSetEval = storage.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = storage.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+
+                let reportName = (sprintf "FullEvalReport" |> UMX.tag<textReportName>)
+
+                let! qpReport = storage.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord configured.RunName
+                let details = sorterSetEvals |> SorterSetEval.makeFullDataTableRecords
+                let dtrs = dataTableRecord.combineWithMany details leadCols
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                let! (_:unit) = storage.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
+                let yab = (rp : runParameters).WithRunFinished(Some true)
+                return yab
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress log)
+
+
+    let makeStageStatsReport 
+            (configured: run) (storage: runStorage)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log (msg: string) : unit = 
+            OpsUtils.report progress 
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Stage stats Report for Run %s" (StringUtils.getTimestampString()) %runId)
+    
+                let! qpSorterSetEval = storage.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = storage.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+
+                let reportName = (sprintf "StageStatsReport" |> UMX.tag<textReportName>)
+
+                let! qpReport = storage.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord configured.RunName
+
+                let stageStatsRecordMaker (eval: sorterEval) : dataTableRecord [] =
+                    eval
+                    |> SorterStageStats.fromSorterEval
+                    |> Array.map (fun sss -> sss.toDataTableRecord())
+
+                let _sorterEvalMeasure = SorterEvalMeasure.stageBiasedFilterUnsorted
+                let _sorterEvalSelectionType = sorterSelectionType.Tmb 300<sorterCount>
+                let _sorterEvalSelection = SorterSelection.makeSelection 
+                                                _sorterEvalMeasure
+                                                _sorterEvalSelectionType 
+                                                sorterSetEvals.SorterEvals
+                                                sorterSetEvals.SorterTestId
+
+                let dtrs = _sorterEvalSelection
+                            |> EvalReporting.toManyDataTableRecords 
+                                                        leadCols 
+                                                        stageStatsRecordMaker
+
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                let! (_:unit) = storage.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
+                return (rp : runParameters).WithRunFinished(Some true)
+
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress log)
+
+    let makeCeBinSummaryStats
+            (configured: run) (storage: runStorage)
+            (rp: runParameters) 
+            (allowOverwrite: bool<allowOverwrite>) 
+            (cts: CancellationTokenSource) 
+            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+
+        let log (msg: string) : unit = 
+            OpsUtils.report progress 
+                (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+
+        asyncResult {
+            try
+                do! checkCancellation cts.Token
+                let runId = rp |> RunParameters.getIdString
+                OpsUtils.report progress (sprintf "%s Starting Ce bins Report for Run %s" (StringUtils.getTimestampString()) %runId)
+    
+                let! qpSorterSetEval = storage.QueryParamsFromRunParams rp (geneSortDataType.SorterSetEval "")
+                                        |> Result.ofOption "Failed to create QueryParams for SorterSetEval."
+                let! outB = storage.RunDb.loadAsync geneSortDataMode.Results qpSorterSetEval
+                let! (sorterSetEvals : sorterSetEval) = outB |> OutputData.asSorterSetEval |> Async.singleton
+
+                let reportName = (sprintf "CeBinsReport" |> UMX.tag<textReportName>)
+
+                let! qpReport = storage.QueryParamsFromRunParams rp (geneSortDataType.TextReport reportName)
+                                |> Result.ofOption "Failed to create QueryParams for Report."
+                let leadCols = qpReport |> QueryParams.makeReportDataTableRecord configured.RunName
+
+                let evalBins = 
+                        sorterSetEvals.SorterEvals
+                        |> Array.filter(fun se -> se |> SorterEval.getIsSorted = true)
+                        |> SorterEvalBinStats.makeBins
+
+                let dtrs = evalBins
+                            |> Array.map (
+                                fun bin -> 
+                                    bin |> CeBinSummaryStats.toDataTableRecord |> dataTableRecord.combine leadCols)
+                                
+                let report = DataTableReport.fromDataTableRecords dtrs
+
+                let! (_:unit) = storage.RunDb.saveAsync geneSortDataMode.Results qpReport (report |> outputData.TextReport) allowOverwrite
+                let yab = (rp : runParameters).WithRunFinished(Some true)
+                return yab
+            with e -> 
+               return! Error (sprintf "Error in %s: %s" (rp |> RunParameters.getIdString) e.Message)
+        } |> Async.map (logResult progress log)
