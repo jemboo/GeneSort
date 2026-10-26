@@ -24,6 +24,7 @@
     <Compile Include="MergeRunConfigTests.fs" />
     <Compile Include="SharedSetupTests.fs" />
     <Compile Include="RunNameTests.fs" />
+    <Compile Include="RunEditorTests.fs" />
     <Compile Include="../scripts/OnePoolAudit/Verification.fs" Link="OnePoolAuditVerification.fs" />
     <Compile Include="OnePoolAuditTests.fs" />
   </ItemGroup>

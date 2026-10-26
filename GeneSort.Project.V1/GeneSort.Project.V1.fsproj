@@ -77,6 +77,7 @@
     <Compile Include="Catalogs\Reports\SorterMutate\Reporting.fs" />
     <Compile Include="Catalogs\Reports\SorterSgd\Reporting.fs" />
     <Compile Include="Catalogs\Reports\ReportCatalog.fs" />
+    <Compile Include="Editing\RunEditor.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

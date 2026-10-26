@@ -4,4 +4,5 @@ public sealed class MainWindowViewModel
 {
     public MessagePackBrowserViewModel MessagePackBrowser { get; } = new();
     public SandboxViewModel Sandbox { get; } = new();
+    public RunEditorViewModel RunEditor { get; } = new();
 }

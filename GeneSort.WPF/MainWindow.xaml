@@ -12,9 +12,13 @@
         <DataTemplate DataType="{x:Type vm:SandboxViewModel}">
             <views:SandboxView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RunEditorViewModel}">
+            <views:RunEditorView />
+        </DataTemplate>
     </Window.Resources>
     <TabControl Margin="12">
         <TabItem Header="MessagePack Browser" Content="{Binding MessagePackBrowser}" />
+        <TabItem Header="Run Editor" Content="{Binding RunEditor}" />
         <TabItem Header="Sandbox" Content="{Binding Sandbox}" />
     </TabControl>
 </Window>
