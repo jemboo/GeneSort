@@ -67,11 +67,11 @@ module internal RunFileStorage =
         let count = (files root parameters).Length
         definition, parameters, count, (count > 0 || (File.Exists definition && not (sameDefinition definition configured)))
 
-    let private acquire root (configured: run) =
+    let acquire root (configured: run) =
         let path = within root (Path.Combine(%root, "Project", ".run-" + %configured.RunName + ".lock"))
         Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
         try new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose)
-        with :? IOException -> raise (IOException("This run is already being saved or generated. Try again when that operation finishes."))
+        with :? IOException -> raise (IOException("Another operation is already using this run. Try again when that operation finishes."))
 
     let saveDefinitionAsync root (configured: run) overwrite = task {
         MessagePackSetup.configure ()

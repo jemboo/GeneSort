@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using GeneSort.WPF.ViewModels;
 
 namespace GeneSort.WPF.Views;
@@ -9,9 +8,11 @@ namespace GeneSort.WPF.Views;
 public partial class RunParameterListView : UserControl
 {
     private RunParameterListViewModel? model;
+    private readonly GridViewColumnLayout columnLayout;
 
     public RunParameterListView()
     {
+        columnLayout = new(nameof(RunParameterItem.Number), key => model?.Sort(key));
         InitializeComponent();
         DataContextChanged += (_, _) => Attach();
         Loaded += (_, _) => Attach();
@@ -20,7 +21,12 @@ public partial class RunParameterListView : UserControl
 
     private void Detach()
     {
-        if (model is not null) model.PropertyChanged -= ModelChanged;
+        if (model is not null)
+        {
+            columnLayout.Capture();
+            model.DisplaySettings.CaptureLayout = null;
+            model.PropertyChanged -= ModelChanged;
+        }
         model = null;
     }
 
@@ -30,6 +36,7 @@ public partial class RunParameterListView : UserControl
         model = DataContext as RunParameterListViewModel;
         if (model is not null) model.PropertyChanged += ModelChanged;
         BuildColumns();
+        if (model is not null) model.DisplaySettings.CaptureLayout = columnLayout.Capture;
     }
 
     private void ModelChanged(object? sender, PropertyChangedEventArgs e)
@@ -40,27 +47,12 @@ public partial class RunParameterListView : UserControl
 
     private void BuildColumns()
     {
-        ParameterColumns.Columns.Clear();
-        ParameterColumns.Columns.Add(new() { Header = "#", Width = 45, DisplayMemberBinding = new Binding(nameof(RunParameterItem.Number)) });
-        if (model is null) return;
-        for (var index = 0; index < model.Keys.Length; index++)
-        {
-            var key = model.Keys[index];
-            var header = new GridViewColumnHeader { Content = key, Tag = key, ToolTip = $"Sort by {key}" };
-            header.Click += Sort_Click;
-            ParameterColumns.Columns.Add(new()
-            {
-                Header = header, Width = Math.Clamp(key.Length * 7 + 32, 110, 260),
-                DisplayMemberBinding = new Binding($"Cells[{index}]")
-            });
-        }
+        columnLayout.Apply(ParameterColumns.Columns, model?.Keys ?? [], model?.DisplaySettings);
         UpdateHeaders();
     }
 
-    private void Sort_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is GridViewColumnHeader { Tag: string key }) model?.Sort(key);
-    }
+    private void SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+        (DataContext as RunParameterListViewModel)?.Select(ParameterItems.SelectedItems.Cast<RunParameterItem>());
 
     private void UpdateHeaders()
     {

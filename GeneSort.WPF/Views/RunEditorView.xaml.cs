@@ -46,6 +46,22 @@ public partial class RunEditorView : UserControl
     {
         await PerformAsync(() => Model.LoadRunParametersAsync());
     }
+    private async void RunSetup_Click(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanRunSetup) await Model.RunSetupAsync();
+    }
+    private async void RunExecution_Click(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanRunExecution) await Model.RunExecutionAsync();
+    }
+    private async void GenerateSummaryReports_Click(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanGenerateSummaryReports) await Model.GenerateSummaryReportsAsync();
+    }
+    private async void RefreshReports_Click(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanRefreshSummaryReports) await Model.LoadSummaryReportsAsync();
+    }
     private async void Generate_Click(object sender, RoutedEventArgs e)
     {
         await PerformAsync(async () =>

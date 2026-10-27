@@ -9,6 +9,8 @@
     <Compile Include="OutputUnionTests.fs" />
     <Compile Include="RunDefinitionFileTests.fs" />
     <Compile Include="RunParameterFileTests.fs" />
+    <Compile Include="RunPhaseFileTests.fs" />
+    <Compile Include="RunSummaryFileTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />

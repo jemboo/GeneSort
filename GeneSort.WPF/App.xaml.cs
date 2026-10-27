@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
-using System.Data;
+using System.IO;
 using System.Windows;
+using GeneSort.WPF.Settings;
 
 namespace GeneSort.WPF
 {
@@ -9,6 +10,21 @@ namespace GeneSort.WPF
     /// </summary>
     public partial class App : Application
     {
+        internal static TableLayoutStore? TableLayouts { get; private set; }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            TableLayouts = new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "GeneSort", "table-layouts.json"));
+            base.OnStartup(e);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            if (TableLayouts?.Save() is string error)
+                MessageBox.Show(error, "Table display settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+            base.OnExit(e);
+        }
     }
 
 }

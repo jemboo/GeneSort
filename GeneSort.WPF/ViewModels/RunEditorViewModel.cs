@@ -9,6 +9,7 @@ using GeneSort.Project.V1;
 using GeneSort.Project.V1.Editing;
 using GeneSort.Project.V1.Runtime;
 using GeneSort.Project.V1.Workflows;
+using RunParameters = GeneSort.Project.V1.Parameters.parameterSet<GeneSort.Project.V1.Parameters.runParameterKind>;
 
 namespace GeneSort.WPF.ViewModels;
 
@@ -21,6 +22,11 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private string firstReplica = "0", replicaCount = "1";
     private bool allowOverwrite, isDirty, isBusy, loading;
     private run? validatedRun;
+    private run? loadedRun;
+    private bool isRunningPhase;
+    private int phaseCompleted, phaseTotal = 1;
+    private string phaseSummary = "";
+    private CancellationTokenSource? summaryLoad;
     private readonly HashSet<ParameterRow> observedRows = [];
 
     public string WorkflowName => RunEditor.workflowName;
@@ -34,6 +40,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public ObservableCollection<ParameterRow> ExecutionParameters => ExecutionSection.Rows;
     public ObservableCollection<string> Issues { get; } = [];
     public RunParameterListViewModel RunParameterList { get; } = new();
+    public SummaryReportListViewModel SummaryReportList { get; } = new();
 
     public string ProjectName { get => projectName; set => Edit(ref projectName, value); }
     public string DatabaseName { get => databaseName; set => Edit(ref databaseName, value); }
@@ -54,17 +61,19 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             {
                 IsDirty = true;
                 RunParameterList.Clear();
+                loadedRun = null;
+                PhaseSummary = "";
                 Status = "Projects folder changed. Validate the definition if needed, then save.";
             }
             Changed(nameof(Destination));
             SaveStateChanged(); GenerationChanged();
         }
     }
-    public bool IsDirty { get => isDirty; private set { isDirty = value; Changed(); Changed(nameof(DirtyLabel)); Changed(nameof(HasUnsavedChanges)); } }
+    public bool IsDirty { get => isDirty; private set { isDirty = value; Changed(); Changed(nameof(DirtyLabel)); Changed(nameof(HasUnsavedChanges)); PhaseActionsChanged(); } }
     public bool HasPendingParameter => SetupSection.IsAdding || ExecutionSection.IsAdding;
     public bool HasUnsavedChanges => IsDirty || HasPendingParameter;
     public string DirtyLabel => HasPendingParameter ? "Finish adding the parameter, or cancel" : IsDirty ? "Unsaved changes" : "";
-    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); SaveStateChanged(); GenerationChanged(); } }
+    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); Changed(nameof(IsProgressIndeterminate)); SaveStateChanged(); GenerationChanged(); } }
     public bool IsReady => !IsBusy;
     public string Status { get => status; set { status = value; Changed(); } }
     public string FirstReplica { get => firstReplica; set => EditGeneration(ref firstReplica, value); }
@@ -78,6 +87,21 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         : HasPendingParameter ? "Add or cancel the pending parameter first."
         : validatedRun is null ? "Validate the current definition before saving." : "Save the validated run definition.";
     public bool CanLoadRunParameters => !IsBusy && !HasPendingParameter && HasProjectsFolder && RunEditor.build(Snapshot()).IsOk;
+    private bool CanRunSelectedRows => !IsBusy && !HasUnsavedChanges && loadedRun is not null && HasProjectsFolder && RunParameterList.SelectedCount > 0;
+    public bool CanRunSetup => CanRunSelectedRows;
+    public bool CanRunExecution => CanRunSelectedRows;
+    public bool CanGenerateSummaryReports => CanRunSelectedRows;
+    public bool CanRefreshSummaryReports => CanRunSelectedRows && !SummaryReportList.IsLoading;
+    public int PhaseCompleted { get => phaseCompleted; private set { phaseCompleted = value; Changed(); } }
+    public int PhaseTotal { get => phaseTotal; private set { phaseTotal = value; Changed(); } }
+    public string PhaseSummary { get => phaseSummary; private set { phaseSummary = value; Changed(); } }
+    public bool IsProgressIndeterminate => IsBusy && !isRunningPhase;
+
+    private void PhaseActionsChanged()
+    {
+        Changed(nameof(CanRunSetup)); Changed(nameof(CanRunExecution)); Changed(nameof(CanGenerateSummaryReports));
+        Changed(nameof(CanRefreshSummaryReports));
+    }
 
     private void SaveStateChanged()
     {
@@ -120,6 +144,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         Changed(nameof(GenerationPreview)); Changed(nameof(CanGenerateParameters));
         Changed(nameof(CanLoadRunParameters));
+        PhaseActionsChanged();
     }
     public string Destination
     {
@@ -144,6 +169,14 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         ExecutionSection.PropertyChanged += SectionChanged;
         SetupParameters.CollectionChanged += RowsChanged;
         ExecutionParameters.CollectionChanged += RowsChanged;
+        RunParameterList.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(RunParameterListViewModel.SelectedCount))
+            {
+                PhaseActionsChanged();
+                _ = LoadSummaryReportsAsync();
+            }
+        };
         Apply(RunEditor.newDraft());
     }
 
@@ -162,6 +195,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         IsDirty = true;
         validatedRun = null;
         RunParameterList.Clear();
+        loadedRun = null;
+        PhaseSummary = "";
         Issues.Clear();
         Status = "Definition changed. Validate before saving.";
         SaveStateChanged();
@@ -225,6 +260,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             Issues.Clear(); IsDirty = false;
             validatedRun = null;
             RunParameterList.Clear();
+            loadedRun = null;
+            PhaseSummary = "";
         }
         finally { loading = false; }
         Changed(nameof(Destination));
@@ -311,7 +348,9 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     public async Task LoadRunParametersAsync(bool updateStatus = true)
     {
-        RunParameterList.Clear("Loading saved RunParameters…", preserveSort: true);
+        if (updateStatus) PhaseSummary = "";
+        loadedRun = null;
+        RunParameterList.Clear("Loading saved RunParameters…");
         try
         {
             if (!HasProjectsFolder) throw new InvalidOperationException("Select an existing projects folder first.");
@@ -319,6 +358,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             if (!configured.IsOk) throw new InvalidOperationException("Correct the run definition before loading its saved parameters.");
             var rows = await RunParameterFiles.loadAllAsync(ProjectsFolder, configured.ResultValue);
             RunParameterList.SetParameters(rows);
+            loadedRun = configured.ResultValue;
+            PhaseActionsChanged();
             if (updateStatus) Status = $"Loaded {rows.Length:N0} saved RunParameters for {RunName}.";
         }
         catch (Exception error)
@@ -326,6 +367,97 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             var message = $"Could not load saved RunParameters: {error.GetBaseException().Message}";
             RunParameterList.Clear(message);
             Status = updateStatus ? message : $"{Status}\n{message}";
+        }
+    }
+
+    public Task RunSetupAsync() => RunSelectedAsync("Setup", RunSetupFiles.runAsync);
+    public Task RunExecutionAsync() => RunSelectedAsync("Execution", RunExecutionFiles.runAsync);
+    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", RunSummaryFiles.runAsync);
+
+    private void ClearSummaryReports()
+    {
+        summaryLoad?.Cancel();
+        summaryLoad = null;
+        SummaryReportList.Clear();
+        Changed(nameof(CanRefreshSummaryReports));
+    }
+
+    public async Task LoadSummaryReportsAsync()
+    {
+        ClearSummaryReports();
+        if (!CanRunSelectedRows) return;
+        var configured = loadedRun!;
+        var selected = RunParameterList.SelectedParameters;
+        using var request = new CancellationTokenSource();
+        summaryLoad = request;
+        SummaryReportList.Clear($"Loading Summary Reports for {selected.Length:N0} selected rows…", loading: true);
+        Changed(nameof(CanRefreshSummaryReports));
+        try
+        {
+            var reports = await RunSummaryFiles.loadAsync(ProjectsFolder, configured, selected, request.Token);
+            // A slower read from a previous selection must never replace the current selection's reports.
+            if (ReferenceEquals(summaryLoad, request)) SummaryReportList.SetReports(reports, selected.Length);
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+        catch (Exception error)
+        {
+            if (ReferenceEquals(summaryLoad, request))
+                SummaryReportList.Clear($"Could not load Summary Reports: {error.GetBaseException().Message}");
+        }
+        finally
+        {
+            if (ReferenceEquals(summaryLoad, request)) summaryLoad = null;
+            Changed(nameof(CanRefreshSummaryReports));
+        }
+    }
+
+    private async Task RunSelectedAsync(string phase,
+        Func<string, run, RunParameters[], IProgress<runPhaseProgress>, Task<runPhaseResult>> runPhase)
+    {
+        // Own the busy state so all callers, including keyboard/programmatic actions, get the same guard.
+        if (!CanRunSelectedRows) throw new InvalidOperationException($"Save the current definition and select saved parameter rows before running {phase}.");
+        var configured = loadedRun!;
+        var selected = RunParameterList.SelectedParameters;
+        ClearSummaryReports();
+        IsBusy = true;
+        isRunningPhase = true;
+        Changed(nameof(IsProgressIndeterminate));
+        PhaseCompleted = 0;
+        PhaseTotal = selected.Length;
+        PhaseSummary = $"{phase}: 0 of {PhaseTotal:N0} selected rows processed.";
+        Status = $"Starting {phase}…";
+        Issues.Clear();
+        var acceptingProgress = true;
+        var progress = new Progress<runPhaseProgress>(update =>
+        {
+            if (!acceptingProgress) return;
+            PhaseCompleted = update.Completed;
+            PhaseSummary = $"{phase}: {update.Completed:N0} of {update.Total:N0} selected rows processed.";
+            Status = update.Message;
+        });
+        try
+        {
+            var result = await runPhase(ProjectsFolder, configured, selected, progress);
+            acceptingProgress = false;
+            PhaseCompleted = PhaseTotal;
+            PhaseSummary = $"{phase} finished: {result.Succeeded:N0} succeeded, {result.Failed:N0} failed, {result.Skipped:N0} skipped.";
+            foreach (var error in result.Errors) Issues.Add(error);
+            Status = PhaseSummary;
+            await LoadRunParametersAsync(false);
+        }
+        catch (Exception error)
+        {
+            acceptingProgress = false;
+            PhaseSummary = $"{phase} stopped after {PhaseCompleted:N0} of {PhaseTotal:N0} rows.";
+            Status = $"Could not run {phase}: {error.GetBaseException().Message}";
+            // Re-read on stale selections too; never leave outdated parameters available for another attempt.
+            await LoadRunParametersAsync(false);
+        }
+        finally
+        {
+            acceptingProgress = false;
+            isRunningPhase = false;
+            IsBusy = false;
         }
     }
 }

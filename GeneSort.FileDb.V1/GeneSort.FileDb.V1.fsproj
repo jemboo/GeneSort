@@ -11,6 +11,11 @@
     <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="RunDefinitionFiles.fs" />
     <Compile Include="RunParameterFiles.fs" />
+    <Compile Include="WorkflowSourceFiles.fs" />
+    <Compile Include="RunPhaseFiles.fs" />
+    <Compile Include="RunSetupFiles.fs" />
+    <Compile Include="RunExecutionFiles.fs" />
+    <Compile Include="RunSummaryFiles.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

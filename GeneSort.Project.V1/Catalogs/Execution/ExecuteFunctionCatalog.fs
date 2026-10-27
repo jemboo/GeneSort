@@ -1,6 +1,7 @@
 namespace GeneSort.Project.V1.Catalogs.Execution
 
 open System
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Runtime
 open GeneSort.Project.V1.Catalogs.Execution.SortableTests
@@ -37,3 +38,19 @@ module ExecuteFunctionCatalog =
             match Map.tryFind name functions with
             | Some execute -> execute
             | None -> invalidOp (sprintf "No execute function named '%s' is registered." name))
+
+    /// Bind execution from the saved definition; execution has no source-library or setup dependency.
+    let bind (configured: run) storage =
+        match get configured.ExecuteFunctionName with
+        | SimpleExecution bind -> bind storage
+        | SgdExecution bind ->
+            match configured with
+            | run.SimpleRun _ ->
+                invalidArg "configured" (sprintf "Execute function '%s' requires an SgdRun with a mutator and generation intervals." configured.ExecuteFunctionName)
+            | run.SgdRun sgd ->
+                let dependencies = sgdExecution.create {
+                    MakeMutator = MutatorMakerCatalog.get (SgdRun.makerNames sgd).Mutator
+                    GenSaveIntervals = RunIntervals.resolve configured.RunName (SgdRun.genSaveIntervalsName sgd)
+                    GenSaveSubIntervals = RunIntervals.resolve configured.RunName (SgdRun.genSaveSubIntervalsName sgd)
+                }
+                bind storage dependencies

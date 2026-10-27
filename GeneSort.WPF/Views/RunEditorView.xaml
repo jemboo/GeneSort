@@ -129,16 +129,33 @@
                         <StackPanel Margin="12">
                             <WrapPanel Margin="0,0,0,10">
                                 <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
-                                <TextBlock Text="All saved replicas for this run. Unsaved edits are not shown." VerticalAlignment="Center" TextWrapping="Wrap" />
+                                <Button Content="Run Setup" Click="RunSetup_Click" IsEnabled="{Binding CanRunSetup}" FontWeight="SemiBold"
+                                        ToolTip="Run Setup for the selected saved rows. Save any definition changes first." ToolTipService.ShowOnDisabled="True" />
+                                <Button Content="Run Execution" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
+                                        ToolTip="Execute the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
+                                <Button Content="Generate Summary Reports" Click="GenerateSummaryReports_Click" IsEnabled="{Binding CanGenerateSummaryReports}" FontWeight="SemiBold"
+                                        ToolTip="Generate Summary Reports from saved results for the selected rows, including finished runs. Uses the run's output overwrite setting." ToolTipService.ShowOnDisabled="True" />
                             </WrapPanel>
+                            <TextBlock Text="{Binding RunParameterList.SelectionSummary}" TextWrapping="Wrap" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding PhaseSummary}" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Run phase progress" />
                             <local:RunParameterListView DataContext="{Binding RunParameterList}" Height="360" />
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Summary Reports">
+                        <StackPanel Margin="12">
+                            <TextBlock Text="Select rows in Run parameters to view their saved Summary Reports here." TextWrapping="Wrap" Margin="0,0,0,8" />
+                            <Button Content="Refresh reports" Click="RefreshReports_Click" IsEnabled="{Binding CanRefreshSummaryReports}" HorizontalAlignment="Left" Margin="0,0,0,10" />
+                            <ProgressBar IsIndeterminate="True" Height="6" Margin="0,0,0,8" AutomationProperties.Name="Loading Summary Reports"
+                                         Visibility="{Binding SummaryReportList.IsLoading, Converter={StaticResource VisibleIfTrue}}" />
+                            <local:SummaryReportListView DataContext="{Binding SummaryReportList}" Height="400" />
                         </StackPanel>
                     </TabItem>
                 </TabControl>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
-            <ProgressBar IsIndeterminate="True" Height="4" Margin="0,0,0,6" Visibility="{Binding IsBusy, Converter={StaticResource VisibleIfTrue}}" />
+            <ProgressBar IsIndeterminate="{Binding IsProgressIndeterminate}" Maximum="{Binding PhaseTotal, Mode=OneWay}" Value="{Binding PhaseCompleted, Mode=OneWay}"
+                         AutomationProperties.Name="Operation progress" Height="6" Margin="0,0,0,6" Visibility="{Binding IsBusy, Converter={StaticResource VisibleIfTrue}}" />
             <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Issues}">
                     <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="#A32525" TextWrapping="Wrap" Margin="0,2" /></DataTemplate></ItemsControl.ItemTemplate>
