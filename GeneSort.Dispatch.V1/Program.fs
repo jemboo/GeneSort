@@ -17,8 +17,8 @@ let main argv =
     //let yab = [| "setup"; "eval" |]
     //let yab = [| "execute"; "eval" |]
     //let yab = [| "setup"; "sgd" |]
-    let yab = [| "execute"; "sgd" |]
-    //let yab = [| "report"; "sgd"; "summary" |]
+    //let yab = [| "execute"; "sgd" |]
+    let yab = [| "report"; "sgd"; "summary" |]
 
     let command =
         match yab with

@@ -1,13 +1,21 @@
-<UserControl x:Class="GeneSort.WPF.Views.RunParameterListView"
+<UserControl Style="{StaticResource {x:Type UserControl}}" x:Class="GeneSort.WPF.Views.RunParameterListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Margin="0,0,0,8" />
-        <ListView x:Name="ParameterItems" Grid.Row="1" ItemsSource="{Binding Items}"
+        <WrapPanel Grid.Row="1">
+            <Button Content="Columns…" Click="ChooseColumns_Click" Margin="0,0,8,8"
+                    ToolTip="Choose which columns to show. Changes are saved immediately." />
+            <Button Content="Reset layout" Click="ResetLayout_Click" Margin="0,0,0,8"
+                    ToolTip="Show all columns and restore the default column order, widths and sorting for Run parameters." />
+        </WrapPanel>
+        <ListView x:Name="ParameterItems" Grid.Row="2" ItemsSource="{Binding Items}"
                   AutomationProperties.Name="Saved RunParameters" SelectionMode="Extended"
                   SelectionChanged="SelectionChanged"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -15,5 +23,7 @@
                   VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.View><GridView x:Name="ParameterColumns" AllowsColumnReorder="True" /></ListView.View>
         </ListView>
+        <TextBlock x:Name="LayoutStatus" Grid.Row="3" TextWrapping="Wrap" Margin="0,6,0,0"
+                   AutomationProperties.Name="Run parameters layout status" />
     </Grid>
 </UserControl>

@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using GeneSort.WPF.Settings;
 
@@ -12,6 +13,19 @@ internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<stri
         [new() { Header = "#", Width = 45, DisplayMemberBinding = new Binding(rowNumberProperty) }];
     private GridViewColumnCollection? columns;
     private TableLayoutSettings? settings;
+    private readonly HashSet<GridViewColumn> hidden = [];
+    private string[] keys = [];
+    private ContextMenu? chooser;
+
+    public void Reset()
+    {
+        CloseChooser();
+        columns?.Clear();
+        layout.Clear();
+        hidden.Clear();
+        layout.Add(CreateColumn(null));
+        if (settings is not null) settings.Columns.Clear();
+    }
 
     public void Capture()
     {
@@ -25,25 +39,29 @@ internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<stri
         if (settings is not null)
             settings.Columns = layout.Select(column => new ColumnLayoutSetting(
                 (column.Header as GridViewColumnHeader)?.Tag as string,
-                double.IsNaN(column.Width) ? null : column.Width)).ToList();
+                double.IsNaN(column.Width) ? null : column.Width, hidden.Contains(column))).ToList();
     }
 
     public void Apply(GridViewColumnCollection columns, string[] keys, TableLayoutSettings? settings)
     {
+        CloseChooser();
         Capture();
         if (!ReferenceEquals(this.settings, settings))
         {
             this.settings = settings;
             layout.Clear();
+            hidden.Clear();
             foreach (var saved in settings?.Columns ?? [])
             {
                 var column = CreateColumn(saved.Key);
                 column.Width = saved.Width ?? double.NaN;
                 layout.Add(column);
+                if (saved.Hidden) hidden.Add(column);
             }
             if (!layout.Any(column => column.Header is not GridViewColumnHeader)) layout.Insert(0, CreateColumn(null));
         }
         this.columns = columns;
+        this.keys = keys;
         columns.Clear();
         for (var index = 0; index < keys.Length; index++)
         {
@@ -57,9 +75,50 @@ internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<stri
             // The backing schema can change independently of the displayed column order.
             column.DisplayMemberBinding = new Binding($"Cells[{index}]");
         }
-        foreach (var column in layout)
-            if (column.Header is not GridViewColumnHeader { Tag: string key } || keys.Contains(key))
-                columns.Add(column);
+        ShowVisibleColumns();
+    }
+
+    private bool IsAvailable(GridViewColumn column) =>
+        column.Header is not GridViewColumnHeader { Tag: string key } || keys.Contains(key);
+
+    private void ShowVisibleColumns()
+    {
+        if (columns is null) return;
+        columns.Clear();
+        foreach (var column in layout.Where(column => IsAvailable(column) && !hidden.Contains(column)))
+            columns.Add(column);
+    }
+
+    public void CloseChooser()
+    {
+        if (chooser is null) return;
+        chooser.IsOpen = false;
+        if (chooser.PlacementTarget is Button button && button.ContextMenu == chooser) button.ContextMenu = null;
+        chooser = null;
+    }
+
+    public void OpenChooser(Button button, Action changed)
+    {
+        CloseChooser();
+        Capture();
+        chooser = new ContextMenu { PlacementTarget = button, Placement = PlacementMode.Bottom, MinWidth = 200, MaxHeight = 420 };
+        ScrollViewer.SetVerticalScrollBarVisibility(chooser, ScrollBarVisibility.Auto);
+        foreach (var column in layout.Where(IsAvailable))
+        {
+            var key = (column.Header as GridViewColumnHeader)?.Tag as string;
+            var item = new MenuItem { Header = key ?? "#", Tag = key, IsCheckable = true, IsChecked = !hidden.Contains(column), StaysOpenOnClick = true };
+            item.Click += (_, _) =>
+            {
+                Capture();
+                if (item.IsChecked) hidden.Remove(column); else hidden.Add(column);
+                ShowVisibleColumns();
+                Capture();
+                changed();
+            };
+            chooser.Items.Add(item);
+        }
+        button.ContextMenu = chooser;
+        chooser.IsOpen = true;
     }
 
     private GridViewColumn CreateColumn(string? key)

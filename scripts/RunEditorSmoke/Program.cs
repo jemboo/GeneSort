@@ -23,7 +23,7 @@ using RunParameters = GeneSort.Project.V1.Parameters.parameterSet<GeneSort.Proje
 
 // Offscreen WPF checks in an isolated folder. Phase failures are exercised without prepared inputs;
 // user project data is never touched.
-internal static class Program
+internal static partial class Program
 {
     [STAThread]
     private static int Main(string[] args)
@@ -32,6 +32,12 @@ internal static class Program
         Directory.CreateDirectory(root);
         try
         {
+            // Load the real app theme without starting the app or touching user layout settings.
+            var application = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+            application.Resources.MergedDictionaries.Add(new ResourceDictionary
+            {
+                Source = new Uri("/GeneSort.WPF;component/Themes/Dark.xaml", UriKind.Relative)
+            });
             SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
             var errors = new StringBuilder();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new TextWriterTraceListener(new StringWriter(errors)));
@@ -40,7 +46,7 @@ internal static class Program
             var view = new RunEditorView
             {
                 DataContext = model, Width = 1060, Height = 900,
-                Background = new SolidColorBrush(Color.FromRgb(243, 245, 248))
+                Background = (Brush)application.FindResource("SurfaceBrush")
             };
             Layout(view);
             var saveButton = Button(view, "Save");
@@ -389,13 +395,14 @@ internal static class Program
                     Render(view, Path.Combine(args[0], $"run-editor-{index}.png"));
                 }
             }
+            CheckThemedControls(view, args.FirstOrDefault());
             tabs.SelectedIndex = 0;
             view.Width = 700; view.Height = 400;
             Layout(view);
             var save = Descendants<Button>(view).Single(button => Equals(button.Content, "Save"));
             var bounds = save.TransformToAncestor(view).TransformBounds(new Rect(save.RenderSize));
             Check(save.Visibility == Visibility.Visible && bounds.Width > 0 && bounds.Left >= 0 && bounds.Right <= view.Width
-                && bounds.Top >= 0 && bounds.Bottom <= view.Height, "Save is outside the minimum layout.");
+                && bounds.Top >= 0 && bounds.Bottom <= view.Height, $"Save is outside the minimum layout: {bounds}; view {view.RenderSize}; visibility {save.Visibility}.");
             ((ScrollViewer)view.FindName("EditorScroll")).ScrollToVerticalOffset(300);
             Layout(view);
             var firstValues = Descendants<ParameterValuesView>(view).First(editor => editor.DataContext == model.SetupParameters[0]);
@@ -426,7 +433,7 @@ internal static class Program
             model.RunName = "AnotherRun";
             Check(!model.CanSave && model.RunParameterList.Count == 0 && model.SummaryReportList.Count == 0, "Changing runs retained validation or rows from the previous run.");
             if (errors.Length > 0) throw new Exception("WPF binding errors:\n" + errors);
-            Console.WriteLine("PASS: Selected-row Setup, Execution and Summary Reports, report viewer loading/refresh/layout preservation/sorting/virtualization/selection changes/export, progress/failure reporting, busy gating, Save validation/folder gating, RunParameters loading/refresh/layout preservation/sorting/virtualization, generation, parameter controls and WPF layout/bindings.");
+            Console.WriteLine("PASS: Selected-row Setup, Execution and Summary Reports, persistent table layouts/reset/save recovery, report viewer loading/refresh/layout preservation/sorting/virtualization/selection changes/export, progress/failure reporting, busy gating, Save validation/folder gating, RunParameters loading/refresh/layout preservation/sorting/virtualization, generation, parameter controls and WPF layout/bindings.");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
@@ -490,6 +497,7 @@ internal static class Program
             new[] { parameters[0].Parameters, parameters[1].Parameters }, CancellationToken.None);
         Wait(savedReports);
         CheckPersistentLayouts(root, parameters.Select(row => row.Parameters).ToArray(), savedReports.Result);
+        CheckColumnVisibility(root, parameters.Select(row => row.Parameters).ToArray(), savedReports.Result);
         WriteReport(3, $"RunName\tScore\tLaterMetric\n{configured.RunName}\t7\tnew\n");
         CheckSummaryLayout(root, view, model, tabs, parameters);
         Click(Button(view, "Refresh reports")); WaitUntil(() => !reports.IsLoading); Layout(view);
@@ -616,6 +624,88 @@ internal static class Program
         Check(export.Result && exported[0] == string.Join('\t', reportLayout.Select(column => column.Key ?? "#"))
             && exported.Skip(1).Select(line => line.Split('\t')[0]).SequenceEqual(new[] { "2", "10", "Infinity", "NaN" }),
             "Combined export ignored the layout and sorting restored from disk.");
+
+        var defaultParameters = new RunParameterListViewModel();
+        var defaultReports = new SummaryReportListViewModel();
+        defaultParameters.SetParameters(parameters); defaultReports.SetReports(reports, 2);
+        var defaultParameterView = new RunParameterListView { DataContext = defaultParameters, Width = 800, Height = 360 };
+        var defaultReportView = new SummaryReportListView { DataContext = defaultReports, Width = 800, Height = 360 };
+        Layout(defaultParameterView); Layout(defaultReportView);
+        var defaultParameterLayout = Snapshot(defaultParameterView);
+        var defaultReportLayout = Snapshot(defaultReportView);
+        void CheckSavedReset(bool resetReports)
+        {
+            // Read the button's publication immediately, without an application-exit save.
+            var persisted = new TableLayoutStore(path);
+            var nextParameters = new RunParameterListViewModel(persisted.RunParameters);
+            var nextReports = new SummaryReportListViewModel(persisted.SummaryReports);
+            nextParameters.SetParameters(parameters); nextReports.SetReports(reports, 2);
+            var nextParameterView = new RunParameterListView { DataContext = nextParameters, Width = 800, Height = 360 };
+            var nextReportView = new SummaryReportListView { DataContext = nextReports, Width = 800, Height = 360 };
+            Layout(nextParameterView); Layout(nextReportView);
+            Check(Snapshot(nextParameterView).SequenceEqual(defaultParameterLayout)
+                && nextParameters.SortKey == defaultParameters.SortKey && !nextParameters.Descending,
+                "Reset Run parameters did not immediately save the default layout and sorting.");
+            Check(Snapshot(nextReportView).SequenceEqual(resetReports ? defaultReportLayout : reportLayout)
+                && nextReports.SortKey == (resetReports ? defaultReports.SortKey : "Score") && !nextReports.Descending,
+                "Reset changed the other table's settings or failed to save the Summary Reports defaults.");
+        }
+
+        var parameterList = Descendants<ListView>(restoredParameterView).Single();
+        parameterList.SelectedItems.Add(parameterList.Items[0]);
+        parameterList.SelectedItems.Add(parameterList.Items[2]);
+        var selected = restoredParameters.SelectedParameters.ToHashSet();
+        var parameterItems = restoredParameters.Items;
+        Click(Button(restoredParameterView, "Reset layout")); Layout(restoredParameterView);
+        Check(Snapshot(restoredParameterView).SequenceEqual(defaultParameterLayout)
+            && restoredParameters.SortKey == defaultParameters.SortKey && !restoredParameters.Descending
+            && restoredParameters.Items.Cast<RunParameterItem>().Select(row => row.Number)
+                .SequenceEqual(defaultParameters.Items.Cast<RunParameterItem>().Select(row => row.Number))
+            && selected.SetEquals(restoredParameters.SelectedParameters) && ReferenceEquals(parameterItems, restoredParameters.Items),
+            "Reset Run parameters failed to restore defaults or changed the rows/selection.");
+        Check(Snapshot(restoredReportView).SequenceEqual(reportLayout) && restoredReports.SortKey == "Score",
+            "Reset Run parameters changed the Summary Reports layout.");
+        CheckSavedReset(resetReports: false);
+
+        var reportItems = restoredReports.Items;
+        Click(Button(restoredReportView, "Reset layout")); Layout(restoredReportView);
+        Check(Snapshot(restoredReportView).SequenceEqual(defaultReportLayout)
+            && restoredReports.SortKey == defaultReports.SortKey && !restoredReports.Descending
+            && restoredReports.Items.Cast<SummaryReportItem>().Select(row => row.Number)
+                .SequenceEqual(defaultReports.Items.Cast<SummaryReportItem>().Select(row => row.Number))
+            && ReferenceEquals(reportItems, restoredReports.Items), "Reset Summary Reports changed the data or did not restore defaults.");
+        CheckSavedReset(resetReports: true);
+        var resetExportPath = Path.Combine(root, "reset-summary.tsv");
+        var resetExport = restoredReportView.SaveCombinedReportAsync(resetExportPath, overwrite: false);
+        Wait(resetExport);
+        Check(resetExport.Result && File.ReadAllLines(resetExportPath)[0] == string.Join('\t', defaultReportLayout.Select(column => column.Key ?? "#"))
+            && File.ReadAllLines(resetExportPath).Skip(1).Select(line => line.Split('\t')[0]).SequenceEqual(new[] { "1", "2", "3", "4" }),
+            "Combined export ignored the reset layout or default sorting.");
+
+        MoveFirst(restoredParameterView, ParamKeys.mutationModKey, 177);
+        var beforeResetFailure = File.ReadAllBytes(path);
+        using (var locked = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            Click(Button(restoredParameterView, "Reset layout"));
+        Check(((TextBlock)restoredParameterView.FindName("LayoutStatus")).Text.Contains("not saved")
+            && beforeResetFailure.SequenceEqual(File.ReadAllBytes(path)), "A failed reset save was not reported or damaged the settings file.");
+        Click(Button(restoredParameterView, "Reset layout"));
+        Check(((TextBlock)restoredParameterView.FindName("LayoutStatus")).Text.Contains("restored and saved"), "Retrying reset did not save or clear the failure message.");
+
+        // Reset while empty must forget absent columns and sorting, including after another restart.
+        MoveFirst(restoredParameterView, ParamKeys.mutationModKey, 147);
+        MoveFirst(restoredReportView, "Score", 123);
+        restoredParameters.Sort(ParamKeys.mutationModKey); restoredReports.Sort("Score");
+        restoredParameters.Clear(); restoredReports.Clear();
+        Layout(restoredParameterView); Layout(restoredReportView);
+        Click(Button(restoredParameterView, "Reset layout"));
+        Click(Button(restoredReportView, "Reset layout"));
+        var emptyReset = new TableLayoutStore(path);
+        Check(emptyReset.RunParameters.SortKey is null && !emptyReset.RunParameters.Descending
+            && emptyReset.SummaryReports.SortKey is null && !emptyReset.SummaryReports.Descending
+            && emptyReset.RunParameters.Columns.SequenceEqual(new[] { new ColumnLayoutSetting(null, 45) })
+            && emptyReset.SummaryReports.Columns.SequenceEqual(new[] { new ColumnLayoutSetting(null, 45) }),
+            "Resetting an empty table retained absent columns or the previous sort preference.");
+        CheckSavedReset(resetReports: true);
 
         var invalidPath = Path.Combine(root, "invalid-display-settings.json");
         File.WriteAllText(invalidPath, "{invalid");

@@ -36,7 +36,8 @@ public sealed class SummaryReportListViewModel : INotifyPropertyChanged
     public bool Descending => DisplaySettings.Descending;
     public bool IsLoading { get; private set; }
     public bool IsSaving { get; private set; }
-    public bool CanSaveCombined => !IsLoading && !IsSaving && Count > 0;
+    public bool CanSaveCombined => !IsLoading && !IsSaving && Count > 0
+        && Keys.Cast<string?>().Prepend(null).Any(key => !DisplaySettings.IsHidden(key));
     public string SaveStatus { get; private set; } = "";
     public int Count => Items.Count;
 
@@ -89,6 +90,20 @@ public sealed class SummaryReportListViewModel : INotifyPropertyChanged
         if (Keys.Contains(key)) ApplySort(key, SortKey == key && !Descending);
     }
 
+    public void ColumnVisibilityChanged() => Changed(nameof(CanSaveCombined));
+
+    public void ResetSort()
+    {
+        DisplaySettings.SortKey = null;
+        DisplaySettings.Descending = false;
+        if (Keys.FirstOrDefault() is string key) ApplySort(key, false);
+        else
+        {
+            Items.CustomSort = null;
+            Changed(nameof(SortKey)); Changed(nameof(Descending));
+        }
+    }
+
     /// Called on the UI thread: snapshot the collection view before handing file IO to FileDb.
     /// A null column key denotes the displayed row-number column.
     public async Task<bool> SaveCombinedAsync(string path, string?[] columnOrder, bool overwrite)
@@ -98,9 +113,8 @@ public sealed class SummaryReportListViewModel : INotifyPropertyChanged
         Changed(nameof(IsSaving)); Changed(nameof(CanSaveCombined));
         try
         {
-            var dataColumns = columnOrder.Where(key => key is not null).ToArray();
-            if (columnOrder.Length != Keys.Length + 1 || dataColumns.Length != Keys.Length ||
-                dataColumns.Distinct(StringComparer.Ordinal).Count() != Keys.Length || dataColumns.Any(key => !Keys.Contains(key)))
+            if (columnOrder.Length == 0 || columnOrder.Distinct(StringComparer.Ordinal).Count() != columnOrder.Length ||
+                columnOrder.Any(key => key is not null && !Keys.Contains(key)))
                 throw new ArgumentException("The displayed columns have changed. Try saving again.");
             var indices = columnOrder.Select(key => key is null ? -1 : Array.IndexOf(Keys, key)).ToArray();
             var report = DataTableReport.create("Combined Summary Reports", columnOrder.Select(key => key ?? "#").ToArray());

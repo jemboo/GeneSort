@@ -1,19 +1,11 @@
-<UserControl x:Class="GeneSort.WPF.Views.RunEditorView"
+<UserControl Style="{StaticResource {x:Type UserControl}}" x:Class="GeneSort.WPF.Views.RunEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:GeneSort.WPF.Views">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
-        <Style TargetType="TextBox">
-            <Setter Property="Padding" Value="6,4" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Padding" Value="14,6" />
+        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Margin" Value="0,0,8,0" />
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Padding" Value="5,4" />
         </Style>
         <DataTemplate x:Key="IntervalTemplate">
             <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
@@ -26,22 +18,22 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <DockPanel Margin="0,0,0,12">
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Content="New" Click="New_Click" />
                 <Button Content="Open…" Click="Open_Click" />
                 <Button Content="Validate" Click="Validate_Click" />
-                <Button Content="Save" Click="Save_Click" FontWeight="SemiBold" IsEnabled="{Binding CanSave}"
+                <Button Content="Save" Click="Save_Click" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanSave}"
                         ToolTip="{Binding SaveHint}" ToolTipService.ShowOnDisabled="True" />
             </StackPanel>
             <StackPanel>
                 <TextBlock Text="Run editor" FontSize="22" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding DirtyLabel}" Foreground="#965B12" />
+                <TextBlock Text="{Binding DirtyLabel}" Foreground="{DynamicResource WarningBrush}" />
             </StackPanel>
         </DockPanel>
         <ScrollViewer x:Name="EditorScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="0,0,12,0">
                 <TextBlock Text="{Binding WorkflowName}" FontSize="16" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding WorkflowDescription}" Foreground="#536075" Margin="0,3,0,12" />
+                <TextBlock Text="{Binding WorkflowDescription}" Foreground="{DynamicResource MutedBrush}" Margin="0,3,0,12" />
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
                     <StackPanel Margin="0,0,12,0">
@@ -61,7 +53,7 @@
                     <Button Content="Browse…" DockPanel.Dock="Right" Margin="8,0,0,0" Click="Browse_Click" />
                     <TextBox Text="{Binding ProjectsFolder, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Projects folder" />
                 </DockPanel>
-                <TextBlock Text="{Binding Destination}" TextWrapping="Wrap" Foreground="#536075" FontSize="11" Margin="0,4,0,12" />
+                <TextBlock Text="{Binding Destination}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,4,0,12" />
                 <TabControl>
                     <TabItem Header="Parameters">
                         <StackPanel Margin="12">
@@ -81,11 +73,11 @@
                         <StackPanel Margin="12">
                             <TextBlock Text="Generation save schedule" />
                             <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" AutomationProperties.Name="Generation save schedule" />
-                            <TextBlock Text="GenerationIntervalLast selects a zero-based index in this schedule." Foreground="#536075" Margin="0,4,0,12" />
+                            <TextBlock Text="GenerationIntervalLast selects a zero-based index in this schedule." Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
                             <TextBlock Text="Summary sampling schedule" />
                             <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SummaryIntervals}" AutomationProperties.Name="Summary sampling schedule" />
                             <CheckBox Content="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="0,16,0,4" />
-                            <TextBlock Text="This is a run setting. Replacing a saved run definition asks for confirmation separately." TextWrapping="Wrap" Foreground="#536075" />
+                            <TextBlock Text="This is a run setting. Replacing a saved run definition asks for confirmation separately." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Catalog selections">
@@ -94,7 +86,7 @@
                             <ItemsControl ItemsSource="{Binding Catalogs}">
                                 <ItemsControl.ItemTemplate><DataTemplate><StackPanel Margin="0,6">
                                     <TextBlock Text="{Binding Role}" FontWeight="SemiBold" />
-                                    <TextBlock Text="{Binding Name}" /><TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#536075" />
+                                    <TextBlock Text="{Binding Name}" /><TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
                                 </StackPanel></DataTemplate></ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
@@ -116,12 +108,12 @@
                                              HorizontalAlignment="Left" AutomationProperties.Name="Replica count" />
                                 </StackPanel>
                             </WrapPanel>
-                            <Border Background="#EDF3FA" BorderBrush="#BACDE3" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <Border Background="{DynamicResource RaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12">
                                 <TextBlock Text="{Binding GenerationPreview}" TextWrapping="Wrap" AutomationProperties.Name="Generation preview" />
                             </Border>
                             <TextBlock Text="Generating publishes the complete parameter set for this run. Replacing existing files requires confirmation."
-                                       Foreground="#536075" TextWrapping="Wrap" Margin="0,10,0,12" />
-                            <Button Content="Generate RunParameters" Click="Generate_Click" IsEnabled="{Binding CanGenerateParameters}"
+                                       Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,10,0,12" />
+                            <Button Content="Generate RunParameters" Click="Generate_Click" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanGenerateParameters}"
                                     HorizontalAlignment="Left" FontWeight="SemiBold" />
                         </StackPanel>
                     </TabItem>
@@ -158,7 +150,7 @@
                          AutomationProperties.Name="Operation progress" Height="6" Margin="0,0,0,6" Visibility="{Binding IsBusy, Converter={StaticResource VisibleIfTrue}}" />
             <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Issues}">
-                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="#A32525" TextWrapping="Wrap" Margin="0,2" /></DataTemplate></ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" Margin="0,2" /></DataTemplate></ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
             <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Margin="0,4,0,0" />

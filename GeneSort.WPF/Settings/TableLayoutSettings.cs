@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace GeneSort.WPF.Settings;
 
 // A null key is the row-number column; a null width means automatic sizing.
-internal sealed record ColumnLayoutSetting(string? Key, double? Width);
+internal sealed record ColumnLayoutSetting(string? Key, double? Width, bool Hidden = false);
 
 internal sealed class TableLayoutSettings
 {
@@ -13,6 +13,8 @@ internal sealed class TableLayoutSettings
     public string? SortKey { get; set; }
     public bool Descending { get; set; }
     internal Action? CaptureLayout { get; set; }
+    internal Func<string?>? SaveChanges { get; set; }
+    internal bool IsHidden(string? key) => Columns.Any(column => column.Key == key && column.Hidden);
 }
 
 /// Per-user presentation settings, independent of run definitions and project files.
@@ -49,10 +51,11 @@ internal sealed class TableLayoutStore
     private TableLayoutSettings Get(string key)
     {
         if (!tables.TryGetValue(key, out var settings)) tables[key] = settings = new();
+        settings.SaveChanges = Save;
         return settings;
     }
 
-    // Called on the UI thread at shutdown, including when a table is still visible.
+    // Called on the UI thread at shutdown, after a reset, or when column visibility changes.
     public string? Save()
     {
         foreach (var settings in tables.Values) settings.CaptureLayout?.Invoke();

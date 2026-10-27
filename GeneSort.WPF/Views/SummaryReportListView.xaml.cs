@@ -22,6 +22,7 @@ public partial class SummaryReportListView : UserControl
 
     private void Detach()
     {
+        columnLayout.CloseChooser();
         if (model is not null)
         {
             columnLayout.Capture();
@@ -66,6 +67,33 @@ public partial class SummaryReportListView : UserControl
         // GridView's collection reflects drag-reordered columns; Tags retain the raw names without sort arrows.
         var order = ReportColumns.Columns.Select(column => (column.Header as GridViewColumnHeader)?.Tag as string).ToArray();
         return current.SaveCombinedAsync(path, order, overwrite);
+    }
+
+    private void ChooseColumns_Click(object sender, RoutedEventArgs e)
+    {
+        if (model is null) return;
+        columnLayout.OpenChooser((Button)sender, () =>
+        {
+            UpdateHeaders();
+            model?.ColumnVisibilityChanged();
+            var save = model?.DisplaySettings.SaveChanges;
+            var error = save?.Invoke();
+            LayoutStatus.Text = error is not null ? $"Column visibility changed, but settings were not saved. {error}"
+                : save is null ? "Column visibility updated." : "Column visibility saved.";
+        });
+    }
+
+    private void ResetLayout_Click(object sender, RoutedEventArgs e)
+    {
+        if (model is null) return;
+        columnLayout.Reset();
+        BuildColumns();
+        model.ResetSort();
+        model.ColumnVisibilityChanged();
+        var save = model.DisplaySettings.SaveChanges;
+        var error = save?.Invoke();
+        LayoutStatus.Text = error is not null ? $"Layout reset, but settings were not saved. {error}"
+            : save is null ? "Default layout restored." : "Default layout restored and saved.";
     }
 
     private async void SaveCombined_Click(object sender, RoutedEventArgs e)

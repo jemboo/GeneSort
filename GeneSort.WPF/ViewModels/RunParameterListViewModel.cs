@@ -88,6 +88,18 @@ public sealed class RunParameterListViewModel : INotifyPropertyChanged
         if (Keys.Contains(key)) ApplySort(key, SortKey == key && !Descending);
     }
 
+    public void ResetSort()
+    {
+        DisplaySettings.SortKey = null;
+        DisplaySettings.Descending = false;
+        if (Keys.FirstOrDefault() is string key) ApplySort(key, false);
+        else
+        {
+            Items.CustomSort = null;
+            Changed(nameof(SortKey)); Changed(nameof(Descending));
+        }
+    }
+
     private void ApplySort(string key, bool descending)
     {
         var index = Array.IndexOf(Keys, key);

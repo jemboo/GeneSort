@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Data;
 using System.IO;
 using GeneSort.WPF.Views;
@@ -28,13 +27,11 @@ public abstract class OutputDataViewerControl : UserControl
             Text = heading,
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67))
         });
         intro.Children.Add(new TextBlock
         {
             Text = description,
             Margin = new Thickness(0, 4, 0, 0),
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117)),
             TextWrapping = TextWrapping.Wrap
         });
         DockPanel.SetDock(intro, Dock.Top);
@@ -145,12 +142,12 @@ public abstract class OutputDataViewerControl : UserControl
         var label = new FrameworkElementFactory(typeof(TextBlock));
         label.SetBinding(TextBlock.TextProperty, new Binding(nameof(MessagePackNode.Label)));
         label.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
-        label.SetValue(TextBlock.ForegroundProperty, new SolidColorBrush(Color.FromRgb(36, 70, 107)));
+        label.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
         row.AppendChild(label);
 
         var value = new FrameworkElementFactory(typeof(TextBlock));
         value.SetBinding(TextBlock.TextProperty, new Binding(nameof(MessagePackNode.Value)) { StringFormat = "  {0}" });
-        value.SetValue(TextBlock.ForegroundProperty, new SolidColorBrush(Color.FromRgb(61, 71, 82)));
+        value.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         row.AppendChild(value);
 
         return new HierarchicalDataTemplate(typeof(MessagePackNode))
@@ -171,7 +168,6 @@ public sealed class FileSelectionDetailsControl : UserControl
             Text = "Details",
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67)),
             Margin = new Thickness(0, 0, 0, 16)
         });
         AddBoundDetail(details, "Name", "SelectionTitle", FontWeights.SemiBold);
@@ -192,7 +188,6 @@ public sealed class FileSelectionDetailsControl : UserControl
         {
             Text = label,
             FontSize = 11,
-            Foreground = new SolidColorBrush(Color.FromRgb(104, 117, 132))
         });
         var value = new TextBlock
         {
@@ -217,7 +212,6 @@ public sealed class MessagePackNodeChildrenGridControl : UserControl
             Text = node.Label,
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67)),
             TextWrapping = TextWrapping.Wrap
         });
         heading.Children.Add(new TextBlock
@@ -225,7 +219,6 @@ public sealed class MessagePackNodeChildrenGridControl : UserControl
             Text = $"{node.Children.Count:N0} child values",
             Margin = new Thickness(0, 3, 0, 0),
             FontSize = 11,
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
         });
         DockPanel.SetDock(heading, Dock.Top);
         layout.Children.Add(heading);
@@ -331,13 +324,11 @@ public sealed class TextReportOutputDataControl : UserControl
             Text = $"Text report: {reportName}",
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67))
         });
         heading.Children.Add(new TextBlock
         {
             Text = "Report output",
             Margin = new Thickness(0, 4, 0, 0),
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
         });
         DockPanel.SetDock(heading, Dock.Top);
         layout.Children.Add(heading);
@@ -416,13 +407,11 @@ public sealed class RunParametersTableControl : UserControl
             Text = "Run parameters",
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67))
         });
         heading.Children.Add(new TextBlock
         {
             Text = $"{table.Rows.Count:N0} RunParameters file(s) loaded from {folderName}; each parameter key is a column.",
             Margin = new Thickness(0, 4, 0, 0),
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117)),
             TextWrapping = TextWrapping.Wrap
         });
         DockPanel.SetDock(heading, Dock.Top);
@@ -475,13 +464,11 @@ public sealed class OutputFolderFilesGridControl : UserControl
             Text = $"Files in {folderName}",
             FontSize = 18,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(Color.FromRgb(23, 43, 67))
         });
         heading.Children.Add(new TextBlock
         {
             Text = $"{table.Rows.Count:N0} output file(s). Load root fields on demand.",
             Margin = new Thickness(0, 4, 0, 0),
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
         });
         DockPanel.SetDock(heading, Dock.Top);
         layout.Children.Add(heading);
@@ -500,7 +487,6 @@ public sealed class OutputFolderFilesGridControl : UserControl
             Text = $"0 of {table.Rows.Count:N0} files loaded",
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(10, 0, 4, 0),
-            Foreground = new SolidColorBrush(Color.FromRgb(89, 102, 117))
         };
         actions.Children.Add(progressText);
         DockPanel.SetDock(actions, Dock.Top);

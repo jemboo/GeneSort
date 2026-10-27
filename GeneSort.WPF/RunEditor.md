@@ -66,6 +66,19 @@ Settings include the `#` column and columns that are temporarily absent. Missing
 unreadable settings use the default layout. A failed settings save is reported when
 closing, and leaves the previous settings file intact.
 
+Use **Columns…** in either table to check the columns you want to show, including
+the `#` column. The chooser scrolls when there are many fields and stays open while
+you make multiple choices. Visibility changes save immediately and survive refreshes,
+selection changes and application restarts. Hidden columns retain their widths and
+positions, and hiding the sort column keeps the existing row order. Columns absent
+from the current files keep their visibility settings until they return.
+
+Each table's **Reset layout** button shows all columns and restores its default
+order and widths, including `#`, and ascending sorting by its first data column. The reset clears
+remembered layouts for absent columns too, and saves immediately. It works with an
+empty table, whose default sort is applied when rows load. The other table keeps
+its layout. A message below the table confirms the save or reports a save failure.
+
 Select rows with Ctrl+click or Shift+click and choose **Run Setup**, **Run Execution**,
 or **Generate Summary Reports**. All three require a saved definition and at least
 one selected row. Each action processes those rows one at a time on a background
@@ -107,12 +120,12 @@ discards earlier loads so stale results cannot replace the current view. Viewing
 refreshing and sorting reports do not generate reports or change any saved files.
 
 Use **Save combined report…** to export the displayed table as one UTF-8,
-tab-separated `.tsv` or `.txt` file. The export has one header row and preserves
-the current column order (including the displayed `#` column), sorting and blank
+tab-separated `.tsv` or `.txt` file. The export contains only visible columns, has
+one header row, and preserves column order (including `#` when visible), sorting and blank
 cells. It includes all displayed report rows, including those outside the visible
 viewport. Missing reports contribute no rows. The button is disabled while loading,
-when the table is empty, or while a save is in progress. The save dialog lets you
-choose the destination and confirms replacing an existing file. Saving takes a
+when the table is empty, when every column is hidden, or while a save is in progress.
+The save dialog lets you choose the destination and confirms replacing an existing file. Saving takes a
 snapshot, so later selection, sorting or column changes cannot alter that export.
 The complete file is written before replacing the destination, and a status message
 reports success or failure.
@@ -164,7 +177,10 @@ Run the offscreen WPF smoke checks on Windows with:
 dotnet run --project scripts/RunEditorSmoke/RunEditorSmoke.csproj
 ```
 
-Pass an output folder after `--` to render each editor tab for visual inspection.
+Pass an output folder after `--` to render each editor tab and dark-theme previews
+(workspace, browser, selected report rows, dropdown and column chooser).
+The shared palette and control styles live in `Themes/Dark.xaml`; views use those
+resources for surfaces, text, focus, selection and validation colors.
 Project validation tests are in `RunEditorTests.fs`; definition persistence tests
 are in `RunDefinitionFileTests.fs`. `RunParameterFileTests.fs` covers generation,
 replacement, rollback, concurrent publication and checkpoint-preserving resume.

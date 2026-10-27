@@ -21,6 +21,7 @@ public partial class RunParameterListView : UserControl
 
     private void Detach()
     {
+        columnLayout.CloseChooser();
         if (model is not null)
         {
             columnLayout.Capture();
@@ -53,6 +54,31 @@ public partial class RunParameterListView : UserControl
 
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) =>
         (DataContext as RunParameterListViewModel)?.Select(ParameterItems.SelectedItems.Cast<RunParameterItem>());
+
+    private void ChooseColumns_Click(object sender, RoutedEventArgs e)
+    {
+        if (model is null) return;
+        columnLayout.OpenChooser((Button)sender, () =>
+        {
+            UpdateHeaders();
+            var save = model?.DisplaySettings.SaveChanges;
+            var error = save?.Invoke();
+            LayoutStatus.Text = error is not null ? $"Column visibility changed, but settings were not saved. {error}"
+                : save is null ? "Column visibility updated." : "Column visibility saved.";
+        });
+    }
+
+    private void ResetLayout_Click(object sender, RoutedEventArgs e)
+    {
+        if (model is null) return;
+        columnLayout.Reset();
+        BuildColumns();
+        model.ResetSort();
+        var save = model.DisplaySettings.SaveChanges;
+        var error = save?.Invoke();
+        LayoutStatus.Text = error is not null ? $"Layout reset, but settings were not saved. {error}"
+            : save is null ? "Default layout restored." : "Default layout restored and saved.";
+    }
 
     private void UpdateHeaders()
     {
