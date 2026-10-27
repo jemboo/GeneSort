@@ -5,7 +5,6 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 
 type catalogChoice =
@@ -20,7 +19,6 @@ type catalogChoice =
 type workflowDefinitionArgs = {
     Name: string
     Description: string
-    SetupFunction: catalogChoice
     SetupQuery: catalogChoice
     SetupEnhancer: catalogChoice
     ExecutionFunction: catalogChoice
@@ -39,7 +37,7 @@ type workflowDefinition =
     member this.Description = this.definition.Description
     member this.CatalogChoices =
         let d = this.definition
-        [| d.SetupFunction; d.SetupQuery; d.SetupEnhancer
+        [| d.SetupQuery; d.SetupEnhancer
            d.ExecutionFunction; d.ExecutionQuery; d.ExecutionEnhancer
            d.TestsMaker; d.SeedMaker; d.Mutator |]
     member this.MakerNames =
@@ -48,8 +46,7 @@ type workflowDefinition =
             SeedPoolSet = this.definition.SeedMaker.Name
             Mutator = this.definition.Mutator.Name
         }
-    member this.SetupConfig spans : setupConfig = {
-        FunctionName = this.definition.SetupFunction.Name
+    member this.SetupConfig spans : sgdSetupConfig = {
         QueryCatalogName = this.definition.SetupQuery.Name
         EnhancerFunctionName = this.definition.SetupEnhancer.Name
         ParameterSpans = spans
@@ -62,8 +59,7 @@ type workflowDefinition =
     }
     member this.Matches(configured: run) =
         let d = this.definition
-        configured.SetupFunctionName = d.SetupFunction.Name
-        && configured.SetupQueryCatalogName = d.SetupQuery.Name
+        configured.SetupQueryCatalogName = d.SetupQuery.Name
         && configured.SetupEnhancerFunctionName = d.SetupEnhancer.Name
         && configured.ExecuteFunctionName = d.ExecutionFunction.Name
         && configured.RunQueryCatalogName = d.ExecutionQuery.Name
@@ -74,7 +70,6 @@ module WorkflowDefinitions =
     let standardMsuf32 = workflowDefinition.create {
         Name = "Standard · Msuf32p4a"
         Description = "Simple sorter models, width 32, prefix p4a, Standard evolution."
-        SetupFunction = catalogChoice.create "Setup" SetupCatalogNames.standard "Create the initial Standard pools and prefixed sortable tests."
         SetupQuery = catalogChoice.create "Setup query" QueryCatalogNamesSetup.sorterSgdMsufStandard "Identify Standard Msuf setup inputs."
         SetupEnhancer = catalogChoice.create "Setup parameters" SetupEnhancerFunctionNames.standardMsuf32 "Supply width 32, prefix p4a and initial pool settings."
         ExecutionFunction = catalogChoice.create "Execution" ExecuteFunctionNames.standard "Evolve Standard sorter pools."

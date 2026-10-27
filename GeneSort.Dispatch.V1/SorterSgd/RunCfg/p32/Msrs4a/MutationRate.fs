@@ -61,7 +61,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -104,7 +103,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -148,7 +146,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -194,7 +191,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -236,7 +232,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -279,7 +274,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -326,7 +320,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -372,7 +365,6 @@ module MutationRate =
                         EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
                     }
                     Setup = {
-                        FunctionName = SetupCatalogNames.standard
                         ParameterSpans = parameterSpans
                         QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
                         EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd

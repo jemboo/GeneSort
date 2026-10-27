@@ -33,7 +33,7 @@ module EvoAppendPools =
         | _ -> source
 
     let private branch (rp: runParameters) (originals: 'pool array) bounds getModifier derive retag =
-        if not (Map.containsKey ParamKeys.sourcePoolFileIdKey rp.ParamMap) then Ok None
+        if not (Map.containsKey ParamKeys.sourceExecutionIdKey rp.ParamMap) then Ok None
         else
             rp.GetMutationMod() |> Result.ofOption "Missing MutationMod."
             |> Result.bind (fun modifier ->

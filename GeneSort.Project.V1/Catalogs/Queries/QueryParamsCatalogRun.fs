@@ -52,51 +52,17 @@ module QueryParamsCatalogRun =
     let nameForDatabase (projectName: string) (databaseName: string) =
         sprintf "%s.%s" projectName databaseName
 
-    let register (name: string) (builder: runQueryParamsCatalogBuilder) =
+    /// Register complete, standalone functions. The catalog never changes their output.
+    let register name builder =
         if System.String.IsNullOrWhiteSpace name then
-            invalidArg (nameof name) "A query parameter catalog name cannot be empty."
-
+            invalidArg "name" "A query parameter catalog name cannot be empty."
         lock syncRoot (fun () ->
             if Map.containsKey name builders then
                 invalidOp (sprintf "A query parameter builder named '%s' is already registered." name)
             builders <- Map.add name builder builders)
 
-    let private lookup (name: string) : runQueryParamsCatalogBuilder =
+    let get name =
         lock syncRoot (fun () ->
             match Map.tryFind name builders with
             | Some builder -> builder
             | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
-
-    /// Include setup linkage unless the workflow identifies its inputs directly by settings.
-    let get name : runQueryParamsCatalogBuilder =
-        let builder = lookup name
-        fun project database parameters outputType ->
-            let setup =
-                match outputType with
-                | geneSortDataType.SorterModelSet _ | geneSortDataType.SortableTestsWithPrefix _ ->
-                    QueryParams.trySetupReference database project parameters outputType
-                    |> Option.orElseWith (fun () -> SetupArtifactQueries.tryCreate name project database parameters outputType)
-                | _ -> None
-            match setup with
-            | Some query -> Some query
-            | None ->
-                builder project database parameters outputType
-                |> Option.map (fun query ->
-                    let references =
-                        match name, outputType with
-                        | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.Run _
-                        | QueryCatalogNamesRun.sorterSgdMsufStandardAppend, geneSortDataType.Run _
-                        | QueryCatalogNamesRun.sorterSgdMsufStandardAppend, geneSortDataType.RunParameters _
-                        | QueryCatalogNamesRun.sorterSgdMsufSossAppend, geneSortDataType.RunParameters _ -> []
-                        | QueryCatalogNamesRun.sorterEvalPrefix, _ -> []
-                        | QueryCatalogNamesRun.sortableTestMerge, geneSortDataType.SortableTests _
-                        | QueryCatalogNamesRun.sortableTestPrefix, geneSortDataType.SortableTests _ -> []
-                        | _ -> SetupFileReferences.fromRunParameters parameters
-                    let references =
-                        references @
-                            ([ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
-                             |> List.choose (fun key -> Map.tryFind key parameters.ParamMap |> Option.map (fun value -> key, value)))
-                    if List.isEmpty references then query
-                    else
-                        let properties = references |> List.fold (fun map (key, value) -> Map.add key value map) query.Properties
-                        queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))

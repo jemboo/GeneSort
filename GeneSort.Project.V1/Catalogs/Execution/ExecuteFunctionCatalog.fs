@@ -39,18 +39,38 @@ module ExecuteFunctionCatalog =
             | Some execute -> execute
             | None -> invalidOp (sprintf "No execute function named '%s' is registered." name))
 
+    /// Typed evolution entry point. Legacy algorithms receive the unchanged parameter
+    /// representation; only progress is allowed to cross back out of that boundary.
+    let bindPath (storage: runStorage) : evoPathFunction =
+        fun path progress overwrite cts sink -> async {
+            try
+                match get path.Workflow.ExecuteFunctionName with
+                | SimpleExecution _ -> return Error "The path does not select an evolutionary executor."
+                | SgdExecution bind ->
+                    let dependencies = sgdExecution.create {
+                        MakeMutator = MutatorMakerCatalog.get path.Workflow.MakerNames.Mutator
+                        GenSaveIntervals = path.GenSaveIntervals
+                        GenSaveSubIntervals = path.GenSaveSubIntervals
+                    }
+                    let! result = bind (RunStorage.forPath path storage) dependencies (EvoPath.toParameters path progress) overwrite cts sink
+                    return result |> Result.map (EvoPath.progressFromParameters path)
+            with error -> return Error error.Message
+        }
+
     /// Bind execution from the saved definition; execution has no source-library or setup dependency.
     let bind (configured: run) storage =
         match get configured.ExecuteFunctionName with
         | SimpleExecution bind -> bind storage
-        | SgdExecution bind ->
+        | SgdExecution _ ->
             match configured with
             | run.SimpleRun _ ->
                 invalidArg "configured" (sprintf "Execute function '%s' requires an SgdRun with a mutator and generation intervals." configured.ExecuteFunctionName)
-            | run.SgdRun sgd ->
-                let dependencies = sgdExecution.create {
-                    MakeMutator = MutatorMakerCatalog.get (SgdRun.makerNames sgd).Mutator
-                    GenSaveIntervals = RunIntervals.resolve configured.RunName (SgdRun.genSaveIntervalsName sgd)
-                    GenSaveSubIntervals = RunIntervals.resolve configured.RunName (SgdRun.genSaveSubIntervalsName sgd)
+            | run.SgdRun _ ->
+                let execute = bindPath storage
+                fun parameters overwrite cts sink -> async {
+                    try
+                        let path, progress = EvoPath.fromParameters configured parameters
+                        let! result = execute path progress overwrite cts sink
+                        return result |> Result.map (EvoPath.toParameters path)
+                    with error -> return Error error.Message
                 }
-                bind storage dependencies

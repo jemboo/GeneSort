@@ -92,10 +92,12 @@ let ``parallel setup shares files across executions replicas and hosts and execu
     // Execution needs no generator settings to resolve a recorded setup reference.
     let recorded = SetupFileReferences.fromRunParameters parameters.[0] |> Map.ofList |> runParameters.create
     for output in [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""] do
-        let query = host.QueryParamsFromRunParams recorded output |> Option.get
+        let query = SetupInputReferences.tryRecordedInput host.Run.ProjectName host.Run.DatabaseName recorded output |> Option.get
         host.RunDb.loadAsync geneSortDataMode.Setup query |> Async.RunSynchronously |> get |> ignore
         let changed = parameters.[0].WithSorterCount(Some 99<sorterCount>).WithRepl(Some 100<replNumber>)
-        Assert.Equal(query.Id, (host.QueryParamsFromRunParams changed output |> Option.get).Id)
+        let requested = host.QueryParamsFromRunParams changed output |> Option.get
+        let resolved = SetupInputReferences.resolveRecorded changed requested
+        Assert.Equal(query.Id, resolved.Id)
 
 [<Theory>]
 [<InlineData("SorterCount", "3")>]
@@ -108,7 +110,7 @@ let ``parallel setup shares files across executions replicas and hosts and execu
 let ``uniform models distinguish every generation input`` key value =
     let host = runHost.Create (configuration ()) 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let query parameters = SetupArtifactQueries.tryCreate host.Run.SetupQueryCatalogName host.Run.ProjectName host.Run.DatabaseName parameters (geneSortDataType.SorterModelSet "") |> Option.get
+    let query (parameters: runParameters) = QueryParamsCatalogSetup.get host.Run.SetupQueryCatalogName host.Run.ProjectName host.Run.DatabaseName (setupParameters.create parameters.ParamMap) (geneSortDataType.SorterModelSet "") |> Option.get
     Assert.NotEqual((query rp).Id, (query (withValue key value rp)).Id)
     Assert.NotEqual((query rp).Id, (query (rp.WithRepl(Some 1<replNumber>))).Id)
 
@@ -119,9 +121,11 @@ let ``different model counts produce separate files with the requested contents`
     let host = (runHost.Create (configuration ()) 1).WithRunDb(storage.Open())
     let original = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head |> SetupFileReferences.attach []
     for count in [2; 3] do
-        let rp = original.WithSorterCount(Some (UMX.tag count))
+        let settings = original.WithSorterCount(Some (UMX.tag count))
+        let rp = SetupInputReferences.recordFiles (SetupOutputs.generatedFiles host.Run settings) settings
         SorterModelSetMakers.makeUniformSorterModelSet host.Storage (UMX.tag false) rp |> Async.RunSynchronously |> get
-        let query = host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "") |> Option.get
+        let request = host.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "") |> Option.get
+        let query = SetupInputReferences.resolveRecorded rp request
         let models = host.RunDb.loadAsync geneSortDataMode.Setup query |> Async.RunSynchronously |> get |> OutputData.asSorterModelSet |> get
         Assert.Equal(count, models.SorterModels.Length)
     Assert.Equal(2, storage.Files().Length)
@@ -130,7 +134,7 @@ let ``different model counts produce separate files with the requested contents`
 let ``Merge tests share across models and replicas while library and format differences stay separate`` () =
     let host = runHost.Create (SorterEval.RunCfg.Merge.Test()) 1
     let parameters = host.MakeRunParameters 0<replNumber> 2<replNumber>
-    let query rp = SetupArtifactQueries.tryCreate host.Run.SetupQueryCatalogName host.Run.ProjectName host.Run.DatabaseName rp (geneSortDataType.SortableTestsWithPrefix "") |> Option.get
+    let query (rp: runParameters) = QueryParamsCatalogSetup.get host.Run.SetupQueryCatalogName host.Run.ProjectName host.Run.DatabaseName (setupParameters.create rp.ParamMap) (geneSortDataType.SortableTestsWithPrefix "") |> Option.get
     let groups = parameters |> Array.groupBy (fun rp -> rp.GetMergeLibId(), rp.GetSortableDataFormat())
     Assert.Equal(groups.Length, parameters |> Array.map (query >> fun q -> q.Id) |> Array.distinct |> Array.length)
     for _, group in groups do Assert.Single(group |> Array.map (query >> fun q -> q.Id) |> Array.distinct) |> ignore
@@ -144,7 +148,7 @@ let ``seed pools share execution-only settings but retain family capacity mutati
     let configured = if soss then WorkflowFixtures.sossSource [0] else WorkflowFixtures.standardSource ()
     let host = runHost.Create configured 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let query catalog parameters = SetupArtifactQueries.tryCreate catalog configured.ProjectName configured.DatabaseName parameters (geneSortDataType.SorterPoolSet "") |> Option.get
+    let query catalog (parameters: runParameters) = QueryParamsCatalogSetup.get catalog configured.ProjectName configured.DatabaseName (setupParameters.create parameters.ParamMap) (geneSortDataType.SorterPoolSet "") |> Option.get
     let baseline = query configured.SetupQueryCatalogName rp
     Assert.Equal(Some baseline.Id, rp.GetSetupSorterPoolSetId())
     for key, value in [ParamKeys.modificationRateKey, "0.5"; ParamKeys.activatorMutationRateKey, "0.9"; ParamKeys.partitionCountKey, "99"; ParamKeys.seedSossKey, "77"; ParamKeys.runNameKey, "AnotherRun"] do

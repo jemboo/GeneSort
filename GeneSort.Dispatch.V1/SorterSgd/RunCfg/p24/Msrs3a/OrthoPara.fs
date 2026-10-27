@@ -53,7 +53,6 @@ module OrthoPara32 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -93,7 +92,6 @@ module OrthoPara32 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd

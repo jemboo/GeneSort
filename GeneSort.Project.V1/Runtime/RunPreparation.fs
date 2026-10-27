@@ -43,7 +43,16 @@ module RunPreparation =
             let query = queryFor parameter (geneSortDataType.RunParameters args.Run.RunName)
                         |> Option.defaultWith (fun () -> invalidOp "Could not build a RunParameter file identity.")
             query, parameter)
-        runParameterSet.create { Run = args.Run; Entries = entries }
+        let setupFiles =
+            parameters
+            |> Seq.collect (SetupOutputs.files args.Run)
+            |> Seq.distinctBy SetupInputReferences.fileIdentity
+            |> Seq.toArray
+        let paths =
+            match args.Run with
+            | run.SimpleRun _ -> [||]
+            | run.SgdRun _ -> parameters |> Array.map (EvoPath.prepare args.Run)
+        runParameterSet.create { Run = args.Run; Entries = entries; SetupFiles = setupFiles; EvolutionPaths = paths }
 
     let prepare args =
         if args.Run.ParameterSource.IsNone then

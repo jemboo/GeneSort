@@ -69,7 +69,6 @@ module RunParameterGeneration =
                        selectSources configured source selected |> Array.map (fun parameters ->
                            let excluded =
                                [ParamKeys.idKey; ParamKeys.sourceExecutionIdKey
-                                ParamKeys.sourcePoolFileIdKey; ParamKeys.sourceTestsFileIdKey
                                 ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey; ParamKeys.sourceMutationModKey
                                 ParamKeys.sourceGenerationIntervalKey; ParamKeys.generationFirstKey; ParamKeys.selectedSorterPoolCountKey]
                                @ SetupFileReferences.keys
@@ -116,11 +115,7 @@ module RunParameterGeneration =
                        let enhanced =
                            if configured.ParameterSource.IsSome then enhanced
                            else
-                               [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""; geneSortDataType.SorterPoolSet ""]
-                               |> List.choose (fun output ->
-                                   SetupArtifactQueries.tryCreate configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName enhanced output
-                                   |> Option.map (fun query -> SetupFileReferences.keyForOutputType output, string query.Id))
-                               |> List.fold (fun (rp: runParameters) (key, value) -> runParameters.create (rp.ParamMap.Add(key, value))) enhanced
+                               SetupInputReferences.recordFiles (SetupOutputs.generatedFiles configured enhanced) enhanced
                        let query =
                            runQuery enhanced (geneSortDataType.Run configured.RunName)
                            |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"

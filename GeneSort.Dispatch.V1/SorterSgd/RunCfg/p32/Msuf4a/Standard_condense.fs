@@ -24,7 +24,6 @@ module Pool_32_condense =
             ProjectName = names.ProjectName
             DatabaseName = names.DatabaseName
             RunName = names.RunName
-            SetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
             Source = evoContinuationSource.create {
                 SourceRun = Standard.Pool_32.Test ()

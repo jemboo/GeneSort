@@ -36,8 +36,8 @@ let ``prefix evaluation combines split spans with reusable setup references`` ()
             Assert.NotEmpty(SetupFileReferences.fromRunParameters parameters)
             for outputType in [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""] do
                 let prepared = host.QueryParamsFromSetupParams setup outputType |> Option.get
-                let loaded = host.QueryParamsFromRunParams parameters outputType |> Option.get
-                let alternate = host.QueryParamsFromRunParams (parameters.WithSorterEvalType(Some sorterEvalType.V1)) outputType |> Option.get
+                let loaded = SetupInputReferences.tryRecordedInput configured.ProjectName configured.DatabaseName parameters outputType |> Option.get
+                let alternate = host.QueryParamsFromSetupParams (setup.WithSorterEvalType(Some sorterEvalType.V1)) outputType |> Option.get
                 Assert.Equal(prepared.Id, loaded.Id)
                 Assert.Equal(loaded.Id, alternate.Id)
                 Assert.False(loaded.Properties.ContainsKey ParamKeys.sorterEvalTypeKey)
@@ -95,7 +95,10 @@ let private configure runValues setupValues outputTypes setupQuery =
         |> SetupEnhancerCatalog.withFileReferences outputTypes context)
     QueryParamsCatalogSetup.register name setupQuery
     QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
-        Some (queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]))
+        // A registered builder owns its full identity; the catalog adds nothing.
+        queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]
+        |> QueryParamsBuildersRun.withSetupReferences rp
+        |> Some)
     RunParamEnhancerBuilders.register name (fun context rp ->
         let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
         Assert.Equal(setup.GetRepl(), rp.GetRepl())
@@ -172,7 +175,8 @@ let ``missing setup queries and conflicting output keys fail explicitly`` () =
 [<Fact>]
 let ``source file IDs affect run identities but not setup identities`` () =
     let configured, _ = configure ["a"] ["one"] [] (fun project database sp outputType ->
-        Some (queryParams.create database project (sp.GetRepl()) None outputType (Map.toArray sp.ParamMap)))
+        let settings = SetupFileReferences.withoutReferences sp
+        Some (queryParams.create database project (sp.GetRepl()) None outputType (Map.toArray settings.ParamMap)))
     let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
     let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
     let first = Guid.NewGuid() |> UMX.tag<queryParamsId>

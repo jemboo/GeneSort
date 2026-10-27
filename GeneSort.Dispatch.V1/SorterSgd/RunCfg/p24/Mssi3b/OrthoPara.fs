@@ -50,7 +50,6 @@ module OrthoPara64 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -91,7 +90,6 @@ module OrthoPara64 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -132,7 +130,6 @@ module OrthoPara64 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -175,7 +172,6 @@ module OrthoPara128 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd

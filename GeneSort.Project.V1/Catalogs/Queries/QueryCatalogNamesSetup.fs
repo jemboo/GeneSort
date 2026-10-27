@@ -7,6 +7,8 @@ open GeneSort.Project.V1.Parameters
 /// Stable names for setup query builders, independent of the run query registry.
 module QueryCatalogNamesSetup =
     [<Literal>]
+    let importedStart = "evolution.imported-start"
+    [<Literal>]
     let sorterSgdUf6MutationRate = "sorter-sgd.uf6-mutation-rate"
     [<Literal>]
     let sorterSgdMsrsOrthoPara = "sorter-sgd.msrs-ortho-para"

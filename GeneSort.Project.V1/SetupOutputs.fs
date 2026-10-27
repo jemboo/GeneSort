@@ -4,10 +4,37 @@ open System
 open FSharp.UMX
 open GeneSort.Project.V1.Catalogs
 open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 
 module SetupOutputs =
+    /// The generated inputs used by each execution family. Their IDs come directly
+    /// from the configured Setup constructors, using fully enhanced parameters.
+    let generatedFiles (configured: run) (parameters: runParameters) =
+        let outputs =
+            match configured.ExecuteFunctionName with
+            | ExecuteFunctionNames.standard | ExecuteFunctionNames.soss ->
+                [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            | ExecuteFunctionNames.sorterEval | ExecuteFunctionNames.sorterMutate ->
+                [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            | _ -> []
+        match outputs with
+        | [] -> []
+        | _ ->
+            let query = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+            outputs |> List.choose (query (setupParameters.create parameters.ParamMap))
+
+    /// Inventory of concrete inputs, with no requested-file aliases.
+    let files (configured: run) (parameters: runParameters) =
+        let recorded =
+            [geneSortDataType.SorterModelSet ""; geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+            |> List.choose (SetupInputReferences.tryRecordedInput configured.ProjectName configured.DatabaseName parameters)
+        let generated =
+            if configured.ParameterSource.IsSome || (QueryParamsCatalogSetup.tryGet configured.SetupQueryCatalogName).IsNone then []
+            else generatedFiles configured parameters
+        recorded @ (generated |> List.filter (fun query -> recorded |> List.exists (fun saved -> saved.OutputDataType = query.OutputDataType) |> not))
+
     /// Carry enhancer-supplied file references alongside the identity of the setup settings.
     let referencesFor (configured: run) (parameters: setupParameters) =
         let settings = SetupFileReferences.withoutReferences parameters

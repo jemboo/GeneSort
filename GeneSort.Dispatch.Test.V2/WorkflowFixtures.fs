@@ -112,7 +112,6 @@ let standardSource () =
         Description = "Single-execution Standard test fixture"
         AllowOverwrite = false
         Setup = {
-            FunctionName = SetupCatalogNames.standard
             ParameterSpans = [
                 ParamKeys.sorterCountPerPoolKey, ["32"]
                 ParamKeys.sorterCountPerPoolSetKey, ["128"]
@@ -149,7 +148,6 @@ let sossSource (modifiers: int list) =
         Description = "Fixed Soss test fixture"
         AllowOverwrite = false
         Setup = {
-            FunctionName = SetupCatalogNames.standard
             ParameterSpans = [
                 ParamKeys.sorterCountPerPoolKey, ["4"]
                 ParamKeys.sorterCountPerPoolSetKey, ["32"]

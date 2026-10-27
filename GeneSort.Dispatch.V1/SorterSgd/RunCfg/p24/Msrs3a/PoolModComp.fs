@@ -50,7 +50,6 @@ module PoolSelSz128 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -89,7 +88,6 @@ module Sz_2048_Of_4096 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -128,7 +126,6 @@ module PoolsSelSzTest_2_vs_256 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd

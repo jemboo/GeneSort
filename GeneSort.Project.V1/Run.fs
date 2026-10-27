@@ -63,6 +63,24 @@ type simpleRunConfig = {
     Setup: setupConfig
 }
 
+/// Evolution setup is selected by the execution family and optional source.
+type sgdSetupConfig = {
+    ParameterSpans: (string * string list) list
+    QueryCatalogName: string
+    EnhancerFunctionName: string
+}
+
+/// SGD definitions have no independently selectable setup function.
+type sgdBaseConfig = {
+    DatabaseName: string<databaseName>
+    ProjectName: string<projectName>
+    RunName: string<runName>
+    Description: string
+    AllowOverwrite: bool
+    Execution: executionConfig
+    Setup: sgdSetupConfig
+}
+
 /// Additional settings validated by SgdRun.create.
 type sgdRunConfig = {
     MakerNames: evolutionMakerNames
@@ -81,7 +99,7 @@ type simpleRun =
           runQueryCatalogName: string
           setupParameterSpans: (string * string list) list
           setupQueryCatalogName: string
-          setupFunctionName: string
+          setupFunctionName: string option
           runEnhancerFunctionName: string
           setupEnhancerFunctionName: string
           allowOverwrite: bool
@@ -130,12 +148,39 @@ module SimpleRun =
           runQueryCatalogName = runQueryCatalogName
           setupParameterSpans = setupParameterSpans
           setupQueryCatalogName = setupQueryCatalogName
-          setupFunctionName = setupFunctionName
+          setupFunctionName = Some setupFunctionName
           runEnhancerFunctionName = runEnhancerFunctionName
           setupEnhancerFunctionName = setupEnhancerFunctionName
           allowOverwrite = allowOverwrite
           executeFunctionName = executeFunctionName
           parameterSource = None
+        }
+
+    /// The shared parameter-generation data for an SGD run or continuation source.
+    let createEvolutionSource (config: sgdBaseConfig) : simpleRun =
+        for argument, value in ["ExecuteFunctionName", config.Execution.FunctionName
+                                "RunQueryCatalogName", config.Execution.QueryCatalogName
+                                "RunEnhancerFunctionName", config.Execution.EnhancerFunctionName
+                                "SetupQueryCatalogName", config.Setup.QueryCatalogName
+                                "SetupEnhancerFunctionName", config.Setup.EnhancerFunctionName] do
+            if String.IsNullOrWhiteSpace value then invalidArg argument "Function names cannot be empty."
+        if String.IsNullOrWhiteSpace %config.DatabaseName then
+            invalidArg "DatabaseName" "Database name cannot be empty."
+        {
+            dataBaseName = config.DatabaseName
+            projName = config.ProjectName
+            runName = config.RunName
+            description = config.Description
+            runParameterSpans = config.Execution.ParameterSpans
+            runQueryCatalogName = config.Execution.QueryCatalogName
+            setupParameterSpans = config.Setup.ParameterSpans
+            setupQueryCatalogName = config.Setup.QueryCatalogName
+            setupFunctionName = None
+            runEnhancerFunctionName = config.Execution.EnhancerFunctionName
+            setupEnhancerFunctionName = config.Setup.EnhancerFunctionName
+            allowOverwrite = config.AllowOverwrite
+            executeFunctionName = config.Execution.FunctionName
+            parameterSource = None
         }
 
     let databaseName (run: simpleRun) = run.dataBaseName
@@ -165,14 +210,14 @@ type sgdRun =
         }
 
 module SgdRun =
-    let create (config: simpleRunConfig) (sgd: sgdRunConfig) : sgdRun =
+    let create (config: sgdBaseConfig) (sgd: sgdRunConfig) : sgdRun =
         EvolutionMakerNames.validate sgd.MakerNames
         if String.IsNullOrWhiteSpace sgd.GenSaveIntervalsName then
             invalidArg "GenSaveIntervalsName" "Generation save interval name cannot be empty"
         if String.IsNullOrWhiteSpace sgd.GenSaveSubIntervalsName then
             invalidArg "GenSaveSubIntervalsName" "Generation summary interval name cannot be empty"
         {
-          baseRun = SimpleRun.create config
+          baseRun = SimpleRun.createEvolutionSource config
           genSaveIntervalsName = sgd.GenSaveIntervalsName
           genSaveSubIntervalsName = sgd.GenSaveSubIntervalsName
           makerNames = sgd.MakerNames
@@ -227,6 +272,10 @@ type run =
 
 
 module Run =
+    let requireSetupFunctionName (configured: run) =
+        configured.SetupFunctionName
+        |> Option.defaultWith (fun () -> invalidArg "configured" "Evolution setup is selected by its execution family and source, not a setup function name.")
+
     let withParameterSource (source: run) spans = function
         | SimpleRun value -> SimpleRun (SimpleRun.withParameterSource source.BaseRun spans value)
         | SgdRun value -> SgdRun (SgdRun.withParameterSource source.BaseRun spans value)

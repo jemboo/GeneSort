@@ -59,7 +59,6 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
             EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
         }
         Setup = {
-            FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
@@ -108,6 +107,29 @@ let ``setup spans and query catalogs survive serialization for simple and SGD ru
         Assert.Equal(original.RunQueryCatalogName, restored.RunQueryCatalogName)
         Assert.Equal(original.RunEnhancerFunctionName, restored.RunEnhancerFunctionName)
         Assert.Equal(original.SetupEnhancerFunctionName, restored.SetupEnhancerFunctionName)
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``SGD setup labels are absent and old labels do not change execution or input identities`` soss =
+    MessagePackSetup.configure ()
+    let configured = if soss then WorkflowFixtures.sossSource [0; 1] else WorkflowFixtures.standardSource ()
+    let dto = RunDto.fromDomain configured
+    Assert.True(configured.SetupFunctionName.IsNone)
+    Assert.Null(dto.SetupFunctionName)
+    let prepare configured = RunPreparation.prepare { Run = configured; FirstReplica = 0; ReplicaCount = 1 }
+    let expected = prepare configured
+    for label in [None; Some "setup.standard"; Some "setup.prefix"; Some "retired-setup"] do
+        let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
+        match label with
+        | None -> json.AsObject().Remove("SetupFunctionName") |> ignore
+        | Some value -> json.["SetupFunctionName"] <- System.Text.Json.Nodes.JsonValue.Create(value)
+        let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
+        Assert.True(restored.SetupFunctionName.IsNone)
+        Assert.Null((RunDto.fromDomain restored).SetupFunctionName)
+        let actual = prepare restored
+        Assert.True(expected.Entries = actual.Entries)
+        Assert.True(expected.SetupFiles = actual.SetupFiles)
 
 [<Fact>]
 let ``host generates independent setup and run combinations using their own query catalogs`` () =
@@ -499,27 +521,15 @@ let ``seed catalogs produce the requested pool variant`` (name: string) (expectS
 let ``workflows reject incompatible seeds before evaluating or saving`` (sossWorkflow: bool) =
     let standard = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) None
     let seed = if sossWorkflow then sorterPoolSet.Standard standard else SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss
-    let creator _ = async { return Ok seed }
-    let database =
-        { new IGeneSortDb with
-            member _.databaseName = UMX.tag "test"
-            member _.makeQueryParamsFromRunParams _ output = Some (queryParams.create (UMX.tag "test") (UMX.tag "test") None None output [||])
-            member _.doesOutPutDataExist _ _ = async { return false }
-            member _.saveAsync _ _ _ _ = failwith "An incompatible seed must not be saved"
-            member _.loadAsync _ _ = failwith "No saved seed exists"
-            member _.loadIfFoundAsync _ _ = failwith "Unexpected load"
-            member _.getRunParameters _ _ _ _ _ = failwith "Unexpected parameter read" }
     let result =
         if sossWorkflow then
-            GeneSort.Project.V1.Catalogs.Execution.SorterSgd.Soss.SgdEx_Soss.initializeAndSaveSeedPoolSet
-                creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
-                Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
-            |> Async.RunSynchronously |> Result.map ignore
+            GeneSort.Project.V1.Catalogs.Setup.SorterSgd.EvoStartCreation.evaluateSossSeed
+                emptyParameters Unchecked.defaultof<_> Unchecked.defaultof<_> seed
+            |> Result.map ignore
         else
-            GeneSort.Project.V1.Catalogs.Execution.SorterSgd.Standard.SgdEx_Standard.initializeAndSaveSeedPoolSet
-                creator database Unchecked.defaultof<_> Unchecked.defaultof<_> emptyParameters
-                Unchecked.defaultof<_> Unchecked.defaultof<_> ignore
-            |> Async.RunSynchronously |> Result.map ignore
+            GeneSort.Project.V1.Catalogs.Setup.SorterSgd.EvoStartCreation.evaluateStandardSeed
+                emptyParameters Unchecked.defaultof<_> Unchecked.defaultof<_> seed
+            |> Result.map ignore
     Assert.Contains((if sossWorkflow then "Expected a Soss" else "Expected a Standard"), errorOf result)
 
 [<Fact>]

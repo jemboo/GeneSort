@@ -27,7 +27,7 @@ module SortableTestsMakers =
             let! query =
                 storage.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
                 |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
-            return! SetupArtifacts.saveOnce storage.RunDb (QueryParams.forSetup rp query) (fun () ->
+            return! SetupArtifacts.saveOnce storage.RunDb (SetupInputReferences.resolveRecorded rp query) (fun () ->
                 makeTests rp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
         }
 

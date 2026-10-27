@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -21,9 +21,9 @@
     <Compile Include="Parameters\QueryParams.fs" />
     <Compile Include="Catalogs\Queries\Common.fs" />
     <Compile Include="Catalogs\Queries\QueryCatalogNamesSetup.fs" />
-    <Compile Include="Catalogs\Queries\SetupArtifactQueries.fs" />
 	<Compile Include="Catalogs\Queries\QueryParamsCatalogSetup.fs" />
 	<Compile Include="Catalogs\Queries\QueryParamsBuildersSetup.fs" />
+    <Compile Include="SetupInputReferences.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsCatalogRun.fs" />
     <Compile Include="Catalogs\Queries\QueryParamsBuildersRun.fs" />
     <Compile Include="QueryProperties.fs" />
@@ -32,6 +32,9 @@
     <Compile Include="Catalogs\SorterModelSet\SorterModelSetCatalogNames.fs" />
     <Compile Include="Catalogs\Setup\SetupCatalogNames.fs" />
     <Compile Include="Run.fs" />
+    <Compile Include="Runtime\RunIntervals.fs" />
+    <Compile Include="EvoStart.fs" />
+    <Compile Include="EvoPath.fs" />
     <Compile Include="Catalogs\RunParameters\RunParamFunctionCatalogs.fs" />
     <Compile Include="Catalogs\SetupParameters\SetupEnhancerCatalog.fs" />
     <Compile Include="Workflows\WorkflowDefinition.fs" />
@@ -56,7 +59,7 @@
     <Compile Include="SorterSgd\EvoContinuation.fs" />
     <Compile Include="SorterSgd\EvoAppend.fs" />
     <Compile Include="SorterSgd\EvoCondense.fs" />
-    <Compile Include="Runtime\RunIntervals.fs" />
+
     <Compile Include="Runtime\OpsUtils.fs" />
     <Compile Include="Storage\SetupArtifacts.fs" />
     <Compile Include="Catalogs\Evolution\Utils.fs" />
@@ -75,8 +78,9 @@
     <Compile Include="Catalogs\Setup\SorterEval\SortableTestsMakers.fs" />
     <Compile Include="Catalogs\Setup\SorterEval\SorterEvalSetup.fs" />
     <Compile Include="Catalogs\Setup\SorterMutate\SorterMutateSetup.fs" />
-    <Compile Include="Catalogs\Setup\SorterSgd\EvoAppendSetup.fs" />
-    <Compile Include="Catalogs\Setup\SorterSgd\SorterSgdSetup.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\EvoCheckpoint.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\EvoStartCreation.fs" />
+    <Compile Include="Catalogs\Setup\SorterSgd\EvoStartImport.fs" />
     <Compile Include="Catalogs\Setup\SetupExecutorCatalog.fs" />
     <Compile Include="Catalogs\Reports\SorterEval\Reporting.fs" />
     <Compile Include="Catalogs\Reports\SorterMutate\Reporting.fs" />
@@ -84,6 +88,12 @@
     <Compile Include="Catalogs\Reports\ReportCatalog.fs" />
     <Compile Include="Editing\RunEditor.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="EvoPath.md" />
+    <None Include="RunQueryBuilders.md" />
+    <None Include="SetupInputs.md" />
   </ItemGroup>
 
   <ItemGroup>

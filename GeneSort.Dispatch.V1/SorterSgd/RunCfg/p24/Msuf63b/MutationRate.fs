@@ -68,7 +68,6 @@ module VarModR_32 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
@@ -112,7 +111,6 @@ module VarModR_32 =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpans
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd

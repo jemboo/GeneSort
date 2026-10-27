@@ -41,7 +41,7 @@ module SorterMutateExecution =
                 let! qpModels =
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
-                let! savedModels = storage.RunDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp qpModels)
+                let! savedModels = storage.RunDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp qpModels)
                 let! modelSet = savedModels |> OutputData.asSorterModelSet
                 
                 let sortersPerSplit = 1000
@@ -55,7 +55,7 @@ module SorterMutateExecution =
                 let! qpTests =
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
                     |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
-                let! savedTests = storage.RunDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp qpTests)
+                let! savedTests = storage.RunDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp qpTests)
                 let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
                 let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
 

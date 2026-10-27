@@ -36,7 +36,7 @@ module SorterEvalSetup =
                 MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests sources.Evolution) storage allowOverwrite |> checkedSetup
                 MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests sources.Evolution) storage allowOverwrite |> checkedSetup
             }
-        SetupCatalog.get configured.SetupFunctionName context
+        SetupCatalog.get (Run.requireSetupFunctionName configured) context
 
 
     /// Uses the run's setup catalog for Standard, Merge, or Prefix setup.

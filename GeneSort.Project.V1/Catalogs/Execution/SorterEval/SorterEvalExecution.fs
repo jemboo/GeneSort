@@ -40,7 +40,7 @@ module SorterEvalExecution =
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
                 log "Loading saved SorterModelSet..."
-                let! savedModels = storage.RunDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp qpModels)
+                let! savedModels = storage.RunDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp qpModels)
                 let! modelSet = savedModels |> OutputData.asSorterModelSet
 
                 let! sWidth = 
@@ -61,7 +61,7 @@ module SorterEvalExecution =
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SortableTestsWithPrefix "")
                     |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
                 log "Loading saved Sortable Tests with prefix..."
-                let! savedTests = storage.RunDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp qpTests)
+                let! savedTests = storage.RunDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp qpTests)
                 let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 

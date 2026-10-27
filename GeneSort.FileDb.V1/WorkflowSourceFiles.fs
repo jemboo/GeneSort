@@ -21,22 +21,25 @@ module WorkflowSourceFiles =
         let definition =
             queryParams.createForRun (UMX.tag database) (UMX.tag project) (UMX.tag name)
             |> OutputDataFile.getFullOutputDataFilePath root geneSortDataMode.Project |> UMX.untag
-        try
-            let! configured = RunDefinitionFiles.loadAsync definition |> Async.AwaitTask
-            if string configured.ProjectName <> project || string configured.DatabaseName <> database || string configured.RunName <> name then
-                invalidOp "The saved library definition has an unexpected identity."
-            let queryFor = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-            let queries =
-                RunParameterGeneration.generate configured replica (replica + 1<replNumber>)
-                |> Array.filter matches
-                |> Array.map (fun row -> queryFor row outputType |> Option.defaultWith (fun () -> invalidOp "Cannot build the library query."))
-                |> Array.distinctBy (fun query -> query.Id)
-            if queries.Length <> 1 then
-                invalidOp (sprintf "Expected one matching library input, found %d. Check the library configuration." queries.Length)
-            let db = new GeneSortDbMp(root, configured.RunQueryCatalogName) :> IGeneSortDb
-            let! result = db.loadAsync geneSortDataMode.Results queries[0]
-            return result |> Result.bind convert |> Result.mapError (fun error -> sprintf "Source library %s/%s/%s: %s" project database name error)
-        with error -> return Error (sprintf "Cannot load source library %s/%s/%s: %s" project database name (error.GetBaseException().Message))
+        if not (File.Exists definition) then
+            return Error (sprintf "Missing source library %s/%s/%s. Expected definition: %s. Prepare and execute this library in the selected projects folder (%s), or copy its Project and Results folders there. This prerequisite is separate from the run being edited." project database name definition projectsFolder)
+        else
+            try
+                let! configured = RunDefinitionFiles.loadAsync definition |> Async.AwaitTask
+                if string configured.ProjectName <> project || string configured.DatabaseName <> database || string configured.RunName <> name then
+                    invalidOp "The saved library definition has an unexpected identity."
+                let queryFor = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+                let queries =
+                    RunParameterGeneration.generate configured replica (replica + 1<replNumber>)
+                    |> Array.filter matches
+                    |> Array.map (fun row -> queryFor row outputType |> Option.defaultWith (fun () -> invalidOp "Cannot build the library query."))
+                    |> Array.distinctBy (fun query -> query.Id)
+                if queries.Length <> 1 then
+                    invalidOp (sprintf "Expected one matching library input, found %d. Check the library configuration." queries.Length)
+                let db = new GeneSortDbMp(root, configured.RunQueryCatalogName) :> IGeneSortDb
+                let! result = db.loadAsync geneSortDataMode.Results queries[0]
+                return result |> Result.bind convert |> Result.mapError (fun error -> sprintf "Source library %s/%s/%s: %s" project database name error)
+            with error -> return Error (sprintf "Cannot load source library %s/%s/%s: %s" project database name (error.GetBaseException().Message))
     }
 
     let create (projectsFolder: string) =

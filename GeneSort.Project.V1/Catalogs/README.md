@@ -36,12 +36,12 @@ these references into each paired `runParameters`. Setup queries exclude the
 references from identity; run queries include them. Keep source ID metadata out
 of setup identity calculations when adding new query entry points.
 
-Prefix evaluation uses settings directly instead of setup reference IDs. Its
-setup enhancer preserves the setup settings; its run enhancer copies RNG type,
-prefix library, model type, data format, and sorter count from the paired setup.
-Run generation omits setup linkage for the prefix evaluation query catalog.
-Setup file queries exclude the evaluation method, while result queries include
-it. Both include sorter count, so changing the input count changes identity.
+Setup constructors return shared stored-file IDs directly. Run generation records
+these IDs on each execution, and prepared runs expose a unique `SetupFiles`
+inventory. There is no generated-file alias map. Prefix evaluation Results still
+use settings directly in their identity; saved references identify their inputs.
+Model IDs include sorter count. Test IDs depend on the library and data format,
+so they can be shared across model counts and evaluation methods.
 
 ## Evolution makers
 
@@ -60,6 +60,10 @@ and allows tests or other hosts to provide alternative storage.
 
 Dispatch binds its existing library databases in `WorkflowSources.fs`.
 `SgdRun.create` takes maker names in its named SGD configuration record.
+Its `sgdBaseConfig.Setup` has only parameter spans, query catalog, and enhancer.
+There is no SGD setup-function choice: execution family and source select how the
+start is prepared. The editor displays only those effective choices. Simple-run
+setup catalogs remain explicit because they select evaluation/mutation inputs.
 `sgdRunHost` resolves all three maker functions when created, so unknown names fail
 before execution. Setup supplies `workflowSources.Evolution`; mutator makers
 require only run parameters.

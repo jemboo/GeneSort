@@ -43,7 +43,6 @@ module Standard =
                 Description = "SimpleS Msuf4, width 32, four-stage PrefixA; eight pools of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
                     EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32S
@@ -92,7 +91,6 @@ module Standard =
                 Description = "SimpleS Msuf4, width 32, four-stage PrefixA; eight pools of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
                     EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32S
@@ -146,7 +144,6 @@ module Soss =
                 Description = "SimpleS Msuf4, width 32, four-stage PrefixA; eight pools of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32S
@@ -178,10 +175,10 @@ module Soss =
         let parameterSpansRun =
             [
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
-                (ParamKeys.partitionCountKey, [8] |> List.map string)
+                (ParamKeys.partitionCountKey, [8; 16;] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
                 (ParamKeys.generationsPerMergedSetKey, [100;] |> List.map string)
-                (ParamKeys.generationIntervalLastKey, [99] |> List.map string)
+                (ParamKeys.generationIntervalLastKey, [159] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.75] |> List.map string)
@@ -198,7 +195,6 @@ module Soss =
                 Description = "SimpleS Msuf4, width 32, four-stage PrefixA; eight pools of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32S
@@ -250,7 +246,6 @@ module Soss =
                 Description = "SimpleS Msuf4, width 32, four-stage PrefixA; four pools of 128 sorters"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
                     EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32S
@@ -267,4 +262,3 @@ module Soss =
                 GenSaveSubIntervalsName = GenIntervalNames.uniformInterval10
             }
         )
-

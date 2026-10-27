@@ -342,7 +342,7 @@ module SorterMutateSetup =
                 let! query =
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                     |> Result.ofOption "Failed to create QueryParams for mutant SorterModelSet."
-                return! SetupArtifacts.saveOnce storage.RunDb (QueryParams.forSetup rp query) (fun () -> asyncResult {
+                return! SetupArtifacts.saveOnce storage.RunDb (SetupInputReferences.resolveRecorded rp query) (fun () -> asyncResult {
                     let! modelStream = makeModels rp
                     let models =
                         modelStream
@@ -376,7 +376,7 @@ module SorterMutateSetup =
                 MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests sources.Evolution) storage allowOverwrite |> checkedSetup
                 MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests sources.Evolution) storage allowOverwrite |> checkedSetup
             }
-        SetupCatalog.get configured.SetupFunctionName context
+        SetupCatalog.get (Run.requireSetupFunctionName configured) context
 
     let bind sources configured storage : runFunction =
         fun rp allowOverwrite cts progress ->

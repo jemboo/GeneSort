@@ -28,7 +28,7 @@ module Utils =
             let! query =
                 genDb.makeQueryParamsFromRunParams setupRp dataType
                 |> Result.ofOption "Failed to create QueryParams for evolution Setup."
-            return! genDb.loadAsync geneSortDataMode.Setup (QueryParams.forSetup rp query)
+            return! genDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp query)
         }
 
     let loadSortableTestsWithPrefix genDb rp =
@@ -47,7 +47,7 @@ module Utils =
             let! query =
                 genDb.makeQueryParamsFromRunParams setupRp (geneSortDataType.SortableTestsWithPrefix "")
                 |> Result.ofOption "Failed to create QueryParams for Setup SortableTestsWithPrefix."
-            let! saved = SetupArtifacts.getOrCreate genDb (QueryParams.forSetup rp query) (fun () ->
+            let! saved = SetupArtifacts.getOrCreate genDb (SetupInputReferences.resolveRecorded rp query) (fun () ->
                 makeTests setupRp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
             return! OutputData.asSortableTestsWithPrefix saved
         }

@@ -56,7 +56,7 @@ module RunDto =
                 project.SetupParameterSpans
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
                 |> List.toArray
-            SetupFunctionName = project.SetupFunctionName
+            SetupFunctionName = project.SetupFunctionName |> Option.toObj
             ExecuteFunctionName = project.ExecuteFunctionName
             ParameterSource = project.ParameterSource |> Option.map (fst >> fromDomain)
             SourceParameterSpans =
@@ -74,7 +74,7 @@ module RunDto =
                 |> List.toArray
         }
 
-    let rec toDomain (dto: runDto) : run =
+    let rec private restore isParameterSource (dto: runDto) : run =
         let databaseName = dto.DataBaseName |> UMX.tag<databaseName>
         let projectName = dto.ProjectName |> UMX.tag<projectName>
         let runName = dto.RunName |> UMX.tag<runName>
@@ -91,12 +91,9 @@ module RunDto =
         let runQueryCatalogName = dto.RunQueryCatalogName
         let runEnhancerFunctionName = dto.RunEnhancerFunctionName
         let allowOverwrite = dto.AllowOverwrite
-        let setupFunctionName = dto.SetupFunctionName
         if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
             invalidArg "dto" "Run data must specify an explicit ExecuteFunctionName."
-        if System.String.IsNullOrWhiteSpace setupFunctionName then
-            invalidArg "dto" "Run data must specify an explicit SetupFunctionName."
-        let config: simpleRunConfig = {
+        let config: sgdBaseConfig = {
             DatabaseName = databaseName
             ProjectName = projectName
             RunName = runName
@@ -109,7 +106,6 @@ module RunDto =
                 EnhancerFunctionName = runEnhancerFunctionName
             }
             Setup = {
-                FunctionName = setupFunctionName
                 ParameterSpans = setupParameterSpans
                 QueryCatalogName = dto.SetupQueryCatalogName
                 EnhancerFunctionName = dto.SetupEnhancerFunctionName
@@ -117,9 +113,25 @@ module RunDto =
         }
         let configured =
           match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
+          | None, None when isParameterSource &&
+                           (System.String.IsNullOrWhiteSpace dto.SetupFunctionName ||
+                            dto.ExecuteFunctionName = ExecuteFunctionNames.standard || dto.ExecuteFunctionName = ExecuteFunctionNames.soss) ->
+            SimpleRun (SimpleRun.createEvolutionSource config)
           | None, None ->
-            SimpleRun (
-                SimpleRun.create config)
+            SimpleRun (SimpleRun.create {
+                DatabaseName = config.DatabaseName
+                ProjectName = config.ProjectName
+                RunName = config.RunName
+                Description = config.Description
+                AllowOverwrite = config.AllowOverwrite
+                Execution = config.Execution
+                Setup = {
+                    FunctionName = dto.SetupFunctionName
+                    ParameterSpans = config.Setup.ParameterSpans
+                    QueryCatalogName = config.Setup.QueryCatalogName
+                    EnhancerFunctionName = config.Setup.EnhancerFunctionName
+                }
+            })
           | saveIntervals, saveSubIntervals ->
             let requireMakerName field value =
                 if System.String.IsNullOrWhiteSpace value then
@@ -144,4 +156,8 @@ module RunDto =
             let spans =
                 dto.SourceParameterSpans |> Option.ofObj |> Option.defaultValue [||]
                 |> Array.map (fun span -> span.Key, Array.toList span.Values) |> Array.toList
-            configured |> Run.withParameterSource (toDomain source) spans
+            configured |> Run.withParameterSource (restore true source) spans
+
+    /// Older SGD setup labels are ignored. Simple workflows still require their
+    /// explicitly selected setup function; the saved field retains its wire shape.
+    let toDomain dto = restore false dto

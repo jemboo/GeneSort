@@ -86,7 +86,7 @@ module EvoCondenseSelection =
                             else Error "Condense requires nonempty, fully evaluated source pools."
                         return poolSet.GenerationNumber, float (SorterPool_Standard.getAverageScore measure pool)
                 }
-                do! if int checkpointGeneration = generation || int checkpointGeneration = generation + 1 then Ok ()
+                do! if int checkpointGeneration = generation then Ok ()
                     else Error "Source checkpoint generation does not match the requested interval."
                 do! if Double.IsFinite score then Ok () else Error "Condense requires finite average evaluation scores."
                 scores.Add(score, %id, candidate)

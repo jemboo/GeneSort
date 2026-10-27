@@ -5,7 +5,6 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.Queries
 open GeneSort.Project.V1.Catalogs.RunParameters
-open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 
@@ -51,7 +50,6 @@ type evoContinuationConfigArgs = {
     ProjectName: string<projectName>
     DatabaseName: string<databaseName>
     RunName: string<runName>
-    SetupQueryCatalogName: string
     RunQueryCatalogName: string
     Source: evoContinuationSource
     ExecutionParameterSpans: (string * string list) list
@@ -62,7 +60,6 @@ type evoContinuationConfig =
         _projectName: string<projectName>
         _databaseName: string<databaseName>
         _runName: string<runName>
-        _setupQueryCatalogName: string
         _runQueryCatalogName: string
         _source: evoContinuationSource
         _executionParameterSpans: (string * string list) list
@@ -71,7 +68,6 @@ type evoContinuationConfig =
     member this.ProjectName = this._projectName
     member this.DatabaseName = this._databaseName
     member this.RunName = this._runName
-    member this.SetupQueryCatalogName = this._setupQueryCatalogName
     member this.RunQueryCatalogName = this._runQueryCatalogName
     member this.Source = this._source
     member this.ExecutionParameterSpans = this._executionParameterSpans
@@ -80,7 +76,6 @@ type evoContinuationConfig =
         { _projectName = args.ProjectName
           _databaseName = args.DatabaseName
           _runName = args.RunName
-          _setupQueryCatalogName = args.SetupQueryCatalogName
           _runQueryCatalogName = args.RunQueryCatalogName
           _source = args.Source
           _executionParameterSpans = args.ExecutionParameterSpans }
@@ -115,8 +110,7 @@ module internal EvoContinuation =
         let reserved =
             [ParamKeys.idKey; ParamKeys.replKey; ParamKeys.selectedSorterPoolCountKey; ParamKeys.sourceExecutionIdKey; ParamKeys.sourceMutationModKey
              ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey
-             ParamKeys.sourceGenerationIntervalKey
-             ParamKeys.sourcePoolFileIdKey; ParamKeys.sourceTestsFileIdKey]
+             ParamKeys.sourceGenerationIntervalKey]
             @ SetupFileReferences.keys
         if config.ExecutionParameterSpans |> List.exists (fun (key, _) -> List.contains key reserved) then
             invalidArg "ExecutionParameterSpans" "Source identity and replica settings cannot be overridden."
@@ -141,9 +135,8 @@ module internal EvoContinuation =
             Description = sprintf "Continue %s/%s/%s from interval %d" %source.ProjectName %source.DatabaseName %source.RunName config.Source.GenerationInterval
             AllowOverwrite = false
             Setup = {
-                FunctionName = SetupCatalogNames.evoAppend
                 ParameterSpans = []
-                QueryCatalogName = config.SetupQueryCatalogName
+                QueryCatalogName = QueryCatalogNamesSetup.importedStart
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             }
             Execution = {

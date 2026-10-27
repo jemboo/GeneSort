@@ -218,13 +218,9 @@ module ParamKeys =
     [<Literal>]
     let sourceMutationModKey = "SourceMutationMod"
     [<Literal>]
-    let sourcePoolFileIdKey = "SourcePoolFileId"
-    [<Literal>]
     let sourceProjectNameKey = "SourceProjectName"
     [<Literal>]
     let sourceRunNameKey = "SourceRunName"
-    [<Literal>]
-    let sourceTestsFileIdKey = "SourceTestsFileId"
     [<Literal>]
     let stageLengthKey = "StageLength"
     [<Literal>]

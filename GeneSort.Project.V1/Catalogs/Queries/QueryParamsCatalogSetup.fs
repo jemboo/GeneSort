@@ -22,26 +22,7 @@ module QueryParamsCatalogSetup =
                 invalidOp (sprintf "A query parameter builder named '%s' is already registered." name)
             builders <- Map.add name builder builders)
 
-    let private lookup (name: string) : setupQueryParamsCatalogBuilder =
-        lock syncRoot (fun () ->
-            match Map.tryFind name builders with
-            | Some builder -> builder
-            | None -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))
+    let tryGet name = lock syncRoot (fun () -> Map.tryFind name builders)
 
-    /// Setup identities depend on setup settings, excluding source file references.
-    let get name : setupQueryParamsCatalogBuilder =
-        let builder = lookup name
-        fun project database parameters outputType ->
-            match SetupArtifactQueries.tryCreate name project database (runParameters.create parameters.ParamMap) outputType with
-            | Some query -> Some query
-            | None ->
-                builder project database (SetupFileReferences.withoutReferences parameters) outputType
-                |> Option.map (fun query ->
-                    let properties =
-                        [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey; ParamKeys.activatorMutationRateKey; ParamKeys.controlledSeedAMaxKey]
-                        |> List.fold (fun map key ->
-                            match Map.tryFind key parameters.ParamMap with
-                            | Some value -> Map.add key value map
-                            | None -> map) query.Properties
-                    if properties = query.Properties then query
-                    else queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType (Map.toArray properties))
+    let get (name: string) : setupQueryParamsCatalogBuilder =
+        tryGet name |> Option.defaultWith (fun () -> invalidOp (sprintf "No query parameter builder named '%s' is registered." name))

@@ -30,8 +30,7 @@ module SorterModelSetMakers =
             let! query =
                 storage.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                 |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
-
-            return! SetupArtifacts.saveOnce storage.RunDb (QueryParams.forSetup rp query) (fun () -> asyncResult {
+            return! SetupArtifacts.saveOnce storage.RunDb (SetupInputReferences.resolveRecorded rp query) (fun () -> asyncResult {
                 let! modelGen = SeedSorterModelGeneration.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
                                 |> SeedSorterModelGeneration.applyParameters rp
                 let baseFirstIdx = (%repl * %totalSorterCount) |> UMX.tag<sorterCount>

@@ -123,12 +123,12 @@ let ``unbound mutant setup reports an error without running tests`` () =
 let ``explicit setup function name survives serialization`` queryCatalog expected =
     MessagePackSetup.configure ()
     let configured = makeRun queryCatalog expected
-    Assert.Equal(expected, configured.SetupFunctionName)
+    Assert.Equal(Some expected, configured.SetupFunctionName)
     let dto = RunDto.fromDomain configured
     let json = MessagePackSerializer.Serialize dto |> MessagePackSerializer.ConvertToJson |> System.Text.Json.Nodes.JsonNode.Parse
 
     let restored = MessagePackSerializer.ConvertFromJson(json.ToJsonString()) |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(expected, restored.SetupFunctionName)
+    Assert.Equal(Some expected, restored.SetupFunctionName)
 
 [<Fact>]
 let ``saved runs must specify a setup function name`` () =
@@ -146,7 +146,7 @@ let ``host setup honors the run setup function and custom names round trip`` () 
     SetupCatalog.register customName (SetupFunctions.fromCatalogs SorterModelSetCatalogNames.mutantMerge SortableTestsWithPrefixCatalogNames.prefix)
     let configured = makeRun QueryCatalogNamesRun.sorterMutateStandard customName
     let restored = configured |> RunDto.fromDomain |> MessagePackSerializer.Serialize |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
-    Assert.Equal(customName, restored.SetupFunctionName)
+    Assert.Equal(Some customName, restored.SetupFunctionName)
     let calls = ResizeArray<string>()
     let bindings = context (fun label _ -> async { calls.Add label; return Ok () })
     let host = (runHost.Create restored 1).WithSetupContext(bindings)

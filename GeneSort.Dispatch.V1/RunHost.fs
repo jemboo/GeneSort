@@ -172,7 +172,7 @@ type runHost =
 
     /// Bind storage and cancellation to the complete setup selected by the run.
     member this.WithSetupContext(context: setupContext) =
-        let setup = SetupCatalog.get this.Run.SetupFunctionName context
+        let setup = SetupCatalog.get (Run.requireSetupFunctionName this.Run) context
         match this with
         | SimpleRunHost host -> SimpleRunHost { host with setup = Some setup }
         | SgdRunHost host -> SgdRunHost { host with simpleHost = { host.simpleHost with setup = Some setup } }
