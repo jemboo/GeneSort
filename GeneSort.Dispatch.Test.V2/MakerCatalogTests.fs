@@ -72,6 +72,15 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
 
 let private makeRun = makeRunWithExecuteName ExecuteFunctionNames.standard
 
+let private pathWithoutMutationSettings () =
+    let configured = makeRun EvolutionMakerNames.standard "Tests" "Mutator"
+    let parameters = emptyParameters.WithId(Some (UMX.tag (Guid.NewGuid())))
+                                    .WithRunName(Some configured.RunName).WithRepl(Some 0<replNumber>)
+                                    .WithGenerationIntervalLast(Some (UMX.tag 1))
+                                    .WithSetupSorterPoolSetId(Some (UMX.tag (Guid.NewGuid())))
+                                    .WithSetupSortableTestsWithPrefixId(Some (UMX.tag (Guid.NewGuid())))
+    EvoPath.fromParameters configured parameters |> fst
+
 let private makeSimpleRun executeName =
     SimpleRun.create {
         DatabaseName = (UMX.tag "CatalogTests")
@@ -319,16 +328,23 @@ let ``SGD execution binds required dependencies once before running`` () =
         Assert.Equal(GenIntervalNames.expInterval100_L50ss, dependencies.GenSaveIntervals.Name)
         Assert.Equal(GenIntervalNames.summaryInterval_C_1p5C, dependencies.GenSaveSubIntervals.Name)
         Assert.NotNull(dependencies.MakeMutator)
-        fun rp _ _ _ -> async {
+        fun path state _ _ _ -> async {
             Assert.Equal("CatalogTests", %storage.RunDb.databaseName)
+            Assert.Equal(path.Settings[ParamKeys.setupSorterPoolSetIdKey], string path.Start.Pool.Id)
+            Assert.Equal(path.Settings[ParamKeys.setupSortableTestsWithPrefixIdKey], string path.Start.Tests.Id)
             executions <- executions + 1
-            return Ok rp
+            return Ok state
         }))
     let host = runHost.Create (makeRunWithExecuteName name EvolutionMakerNames.standard "Tests" "Bound") 1
     Assert.Equal(1, bindings)
+    let parameters = emptyParameters.WithId(Some (UMX.tag (Guid.NewGuid())))
+                                    .WithRunName(Some host.Run.RunName).WithRepl(Some 0<replNumber>)
+                                    .WithGenerationIntervalLast(Some (UMX.tag 1))
+                                    .WithSetupSorterPoolSetId(Some (UMX.tag (Guid.NewGuid())))
+                                    .WithSetupSortableTestsWithPrefixId(Some (UMX.tag (Guid.NewGuid())))
     use cts = new System.Threading.CancellationTokenSource()
     for _ in 1..2 do
-        host.ExecuteFunction emptyParameters (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+        host.ExecuteFunction parameters (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
     Assert.Equal(1, bindings)
     Assert.Equal(2, executions)
 
@@ -412,7 +428,7 @@ let ``SGD host resolves custom configured makers`` () =
         Assert.Equal(names, host.MakerNames)
         Assert.Equal("host tests", host.MakeSortableTests sources emptyParameters |> Async.RunSynchronously |> errorOf)
         Assert.Equal("host seed", host.MakeSeedPoolSet sources emptyParameters |> Async.RunSynchronously |> errorOf)
-        Assert.Equal("host mutator", host.MakeMutator emptyParameters |> Async.RunSynchronously |> errorOf)
+        Assert.Equal("host mutator", host.MakeMutator (pathWithoutMutationSettings ()) |> Async.RunSynchronously |> errorOf)
 
 [<Theory>]
 [<InlineData("tests")>]
@@ -667,8 +683,9 @@ let ``unknown names and blank registrations report catalog errors`` () =
 let ``simple mutator maker resolves by its built-in name`` () =
     SorterSgdMakerCatalogs.registerAll ()
     SorterSgdMakerCatalogs.registerAll ()
-    let expected = MutatorMakers.makeSimpleSorterModelMutator emptyParameters |> Async.RunSynchronously |> errorOf
-    let actual = MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel emptyParameters |> Async.RunSynchronously |> errorOf
+    let path = pathWithoutMutationSettings ()
+    let expected = MutatorMakers.makeSimpleSorterModelMutator path |> Async.RunSynchronously |> errorOf
+    let actual = MutatorMakerCatalog.get MutatorMakerNames.simpleSorterModel path |> Async.RunSynchronously |> errorOf
     Assert.Equal(expected, actual)
 
 [<Fact>]
@@ -678,7 +695,7 @@ let ``mutator catalog supports custom makers and validates names`` () =
     Assert.Throws<ArgumentException>(fun () ->
         MutatorMakerCatalog.register " " (fun _ -> async { return Error "unused" })) |> ignore
     MutatorMakerCatalog.register name (fun _ -> async { return Error "custom mutator" })
-    Assert.Equal("custom mutator", MutatorMakerCatalog.get name emptyParameters |> Async.RunSynchronously |> errorOf)
+    Assert.Equal("custom mutator", MutatorMakerCatalog.get name (pathWithoutMutationSettings ()) |> Async.RunSynchronously |> errorOf)
     Assert.Throws<InvalidOperationException>(fun () ->
         MutatorMakerCatalog.register name (fun _ -> async { return Error "replacement" })) |> ignore
 

@@ -10,8 +10,9 @@ paths share the tests. Their combined SetupFiles inventory contains five stored 
 
 ## Specification and progress
 
-`evoPath` has a private constructor. Use `EvoPath.fromParameters` to resolve a
-saved or generated row against its owning `run`. It contains:
+`evoPath` has a private constructor. Setup uses `EvoPath.fromStart` with its exact
+start; `EvoPath.fromParameters` resolves saved rows and generation previews.
+It contains:
 
 - `Id` and `Replica`, taken from the existing row.
 - `Workflow`, containing selected function/catalog/maker names and run ownership.
@@ -50,10 +51,14 @@ match entry with
 ```
 
 A continuation becomes resolvable after `EvoCheckpoint.load` validates its checkpoint,
-an `EvoStartImport` function prepares its inputs, and `EvoStart.attach` records the
-pool/test IDs and starting generation. Resolve
-the updated row with `EvoPath.fromParameters`; the earlier preparation snapshot
-does not mutate itself when setup completes.
+an `EvoStartImport` function prepares its inputs, and the import branch in
+`SetupExecutorCatalog` records the pool/test IDs. `EvoStart.initializeExecution`
+then sets the starting generation and initial progress without rewriting the IDs.
+`SetupExecutorCatalog.prepare` calls `EvoPath.fromStart` once, then returns
+`Evolution (path, progress)`. The path contains the exact `evoStart`; progress
+stays separate. The shared phase boundary uses `Parameters row` for simple runs.
+There is no extra record holding a parameter row alongside the start.
+The earlier preparation snapshot does not mutate itself.
 
 ## Execution
 
@@ -65,16 +70,36 @@ let! result = execute path progress allowOverwrite cancellation log
 // result: Result<evoProgress, string>
 ```
 
-The path supplies the workflow and interval configuration. `RunStorage.forPath`
-binds Setup reads to its start's two files. Results queries continue to use the
-existing query builders, so checkpoints and reports keep their identities.
+The path supplies the workflow, interval configuration, and `path.Start` directly
+to the executor. Standard and Soss execution load `start.Tests` and `start.Pool`
+from Setup through the original database; no storage wrapper or Setup query
+reconstruction is involved. Results queries continue to use the existing query
+builders, so checkpoints and reports keep their identities.
 
-The existing evolution algorithms still use `runParameters` internally. The
-adapter joins specification and progress before calling them, then accepts only
-progress changes from their returned parameters. A changed rate, identity,
-origin, or setup reference is an error rather than a silent change to the path.
-The existing `ExecuteFunctionCatalog.bind` API uses this same typed entry point,
-so both Dispatch and WPF use it without changing their saved-file interfaces.
+Standard and Soss executors, mutator makers, and generation loops read fixed
+settings directly from `evoPath`. Execution returns only `evoProgress`, so its
+return value cannot change a rate, identity, origin, or Setup reference.
+`bindPath` passes the supplied path and progress directly to the executor.
+Execution uses the exact path returned by Setup; it calls neither `fromStart`
+nor `fromParameters` for a live path. `RunExecutionFiles.runPathsAsync` and
+`ProjectOps.executePaths` accept the selected `(evoPath, evoProgress)` pairs and
+call `ExecuteFunctionCatalog.bindPath` directly. There is no row-to-path lookup.
+
+Each UI list item holds its path and progress. Setup and execution results update
+the selected items directly, using the original selection indices, even if the
+display is sorted. Completing a phase does not reload parameter files or rebuild
+paths. Explicitly opening or refreshing saved rows calls `EvoPath.fromParameters`
+once for each row. Rows still awaiting Setup remain available for preparation.
+
+Dispatch retains the paths returned by `ProjectOps.prepareRuns`, passes them
+directly to `executePaths`, and retains the updated progress. Starting without
+live paths calls `ProjectOps.reopenPaths` at the application boundary.
+
+Storage validation compares each supplied path's parameter representation with
+its saved file before any execution. A changed file requires reopening; execution
+never silently replaces the supplied path. `RunExecutionFiles.runSavedAsync` is
+the explicit saved-row entry point for non-UI callers reopening parameter files.
+Only the existing parameter representation is written to disk.
 
 ## Saved-file compatibility
 
@@ -82,6 +107,10 @@ so both Dispatch and WPF use it without changing their saved-file interfaces.
 The adapter preserves missing optional fields, original string representations,
 unknown settings, and IDs. It does not hash a new identity or write a new schema.
 The existing `RunParametersDto` and MessagePack files remain the storage format.
+`Storage/EvolutionFiles.fs` also uses this conversion at the file-query boundary:
+checkpoint lookup and result queries retain their existing builders and IDs.
+Generation loops pass the path, progress, and output generation to that boundary;
+they do not reconstruct parameter rows themselves.
 
 ```fsharp
 let path, progress = EvoPath.fromParameters configured savedParameters

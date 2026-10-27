@@ -29,7 +29,8 @@ module EvoOrch_Standard =
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
-            (rp: runParameters)
+            (path: evoPath)
+            (state: evoProgress)
             (allowOverwrite: bool<allowOverwrite>)
             (initialPoolSet: sorterPoolSet_Standard)
             (sortableTests: sortableTests)
@@ -41,24 +42,24 @@ module EvoOrch_Standard =
         asyncResult {
             let evalType = sorterEvalType.V2
             // Mandatory parameters
-            do! ParameterValidation.validateValues SgdParameterValidation.standardEvolutionKeys rp.ParamMap |> ParameterValidation.toResult
-            let! genIntervalLast = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing generationIntervalLast."
-            let! prioritizeNewMutants = rp.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
-            let! distinctSorterHashes = rp.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
-            let! sorterCountPerPool = rp.GetSorterCountPerPool() |> Result.ofOption "Missing sorterCountPerPool."
-            let! selectedSorterCountPerPool = rp.GetSelectedSorterCountPerPool() |> Result.ofOption "Missing selectedSorterCountPerPool."
-            let! sorterChildCount = rp.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
-            let! adjustCeLengthFrequency = rp.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
-            let! srtrEvalMeasure = rp.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
-            let! collectNewSortableTests = rp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
-            let! sortedFractionThreshold = rp.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
+            do! ParameterValidation.validateValues SgdParameterValidation.standardEvolutionKeys path.Settings |> ParameterValidation.toResult
+            let! genIntervalLast = path.GetGenerationIntervalLast() |> Result.ofOption "Missing generationIntervalLast."
+            let! prioritizeNewMutants = path.GetPrioritizeNewMutants() |> Result.ofOption "Missing prioritizeNewMutants."
+            let! distinctSorterHashes = path.GetDistinctSorterHashes() |> Result.ofOption "Missing distinctSorterHashes."
+            let! sorterCountPerPool = path.GetSorterCountPerPool() |> Result.ofOption "Missing sorterCountPerPool."
+            let! selectedSorterCountPerPool = path.GetSelectedSorterCountPerPool() |> Result.ofOption "Missing selectedSorterCountPerPool."
+            let! sorterChildCount = path.GetSorterChildCount() |> Result.ofOption "Missing sorter child count."
+            let! adjustCeLengthFrequency = path.GetAdjustCeLengthFrequency() |> Result.ofOption "Missing AdjustCeLengthFrequency."
+            let! srtrEvalMeasure = path.GetSorterEvalMeasure() |> Result.ofOption "Missing sorterEvalMeasure."
+            let! collectNewSortableTests = path.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
+            let! sortedFractionThreshold = path.GetSortedFraction() |> Result.ofOption "Missing sortedFraction."
 
             // Optional parameters for Dynamic Variation and Pool Expansion
-            let optSorterCountCycle = rp.GetSorterCountCycle()
-            let optSorterCountCycleMultiplier = rp.GetSorterCountCycleMultiplier()
-            let optSorterPoolExpansionRate = rp.GetSorterPoolExpansionRate()
-            let optSorterPoolSelectionIntervals = rp.GetSorterPoolSelectionIntervals()
-            let optPoolMeasure = rp.GetSorterPoolMeasure()
+            let optSorterCountCycle = path.GetSorterCountCycle()
+            let optSorterCountCycleMultiplier = path.GetSorterCountCycleMultiplier()
+            let optSorterPoolExpansionRate = path.GetSorterPoolExpansionRate()
+            let optSorterPoolSelectionIntervals = path.GetSorterPoolSelectionIntervals()
+            let optPoolMeasure = path.GetSorterPoolMeasure()
             do! ParameterValidation.intervalIndex saveIntervals %genIntervalLast
             let genStart = initialPoolSet.GenerationNumber
             let! targetGenInt =
@@ -202,19 +203,18 @@ module EvoOrch_Standard =
                                 asyncResult {
 
                                     if shouldSaveResults && (%currentGen > 0) then
-                                        let stepRp = rp.WithGenerationCurrent(Some currentGen)
                                         log (sprintf "Saving SorterPoolSet and others at Generation %d..." %currentGen)
 
                                         // Save SorterPoolSet
                                         let! qpSorterPoolSet = 
-                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolSet "")
+                                            EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
                                         do! genDb.saveAsync geneSortDataMode.Results qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Standard |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries
                                         let! qpSummaries = 
-                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolSetSummarySet "")
+                                            EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolSetSummarySet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSetSummarySet."
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
@@ -227,7 +227,7 @@ module EvoOrch_Standard =
                                         let evalBinsCollection = 
                                             sorterPoolBinsSetSeries_Standard.create collectionId (updatedEvalBinsSetAcc |> List.rev)
                                         let! qpBinsSeries = 
-                                            genDb.makeQueryParamsFromRunParams stepRp (geneSortDataType.SorterPoolBinsSetSeries "")
+                                            EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
                                         do! genDb.saveAsync geneSortDataMode.Results qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Standard |> outputData.SorterPoolBinsSetSeries) allowOverwrite
 
@@ -236,7 +236,7 @@ module EvoOrch_Standard =
                                         //let poolSetHistory, prunedRunningMap = 
                                         //    SorterPoolSetHistory.pruneAndCreateFromPoolSet currentGen nextSorterPoolSet updatedRunningHistoryMap
                                         //let! qpHistory = 
-                                        //    genDb.MakeQueryParamsFromRunParams stepRp (outputDataType.SorterPoolSetHistory "")
+                                        //    EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolSetHistory "")
                                         //    |> Result.ofOption "Failed to create QueryParams for SorterPoolSetHistory."
                                         //do! genDb.saveAsync geneSortDataMode.Results qpHistory (poolSetHistory |> spsh.Standard |> outputData.SorterPoolSetHistory) allowOverwrite
 

@@ -36,39 +36,42 @@ module SgdEx_Soss =
         PartitionOfSortableTests.partition sossRng.NextIndex
             (UMX.cast<partitionCount, sortableTestsCount> partitionCount) sortableTests
 
-    /// Dispatches the evolution history run parameters, executes the generative loop via asyncResult,
+    /// Executes a resolved evolutionary path with separate progress via asyncResult,
     /// and manages final state serialization/reporting pipelines.
     let evaluateEvolutionRunSoss
             (makeMutator: sorterModelMutatorMaker)
             (genDb: IGeneSortDb)
             (saveIntervals: genIntervalConfig)
             (subIntervals: genIntervalConfig)
-            (rp: runParameters)
+            (path: evoPath)
+            (state: evoProgress)
             (allowOverwrite: bool<allowOverwrite>)
             (cts: CancellationTokenSource)
-            (progress: IProgress<string> option) : Async<Result<runParameters, string>> =
+            (progress: IProgress<string> option) : Async<Result<evoProgress, string>> =
 
+        let start = path.Start
         let log (msg: string) =
                 OpsUtils.report progress
-                    (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (rp |> RunParameters.getIdString) msg)
+                    (sprintf "%s [%s] %s" (StringUtils.getTimestampString()) (string path.Id) msg)
 
         asyncResult {
             try
                 do! checkCancellation cts.Token
 
-                let! partitionCount = rp.GetPartitionCount() |> Result.ofOption "Missing PartitionCount."
+                let! partitionCount = path.GetPartitionCount() |> Result.ofOption "Missing PartitionCount."
                 do! if %partitionCount > 0 then Ok () else Error "PartitionCount must be greater than zero."
 
                 log "Loading saved Setup SortableTestsWithPrefix..."
                 let! sWidth =
-                    rp.GetSortingWidth()
+                    path.GetSortingWidth()
                     |> Result.ofOption "Missing sorting width."
-                let! (sortableTests, ces) = Utils.loadSortableTestsWithPrefix genDb rp
+                let! testsData = genDb.loadAsync geneSortDataMode.Setup start.Tests
+                let! (sortableTests, ces) = OutputData.asSortableTestsWithPrefix testsData
                 let! seedSoss =
-                    rp.GetSeedSoss()
+                    path.GetSeedSoss()
                     |> Result.ofOption "Missing SeedSoss."
                 let! rngType =
-                    rp.GetRngType()
+                    path.GetRngType()
                     |> Result.ofOption "Missing RNG type."
                 let sortableTestsPartitions =
                     makeSortableTestsPartitions rngType seedSoss partitionCount sortableTests
@@ -85,26 +88,25 @@ module SgdEx_Soss =
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces
 
                 // 1. Check for existing checkpoints directly via genDb
-                let! highestPoolSetOpt = Utils.loadHighestGenSorterPoolSetSoss saveIntervals genDb rp
+                let! highestPoolSetOpt = EvolutionFiles.loadHighestSoss saveIntervals genDb path state
 
                 // 2. Resume Results or load the initial pool prepared by setup
-                let! (activeSeedPoolSet, activeRp) =
+                let! (activeSeedPoolSet, activeState) =
                     match highestPoolSetOpt with
                     | None ->
                         asyncResult {
-                            let initRp = rp.WithGenerationCurrent(Some (0 |> UMX.tag<generationNumber>))
-                            let! setupData = Utils.loadSetupOutputData genDb initRp (geneSortDataType.SorterPoolSet "")
+                            let! setupData = genDb.loadAsync geneSortDataMode.Setup start.Pool
                             let! seedSet = OutputData.asSorterPoolSetSoss setupData
-                            let! seedSet = prepareImportedPool rp seedSet
+                            let! seedSet = prepareImportedPool path seedSet
                             log "Loaded initial Setup sorterPoolSet. Beginning evolution."
-                            return seedSet, initRp.WithGenerationCurrent(Some seedSet.GenerationNumber)
+                            return seedSet, state.WithCurrentGeneration(Some seedSet.GenerationNumber)
                         }
                     | Some (highestPoolSet: sorterPoolSet_Soss) ->
                         asyncResult {
                             let currentGen = highestPoolSet.GenerationNumber
                             log (sprintf "Found existing checkpoint at Generation %d. Resuming evolution." %currentGen)
-                            let updatedRp = rp.WithGenerationCurrent(Some currentGen)
-                            return highestPoolSet, updatedRp
+                            let updatedState = state.WithCurrentGeneration(Some currentGen)
+                            return highestPoolSet, updatedState
                         }
 
                 do! checkCancellation cts.Token
@@ -113,9 +115,9 @@ module SgdEx_Soss =
                 do! (activeSeedPoolSet: sorterPoolSet_Soss).SorterPools |> Map.values
                     |> Seq.collect (fun pool -> pool.SorterPoolMembers)
                     |> Seq.map (fun memberValue -> memberValue.SorterModel)
-                    |> MutatorMakers.validateModels activeRp
-                let! (sSmm: simpleSorterModelMutator) = makeMutator activeRp
-                let! sorterModelMutator = sSmm |> sorterModelMutator.Simple |> MutatorMakers.applyParameters activeRp
+                    |> MutatorMakers.validateModels path
+                let! (sSmm: simpleSorterModelMutator) = makeMutator path
+                let! sorterModelMutator = sSmm |> sorterModelMutator.Simple |> MutatorMakers.applyPath path
 
                 let! poolSetForEvolution = asyncResult {
                     if highestPoolSetOpt.IsNone then return activeSeedPoolSet
@@ -128,7 +130,7 @@ module SgdEx_Soss =
                             sortableTestsPartitions.SortableTests |> Map.keys |> Seq.head
                             |> UMX.cast<sortableTestsPartitionId, sortableTestsSubsetId>
                         let! collectNewSortableTests =
-                            activeRp.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
+                            path.GetCollectNewSortableTests() |> Result.ofOption "Missing collectNewSortableTests."
                         log "Refreshing checkpoint evaluations at the saved pool CE lengths."
                         return activeSeedPoolSet
                                |> SorterPoolSet_Soss.clearEvaluations
@@ -142,7 +144,8 @@ module SgdEx_Soss =
                         genDb
                         saveIntervals
                         subIntervals
-                        activeRp
+                        path
+                        activeState
                         allowOverwrite
                         poolSetForEvolution
                         sortableTestsPartitions
@@ -152,7 +155,7 @@ module SgdEx_Soss =
                         log
 
                 log "evaluateEvolutionRun completed."
-                return activeRp.WithGenerationCurrent(Some finalRunResult.GenerationNumber).WithRunFinished(Some true)
+                return activeState.WithCurrentGeneration(Some finalRunResult.GenerationNumber).WithFinished(Some true)
 
             with e ->
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message

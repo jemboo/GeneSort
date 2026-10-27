@@ -60,9 +60,30 @@ copies the inputs into the destination Setup database, converting the pool when
 the destination uses a different execution family. These functions return a start;
 they do not mutate run parameters or run evolution.
 
-`EvoStart.attach` records the two references and starting generation on the existing
-parameter row. The execution ID is unchanged. Evolution consumes this start through
-`evoPath`, regardless of how the files were prepared.
+Fresh runs keep the Setup IDs already recorded by `RunParameterGeneration`.
+Only the import branches in `SetupExecutorCatalog` record the imported file IDs,
+after the checkpoint has been validated and its files prepared.
+`EvoStart.initializeExecution` sets `GenerationFirst`, `GenerationCurrent`, and
+`RunFinished`; it does not rewrite references or the execution ID. Evolution
+consumes this start through `evoPath`, regardless of how the files were prepared.
+
+`SetupExecutorCatalog.prepare` constructs the path with `EvoPath.fromStart` and
+returns `Evolution (path, progress)`. Construction checks the run, recorded IDs,
+and starting generation while retaining the exact start object. The UI and Dispatch
+retain only `(evoPath, evoProgress)` pairs and pass the same path and progress to
+`ExecuteFunctionCatalog.bindPath`. Execution returns new progress; the path stays
+unchanged. The UI opens paths when loading saved rows and then updates the selected
+items directly after each phase. Dispatch reopens through `ProjectOps.reopenPaths`
+only when it has no live paths. Execution never matches rows back to paths or
+reconstructs them. Saving uses `EvoPath.toParameters` and the existing DTO.
+
+Standard and Soss executors receive `evoPath` and `evoProgress` directly, reading
+fixed settings from the path and returning only progress. They load the start's
+`Tests` reference from Setup and load its `Pool` reference when no Results
+checkpoint exists. Execution does not build or redirect Setup queries; Results
+lookup and saving continue to use the existing Run constructors through
+`Storage/EvolutionFiles.fs`. Conversion to a parameter row happens at that file
+boundary, not in `bindPath`, mutator makers, or generation loops.
 
 Continuation configurations no longer choose a seed Setup query catalog. They use
 `QueryParamsBuildersSetup.ImportedStart.makeQueryParams`, which reads only explicit

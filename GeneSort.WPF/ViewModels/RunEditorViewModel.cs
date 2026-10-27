@@ -357,7 +357,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             var configured = RunEditor.build(Snapshot());
             if (!configured.IsOk) throw new InvalidOperationException("Correct the run definition before loading its saved parameters.");
             var rows = await RunParameterFiles.loadAllAsync(ProjectsFolder, configured.ResultValue);
-            RunParameterList.SetParameters(rows);
+            RunParameterList.SetParameters(rows, configured.ResultValue);
             loadedRun = configured.ResultValue;
             PhaseActionsChanged();
             if (updateStatus) Status = $"Loaded {rows.Length:N0} saved RunParameters for {RunName}.";
@@ -370,9 +370,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         }
     }
 
-    public Task RunSetupAsync() => RunSelectedAsync("Setup", RunSetupFiles.runAsync);
-    public Task RunExecutionAsync() => RunSelectedAsync("Execution", RunExecutionFiles.runAsync);
-    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", RunSummaryFiles.runAsync);
+    public Task RunSetupAsync() => RunSelectedAsync("Setup", (folder, configured, rows, progress) =>
+        RunSetupFiles.runAsync(folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
+    public Task RunExecutionAsync() => RunSelectedAsync("Execution", (folder, configured, rows, progress) =>
+        RunExecutionFiles.runPathsAsync(folder, configured, rows.Select(row => row.Evolution).ToArray(), progress));
+    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", (folder, configured, rows, progress) =>
+        RunSummaryFiles.runAsync(folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
 
     private void ClearSummaryReports()
     {
@@ -412,12 +415,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     }
 
     private async Task RunSelectedAsync(string phase,
-        Func<string, run, RunParameters[], IProgress<runPhaseProgress>, Task<runPhaseResult>> runPhase)
+        Func<string, run, RunParameterItem[], IProgress<runPhaseProgress>, Task<runPhaseResult>> runPhase)
     {
         // Own the busy state so all callers, including keyboard/programmatic actions, get the same guard.
         if (!CanRunSelectedRows) throw new InvalidOperationException($"Save the current definition and select saved parameter rows before running {phase}.");
         var configured = loadedRun!;
-        var selected = RunParameterList.SelectedParameters;
+        var selected = RunParameterList.SelectedItems;
         ClearSummaryReports();
         IsBusy = true;
         isRunningPhase = true;
@@ -438,12 +441,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         try
         {
             var result = await runPhase(ProjectsFolder, configured, selected, progress);
+            RunParameterList.ApplyUpdates(selected, result.Updates);
             acceptingProgress = false;
             PhaseCompleted = PhaseTotal;
             PhaseSummary = $"{phase} finished: {result.Succeeded:N0} succeeded, {result.Failed:N0} failed, {result.Skipped:N0} skipped.";
             foreach (var error in result.Errors) Issues.Add(error);
             Status = PhaseSummary;
-            await LoadRunParametersAsync(false);
+            PhaseActionsChanged();
         }
         catch (Exception error)
         {

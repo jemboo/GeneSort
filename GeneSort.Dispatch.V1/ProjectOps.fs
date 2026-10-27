@@ -9,6 +9,8 @@ open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Runtime
 open GeneSort.Project.V1.Storage
 open GeneSort.Project.V1.Runtime.OpsUtils
+open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.Execution
 
 module ProjectOps =
 
@@ -16,12 +18,14 @@ module ProjectOps =
     let private runTask skipFinished persistParameters (db: IGeneSortDb)
                         (runName: string<runName>)
                         (buildQueryParams: runParameters -> geneSortDataType -> queryParams option)
+                        parametersFor
                         executor 
                         allowOverwrite 
                         cts 
                         progress 
-                        (rp: runParameters) = 
+                        input =
         async {
+            let rp: runParameters = parametersFor input
             let id = rp.GetId() |> Option.defaultValue (Guid.Empty |> UMX.tag)
             let repl = rp.GetRepl() |> Option.defaultValue (-1 |> UMX.tag)
     
@@ -37,7 +41,7 @@ module ProjectOps =
                         )
                 
                     // 1. Unwrapping the Result manually inside the async block
-                    let! execResult = executor rp allowOverwrite cts progress
+                    let! execResult = executor input allowOverwrite cts progress
                 
                     match execResult with
                     | Error m -> 
@@ -92,7 +96,7 @@ module ProjectOps =
                     let! results = 
                         paramsArray 
                         |> Seq.map (runTask skipFinished persistParameters db runName host.QueryParamsFromRunParams
-                                            executor allowOverwrite cts progress)
+                                            id executor allowOverwrite cts progress)
                         |> fun tasks -> Async.Parallel(tasks, maxParallel)
 
                     // Unified reporting logic
@@ -115,15 +119,74 @@ module ProjectOps =
     let executeRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =
         executeBatch true true minRepl maxRepl allowOverwrite cts progress host host.ExecuteFunction maxParallel
 
-    /// Local preparation only. Persist all Setup artifacts before transferring Project and Setup.
-    let executeSetupRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =
+    /// Reopen saved executions once, at the application boundary.
+    let reopenPaths minRepl maxRepl (cts: CancellationTokenSource) progress (host: runHost) = asyncResult {
+        try
+            let! rows = host.RunDb.getRunParameters host.Run.RunName (Some minRepl) (Some maxRepl) (Some cts.Token) progress
+            return rows |> Array.map (EvoPath.fromParameters host.Run)
+        with error -> return! Error error.Message
+    }
+
+    /// Execute the supplied paths directly and retain their updated progress after successful saves.
+    let executePaths allowOverwrite cts progress (host: runHost) maxParallel (paths: (evoPath * evoProgress)[]) =
+        let paths = Array.copy paths
         asyncResult {
             try
-                let setupExecutor = host.SetupExecutor
-                return! executeBatch true true minRepl maxRepl allowOverwrite cts progress host setupExecutor maxParallel
+                if (paths |> Array.distinctBy (fun (path, _) -> path.Id)).Length <> paths.Length then
+                    invalidArg "paths" "The selection contains duplicate evolutionary paths."
+                // Validate storage before any execution; changed files require an explicit reopen.
+                for path, state in paths do
+                    EvoPath.requireRun host.Run path
+                    let row = EvoPath.toParameters path state
+                    let query = host.QueryParamsFromRunParams row (geneSortDataType.RunParameters host.Run.RunName)
+                                |> Option.defaultWith (fun () -> invalidOp "Cannot identify the RunParameter file.")
+                    let! current = host.RunDb.loadAsync geneSortDataMode.Project query |> Async.map (Result.bind OutputData.asRunParameters)
+                    do! if current = row then Ok () else Error "A selected RunParameter file has changed. Reopen the saved run before execution."
+                let execute = ExecuteFunctionCatalog.bindPath host.Storage
+                let! completed =
+                    paths |> Seq.map (fun (path, state) -> async {
+                        let mutable updatedState = state
+                        let executor (path, state) overwrite cancellation sink = async {
+                            let! result = execute path state overwrite cancellation sink
+                            return result |> Result.map (fun updated ->
+                                updatedState <- updated
+                                EvoPath.toParameters path updated)
+                        }
+                        let! result = runTask true true host.RunDb host.Run.RunName host.QueryParamsFromRunParams
+                                             (fun (path, state) -> EvoPath.toParameters path state)
+                                             executor allowOverwrite cts progress (path, state)
+                        let retained = match result with Success _ -> updatedState | _ -> state
+                        return result, (path, retained)
+                    }) |> fun tasks -> Async.Parallel(tasks, maxParallel)
+                return Array.unzip completed
+            with error -> return! Error error.Message
+        }
+
+    /// Local preparation only. Persist all Setup artifacts before transferring Project and Setup.
+    let prepareRuns minRepl maxRepl allowOverwrite cts progress (host: runHost) maxParallel =
+        asyncResult {
+            try
+                let paths = System.Collections.Concurrent.ConcurrentBag<evoPath * evoProgress>()
+                let setup = SetupExecutorCatalog.prepare WorkflowSources.defaults host.Run host.Storage
+                let setupExecutor : runFunction = fun row overwrite cancellation sink -> async {
+                    let! result = setup row overwrite cancellation sink
+                    return result |> Result.map (fun ready ->
+                        match ready with
+                        | Evolution (path, progress) -> paths.Add(path, progress)
+                        | Parameters _ -> ()
+                        RunPhaseOutput.toParameters ready)
+                }
+                let! results = executeBatch true true minRepl maxRepl allowOverwrite cts progress host setupExecutor maxParallel
+                let succeeded = results |> Array.choose (function Success (id, _, _) -> Some id | _ -> None) |> Set.ofArray
+                let saved = paths |> Seq.filter (fun (path, _) -> Set.contains path.Id succeeded) |> Seq.toArray
+                return results, saved
             with error ->
                 return! Error (sprintf "Failed to resolve or execute setup: %s" error.Message)
         }
+
+    /// Parameter-only callers deliberately discard live paths before reopening saved runs.
+    let executeSetupRuns minRepl maxRepl allowOverwrite cts progress host maxParallel =
+        prepareRuns minRepl maxRepl allowOverwrite cts progress host maxParallel |> Async.map (Result.map fst)
 
     /// Reports include completed runs and never rewrite run parameters.
     let executeReportRuns minRepl maxRepl allowOverwrite cts progress host reportExecutor maxParallel =

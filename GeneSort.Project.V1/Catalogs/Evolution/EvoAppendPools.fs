@@ -9,6 +9,7 @@ open GeneSort.Eval.V1.Sgd
 open GeneSort.Eval.V1.Sgd.Soss
 open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 
 /// Convert checkpoints during Setup and apply branch settings when loading imported pools.
@@ -32,13 +33,13 @@ module EvoAppendPools =
             converted |> SorterPoolSet_Standard.updateSorterEvals evaluations |> sorterPoolSet.Standard
         | _ -> source
 
-    let private branch (rp: runParameters) (originals: 'pool array) bounds getModifier derive retag =
-        if not (Map.containsKey ParamKeys.sourceExecutionIdKey rp.ParamMap) then Ok None
+    let private branch (path: evoPath) (originals: 'pool array) bounds getModifier derive retag =
+        if not (Map.containsKey ParamKeys.sourceExecutionIdKey path.Settings) then Ok None
         else
-            rp.GetMutationMod() |> Result.ofOption "Missing MutationMod."
+            path.GetMutationMod() |> Result.ofOption "Missing MutationMod."
             |> Result.bind (fun modifier ->
                 let targetCount =
-                    match rp.GetSorterCountPerPoolSet(), rp.GetSorterCountPerPool() with
+                    match path.GetSorterCountPerPoolSet(), path.GetSorterCountPerPool() with
                     | Some total, Some perPool when int total > 0 && int perPool > 0 && int total % int perPool = 0 ->
                         if originals.Length = 0 then Error "Cannot resize an empty imported pool set."
                         else Ok (int total / int perPool)
@@ -63,8 +64,8 @@ module EvoAppendPools =
                                 if resized then retag (D1 index) branched else branched)
                             Some (pools, newBounds))))
 
-    let prepareStandard rp (pool: sorterPoolSet_Standard) =
-        branch rp (pool.SorterPools |> Map.values |> Seq.toArray) pool.LatticeBounds
+    let prepareStandard path (pool: sorterPoolSet_Standard) =
+        branch path (pool.SorterPools |> Map.values |> Seq.toArray) pool.LatticeBounds
             (fun item -> item.MutationMod) SorterPool_Standard.deriveChildPool
             (fun tag item -> sorterPool_Standard.create item.SorterPoolId item.ParentSorterPoolId item.Name tag
                                 (item.SorterPoolMembers |> Seq.toArray) item.RawCeLength item.MutationMod)
@@ -72,8 +73,8 @@ module EvoAppendPools =
             | None -> pool
             | Some (pools, bounds) -> sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) pool.GenerationNumber bounds (Some pools))
 
-    let prepareSoss rp (pool: sorterPoolSet_Soss) =
-        branch rp (pool.SorterPools |> Map.values |> Seq.toArray) pool.LatticeBounds
+    let prepareSoss path (pool: sorterPoolSet_Soss) =
+        branch path (pool.SorterPools |> Map.values |> Seq.toArray) pool.LatticeBounds
             (fun item -> item.MutationMod) SorterPool_Soss.deriveChildPool
             (fun tag item -> sorterPool_Soss.create item.SorterPoolId item.ParentSorterPoolId item.Name tag
                                 (item.SorterPoolMembers |> Seq.toArray) item.RawCeLength item.MutationMod)

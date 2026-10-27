@@ -12,7 +12,7 @@ open GeneSort.Project.V1.Catalogs.Execution.SorterSgd.Soss
 
 /// Resolves run functions independently of setup and executor labels.
 module ExecuteFunctionCatalog =
-    let private evolution evaluate (storage: runStorage) (dependencies: sgdExecution) : runFunction =
+    let private evolution evaluate (storage: runStorage) (dependencies: sgdExecution) : evoPathFunction =
         evaluate dependencies.MakeMutator storage.RunDb dependencies.GenSaveIntervals dependencies.GenSaveSubIntervals
 
     let private syncRoot = obj ()
@@ -39,8 +39,7 @@ module ExecuteFunctionCatalog =
             | Some execute -> execute
             | None -> invalidOp (sprintf "No execute function named '%s' is registered." name))
 
-    /// Typed evolution entry point. Legacy algorithms receive the unchanged parameter
-    /// representation; only progress is allowed to cross back out of that boundary.
+    /// Evolution consumes the fixed path and separate progress directly.
     let bindPath (storage: runStorage) : evoPathFunction =
         fun path progress overwrite cts sink -> async {
             try
@@ -52,25 +51,6 @@ module ExecuteFunctionCatalog =
                         GenSaveIntervals = path.GenSaveIntervals
                         GenSaveSubIntervals = path.GenSaveSubIntervals
                     }
-                    let! result = bind (RunStorage.forPath path storage) dependencies (EvoPath.toParameters path progress) overwrite cts sink
-                    return result |> Result.map (EvoPath.progressFromParameters path)
+                    return! bind storage dependencies path progress overwrite cts sink
             with error -> return Error error.Message
         }
-
-    /// Bind execution from the saved definition; execution has no source-library or setup dependency.
-    let bind (configured: run) storage =
-        match get configured.ExecuteFunctionName with
-        | SimpleExecution bind -> bind storage
-        | SgdExecution _ ->
-            match configured with
-            | run.SimpleRun _ ->
-                invalidArg "configured" (sprintf "Execute function '%s' requires an SgdRun with a mutator and generation intervals." configured.ExecuteFunctionName)
-            | run.SgdRun _ ->
-                let execute = bindPath storage
-                fun parameters overwrite cts sink -> async {
-                    try
-                        let path, progress = EvoPath.fromParameters configured parameters
-                        let! result = execute path progress overwrite cts sink
-                        return result |> Result.map (EvoPath.toParameters path)
-                    with error -> return Error error.Message
-                }

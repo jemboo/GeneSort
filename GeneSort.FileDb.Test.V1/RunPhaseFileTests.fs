@@ -49,16 +49,67 @@ module RunPhaseFileTests =
         (db folder configured).saveAsync geneSortDataMode.Project query (outputData.RunParameters row) (UMX.tag true) |> Async.StartAsTask
     let private custom setup =
         let name = "setup-selection-" + Guid.NewGuid().ToString("N")
-        SetupExecutorCatalog.register name (fun _ _ _ -> setup)
+        SetupExecutorCatalog.register name (fun _ _ _ rp overwrite cts progress ->
+            setup rp overwrite cts progress |> Async.map (Result.map Parameters))
         // There deliberately is no ExecuteFunction registration: setup must never resolve or call it.
         let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
         { configured with ExecuteFunctionName = name } |> RunDto.toDomain
 
     let private phaseRunner = function
         | "Setup" -> RunSetupFiles.runAsync
-        | "Execution" -> RunExecutionFiles.runAsync
+        | "Execution" -> RunExecutionFiles.runSavedAsync
         | "Summary Reports" -> RunSummaryFiles.runAsync
         | name -> invalidArg "name" name
+
+    [<Theory>]
+    [<InlineData(false)>]
+    [<InlineData(true)>]
+    let ``Setup passes its exact path to execution while reopened rows retain file identities`` reopen = withFolder (fun folder -> task {
+        let name = "live-setup-" + Guid.NewGuid().ToString("N")
+        let mutable created: evoPath option = None
+        SetupExecutorCatalog.register name (fun _ configured _ row _ _ _ -> async {
+            let reference output id = queryParams.create configured.DatabaseName configured.ProjectName None None output [||] |> queryParams.withId id
+            let start = {
+                Tests = reference (geneSortDataType.SortableTestsWithPrefix "") (row.GetSetupSortableTestsWithPrefixId().Value)
+                Pool = reference (geneSortDataType.SorterPoolSet "") (row.GetSetupSorterPoolSetId().Value)
+                FirstGeneration = 0<generationNumber>
+            }
+            let path, progress = EvoPath.fromStart configured start (EvoStart.initializeExecution start row)
+            created <- Some path
+            return Ok (Evolution (path, progress))
+        })
+        ExecuteFunctionCatalog.register name (SgdExecution (fun _ _ path state _ _ _ -> async {
+            if reopen then Assert.NotSame(created.Value, path) else Assert.Same(created.Value, path)
+            Assert.Equal(created.Value.Start, path.Start)
+            return Ok (state.WithFinished(Some true))
+        }))
+        let dto = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
+        let configured = { dto with ExecuteFunctionName = name } |> RunDto.toDomain
+        let! rows = publish folder configured
+        let files = Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.sort
+        let! setup = RunSetupFiles.runAsync folder configured [|rows[0]|] null
+        Assert.Empty(setup.Errors)
+        let path, progress = Assert.Single(setup.EvolutionPaths)
+        Assert.Same(created.Value, path)
+        let! result =
+            if reopen then task {
+                let! saved = RunParameterFiles.loadAllAsync folder configured
+                let selected = saved |> Array.find (fun row -> row.GetId() = rows[0].GetId())
+                return! RunExecutionFiles.runSavedAsync folder configured [|selected|] null
+            }
+            else RunExecutionFiles.runPathsAsync folder configured [|path, progress|] null
+        Assert.Empty(result.Errors)
+        Assert.Equal(1, result.Succeeded)
+        let finishedPath, finishedProgress = Assert.Single(result.EvolutionPaths)
+        if reopen then Assert.NotSame(path, finishedPath) else Assert.Same(path, finishedPath)
+        Assert.Equal(Some false, progress.Finished)
+        Assert.Equal(Some true, finishedProgress.Finished)
+        let finished = EvoPath.toParameters finishedPath finishedProgress
+        Assert.Equal(rows[0].GetId(), finished.GetId())
+        Assert.Equal(rows[0].GetSetupSorterPoolSetId(), finished.GetSetupSorterPoolSetId())
+        Assert.Equal(rows[0].GetSetupSortableTestsWithPrefixId(), finished.GetSetupSortableTestsWithPrefixId())
+        Assert.Equal<string>(files, Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.sort)
+    })
 
     [<Fact>]
     let ``selected setup persists successes skips finished rows and continues after errors`` () = withFolder (fun folder -> task {
@@ -81,6 +132,8 @@ module RunPhaseFileTests =
         Assert.Equal(1, result.Succeeded)
         Assert.Equal(1, result.Failed)
         Assert.Equal(1, result.Skipped)
+        let index, _ = Assert.Single(result.Updates)
+        Assert.Equal(2, index)
         Assert.Contains("Missing source input", result.Errors[0])
         Assert.Equal<int>([|1; 0|], calls.ToArray())
         Assert.Equal(0, progress[0].Completed)
@@ -95,6 +148,32 @@ module RunPhaseFileTests =
         Assert.Equal(finished, after[2])
         Assert.Equal(byMutation[3], after[3])
         Assert.Empty(Directory.GetDirectories(folder, "Results", SearchOption.AllDirectories))
+    })
+
+    [<Theory>]
+    [<InlineData("changed")>]
+    [<InlineData("duplicate")>]
+    [<InlineData("workflow")>]
+    let ``direct path execution validates the whole selection before running`` scenario = withFolder (fun folder -> task {
+        let mutable calls = 0
+        let configured = custom (fun row _ _ _ -> async { return Ok row })
+        ExecuteFunctionCatalog.register configured.ExecuteFunctionName (SgdExecution (fun _ _ _ row _ _ _ -> async {
+            calls <- calls + 1
+            return Ok row
+        }))
+        let! rows = publish folder configured
+        let paths = rows |> Array.take 2 |> Array.map (EvoPath.fromParameters configured)
+        match scenario with
+        | "changed" ->
+            let! result = save folder configured (rows[1].WithMessage(Some "Changed externally"))
+            get result
+        | "duplicate" -> paths[1] <- paths[0]
+        | "workflow" ->
+            let different = { RunDto.fromDomain configured with ExecuteFunctionName = "another-executor" } |> RunDto.toDomain
+            paths[1] <- EvoPath.fromParameters different rows[1]
+        | _ -> failwith scenario
+        let! _ = Assert.ThrowsAnyAsync<Exception>(fun () -> RunExecutionFiles.runPathsAsync folder configured paths null :> Task)
+        Assert.Equal(0, calls)
     })
 
     [<Theory>]
@@ -154,7 +233,7 @@ module RunPhaseFileTests =
         let configured = custom executor
         ExecuteFunctionCatalog.register configured.ExecuteFunctionName (SimpleExecution (fun _ -> executor))
         let runPhase = phaseRunner phase
-        let otherPhase = if phase = "Execution" then RunSetupFiles.runAsync else RunExecutionFiles.runAsync
+        let otherPhase = if phase = "Execution" then RunSetupFiles.runAsync else RunExecutionFiles.runSavedAsync
         let! rows = publish folder configured
         let progress = { new IProgress<runPhaseProgress> with
                             member _.Report _ =
@@ -208,7 +287,7 @@ module RunPhaseFileTests =
         Assert.Equal(1, again.Succeeded)
         Assert.Equal<DateTime>(before, files |> Array.map File.GetLastWriteTimeUtc)
         // The actual executor consumes prepared inputs, persists completion, and leaves the other row alone.
-        let! evaluated = RunExecutionFiles.runAsync folder configured [|selected|] null
+        let! evaluated = RunExecutionFiles.runSavedAsync folder configured [|selected|] null
         Assert.Empty(evaluated.Errors)
         Assert.Equal(1, evaluated.Succeeded)
         let! saved = RunParameterFiles.loadAllAsync folder configured
@@ -217,10 +296,10 @@ module RunPhaseFileTests =
         Assert.Equal(Some true, finished.GetRunFinished())
         Assert.NotEqual(Some true, pending.GetRunFinished())
         Assert.Equal(rows |> Array.find (fun row -> row.GetId() = pending.GetId()), pending)
-        let! skipped = RunExecutionFiles.runAsync folder configured [|finished|] null
+        let! skipped = RunExecutionFiles.runSavedAsync folder configured [|finished|] null
         Assert.Equal(1, skipped.Skipped)
         Assert.Equal(0, skipped.Succeeded)
-        let! unprepared = RunExecutionFiles.runAsync folder configured [|pending|] null
+        let! unprepared = RunExecutionFiles.runSavedAsync folder configured [|pending|] null
         Assert.Equal(1, unprepared.Failed)
         Assert.Equal<DateTime>(before, files |> Array.map File.GetLastWriteTimeUtc)
         let setupFiles = Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.filter (fun path -> path.Contains(string Path.DirectorySeparatorChar + "Setup" + string Path.DirectorySeparatorChar)) |> Array.sort
@@ -266,7 +345,7 @@ module RunPhaseFileTests =
         get savedFinished
         let updates = ResizeArray<runPhaseProgress>()
         let progress = { new IProgress<runPhaseProgress> with member _.Report update = updates.Add update }
-        let! result = RunExecutionFiles.runAsync folder configured [|rows[1]; finished; resumed|] progress
+        let! result = RunExecutionFiles.runSavedAsync folder configured [|rows[1]; finished; resumed|] progress
         Assert.Equal(1, result.Succeeded)
         Assert.Equal(1, result.Skipped)
         Assert.Equal(1, result.Failed)
@@ -291,20 +370,20 @@ module RunPhaseFileTests =
     let ``SGD execution binds the saved run intervals and mutator without source makers`` () = withFolder (fun folder -> task {
         let name = "sgd-execution-selection-" + Guid.NewGuid().ToString("N")
         let mutable bound = false
-        ExecuteFunctionCatalog.register name (SgdExecution (fun _ dependencies row _ _ _ -> async {
+        ExecuteFunctionCatalog.register name (SgdExecution (fun _ dependencies path state _ _ _ -> async {
             Assert.Equal(RunIntervals.resolve (UMX.tag "test") GenIntervalNames.uniformInterval2, dependencies.GenSaveIntervals)
             Assert.Equal(RunIntervals.resolve (UMX.tag "test") GenIntervalNames.uniformInterval10, dependencies.GenSaveSubIntervals)
-            let! mutator = dependencies.MakeMutator row
+            let! mutator = dependencies.MakeMutator path
             get mutator |> ignore
             bound <- true
-            return Ok (row.WithRunFinished(Some true))
+            return Ok (state.WithFinished(Some true))
         }))
         let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
         let configured = { configured with ExecuteFunctionName = name; GenSaveIntervalsName = GenIntervalNames.uniformInterval2
                                            GenSaveSubIntervalsName = GenIntervalNames.uniformInterval10
                                            SortableTestsMakerName = "not-required-for-execution"; SeedPoolSetMakerName = "not-required-for-execution" } |> RunDto.toDomain
         let! rows = publish folder configured
-        let! result = RunExecutionFiles.runAsync folder configured [|rows[0]|] null
+        let! result = RunExecutionFiles.runSavedAsync folder configured [|rows[0]|] null
         Assert.Empty(result.Errors)
         Assert.Equal(1, result.Succeeded)
         Assert.True(bound)

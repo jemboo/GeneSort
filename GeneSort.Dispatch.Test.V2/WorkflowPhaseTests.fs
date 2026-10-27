@@ -54,6 +54,10 @@ let private hostMutator = function
     | SgdRunHost host -> host.MakeMutator
     | SimpleRunHost _ -> failwith "Expected an SGD test host."
 
+let private pathFor (host: runHost) parameters =
+    let path, _ = EvoPath.fromParameters host.Run parameters
+    path
+
 let private sourceSelection (source: run) interval selection =
     let modifiers =
         selection |> List.tryFind (fst >> ParamKeys.sourceParameterKey >> (=) ParamKeys.mutationModKey)
@@ -383,7 +387,7 @@ let ``Pool 4 debug generates split parameters and completes setup and execution`
 let ``Soss adjusts on merged evaluations but retains the scheduled partition for selection`` changed otherPartitionUnsorted partitionCount =
     let host = runHost.Create (singleSource ()) 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
-    let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let makeTests values =
         sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
@@ -432,7 +436,7 @@ let ``Soss adjusts on merged evaluations but retains the scheduled partition for
 let ``Soss length changes invalidate every subset before parent and survivor ranking`` (partitionCount: int) forReport mergedSelection =
     let host = runHost.Create (singleSource ()) 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
-    let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let values = Array.create 32 true
     values.[1] <- false
@@ -565,7 +569,7 @@ let ``Soss resume replaces legacy length caches before parent and survivor selec
         use cts = new CancellationTokenSource()
         SgdEx_Soss.evaluateEvolutionRunSoss (hostMutator host) db
             { intervals with MaxCount = Some 10 } { intervals with Method = Constant 100 }
-            rp (UMX.tag false) cts None
+            (pathFor host rp) (EvoProgress.fromParameters rp) (UMX.tag false) cts None
         |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
         let result = db.loadAsync geneSortDataMode.Results (query (UMX.tag (generation + 1)) (geneSortDataType.SorterPoolSet ""))
                      |> Async.RunSynchronously |> Result.bind OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
@@ -591,7 +595,7 @@ let ``Soss resume replaces legacy length caches before parent and survivor selec
 let ``Soss parent survivor and pool rankings follow every cycle boundary`` cached forReport partitionCount =
     let host = runHost.Create (singleSource ()) 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
-    let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     // Each test has one adjacent inversion at a different position.
     let makeTests cuts =
@@ -687,7 +691,7 @@ let ``Soss parent survivor and pool rankings follow every cycle boundary`` cache
         let reportConfig = if forReport then config else { config with Method = Constant 100 }
         let reportingDb = MemoryDb()
         let expanded =
-            EvoOrch_Soss.runSossEvolutionAsync reportingDb config reportConfig expansionRp (UMX.tag false)
+            EvoOrch_Soss.runSossEvolutionAsync reportingDb config reportConfig (pathFor host expansionRp) (EvoProgress.fromParameters expansionRp) (UMX.tag false)
                 prepared partitions prefix mutator CancellationToken.None ignore
             |> Async.RunSynchronously |> Result.defaultWith failwith
         Assert.Equal(3, int expanded.SorterPoolCount)
@@ -718,7 +722,7 @@ let ``Soss parent survivor and pool rankings follow every cycle boundary`` cache
                                        .WithDistinctSorterHashes(Some (UMX.tag false))
             let groupedDb = MemoryDb()
             let groupedResult =
-                EvoOrch_Soss.runSossEvolutionAsync groupedDb config config groupedRp (UMX.tag false)
+                EvoOrch_Soss.runSossEvolutionAsync groupedDb config config (pathFor host groupedRp) (EvoProgress.fromParameters groupedRp) (UMX.tag false)
                     groupedInput partitions prefix mutator CancellationToken.None ignore
                 |> Async.RunSynchronously |> Result.defaultWith failwith
             Assert.Equal(4, groupedResult.SorterPools.[groupedPool.SorterPoolId].SorterPoolMembers |> Seq.length)
@@ -899,7 +903,7 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
         use cts = new CancellationTokenSource()
         // Deliberately stale caller generation: checkpoint discovery must supply it.
         SgdEx_Soss.evaluateEvolutionRunSoss (hostMutator host) db config config
-            (rp.WithGenerationCurrent(Some 0<generationNumber>)) (UMX.tag false) cts None
+            (pathFor host rp) ((EvoProgress.fromParameters rp).WithCurrentGeneration(Some 0<generationNumber>)) (UMX.tag false) cts None
         |> Async.RunSynchronously |> Result.defaultWith failwith
     let uninterrupted = MemoryDb()
     initialize uninterrupted
@@ -931,7 +935,7 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
         saveCheckpoint resumed checkpoint
         resumed.PoolGenerations.Clear()
         let finished = execute resumed
-        Assert.Equal(Some 15<generationNumber>, finished.GetGenerationCurrent())
+        Assert.Equal(Some 15<generationNumber>, finished.CurrentGeneration)
         Assert.Equal<(int option * int) list>(
             [for generation in checkpointGeneration + 1 .. 15 -> Some generation, generation],
             List.ofSeq resumed.PoolGenerations)
@@ -985,7 +989,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
     let execute db saveStep =
         use cts = new CancellationTokenSource()
         SgdEx_Soss.evaluateEvolutionRunSoss (hostMutator host) db (config saveStep) (config reportEvery)
-            (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveStep)))) (UMX.tag false) cts None
+            (pathFor host (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveStep))))) (EvoProgress.fromParameters rp) (UMX.tag false) cts None
         |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
     let summaries db generation =
         let source = match load db generation (geneSortDataType.SorterPoolSetSummarySet "") with
@@ -1029,7 +1033,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
         Assert.Equal(0, generation % reportEvery)
         use cts = new CancellationTokenSource()
         let mutable cancellationTriggered = false
-        let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+        let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                       |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
         // This synchronous callback requests cancellation during the chosen step.
         // That step finishes (including its buffered report); the next loop exits.
@@ -1040,7 +1044,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
         uninterrupted.PoolGenerations.Clear()
         let outcome =
             EvoOrch_Soss.runSossEvolutionAsync uninterrupted (config saveEvery) (config reportEvery)
-                (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveEvery)))) (UMX.tag false)
+                (pathFor host (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveEvery))))) (EvoProgress.fromParameters rp) (UMX.tag false)
                 seed partitions prefix mutator cts.Token log
             |> Async.RunSynchronously
         Assert.True(cancellationTriggered)
@@ -1135,14 +1139,14 @@ let ``Soss checkpoints label the produced generation and stop exactly at the tar
     let host = runHost.Create sourceRun 1
     let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne)
                  .WithGenerationIntervalLast(Some (UMX.tag 2))
-    let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let partitions = PartitionOfSortableTests.partition (fun _ -> 0) 1<sortableTestsCount> tests
     let prefix = ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]
     let initial = pool true startingGeneration |> SorterPoolSet.asSoss |> Result.defaultWith failwith
     let memory = MemoryDb()
     let config = { intervals with MaxCount = Some 3 }
-    let final = EvoOrch_Soss.runSossEvolutionAsync memory config config rp (UMX.tag false) initial partitions prefix mutator CancellationToken.None ignore
+    let final = EvoOrch_Soss.runSossEvolutionAsync memory config config (pathFor host rp) (EvoProgress.fromParameters rp) (UMX.tag false) initial partitions prefix mutator CancellationToken.None ignore
                 |> Async.RunSynchronously |> Result.defaultWith failwith
     Assert.Equal(2, int final.GenerationNumber)
     Assert.Equal<(int option * int) list>([for gen in startingGeneration + 1 .. 2 -> Some gen, gen], List.ofSeq memory.PoolGenerations)
@@ -1231,7 +1235,7 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
             |> Async.RunSynchronously |> Result.bind OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
         Assert.Equal(2, imported.SorterPools.Count)
         Assert.Equal(sourcePoolSet, imported)
-        let executionPool = SgdEx_Soss.prepareImportedPool updated imported |> Result.defaultWith failwith
+        let executionPool = SgdEx_Soss.prepareImportedPool (pathFor host updated) imported |> Result.defaultWith failwith
         for importedPool in executionPool.SorterPools.Values do
             Assert.Equal(rp.GetMutationMod().Value, importedPool.MutationMod)
             Assert.True(sourcePools |> Array.exists (fun pool -> Some pool.SorterPoolId = importedPool.ParentSorterPoolId))
@@ -1409,14 +1413,14 @@ let ``Append source branching shares one database copy of each checkpoint and te
             if soss then
                 let saved = OutputData.asSorterPoolSetSoss savedData |> Result.defaultWith failwith
                 Assert.Equal(generation, int saved.GenerationNumber)
-                let execution = SgdEx_Soss.prepareImportedPool rp saved |> Result.defaultWith failwith
+                let execution = SgdEx_Soss.prepareImportedPool (pathFor host rp) saved |> Result.defaultWith failwith
                 Assert.Equal(sourcePoolCount, saved.SorterPools.Count)
                 Assert.Equal(int (rp.GetSorterPoolCount().Value), execution.SorterPools.Count)
                 Assert.All(execution.SorterPools.Values, fun pool -> Assert.Equal(rp.GetMutationMod().Value, pool.MutationMod))
             else
                 let saved = OutputData.asSorterPoolSetStandard savedData |> Result.defaultWith failwith
                 Assert.Equal(generation, int saved.GenerationNumber)
-                let execution = GeneSort.Project.V1.Catalogs.Evolution.EvoAppendPools.prepareStandard rp saved |> Result.defaultWith failwith
+                let execution = GeneSort.Project.V1.Catalogs.Evolution.EvoAppendPools.prepareStandard (pathFor host rp) saved |> Result.defaultWith failwith
                 Assert.Equal(sourcePoolCount, saved.SorterPools.Count)
                 Assert.Equal(int (rp.GetSorterPoolCount().Value), execution.SorterPools.Count)
                 Assert.All(execution.SorterPools.Values, fun pool -> Assert.Equal(rp.GetMutationMod().Value, pool.MutationMod))
@@ -1662,25 +1666,44 @@ let ``Soss seed setup labels its full test evaluation Merge rather than Default`
 [<InlineData(true, "results")>]
 [<InlineData(false, "missing")>]
 [<InlineData(true, "missing")>]
-let ``evolution run reads prepared inputs and prioritizes Results without setup writes`` soss source =
-    let memory = MemoryDb()
+let ``evolution loads evoStart directly and prioritizes Results without setup writes`` soss source =
+    let memory = MemoryDb(fun rp output ->
+        match output with
+        | geneSortDataType.SortableTestsWithPrefix _ -> failwith "Execution must not build a Run query for Setup tests."
+        | _ -> Some (queryParams.create (UMX.tag "test") (UMX.tag "test") None (rp.GetGenerationCurrent()) output [||]))
     let db = memory :> IGeneSortDb
-    save db geneSortDataMode.Setup 0 (geneSortDataType.SortableTestsWithPrefix "") (outputData.SortableTestsWithPrefix(tests, [||]))
+    let reference output =
+        queryParams.create (UMX.tag "test") (UMX.tag "test") None None output [||]
+        |> queryParams.withId (UMX.tag (Guid.NewGuid()))
+    let start = {
+        Tests = reference (geneSortDataType.SortableTestsWithPrefix "")
+        Pool = reference (geneSortDataType.SorterPoolSet "")
+        FirstGeneration = 0<generationNumber>
+    }
+    let persist query data = db.saveAsync geneSortDataMode.Setup query data (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
+    persist start.Tests (outputData.SortableTestsWithPrefix(tests, [||]))
     if source <> "missing" then
-        save db geneSortDataMode.Setup 0 (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet(pool soss 0))
+        persist start.Pool (outputData.SorterPoolSet(pool soss 0))
     if source = "results" then
         save db geneSortDataMode.Results 1 (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet(pool soss 1))
     memory.Writes.Clear()
-    let mutable selectedGeneration = None
-    let mutator (rp: runParameters) = async {
-        selectedGeneration <- rp.GetGenerationCurrent()
+    let mutable suppliedPath = None
+    let mutator (path: evoPath) = async {
+        suppliedPath <- Some path
         return Error "Stop before evolution"
     }
     use cts = new CancellationTokenSource()
     let run = if soss then SgdEx_Soss.evaluateEvolutionRunSoss else SgdEx_Standard.evaluateEvolutionRunStandard
-    let result = run mutator db intervals intervals parameters (UMX.tag false) cts None |> Async.RunSynchronously
+    let dto = (if soss then singleSource () else standardSource ()) |> GeneSort.Project.Mp.V1.RunDto.fromDomain
+    let configured = { dto with ProjectName = "test"; DataBaseName = "test" } |> GeneSort.Project.Mp.V1.RunDto.toDomain
+    let rp = parameters.WithId(Some (UMX.tag (Guid.NewGuid()))).WithRepl(Some 0<replNumber>).WithRunName(Some configured.RunName)
+                       .WithGenerationIntervalLast(Some (UMX.tag 1))
+                       .WithSetupSorterPoolSetId(Some start.Pool.Id).WithSetupSortableTestsWithPrefixId(Some start.Tests.Id)
+    let path, state = EvoPath.fromStart configured start rp
+    let result = run mutator db intervals intervals path state (UMX.tag false) cts None |> Async.RunSynchronously
     Assert.Equal(Error (if source = "missing" then "Missing prepared input" else "Stop before evolution"), result)
-    Assert.Equal((match source with "results" -> Some 1<generationNumber> | "setup" -> Some 0<generationNumber> | _ -> None), selectedGeneration)
+    if source = "missing" then Assert.True(suppliedPath.IsNone)
+    else Assert.Same(path, suppliedPath.Value)
     Assert.Empty(memory.Writes)
     if source = "results" then
         Assert.DoesNotContain((geneSortDataMode.Setup, geneSortDataType.SorterPoolSet ""), memory.Reads)
@@ -1691,6 +1714,7 @@ let ``evolution run reads prepared inputs and prioritizes Results without setup 
 [<InlineData(64, 0)>]
 [<InlineData(64, 7)>]
 let ``Explicit append resizes whole pools and preserves imported data`` (total: int) (modifier: int) =
+    let host = runHost.Create (singleSource ()) 1
     let sourcePools =
         [| for index in 0 .. 7 ->
             let members =
@@ -1701,10 +1725,10 @@ let ``Explicit append resizes whole pools and preserves imported data`` (total: 
                 members 150<ceLength> (UMX.tag 0) |]
     let original = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 5<generationNumber> (Dim1 8) (Some sourcePools)
     let rp =
-        Map.ofList [ParamKeys.sourceExecutionIdKey, string (Guid.NewGuid())]
+        (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne).ParamMap.Add(ParamKeys.sourceExecutionIdKey, string (Guid.NewGuid()))
         |> runParameters.create
         |> fun rp -> rp.WithSorterCountPerPoolSet(Some (UMX.tag total)).WithSorterCountPerPool(Some 4<sorterCountPerPool>).WithMutationMod(Some (UMX.tag modifier))
-    let resized = SgdEx_Soss.prepareImportedPool rp original |> Result.defaultWith failwith
+    let resized = SgdEx_Soss.prepareImportedPool (pathFor host rp) original |> Result.defaultWith failwith
     Assert.Equal(total / 4, resized.SorterPools.Count)
     Assert.Equal(Dim1 (total / 4), resized.LatticeBounds)
     Assert.Equal(original.GenerationNumber, resized.GenerationNumber)
@@ -1731,13 +1755,14 @@ let ``Explicit append resizes whole pools and preserves imported data`` (total: 
 [<InlineData(32, 0)>]
 [<InlineData(-32, 4)>]
 let ``Explicit append rejects invalid or changed pool sizes`` (total: int) (perPool: int) =
+    let host = runHost.Create (singleSource ()) 1
     let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) GeneSort.Model.Sorting.V1.sorterModel.Unknown
                           (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let sourcePool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
     let source = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [sourcePool])
-    let rp = Map.ofList [ParamKeys.sourceExecutionIdKey, "selected"] |> runParameters.create
+    let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne).ParamMap.Add(ParamKeys.sourceExecutionIdKey, "selected") |> runParameters.create
     let rp = rp.WithMutationMod(Some (UMX.tag 0)).WithSorterCountPerPoolSet(Some (UMX.tag total)).WithSorterCountPerPool(Some (UMX.tag perPool))
-    Assert.True(SgdEx_Soss.prepareImportedPool rp source |> Result.isError)
+    Assert.True(SgdEx_Soss.prepareImportedPool (pathFor host rp) source |> Result.isError)
 
 [<Fact>]
 let ``Explicit chained appends retain each immediate source identity across serialization`` () =
@@ -1803,12 +1828,12 @@ let ``Saved runs without explicit source fields remain readable`` () =
 let ``Standard checkpoints label produced generations and stop at the target`` (startingGeneration: int) =
     let host = runHost.Create (standardSource ()) 1
     let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne).WithGenerationIntervalLast(Some (UMX.tag 2))
-    let mutator = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let initial = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) (UMX.tag startingGeneration) (Dim1 1) None
     let memory = MemoryDb()
     let config = { intervals with MaxCount = Some 3 }
-    let final = EvoOrch_Standard.runStandardEvolutionAsync memory config config rp (UMX.tag false) initial tests
+    let final = EvoOrch_Standard.runStandardEvolutionAsync memory config config (pathFor host rp) (EvoProgress.fromParameters rp) (UMX.tag false) initial tests
                     (ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]) mutator CancellationToken.None ignore
                 |> Async.RunSynchronously |> Result.defaultWith failwith
     Assert.Equal(2, int final.GenerationNumber)
@@ -1986,11 +2011,11 @@ let ``Standard append starts from imported setup and resumes its resulting check
     let config = { intervals with MaxCount = Some 3 }
     let summaries = { intervals with Min = 100; MaxCount = Some 1 }
     use cts = new CancellationTokenSource()
-    let execute () = SgdEx_Standard.evaluateEvolutionRunStandard (hostMutator host) db config summaries rp (UMX.tag false) cts None
+    let execute () = SgdEx_Standard.evaluateEvolutionRunStandard (hostMutator host) db config summaries (pathFor host rp) (EvoProgress.fromParameters rp) (UMX.tag false) cts None
                      |> Async.RunSynchronously |> Result.defaultWith failwith
     let completed = execute ()
-    Assert.Equal(Some true, completed.GetRunFinished())
-    Assert.Equal(Some 2<generationNumber>, completed.GetGenerationCurrent())
+    Assert.Equal(Some true, completed.Finished)
+    Assert.Equal(Some 2<generationNumber>, completed.CurrentGeneration)
     let saved = GeneSort.Project.V1.Catalogs.Evolution.Utils.loadHighestGenSorterPoolSet config db rp
                 |> Async.RunSynchronously |> Result.defaultWith failwith |> Option.get
     Assert.Equal(2, int saved.GenerationNumber)
@@ -2351,7 +2376,7 @@ let ``Soss condense ranks per replica and copies selected Soss checkpoints into 
             let query = host.QueryParamsFromRunParams prepared (geneSortDataType.SorterPoolSet "") |> Option.get |> fun query -> SetupInputReferences.resolveRecorded prepared query
             let pool = host.RunDb.loadAsync geneSortDataMode.Setup query |> Async.RunSynchronously
                        |> Result.bind OutputData.asSorterPoolSetSoss |> Result.defaultWith failwith
-            let branched = EvoAppendPools.prepareSoss prepared pool |> Result.defaultWith failwith
+            let branched = EvoAppendPools.prepareSoss (pathFor host prepared) pool |> Result.defaultWith failwith
             Assert.Single(branched.SorterPools) |> ignore
             Assert.All(branched.SorterPools.Values, fun pool ->
                 Assert.Equal(prepared.GetMutationMod().Value, pool.MutationMod)
@@ -2391,7 +2416,7 @@ let ``Condense ranks averages per replica and branches only winners through norm
             let poolQuery = host.QueryParamsFromRunParams prepared (geneSortDataType.SorterPoolSet "") |> Option.get |> fun query -> SetupInputReferences.resolveRecorded prepared query
             let pool = host.RunDb.loadAsync geneSortDataMode.Setup poolQuery |> Async.RunSynchronously
                        |> Result.bind OutputData.asSorterPoolSetStandard |> Result.defaultWith failwith
-            let branched = GeneSort.Project.V1.Catalogs.Evolution.EvoAppendPools.prepareStandard prepared pool |> Result.defaultWith failwith
+            let branched = GeneSort.Project.V1.Catalogs.Evolution.EvoAppendPools.prepareStandard (pathFor host prepared) pool |> Result.defaultWith failwith
             Assert.Equal(1, branched.SorterPools.Count)
             Assert.Equal(prepared.GetMutationMod().Value, (branched.SorterPools |> Map.values |> Seq.exactlyOne).MutationMod)
 
@@ -2609,9 +2634,12 @@ let ``Mixed family Setup converts members and execution needs only destination d
             LoadPrefixSorterEvals = fun _ _ _ -> failwith "Continuation must copy its saved pool."
         }
     }
-    let setup = SetupExecutorCatalog.get sources host.Run host.Storage
+    let setup = SetupExecutorCatalog.prepare sources host.Run host.Storage
     Assert.Equal(0, sourceOpens)
-    let updated = setup rp (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith
+    let path, progress =
+        setup rp (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith
+        |> function Evolution (path, progress) -> path, progress | Parameters _ -> failwith "Expected an evolutionary path"
+    let updated = EvoPath.toParameters path progress
     Assert.Equal(1, sourceOpens)
     let imported = Utils.loadSetupOutputData host.RunDb updated (geneSortDataType.SorterPoolSet "") |> Async.RunSynchronously |> Result.defaultWith failwith
     let ids =
@@ -2639,10 +2667,10 @@ let ``Mixed family Setup converts members and execution needs only destination d
                    GeneSort.Model.Sorting.V1.mutatorVariant.V2
                |> GeneSort.Model.Sorting.Simple.V1.simpleSorterModelMutator.SmmMsceRandMutate |> Ok
     }
-    let finished = execute makeMutator host.RunDb shortIntervals shortIntervals updated (UMX.tag false) cts None
+    let finished = execute makeMutator host.RunDb shortIntervals shortIntervals path (EvoProgress.fromParameters updated) (UMX.tag false) cts None
                    |> Async.RunSynchronously |> Result.defaultWith failwith
-    Assert.Equal(Some true, finished.GetRunFinished())
-    Assert.Equal(Some (UMX.tag (GenIntervalConfig.getSampleAtIndex shortIntervals 2 |> Option.get)), finished.GetGenerationCurrent())
+    Assert.Equal(Some true, finished.Finished)
+    Assert.Equal(Some (UMX.tag (GenIntervalConfig.getSampleAtIndex shortIntervals 2 |> Option.get)), finished.CurrentGeneration)
     Assert.Empty(sourceMemory.Reads)
 
 [<Fact>]
@@ -2760,15 +2788,16 @@ let ``SimpleR seed generation setup and evolution execute with bounded activator
     let shortIntervals = { Name = "simple-r-test"; Min = 0; MaxCount = Some 3; Scale = 1.0; Method = Constant 1 }
     use cts = new CancellationTokenSource()
     let setup = if soss then EvoStartCreation.createSossStart configured.ProjectName configured.DatabaseName else EvoStartCreation.createStandardStart configured.ProjectName configured.DatabaseName
-    setup (fun _ -> async { return Ok (tinyTests, [||]) }) makePool db rp cts.Token
-    |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    let start = setup (fun _ -> async { return Ok (tinyTests, [||]) }) makePool db rp cts.Token
+                |> Async.RunSynchronously |> Result.defaultWith failwith
     Assert.Equal(1, loads)
     let execute = if soss then SgdEx_Soss.evaluateEvolutionRunSoss else SgdEx_Standard.evaluateEvolutionRunStandard
-    let finished = execute (hostMutator host) db shortIntervals shortIntervals rp (UMX.tag false) cts None
+    let path, state = EvoPath.fromStart host.Run start rp
+    let finished = execute (hostMutator host) db shortIntervals shortIntervals path state (UMX.tag false) cts None
                    |> Async.RunSynchronously |> Result.defaultWith failwith
-    Assert.Equal(Some true, finished.GetRunFinished())
+    Assert.Equal(Some true, finished.Finished)
     Assert.Equal(1, loads) // Execution consumes the prepared seeds and does not regenerate them.
-    let query = db.makeQueryParamsFromRunParams finished (geneSortDataType.SorterPoolSet "") |> Option.get
+    let query = EvolutionFiles.queryAtGeneration db path finished finished.CurrentGeneration.Value (geneSortDataType.SorterPoolSet "") |> Option.get
     let saved = db.loadAsync geneSortDataMode.Results query |> Async.RunSynchronously |> Result.defaultWith failwith
     let models, mutated =
         match saved with
@@ -2793,7 +2822,7 @@ let ``Dispatch SimpleR settings reject missing invalid and incompatible activato
     let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SimpleR.Standard()
     let host = runHost.Create configured 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let underlying = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let underlying = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                      |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     for invalid in [rp.WithAMax None; rp.WithAMax(Some -1); rp.WithActivatorMutationRate None;
                     rp.WithActivatorMutationRate(Some Double.NaN); rp.WithActivatorMutationRate(Some 1.1); rp.WithActivatorMutationRate(Some -0.1)] do
@@ -2803,8 +2832,8 @@ let ``Dispatch SimpleR settings reject missing invalid and incompatible activato
     Assert.True(SeedSorterModelGeneration.applyParameters (rp.WithAMax(Some -1)) generator |> Result.isError)
     let paired = SeedSorterModelGeneration.applyParameters rp generator |> Result.defaultWith failwith
                  |> GeneSort.Model.Sorting.V1.SorterModelGen.makeSorterModelFromIndex (UMX.tag 0)
-    Assert.True(MutatorMakers.validateModels (rp.WithAMax(Some 9)) [paired] |> Result.isError)
-    Assert.True(MutatorMakers.validateModels rp [paired] |> Result.isOk)
+    Assert.True(MutatorMakers.validateModels (pathFor host (rp.WithAMax(Some 9))) [paired] |> Result.isError)
+    Assert.True(MutatorMakers.validateModels (pathFor host rp) [paired] |> Result.isOk)
 
 [<Fact>]
 let ``OnePool SimpleS presets inherit probability and rate while preserving pool capacity`` () =
@@ -2889,15 +2918,16 @@ let ``SimpleS seed generation setup and evolution execute with boolean activator
     let shortIntervals = { Name = "simple-s-test"; Min = 0; MaxCount = Some 3; Scale = 1.0; Method = Constant 1 }
     use cts = new CancellationTokenSource()
     let setup = if soss then EvoStartCreation.createSossStart configured.ProjectName configured.DatabaseName else EvoStartCreation.createStandardStart configured.ProjectName configured.DatabaseName
-    setup (fun _ -> async { return Ok (tinyTests, [||]) }) makePool db rp cts.Token
-    |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    let start = setup (fun _ -> async { return Ok (tinyTests, [||]) }) makePool db rp cts.Token
+                |> Async.RunSynchronously |> Result.defaultWith failwith
     Assert.Equal(1, loads)
     let execute = if soss then SgdEx_Soss.evaluateEvolutionRunSoss else SgdEx_Standard.evaluateEvolutionRunStandard
-    let finished = execute (hostMutator host) db shortIntervals shortIntervals rp (UMX.tag false) cts None
+    let path, state = EvoPath.fromStart host.Run start rp
+    let finished = execute (hostMutator host) db shortIntervals shortIntervals path state (UMX.tag false) cts None
                    |> Async.RunSynchronously |> Result.defaultWith failwith
-    Assert.Equal(Some true, finished.GetRunFinished())
+    Assert.Equal(Some true, finished.Finished)
     Assert.Equal(1, loads) // Execution consumes the prepared seeds and does not regenerate them.
-    let query = db.makeQueryParamsFromRunParams finished (geneSortDataType.SorterPoolSet "") |> Option.get
+    let query = EvolutionFiles.queryAtGeneration db path finished finished.CurrentGeneration.Value (geneSortDataType.SorterPoolSet "") |> Option.get
     let saved = db.loadAsync geneSortDataMode.Results query |> Async.RunSynchronously |> Result.defaultWith failwith
     let models, mutated =
         match saved with
@@ -2921,7 +2951,7 @@ let ``Dispatch SimpleS settings reject missing invalid and incompatible activato
     let configured = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.SimpleS.StandardS()
     let host = runHost.Create configured 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let underlying = (hostMutator host) rp |> Async.RunSynchronously |> Result.defaultWith failwith
+    let underlying = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                      |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     for invalid in [rp.WithActivationProbability None; rp.WithActivationProbability(Some -0.1);
                     rp.WithActivationProbability(Some Double.NaN); rp.WithActivationProbability(Some 1.1);
@@ -2934,5 +2964,5 @@ let ``Dispatch SimpleS settings reject missing invalid and incompatible activato
     Assert.True(SeedSorterModelGeneration.applyParameters (rp.WithAMax(Some 3)) generator |> Result.isError)
     let paired = SeedSorterModelGeneration.applyParameters rp generator |> Result.defaultWith failwith
                  |> GeneSort.Model.Sorting.V1.SorterModelGen.makeSorterModelFromIndex (UMX.tag 0)
-    Assert.True(MutatorMakers.validateModels (rp.WithActivationProbability None) [paired] |> Result.isError)
-    Assert.True(MutatorMakers.validateModels rp [paired] |> Result.isOk)
+    Assert.True(MutatorMakers.validateModels (pathFor host (rp.WithActivationProbability None)) [paired] |> Result.isError)
+    Assert.True(MutatorMakers.validateModels (pathFor host rp) [paired] |> Result.isOk)

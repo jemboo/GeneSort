@@ -286,10 +286,11 @@ module RunEditorTests =
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let original = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> Array.head
         let parameters = runParameters.create (original.ParamMap.Add(key, value))
+        let path, progress = EvoPath.fromParameters configured parameters
         let intervals = GenIntervalRegistry.genIntervalConfigsDict[GenIntervalNames.uniformInterval5_L5]
         // Invalid settings must be rejected before any storage, pool or mutator is accessed.
         let result =
-            EvoOrch_Standard.runStandardEvolutionAsync Unchecked.defaultof<_> intervals intervals parameters (UMX.tag false)
+            EvoOrch_Standard.runStandardEvolutionAsync Unchecked.defaultof<_> intervals intervals path progress (UMX.tag false)
                 Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_> Unchecked.defaultof<_>
                 Threading.CancellationToken.None ignore |> Async.RunSynchronously
         match result with

@@ -14,8 +14,8 @@ type evoStart = {
 }
 
 module EvoStart =
-    let attach (start: evoStart) (parameters: runParameters) =
-        SetupInputReferences.recordFiles [start.Tests; start.Pool] parameters
-        |> fun rp -> rp.WithGenerationFirst(Some start.FirstGeneration)
-                        .WithGenerationCurrent(Some start.FirstGeneration)
-                        .WithRunFinished(Some false)
+    /// Initialize the execution origin and progress; recorded file references stay untouched.
+    let initializeExecution (start: evoStart) (parameters: runParameters) =
+        parameters.WithGenerationFirst(Some start.FirstGeneration)
+                  .WithGenerationCurrent(Some start.FirstGeneration)
+                  .WithRunFinished(Some false)

@@ -66,7 +66,7 @@ start is prepared. The editor displays only those effective choices. Simple-run
 setup catalogs remain explicit because they select evaluation/mutation inputs.
 `sgdRunHost` resolves all three maker functions when created, so unknown names fail
 before execution. Setup supplies `workflowSources.Evolution`; mutator makers
-require only run parameters.
+require only `evoPath`, reading its fixed settings directly.
 
 ## Storage and phase functions
 
@@ -78,25 +78,43 @@ FileDb or Dispatch. The former contract-only `GeneSort.Db.V1` project has been r
 
 - `runFunction`: a bound setup, execution, or report phase, accepting run parameters,
   overwrite policy, cancellation, and progress.
+- `runPhaseOutput`: `Evolution (evoPath, evoProgress)` for evolution, or
+  `Parameters runParameters` for simple runs. These alternatives let the shared
+  phase runner persist either kind without duplicating a path's start or parameters.
+- `runPhaseFunction`: a phase returning that output from a selected parameter row.
+- `evoPathFunction`: execution accepts a path and progress, returning new progress.
 - `runStorage`: the destination database and its run-query builder.
 - `sgdExecution`: the required mutator maker and generation save intervals.
 - `executionBinding`: either a simple storage binding or an SGD binding that also
-  requires `sgdExecution`.
+  requires `sgdExecution` and produces an `evoPathFunction`.
 - `workflowSources`: the source database opener and saved-library loaders used by
   setup and source-dependent reports.
 
 Execution catalogs register `SimpleExecution` or `SgdExecution` builders. A host
 binds its execution function once. A simple run cannot bind an SGD entry;
 `WithRunDb` creates a new binding while previously obtained functions retain their
-original database. The batch runner invokes `runFunction` directly, without an
-executor interface or a host parameter.
+original database. Parameter-based phases use `runFunction`; live evolution uses
+`bindPath` with the supplied `evoPath` and progress. The UI and Dispatch keep those
+values between phases; only opening saved runs reconstructs them.
+Standard and Soss executors and generation loops consume those values directly.
+Only the storage boundary (`EvolutionFiles` for result queries and checkpoint
+lookup, existing phase persistence for parameter files) joins them into saved
+`runParameters`. The query builders, IDs, DTOs, and saved files stay unchanged.
 
 Setup and report factories accept source services, a run configuration, and its
 `runStorage`; they never receive `runHost`. Dispatch supplies its concrete
 `WorkflowSources.defaults` when binding phases:
 
 ```fsharp
-let setup = SetupExecutorCatalog.get sources configured storage
+let setup = SetupExecutorCatalog.prepare sources configured storage
+let execute = ExecuteFunctionCatalog.bindPath storage
+let! ready = setup parameters overwrite cancellation progress
+match ready with
+| Ok (Evolution (path, state)) ->
+    let! result = execute path state overwrite cancellation progress
+    // Persist EvoPath.toParameters path updatedState on success.
+    ()
+| _ -> ()
 let report = ReportCatalog.get ReportCatalog.evolutionSummary sources configured storage
 ```
 

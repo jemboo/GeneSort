@@ -63,6 +63,7 @@
     <Compile Include="Runtime\OpsUtils.fs" />
     <Compile Include="Storage\SetupArtifacts.fs" />
     <Compile Include="Catalogs\Evolution\Utils.fs" />
+    <Compile Include="Storage\EvolutionFiles.fs" />
     <Compile Include="Catalogs\Evolution\EvoAppendPools.fs" />
     <Compile Include="Catalogs\Execution\SorterSgd\Standard\EvoOrch_Standard.fs" />
     <Compile Include="Catalogs\Execution\SorterSgd\Standard\SgdEx_Standard.fs" />

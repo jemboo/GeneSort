@@ -9,7 +9,7 @@ open GeneSort.Model.Sorting.Simple.V1
 
 type sortableTestsMaker = evolutionSetupSources -> runParameters -> Async<Result<sortableTests * ce array, string>>
 type seedSorterPoolSetMaker = evolutionSetupSources -> runParameters -> Async<Result<sorterPoolSet, string>>
-type sorterModelMutatorMaker = runParameters -> Async<Result<simpleSorterModelMutator, string>>
+type sorterModelMutatorMaker = evoPath -> Async<Result<simpleSorterModelMutator, string>>
 
 module private MakerCatalog =
     let register catalogName (name: string) value (catalog: Map<string, 'T> ref) syncRoot =

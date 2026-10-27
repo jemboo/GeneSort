@@ -112,7 +112,10 @@ module RunSummaryFiles =
     let runAsync projectsFolder configured selected progress =
         RunPhaseFiles.runAsync {
             Name = "Summary Reports"
-            Bind = ReportCatalog.get ReportCatalog.evolutionSummary (WorkflowSourceFiles.create projectsFolder)
+            ToParameters = id
+            Bind = fun configured storage ->
+                let report = ReportCatalog.get ReportCatalog.evolutionSummary (WorkflowSourceFiles.create projectsFolder) configured storage
+                fun row overwrite cts sink -> report row overwrite cts sink |> Async.map (Result.map Parameters)
             SkipFinished = false
             SaveParameters = false
         } projectsFolder configured selected progress

@@ -34,12 +34,21 @@ let private first () =
 [<Theory>]
 [<InlineData(0)>]
 [<InlineData(100)>]
-let ``attaching a prepared start preserves execution identity and round trips through a path`` (generation: int) =
-    let configured, original = first ()
+let ``initializing execution preserves recorded references and round trips through a path`` (generation: int) =
+    let configured, saved = first ()
+    // Rewriting the same GUID would normalize its spelling; execution initialization must leave it alone.
+    let original =
+        [ParamKeys.setupSorterPoolSetIdKey; ParamKeys.setupSortableTestsWithPrefixIdKey]
+        |> List.fold (fun values key -> Map.add key (saved.ParamMap[key].ToUpperInvariant()) values) saved.ParamMap
+        |> runParameters.create
+        |> fun rp -> rp.WithGenerationCurrent(Some 250<generationNumber>).WithRunFinished(Some true)
     let path, _ = EvoPath.fromParameters configured original
     let start = { path.Start with FirstGeneration = UMX.tag generation }
-    let updated = EvoStart.attach start original
+    let updated = EvoStart.initializeExecution start original
     let reopened, progress = EvoPath.fromParameters configured updated
+    let unchanged (rp: runParameters) =
+        rp.ParamMap |> Map.filter (fun key _ -> not (List.contains key [ParamKeys.generationFirstKey; ParamKeys.generationCurrentKey; ParamKeys.runFinishedKey]))
+    Assert.True(unchanged original = unchanged updated)
     Assert.Equal(original.GetId(), updated.GetId())
     Assert.Equal(original.GetMutationMod(), updated.GetMutationMod())
     Assert.Equal(start.Pool.Id, reopened.Start.Pool.Id)
@@ -94,7 +103,6 @@ let ``advancing progress leaves path and all setup bindings unchanged`` () =
     let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
     Assert.Equal((query original (geneSortDataType.RunParameters configured.RunName) |> Option.get).Id,
                  (query updated (geneSortDataType.RunParameters configured.RunName) |> Option.get).Id)
-    Assert.Throws<ArgumentException>(fun () -> EvoPath.progressFromParameters path (updated.WithActivatorMutationRate(Some 0.9)) |> ignore) |> ignore
 
 [<Fact>]
 let ``saved inputs reopen after their setup catalog is retired`` () =
@@ -138,41 +146,111 @@ let private unusedDb () =
         member _.doesOutPutDataExist _ _ = failwith "Unexpected probe" }
 
 [<Fact>]
-let ``path storage uses planned setup inputs but leaves result queries untouched`` () =
+let ``typed result queries preserve saved parameter identity and separate activator rates`` () =
+    let batch = prepared ()
+    let query = QueryParamsCatalogRun.get batch.Run.RunQueryCatalogName batch.Run.ProjectName batch.Run.DatabaseName
+    let mutable expectedRow = None
+    let db = { new IGeneSortDb with
+        member _.databaseName = batch.Run.DatabaseName
+        member _.makeQueryParamsFromRunParams row output =
+            Assert.Equal(expectedRow.Value, row)
+            query row output
+        member _.getRunParameters _ _ _ _ _ = failwith "Unexpected enumeration"
+        member _.saveAsync _ _ _ _ = failwith "Unexpected write"
+        member _.loadAsync _ _ = failwith "Unexpected read"
+        member _.loadIfFoundAsync _ _ = failwith "Unexpected read"
+        member _.doesOutPutDataExist _ _ = failwith "Unexpected probe" }
+    for generation in [0<generationNumber>; 100<generationNumber>] do
+        for output in [geneSortDataType.RunParameters batch.Run.RunName; geneSortDataType.SorterPoolSet "";
+                       geneSortDataType.SorterPoolSetSummarySet ""; geneSortDataType.SorterPoolBinsSetSeries ""] do
+            let ids = batch.Entries |> Array.map (fun (_, row) ->
+                let path, state = EvoPath.fromParameters batch.Run row
+                let saved = row.WithGenerationCurrent(Some generation)
+                expectedRow <- Some saved
+                let actual = EvolutionFiles.queryAtGeneration db path state generation output |> Option.get
+                let expected = query saved output |> Option.get
+                Assert.Equal(expected, actual)
+                actual.Id)
+            Assert.Equal(8, ids |> Array.distinct |> Array.length)
+
+[<Fact>]
+let ``typed execution receives the original database and exact start references`` () =
     let configured, row = first ()
-    let path, _ = EvoPath.fromParameters configured row
     let observed = ResizeArray<geneSortDataMode * queryParams>()
     let db = { new IGeneSortDb with
         member _.databaseName = configured.DatabaseName
-        member _.makeQueryParamsFromRunParams _ _ = None
+        member _.makeQueryParamsFromRunParams _ _ = failwith "Unexpected query"
         member _.getRunParameters _ _ _ _ _ = failwith "Unexpected enumeration"
         member _.saveAsync _ _ _ _ = failwith "Unexpected write"
         member _.loadAsync mode query = async { observed.Add(mode, query); return Error "Read observed" }
         member _.loadIfFoundAsync _ _ = failwith "Unexpected read"
         member _.doesOutPutDataExist _ _ = failwith "Unexpected probe"
     }
-    let storage = RunStorage.forPath path (runStorage.create { RunDb = db; QueryParamsFromRunParams = fun _ _ -> None })
+    let storage = runStorage.create { RunDb = db; QueryParamsFromRunParams = fun _ _ -> None }
     let request = queryParams.create configured.DatabaseName configured.ProjectName (Some 0<replNumber>) (Some 100<generationNumber>) (geneSortDataType.SorterPoolSet "") [|"Checkpoint", "100"|]
-    storage.RunDb.loadAsync geneSortDataMode.Setup request |> Async.RunSynchronously |> ignore
-    storage.RunDb.loadAsync geneSortDataMode.Results request |> Async.RunSynchronously |> ignore
-    Assert.Equal((EvoPath.setupQuery request.OutputDataType path).Id, (snd observed[0]).Id)
-    Assert.Equal(request, snd observed[1])
+    let name = "evo-start-test-" + Guid.NewGuid().ToString("N")
+    ExecuteFunctionCatalog.register name (SgdExecution (fun supplied _ path state _ _ _ -> async {
+        let start = path.Start
+        Assert.Same(db, supplied.RunDb)
+        let! _ = supplied.RunDb.loadAsync geneSortDataMode.Setup start.Tests
+        let! _ = supplied.RunDb.loadAsync geneSortDataMode.Setup start.Pool
+        let! _ = supplied.RunDb.loadAsync geneSortDataMode.Results request
+        return Ok state
+    }))
+    let configured = { RunDto.fromDomain configured with ExecuteFunctionName = name } |> RunDto.toDomain
+    let path, progress = EvoPath.fromParameters configured row
+    use cts = new CancellationTokenSource()
+    ExecuteFunctionCatalog.bindPath storage path progress (UMX.tag false) cts None
+    |> Async.RunSynchronously |> Result.defaultWith failwith |> ignore
+    Assert.Equal<list<geneSortDataMode * queryParams>>(
+        [geneSortDataMode.Setup, path.Start.Tests; geneSortDataMode.Setup, path.Start.Pool; geneSortDataMode.Results, request],
+        List.ofSeq observed)
 
-[<Theory>]
-[<InlineData(false)>]
-[<InlineData(true)>]
-let ``typed executor returns progress and rejects changes to settings`` changeSettings =
+[<Fact>]
+let ``typed executor returns only progress and retains fixed settings`` () =
     let configured, row = first ()
     let name = "evo-path-test-" + Guid.NewGuid().ToString("N")
-    ExecuteFunctionCatalog.register name (SgdExecution (fun _ _ rp _ _ _ -> async {
-        return Ok (if changeSettings then rp.WithActivatorMutationRate(Some 0.9) else rp.WithGenerationCurrent(Some 100<generationNumber>).WithRunFinished(Some true))
+    ExecuteFunctionCatalog.register name (SgdExecution (fun _ _ _ state _ _ _ -> async {
+        return Ok (state.WithCurrentGeneration(Some 100<generationNumber>).WithFinished(Some true))
     }))
     let configured = { RunDto.fromDomain configured with ExecuteFunctionName = name } |> RunDto.toDomain
     let path, progress = EvoPath.fromParameters configured row
     let storage = runStorage.create { RunDb = unusedDb (); QueryParamsFromRunParams = fun _ _ -> None }
     use cts = new CancellationTokenSource()
-    let result = ExecuteFunctionCatalog.bindPath storage path progress (UMX.tag false) cts None |> Async.RunSynchronously
-    match result, changeSettings with
-    | Ok updated, false -> Assert.Equal(Some true, updated.Finished)
-    | Error message, true -> Assert.Contains("changed the evolutionary specification", message)
-    | _ -> failwithf "Unexpected result: %A" result
+    let updated = ExecuteFunctionCatalog.bindPath storage path progress (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith
+    Assert.Equal(Some true, updated.Finished)
+    Assert.Equal(Some 100<generationNumber>, updated.CurrentGeneration)
+    Assert.Equal(row.GetActivatorMutationRate(), path.GetActivatorMutationRate())
+
+[<Fact>]
+let ``live execution retains the exact path and progress is separate`` () =
+    let configured, row = first ()
+    let start = (EvoPath.fromParameters configured row |> fst).Start
+    let row = EvoStart.initializeExecution start row
+    let name = "live-start-" + Guid.NewGuid().ToString("N")
+    let mutable calls = 0
+    let mutable expectedPath = None
+    let mutable expectedProgress = None
+    ExecuteFunctionCatalog.register name (SgdExecution (fun _ _ actual parameters _ _ _ -> async {
+        Assert.Same(expectedPath.Value, actual)
+        Assert.Same(expectedProgress.Value, parameters)
+        Assert.Same(start, actual.Start)
+        calls <- calls + 1
+        return Ok (parameters.WithCurrentGeneration(Some 100<generationNumber>))
+    }))
+    let configured = { RunDto.fromDomain configured with ExecuteFunctionName = name; RunQueryCatalogName = "unavailable-live-query" } |> RunDto.toDomain
+    let storage = runStorage.create { RunDb = unusedDb (); QueryParamsFromRunParams = fun _ _ -> failwith "Unexpected query" }
+    let path, progress = EvoPath.fromStart configured start row
+    expectedPath <- Some path
+    expectedProgress <- Some progress
+    let execute = ExecuteFunctionCatalog.bindPath storage
+    use cts = new CancellationTokenSource()
+    let updated = execute path progress (UMX.tag false) cts None |> Async.RunSynchronously |> Result.defaultWith failwith
+    Assert.Same(start, path.Start)
+    Assert.Equal(Some 0<generationNumber>, progress.CurrentGeneration)
+    Assert.Equal(Some 100<generationNumber>, updated.CurrentGeneration)
+    Assert.Equal(row.GetId(), (EvoPath.toParameters path updated).GetId())
+    // Inconsistent references are rejected when Setup constructs the path, before execution.
+    let stale = row.WithSetupSorterPoolSetId(Some (UMX.tag (Guid.NewGuid())))
+    Assert.Throws<ArgumentException>(fun () -> EvoPath.fromStart configured start stale |> ignore) |> ignore
+    Assert.Equal(1, calls)

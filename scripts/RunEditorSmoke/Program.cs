@@ -396,6 +396,7 @@ internal static partial class Program
                 }
             }
             CheckThemedControls(view, args.FirstOrDefault());
+            CheckDirectEvolutionSelection();
             tabs.SelectedIndex = 0;
             view.Width = 700; view.Height = 400;
             Layout(view);

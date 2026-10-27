@@ -42,6 +42,10 @@ public partial class RunParameterListView : UserControl
 
     private void ModelChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // Phase completion keeps live path objects while clearing the completed selection.
+        if (e.PropertyName == nameof(RunParameterListViewModel.SelectedCount)
+            && model?.SelectedCount == 0 && ParameterItems.SelectedItems.Count > 0)
+            ParameterItems.SelectedItems.Clear();
         if (e.PropertyName == nameof(RunParameterListViewModel.Keys)) BuildColumns();
         if (e.PropertyName is nameof(RunParameterListViewModel.SortKey) or nameof(RunParameterListViewModel.Descending)) UpdateHeaders();
     }

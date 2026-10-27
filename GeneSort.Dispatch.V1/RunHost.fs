@@ -112,7 +112,15 @@ type runHost =
             let bind =
                 match execution with
                 | SimpleExecution bind -> bind
-                | SgdExecution bind -> fun storage -> bind storage dependencies
+                | SgdExecution bind -> fun storage ->
+                    let execute = bind storage dependencies
+                    fun parameters overwrite cts progress -> async {
+                        try
+                            let path, state = EvoPath.fromParameters run parameters
+                            let! result = execute path state overwrite cts progress
+                            return result |> Result.map (EvoPath.toParameters path)
+                        with error -> return Error error.Message
+                    }
             let simpleHost = makeSimpleHost (SgdRun.baseRun value) bind
             SgdRunHost {
                 simpleHost = simpleHost

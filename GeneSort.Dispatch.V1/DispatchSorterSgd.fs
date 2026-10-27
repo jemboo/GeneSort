@@ -5,6 +5,7 @@ open System.Runtime
 open System.Threading
 open FSharp.UMX
 open GeneSort.Project.V1
+open GeneSort.Project.V1.Runtime
 open GeneSort.Project.V1.Catalogs.Setup
 open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Dispatch.V1
@@ -51,8 +52,10 @@ module DispatchSorterSgd =
     let private host: runHost = runHost.Create (RunCfg.p32.Msuf4a.SimpleS.Soss.ActivatorRates ()) 8
     let private minReplica = 0<replNumber>
     let private maxReplica = 1<replNumber>
+    let mutable private evolutionPaths : (evoPath * evoProgress)[] option = None
 
     let private initializeParameters() =
+        evolutionPaths <- None
         ParamOps.initRunAndParamFiles host.RunDb (Some progress) host.Run
             minReplica maxReplica host.AllowOverwrite host.MakeRunParameters
 
@@ -65,6 +68,15 @@ module DispatchSorterSgd =
                 failwith (String.concat Environment.NewLine summary.IssueLog)
         | Error error -> failwith error
 
+    let private showPathResult result =
+        match result with
+        | Ok (results, ready) ->
+            evolutionPaths <- Some ready
+            showResult (Ok results)
+        | Error error ->
+            evolutionPaths <- None
+            showResult (Error error)
+
     let makeRunParams() =
         async {
             let! result = initializeParameters()
@@ -74,14 +86,22 @@ module DispatchSorterSgd =
         } |> Async.RunSynchronously
 
     let setupRunParams() =
-        ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+        ProjectOps.prepareRuns minReplica maxReplica host.AllowOverwrite cts
             (Some progress) host host.MaxParallel
-        |> Async.RunSynchronously |> showResult
+        |> Async.RunSynchronously |> showPathResult
 
     let runRunParams() =
-        ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
-            (Some progress) host host.MaxParallel
-        |> Async.RunSynchronously |> showResult
+        async {
+            let! opened =
+                match evolutionPaths with
+                | Some paths -> async { return Ok paths }
+                | None -> ProjectOps.reopenPaths minReplica maxReplica cts (Some progress) host
+            match opened with
+            | Error error -> showPathResult (Error error)
+            | Ok paths ->
+                let! result = ProjectOps.executePaths host.AllowOverwrite cts (Some progress) host host.MaxParallel paths
+                showPathResult result
+        } |> Async.RunSynchronously
 
     /// Local phase: initialize parameters and materialize Setup dependencies only.
     let prepareRun() =
@@ -91,9 +111,9 @@ module DispatchSorterSgd =
             | Error error -> failwithf "Init failure: %s" error
             | Ok () ->
                 let! result =
-                    ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
+                    ProjectOps.prepareRuns minReplica maxReplica host.AllowOverwrite cts
                         (Some progress) host host.MaxParallel
-                showResult result
+                showPathResult result
         } |> Async.RunSynchronously
 
     /// Runs a named report against saved parameters, including completed runs.

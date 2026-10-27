@@ -65,8 +65,9 @@ let ``Msuf4a SimpleS presets expand distinct executions with boolean models and 
             SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<sortingWidth> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
             |> SeedSorterModelGeneration.applyParameters rp |> Result.defaultWith failwith
         let parent = SorterModelGen.makeSorterModelFromIndex 0<sortingGenIndex> generator
-        let underlying = MutatorMakers.makeSimpleSorterModelMutator rp |> Async.RunSynchronously |> Result.defaultWith failwith
-        let mutator = MutatorMakers.applyParameters rp (sorterModelMutator.Simple underlying) |> Result.defaultWith failwith
+        let path, _ = EvoPath.fromParameters configured rp
+        let underlying = MutatorMakers.makeSimpleSorterModelMutator path |> Async.RunSynchronously |> Result.defaultWith failwith
+        let mutator = MutatorMakers.applyPath path (sorterModelMutator.Simple underlying) |> Result.defaultWith failwith
         match parent, mutator with
         | sorterModel.SimpleS model, sorterModelMutator.SimpleS mutation ->
             Assert.Equal(rp.GetActivatorMutationRate().Value, mutation.ActivatorMutationRate)

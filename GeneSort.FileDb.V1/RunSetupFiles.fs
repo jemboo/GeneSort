@@ -7,7 +7,8 @@ module RunSetupFiles =
     let runWithSourcesAsync sources projectsFolder configured selected progress =
         RunPhaseFiles.runAsync {
             Name = "Setup"
-            Bind = SetupExecutorCatalog.get sources
+            ToParameters = id
+            Bind = SetupExecutorCatalog.prepare sources
             SkipFinished = true
             SaveParameters = true
         } projectsFolder configured selected progress
