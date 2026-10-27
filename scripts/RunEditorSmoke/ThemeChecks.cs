@@ -55,6 +55,8 @@ internal static partial class Program
             tabs.SelectedIndex = 5; Layout(view);
         }
 
+        CheckRemainingThemeStates(previewDirectory);
+
         if (previewDirectory is null) return;
         var window = new MainWindow { Left = -20000, Top = -20000, ShowActivated = false, ShowInTaskbar = false, Width = 1280, Height = 900 };
         try

@@ -432,6 +432,7 @@ internal static partial class Program
                 "Recovery from a failed refresh did not restore the RunParameters layout and sorting.");
             model.RunName = "AnotherRun";
             Check(!model.CanSave && model.RunParameterList.Count == 0 && model.SummaryReportList.Count == 0, "Changing runs retained validation or rows from the previous run.");
+            CheckDialogs(args.FirstOrDefault());
             if (errors.Length > 0) throw new Exception("WPF binding errors:\n" + errors);
             Console.WriteLine("PASS: Selected-row Setup, Execution and Summary Reports, persistent table layouts/reset/save recovery, report viewer loading/refresh/layout preservation/sorting/virtualization/selection changes/export, progress/failure reporting, busy gating, Save validation/folder gating, RunParameters loading/refresh/layout preservation/sorting/virtualization, generation, parameter controls and WPF layout/bindings.");
             return 0;

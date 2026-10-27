@@ -73,7 +73,20 @@
         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
+    <!-- WPF's internal editor menu subclasses bypass implicit ContextMenu/MenuItem styles.
+         Use standard editing commands, targeted at the field that opened this shared menu. -->
+    <ContextMenu x:Key="TextEditingMenu">
+        <MenuItem Command="ApplicationCommands.Undo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <MenuItem Command="ApplicationCommands.Redo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <Separator />
+        <MenuItem Command="ApplicationCommands.Cut" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <MenuItem Command="ApplicationCommands.Copy" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <MenuItem Command="ApplicationCommands.Paste" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <Separator />
+        <MenuItem Command="ApplicationCommands.SelectAll" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+    </ContextMenu>
     <Style TargetType="TextBox">
+        <Setter Property="ContextMenu" Value="{StaticResource TextEditingMenu}" />
         <Setter Property="Background" Value="{DynamicResource InputBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}" />
@@ -371,6 +384,12 @@
                 <Trigger Property="HasItems" Value="True"><Setter TargetName="Arrow" Property="Visibility" Value="Visible" /></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5" /></Trigger>
             </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <!-- Menus use a separate separator style key rather than the implicit Separator style. -->
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator">
+            <Border Height="1" Margin="8,4" Background="{DynamicResource BorderBrush}" />
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style TargetType="ToolTip">

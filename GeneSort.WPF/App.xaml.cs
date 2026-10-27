@@ -18,13 +18,6 @@ namespace GeneSort.WPF
                 "GeneSort", "table-layouts.json"));
             base.OnStartup(e);
         }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            if (TableLayouts?.Save() is string error)
-                MessageBox.Show(error, "Table display settings", MessageBoxButton.OK, MessageBoxImage.Warning);
-            base.OnExit(e);
-        }
     }
 
 }

@@ -11,7 +11,7 @@ public partial class RunEditorView : UserControl
 {
     private RunEditorViewModel Model => (RunEditorViewModel)DataContext;
     public RunEditorView() => InitializeComponent();
-    private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageBox.Show(Window.GetWindow(this),
+    private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageDialog.Show(Window.GetWindow(this),
         "Discard the unsaved run definition changes?", "Run editor", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
     private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
@@ -37,7 +37,7 @@ public partial class RunEditorView : UserControl
         {
             var path = RunDefinitionFiles.pathFor(Model.ProjectsFolder, configured);
             var overwrite = File.Exists(path);
-            if (overwrite && MessageBox.Show(Window.GetWindow(this), $"Replace this run definition?\n\n{path}",
+            if (overwrite && MessageDialog.Show(Window.GetWindow(this), $"Replace this run definition?\n\n{path}",
                     "Save run", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             await Model.SaveAsync(configured, overwrite);
         });
@@ -69,7 +69,7 @@ public partial class RunEditorView : UserControl
             var prepared = await Model.PrepareGenerationAsync();
             if (prepared is null) return;
             var replace = prepared.RequiresReplacement;
-            if (replace && MessageBox.Show(Window.GetWindow(this),
+            if (replace && MessageDialog.Show(Window.GetWindow(this),
                     $"Save this definition and replace all {prepared.ExistingFileCount:N0} existing RunParameter files for '{prepared.Run.RunName}' with the {prepared.FileCount:N0} prepared files?\n\n" +
                     $"Old parameter files, including replicas outside the new range, will be removed.\n\n{prepared.ParameterFolder}",
                     "Generate RunParameters", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)

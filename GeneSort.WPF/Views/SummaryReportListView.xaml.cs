@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -103,9 +104,13 @@ public partial class SummaryReportListView : UserControl
         {
             Title = "Save combined Summary Reports", FileName = "SummaryReports_combined.tsv",
             DefaultExt = ".tsv", Filter = "Tab-separated values (*.tsv)|*.tsv|Tab-separated text (*.txt)|*.txt",
-            AddExtension = true, CheckPathExists = true, OverwritePrompt = true
+            AddExtension = true, CheckPathExists = true, OverwritePrompt = false
         };
-        if (dialog.ShowDialog(Window.GetWindow(this)) == true)
-            await SaveCombinedReportAsync(dialog.FileName, overwrite: true);
+        var owner = Window.GetWindow(this);
+        if (dialog.ShowDialog(owner) != true) return;
+        var overwrite = File.Exists(dialog.FileName);
+        if (overwrite && MessageDialog.Show(owner, $"Replace this combined Summary Report?\n\n{dialog.FileName}",
+                "Save combined Summary Reports", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        await SaveCombinedReportAsync(dialog.FileName, overwrite);
     }
 }

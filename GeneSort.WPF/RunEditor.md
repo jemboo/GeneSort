@@ -125,7 +125,7 @@ one header row, and preserves column order (including `#` when visible), sorting
 cells. It includes all displayed report rows, including those outside the visible
 viewport. Missing reports contribute no rows. The button is disabled while loading,
 when the table is empty, when every column is hidden, or while a save is in progress.
-The save dialog lets you choose the destination and confirms replacing an existing file. Saving takes a
+The save dialog lets you choose the destination; a themed confirmation asks before replacing an existing file. Saving takes a
 snapshot, so later selection, sorting or column changes cannot alter that export.
 The complete file is written before replacing the destination, and a status message
 reports success or failure.
@@ -178,9 +178,17 @@ dotnet run --project scripts/RunEditorSmoke/RunEditorSmoke.csproj
 ```
 
 Pass an output folder after `--` to render each editor tab and dark-theme previews
-(workspace, browser, selected report rows, dropdown and column chooser).
+(workspace, browser, selected report rows, dropdown, column chooser, text menus,
+tooltips, progress controls and message dialogs).
 The shared palette and control styles live in `Themes/Dark.xaml`; views use those
 resources for surfaces, text, focus, selection and validation colors.
+App confirmations and warnings use `Views/MessageDialog` with the same dark title
+bar. Messages are selectable, and long messages scroll. Enter invokes the first
+button; Escape or closing the dialog declines a confirmation. Windows file and
+folder pickers continue to use the system appearance.
+Text fields share a dark editing menu with standard Undo, Redo, Cut, Copy, Paste
+and Select All commands. Commands target the field that opened the menu, with
+editing commands disabled for read-only paths and message details.
 Project validation tests are in `RunEditorTests.fs`; definition persistence tests
 are in `RunDefinitionFileTests.fs`. `RunParameterFileTests.fs` covers generation,
 replacement, rollback, concurrent publication and checkpoint-preserving resume.
