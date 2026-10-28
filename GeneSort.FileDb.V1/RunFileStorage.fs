@@ -58,7 +58,8 @@ module internal RunFileStorage =
                 let path = within root entry
                 if Directory.Exists path then files root path else [|path|])
     let private sameDefinition path configured =
-        try File.Exists path && MessagePackSerializer.Deserialize<runDto>(File.ReadAllBytes path) = RunDto.fromDomain configured
+        try File.Exists path &&
+            (MessagePackSerializer.Deserialize<runDto>(File.ReadAllBytes path) |> RunDto.toDomain |> RunDto.fromDomain) = RunDto.fromDomain configured
         with :? MessagePackSerializationException -> false
 
     let inspect root configured =

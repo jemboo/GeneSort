@@ -42,7 +42,7 @@ let private createHostWithSaveResult saveResult finished execute =
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
             }
         }
-        |> run.SimpleRun
+        |> Run.ofSimple
     let rp = (runParameters.create Map.empty).WithRunFinished(Some finished).WithRepl(Some (UMX.tag 0))
     let writes = ResizeArray<geneSortDataMode>()
     let db =
@@ -167,7 +167,7 @@ let ``missing setup registration fails preparation`` () =
     Assert.Empty(writes)
 
 [<Fact>]
-let ``built-in hosts resolve setup for every execution family`` () =
+let ``built-in hosts resolve setup only for workflows with a preparation phase`` () =
     let runs = [
         WorkflowFixtures.sortableTestsRun false
         WorkflowFixtures.sortableTestsRun true
@@ -178,7 +178,8 @@ let ``built-in hosts resolve setup for every execution family`` () =
     ]
     for run in runs do
         let host = runHost.Create run 1
-        Assert.NotNull(host.SetupExecutor)
+        if run.HasSetup then Assert.NotNull(host.SetupExecutor)
+        else Assert.Throws<ArgumentException>(fun () -> host.SetupExecutor |> ignore) |> ignore
 
 [<Fact>]
 let ``setup executor catalog rejects blank and duplicate names`` () =

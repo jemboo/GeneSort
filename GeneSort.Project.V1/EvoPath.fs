@@ -229,7 +229,7 @@ type evoPathPreparation =
 module EvoPath =
     let private require label value = value |> Option.defaultWith (fun () -> invalidArg "parameters" ("Missing " + label + "."))
     let private workflowFor (configured: run) =
-        let sgd = match configured with SgdRun sgd -> sgd | _ -> invalidArg "configured" "An evoPath requires an SgdRun."
+        let sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> sgd | _ -> invalidArg "configured" "An evoPath requires an evolutionary run."
         {
             ProjectName = configured.ProjectName; DatabaseName = configured.DatabaseName; RunName = configured.RunName
             ExecuteFunctionName = configured.ExecuteFunctionName
@@ -250,7 +250,7 @@ module EvoPath =
 
     /// Build a path with the exact start produced by Setup, without reconstructing its references.
     let fromStart (configured: run) (start: evoStart) (parameters: runParameters) =
-        let sgd = match configured with SgdRun sgd -> sgd | _ -> invalidArg "configured" "An evoPath requires an SgdRun."
+        let sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> sgd | _ -> invalidArg "configured" "An evoPath requires an evolutionary run."
         let id = parameters.GetId() |> require "Id"
         let replica = parameters.GetRepl() |> require "Repl"
         if int replica < 0 then invalidArg "parameters" "Replica cannot be negative."

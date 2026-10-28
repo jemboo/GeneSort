@@ -21,9 +21,6 @@ module PrefixTest =
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-    let setupFunctionName = SetupCatalogNames.prefix
-    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test  () : run =
@@ -35,8 +32,8 @@ module PrefixTest =
                  [prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
             ]
-        run.SimpleRun (
-            SimpleRun.create {
+        run.DirectRun (
+            DirectRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
                 RunName = names.RunName
@@ -48,23 +45,20 @@ module PrefixTest =
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
-                Setup = {
-                    FunctionName = setupFunctionName
-                    ParameterSpans = parameterSpans
-                    QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
-                }
             }
         )
+
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SortableTests.PrefixTest", [|
+            runExample("Test", Test)
+        |])
 
 module Prefix =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-    let setupFunctionName = SetupCatalogNames.prefix
-    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Width24s  () : run =
@@ -81,8 +75,8 @@ module Prefix =
                  ]
                  |> List.map PrefixLibId.toString)
             ]
-        run.SimpleRun (
-            SimpleRun.create {
+        run.DirectRun (
+            DirectRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
                 RunName = names.RunName
@@ -93,12 +87,6 @@ module Prefix =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
-                }
-                Setup = {
-                    FunctionName = setupFunctionName
-                    ParameterSpans = parameterSpans
-                    QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -113,8 +101,8 @@ module Prefix =
                  [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
             ]
-        run.SimpleRun (
-            SimpleRun.create {
+        run.DirectRun (
+            DirectRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
                 RunName = names.RunName
@@ -125,12 +113,6 @@ module Prefix =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
-                }
-                Setup = {
-                    FunctionName = setupFunctionName
-                    ParameterSpans = parameterSpans
-                    QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -149,3 +131,9 @@ module Prefix =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SortableTests.Prefix", [|
+            runExample("Width24s", Width24s)
+            runExample("Width32", Width32)
+        |])

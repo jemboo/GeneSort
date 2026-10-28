@@ -135,3 +135,5 @@ module PrefixLib =
     /// Safely attempts to find a network string by its key properties.
     let tryGet (prefixKey: prefixLibId) =
         Map.tryFind prefixKey AllNetworksList
+
+    let ids () = AllNetworksList |> Map.toArray |> Array.map fst

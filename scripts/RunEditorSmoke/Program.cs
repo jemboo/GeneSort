@@ -49,6 +49,18 @@ internal static partial class Program
                 Background = (Brush)application.FindResource("SurfaceBrush")
             };
             Layout(view);
+            if (args.Contains("--parameters"))
+            {
+                CheckParameterChoices(root, model, view, errors);
+                Console.WriteLine("Merge, prefix, and sorter library layouts and unique parameter values passed.");
+                return 0;
+            }
+            if (args.Contains("--run-types"))
+            {
+                CheckRunTypes(root, model, view, errors);
+                Console.WriteLine("Run-type editor smoke checks passed.");
+                return 0;
+            }
             var saveButton = Button(view, "Save");
             Check(!saveButton.IsEnabled, "Save is enabled before selecting a folder and validating.");
             Click(Button(view, "Validate"));
@@ -97,7 +109,7 @@ internal static partial class Program
             Layout(view);
             var pending = model.SetupSection.PendingRow!;
             Check(pending.Values.All(value => value.Kind == parameterValueKind.Integer)
-                && pending.Snapshot().Values.SequenceEqual(new[] { "0", "1", "2", "3" }), "Choosing another parameter carried incompatible values over.");
+                && pending.Snapshot().Values.SequenceEqual(mutation.Snapshot().Values), "Choosing another parameter carried incompatible values over.");
             EditValue(setup, pending.Values[0], "1.5");
             Check(pending.HasErrors && !Button(setup, "Add").IsEnabled, "Fractional integers can be added.");
             EditValue(setup, pending.Values[0], "01");
@@ -212,6 +224,11 @@ internal static partial class Program
             detachedValue.Text = "V3";
             Check(changes == 0, "Removed values still notify their old row.");
             model.New();
+            // Keep the generation/report fixture small independently of code-preset defaults.
+            var fixtureMutations = model.SetupParameters.Single(row => row.Key == ParamKeys.mutationModKey);
+            while (fixtureMutations.Values.Count > 4) fixtureMutations.Values.RemoveAt(fixtureMutations.Values.Count - 1);
+            model.SetupParameters.Single(row => row.Key == ParamKeys.generationIntervalLastKey).Values[0].Text = "3";
+            model.SummaryIntervals = GenIntervalNames.uniformInterval1;
 
             var tabs = Descendants<TabControl>(view).Single();
             for (var index = 0; index < tabs.Items.Count; index++)
@@ -237,11 +254,11 @@ internal static partial class Program
                     count.Text = "3"; Pump();
                     Check(generate.IsEnabled && model.GenerationPreview.Contains("12 RunParameter files")
                         && model.GenerationPreview.Contains("2–4"), "The generated-file preview does not match the replica range.");
-                    Check(!Directory.Exists(RunParameterFiles.folderFor(root, RunEditor.build(model.Snapshot()).ResultValue)),
+                    Check(!Directory.Exists(RunParameterFiles.folderFor(root, model.Build().ResultValue)),
                         "The live preview wrote parameter files.");
                     Click(generate);
                     WaitUntil(() => !model.IsBusy);
-                    var generated = RunEditor.build(model.Snapshot()).ResultValue;
+                    var generated = model.Build().ResultValue;
                     var folder = RunParameterFiles.folderFor(root, generated);
                     Check(Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories).Length == 12
                         && !model.IsDirty && model.Status.Contains("12 RunParameter files"), "The Generate button did not publish the previewed set.");
@@ -305,7 +322,7 @@ internal static partial class Program
                     Check(!model.RunParameterList.Descending && mutationHeader.Content.ToString()!.EndsWith(" ▲")
                         && model.RunParameterList.Items.Cast<RunParameterItem>().Select(row => row.Values[ParamKeys.mutationModKey]).SequenceEqual(new[] { "0", "1", "2", "3" }),
                         "Refreshing RunParameters did not retain ascending sorting.");
-                    var savedDefinition = RunDefinitionFiles.pathFor(root, RunEditor.build(model.Snapshot()).ResultValue);
+                    var savedDefinition = RunDefinitionFiles.pathFor(root, model.Build().ResultValue);
                     Wait(model.OpenAsync(savedDefinition));
                     Layout(view);
                     Check(model.RunParameterList.Count == 4 && model.CanSave, "Opening a definition did not load and validate its saved parameters.");
@@ -338,6 +355,18 @@ internal static partial class Program
                     Check(model.PhaseSummary.Contains("2 failed") && model.Issues.Count == 2
                         && model.Issues.All(issue => issue.Contains("source library")),
                         "Missing sources were not reported for each selected row.");
+                    var errorText = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "Run errors");
+                    var fullErrors = string.Join(Environment.NewLine + Environment.NewLine, model.Issues);
+                    Check(model.HasErrors && errorText.IsReadOnly && errorText.Text == fullErrors
+                        && ((FrameworkElement)Button(view, "Copy errors").Parent).Visibility == Visibility.Visible,
+                        "The copyable error panel omitted errors or full file paths.");
+                    errorText.SelectAll();
+                    Check(errorText.SelectedText == fullErrors && System.Windows.Input.ApplicationCommands.Copy.CanExecute(null, errorText),
+                        "Error messages cannot be selected and copied.");
+                    var statusText = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "Run status");
+                    var phaseText = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "Run phase progress");
+                    Check(statusText.IsReadOnly && statusText.Text == model.Status && phaseText.IsReadOnly && phaseText.Text == model.PhaseSummary,
+                        "Status and phase messages are not selectable read-only text.");
                     Check(model.RunParameterList.Count == 4 && model.RunParameterList.SelectedCount == 0 && !runSetup.IsEnabled,
                         "Setup did not refresh saved rows and clear its completed selection.");
                     CheckParameterLayout();
@@ -412,7 +441,7 @@ internal static partial class Program
                 "The parameter value editor is clipped horizontally at the minimum width.");
             if (args.Length > 0) Render(view, Path.Combine(args[0], "run-editor-small.png"));
             CheckSortingAndVirtualization();
-            var current = RunEditor.build(model.Snapshot()).ResultValue;
+            var current = model.Build().ResultValue;
             var parameterFolder = RunParameterFiles.folderFor(root, current);
             var parameterPath = Directory.GetFiles(parameterFolder, "*.msgpack", SearchOption.AllDirectories)[0];
             var parameterBytes = File.ReadAllBytes(parameterPath);
@@ -448,7 +477,7 @@ internal static partial class Program
         Check(!Button(view, "Refresh reports").IsEnabled && model.SummaryReportList.Count == 0,
             "Report viewing is enabled without a selection.");
         Check(!Button(view, "Save combined report…").IsEnabled, "Combined export is enabled without displayed rows.");
-        var configured = RunEditor.build(model.Snapshot()).ResultValue;
+        var configured = model.Build().ResultValue;
         var dataRoot = Path.Combine(root, configured.ProjectName, configured.DatabaseName, "Data");
         IGeneSortDb database = new GeneSortDbMp(dataRoot, FSharpOption<string>.Some(configured.RunQueryCatalogName));
         var generation = GenIntervalConfig.getSampleAtIndex(RunIntervals.forRun(configured).Value, 0).Value;

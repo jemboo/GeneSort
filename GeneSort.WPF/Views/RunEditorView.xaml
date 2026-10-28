@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:GeneSort.WPF.Views">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+        <Style x:Key="SelectableMessage" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Margin" Value="0,0,8,0" />
         </Style>
@@ -32,8 +40,18 @@
         </DockPanel>
         <ScrollViewer x:Name="EditorScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="0,0,12,0">
+                <TextBlock Text="Run type" />
+                <ComboBox ItemsSource="{Binding RunTypes}" DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedRunType, Mode=OneWay}" SelectionChanged="RunType_SelectionChanged"
+                          AutomationProperties.Name="Run type" />
+                <TextBlock Text="Example run" Margin="0,8,0,0" />
+                <ComboBox ItemsSource="{Binding Examples}" DisplayMemberPath="Name"
+                          SelectedItem="{Binding SelectedExample, Mode=OneWay}" SelectionChanged="Example_SelectionChanged"
+                          AutomationProperties.Name="Example run" />
+                <TextBlock Text="The example supplies parameter defaults and catalog selections for the new run." TextWrapping="Wrap" Margin="0,4,0,12" />
                 <TextBlock Text="{Binding WorkflowName}" FontSize="16" FontWeight="SemiBold" />
                 <TextBlock Text="{Binding WorkflowDescription}" Foreground="{DynamicResource MutedBrush}" Margin="0,3,0,12" />
+                <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
                     <StackPanel Margin="0,0,12,0">
@@ -48,6 +66,7 @@
                 </Grid>
                 <TextBlock Text="Description" Margin="0,10,0,0" />
                 <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
+                <CheckBox Content="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="0,8,0,4" />
                 <TextBlock Text="Projects folder" Margin="0,10,0,0" />
                 <DockPanel>
                     <Button Content="Browse…" DockPanel.Dock="Right" Margin="8,0,0,0" Click="Browse_Click" />
@@ -57,8 +76,16 @@
                 <TabControl>
                     <TabItem Header="Parameters">
                         <StackPanel Margin="12">
+                            <StackPanel Visibility="{Binding HasPrefixWidthSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
+                                <TextBlock Text="Sorting width" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding PrefixSortingWidths}" SelectedItem="{Binding SelectedPrefixSortingWidth}"
+                                          IsEnabled="{Binding CanSelectPrefixWidth}" Width="140" HorizontalAlignment="Left"
+                                          AutomationProperties.Name="SortableTests sorting width" />
+                                <TextBlock Text="Choose a width, then select PrefixLibId values below. Changing width clears prefixes from other widths."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+                            </StackPanel>
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
-                            <local:ParameterSectionView DataContext="{Binding SetupSection}" />
+                            <local:ParameterSectionView DataContext="{Binding SetupSection}" Visibility="{Binding DataContext.HasSetup, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
                             <local:ParameterSectionView DataContext="{Binding ExecutionSection}" />
                             <Expander Header="Parameter reference" Margin="0,12,0,0">
                                 <ItemsControl ItemsSource="{Binding Parameters}">
@@ -69,14 +96,13 @@
                             </Expander>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Save intervals">
+                    <TabItem Header="Save intervals" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">
                         <StackPanel Margin="12">
                             <TextBlock Text="Generation save schedule" />
                             <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" AutomationProperties.Name="Generation save schedule" />
                             <TextBlock Text="GenerationIntervalLast selects a zero-based index in this schedule." Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
                             <TextBlock Text="Summary sampling schedule" />
                             <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SummaryIntervals}" AutomationProperties.Name="Summary sampling schedule" />
-                            <CheckBox Content="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="0,16,0,4" />
                             <TextBlock Text="This is a run setting. Replacing a saved run definition asks for confirmation separately." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
                         </StackPanel>
                     </TabItem>
@@ -94,7 +120,7 @@
                     <TabItem Header="Generate parameters">
                         <StackPanel Margin="12">
                             <TextBlock Text="Generate RunParameters" FontWeight="SemiBold" FontSize="16" />
-                            <TextBlock Text="Save the current definition and generate its parameter files. Setup and execution are separate steps."
+                            <TextBlock Text="{Binding PhaseHelp}"
                                        TextWrapping="Wrap" Margin="0,6,0,14" />
                             <WrapPanel>
                                 <StackPanel Margin="0,0,20,12">
@@ -121,7 +147,7 @@
                         <StackPanel Margin="12">
                             <WrapPanel Margin="0,0,0,10">
                                 <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
-                                <Button Content="Run Setup" Click="RunSetup_Click" IsEnabled="{Binding CanRunSetup}" FontWeight="SemiBold"
+                                <Button Content="Run Setup" Visibility="{Binding HasSetup, Converter={StaticResource VisibleIfTrue}}" Click="RunSetup_Click" IsEnabled="{Binding CanRunSetup}" FontWeight="SemiBold"
                                         ToolTip="Run Setup for the selected saved rows. Save any definition changes first." ToolTipService.ShowOnDisabled="True" />
                                 <Button Content="Run Execution" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
                                         ToolTip="Execute the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
@@ -129,11 +155,11 @@
                                         ToolTip="Generate Summary Reports from saved results for the selected rows, including finished runs. Uses the run's output overwrite setting." ToolTipService.ShowOnDisabled="True" />
                             </WrapPanel>
                             <TextBlock Text="{Binding RunParameterList.SelectionSummary}" TextWrapping="Wrap" Margin="0,0,0,6" />
-                            <TextBlock Text="{Binding PhaseSummary}" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Run phase progress" />
+                            <TextBox Text="{Binding PhaseSummary, Mode=OneWay}" Style="{StaticResource SelectableMessage}" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Run phase progress" />
                             <local:RunParameterListView DataContext="{Binding RunParameterList}" Height="360" />
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Summary Reports">
+                    <TabItem Header="Summary Reports" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">
                         <StackPanel Margin="12">
                             <TextBlock Text="Select rows in Run parameters to view their saved Summary Reports here." TextWrapping="Wrap" Margin="0,0,0,8" />
                             <Button Content="Refresh reports" Click="RefreshReports_Click" IsEnabled="{Binding CanRefreshSummaryReports}" HorizontalAlignment="Left" Margin="0,0,0,10" />
@@ -148,12 +174,15 @@
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
             <ProgressBar IsIndeterminate="{Binding IsProgressIndeterminate}" Maximum="{Binding PhaseTotal, Mode=OneWay}" Value="{Binding PhaseCompleted, Mode=OneWay}"
                          AutomationProperties.Name="Operation progress" Height="6" Margin="0,0,0,6" Visibility="{Binding IsBusy, Converter={StaticResource VisibleIfTrue}}" />
-            <ScrollViewer MaxHeight="110" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Issues}">
-                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" Margin="0,2" /></DataTemplate></ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-            <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Margin="0,4,0,0" />
+            <DockPanel Visibility="{Binding HasErrors, Converter={StaticResource VisibleIfTrue}}">
+                <Button DockPanel.Dock="Right" Content="Copy errors" Click="CopyErrors_Click" VerticalAlignment="Top" Margin="8,0,0,0"
+                        ToolTip="Copy all error messages, including full file paths." AutomationProperties.Name="Copy errors" />
+                <TextBox Text="{Binding ErrorMessages, Mode=OneWay}" Style="{StaticResource SelectableMessage}"
+                         Foreground="{DynamicResource ErrorBrush}" MaxHeight="110" VerticalScrollBarVisibility="Auto"
+                         AutomationProperties.Name="Run errors" />
+            </DockPanel>
+            <TextBox Text="{Binding Status, Mode=OneWay}" Style="{StaticResource SelectableMessage}" Margin="0,4,0,0"
+                     MaxHeight="110" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Run status" />
         </StackPanel>
     </Grid>
 </UserControl>

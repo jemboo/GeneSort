@@ -33,6 +33,7 @@
     <Compile Include="Catalogs\Evolution\ExecuteFunctionNames.fs" />
     <Compile Include="Catalogs\SorterModelSet\SorterModelSetCatalogNames.fs" />
     <Compile Include="Catalogs\Setup\SetupCatalogNames.fs" />
+    <Compile Include="Parameters\RunParameterRoles.fs" />
     <Compile Include="Run.fs" />
     <Compile Include="Runtime\RunIntervals.fs" />
     <Compile Include="EvoStart.fs" />
@@ -90,6 +91,7 @@
     <Compile Include="Catalogs\Reports\SorterSgd\Reporting.fs" />
     <Compile Include="Catalogs\Reports\ReportCatalog.fs" />
     <Compile Include="Editing\RunEditor.fs" />
+    <Compile Include="Editing\RunTypeEditor.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

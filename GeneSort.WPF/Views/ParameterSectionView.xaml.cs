@@ -13,6 +13,6 @@ public partial class ParameterSectionView : UserControl
     private void ConfirmAdd_Click(object sender, RoutedEventArgs e) => Model.Add();
     private void RemoveRow_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: ParameterRow row }) Model.Rows.Remove(row);
+        if (sender is FrameworkElement { DataContext: ParameterRow row } && !row.IsReadOnly) Model.Rows.Remove(row);
     }
 }

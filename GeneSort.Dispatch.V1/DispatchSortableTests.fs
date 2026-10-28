@@ -71,28 +71,10 @@ module DispatchSortableTests =
             | Error error -> failwithf "Init failure: %s" error
         } |> Async.RunSynchronously
 
-    let setupRunParams() =
-        ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
-            (Some progress) host host.MaxParallel
-        |> Async.RunSynchronously |> showResult
-
     let runRunParams() =
         ProjectOps.executeRuns minReplica maxReplica host.AllowOverwrite cts
             (Some progress) host host.MaxParallel
         |> Async.RunSynchronously |> showResult
-
-    /// Local phase: initialize parameters and materialize Setup dependencies only.
-    let prepareRun() =
-        async {
-            let! initialized = initializeParameters()
-            match initialized with
-            | Error error -> failwithf "Init failure: %s" error
-            | Ok () ->
-                let! result =
-                    ProjectOps.executeSetupRuns minReplica maxReplica host.AllowOverwrite cts
-                        (Some progress) host host.MaxParallel
-                showResult result
-        } |> Async.RunSynchronously
 
     /// Runs a named report against saved parameters, including completed runs.
     let runReport name =

@@ -23,7 +23,7 @@ let private simpleFixture project database (name: string) setup execution =
         AllowOverwrite = false
         Setup = setup
         Execution = execution
-    } |> run.SimpleRun
+    } |> Run.ofSimple
 
 let private prefixId (width: int) =
     prefixLibId.create (UMX.tag width) 4<stageLength> prefixLibVariant.PrefixA
@@ -138,7 +138,7 @@ let standardSource () =
         MakerNames = EvolutionMakerNames.prefix
         GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
         GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
-    } |> run.SgdRun
+    } |> Run.ofSgd
 
 let sossSource (modifiers: int list) =
     SgdRun.create {
@@ -178,7 +178,7 @@ let sossSource (modifiers: int list) =
         MakerNames = EvolutionMakerNames.sossPrefix
         GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
         GenSaveSubIntervalsName = GenIntervalNames.uniformInterval2
-    } |> run.SgdRun
+    } |> Run.ofSgd
 
 let withSetupSpans overrides (source: run) =
     let dto = GeneSort.Project.Mp.V1.RunDto.fromDomain source

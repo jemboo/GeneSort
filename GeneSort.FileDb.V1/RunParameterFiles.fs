@@ -9,6 +9,7 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Runtime
 open GeneSort.Project.V1.Storage
+open GeneSort.Project.V1.Catalogs.Setup.SorterSgd
 
 type preparedRunFiles =
     private {
@@ -65,7 +66,13 @@ module RunParameterFiles =
     let prepareAsync projectsFolder (args: runPreparationArgs) =
         Task.Run(fun () ->
             let root = RunFileStorage.dataRoot projectsFolder args.Run
-            let prepared = RunPreparation.prepare args
+            let prepared =
+                if args.Run.ParameterSource.IsNone then RunPreparation.prepare args
+                else
+                    let openSource (source: run) : IGeneSortDb =
+                        new GeneSortDbMp(RunFileStorage.dataRoot projectsFolder source, source.RunQueryCatalogName)
+                    RunPreparation.prepareWith
+                        (RunParameterGeneration.generateWithSourceSelection (EvoCondenseSelection.select openSource) args.Run) args
             preparedRunFiles.create root prepared)
 
     let generateAsync (prepared: preparedRunFiles) (replace: bool) (progress: IProgress<string>) = task {

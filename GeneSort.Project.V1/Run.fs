@@ -63,6 +63,16 @@ type simpleRunConfig = {
     Setup: setupConfig
 }
 
+/// A publication run has one parameter sweep and no preparation phase.
+type directRunConfig = {
+    DatabaseName: string<databaseName>
+    ProjectName: string<projectName>
+    RunName: string<runName>
+    Description: string
+    AllowOverwrite: bool
+    Execution: executionConfig
+}
+
 /// Evolution setup is selected by the execution family and optional source.
 type sgdSetupConfig = {
     ParameterSpans: (string * string list) list
@@ -144,7 +154,7 @@ module SimpleRun =
           projName = projectName
           runName = runName
           description = description
-          runParameterSpans = runParameterSpans
+          runParameterSpans = RunParameterRoles.withoutRepeatedSetup executeFunctionName false setupParameterSpans runParameterSpans
           runQueryCatalogName = runQueryCatalogName
           setupParameterSpans = setupParameterSpans
           setupQueryCatalogName = setupQueryCatalogName
@@ -171,7 +181,10 @@ module SimpleRun =
             projName = config.ProjectName
             runName = config.RunName
             description = config.Description
-            runParameterSpans = config.Execution.ParameterSpans
+            runParameterSpans =
+                RunParameterRoles.withoutRepeatedSetup config.Execution.FunctionName
+                    (config.Execution.ParameterSpans |> List.exists (fst >> (=) ParamKeys.sourceRunNameKey))
+                    config.Setup.ParameterSpans config.Execution.ParameterSpans
             runQueryCatalogName = config.Execution.QueryCatalogName
             setupParameterSpans = config.Setup.ParameterSpans
             setupQueryCatalogName = config.Setup.QueryCatalogName
@@ -199,6 +212,33 @@ module SimpleRun =
     let parameterSource (run: simpleRun) = run.parameterSource
     let withParameterSource source spans (run: simpleRun) =
         { run with parameterSource = Some (source, spans) }
+
+    /// Import the old two-phase SortableTests definition into a single sweep.
+    let asDirect (value: simpleRun) =
+        let spans =
+            value.setupParameterSpans @ value.runParameterSpans
+            |> List.fold (fun acc (key, values) ->
+                (acc |> List.filter (fst >> (<>) key)) @ [key, values]) []
+        { value with setupParameterSpans = []; runParameterSpans = spans }
+
+    let internal withSpans setup execution value =
+        { value with setupParameterSpans = setup; runParameterSpans = execution }
+
+module DirectRun =
+    let create (config: directRunConfig) =
+        // Retain the historical DTO's catalog fields. They are not workflow choices
+        // and are never invoked by direct parameter generation or execution.
+        let prefix = config.Execution.QueryCatalogName = Catalogs.Queries.QueryCatalogNamesRun.sortableTestPrefix
+        SimpleRun.create {
+            DatabaseName = config.DatabaseName; ProjectName = config.ProjectName; RunName = config.RunName
+            Description = config.Description; AllowOverwrite = config.AllowOverwrite; Execution = config.Execution
+            Setup = {
+                FunctionName = if prefix then Catalogs.Setup.SetupCatalogNames.prefix else Catalogs.Setup.SetupCatalogNames.merge
+                QueryCatalogName = if prefix then Catalogs.Queries.QueryCatalogNamesSetup.sortableTestPrefix else Catalogs.Queries.QueryCatalogNamesSetup.sortableTestMerge
+                EnhancerFunctionName = "setup-enhancer.sortable-tests"
+                ParameterSpans = []
+            }
+        }
 
 type sgdRun =
     private
@@ -230,18 +270,24 @@ module SgdRun =
     let executeFunctionName (run: sgdRun) = SimpleRun.executeFunctionName run.baseRun
     let genSaveIntervalsName (run: sgdRun) = run.genSaveIntervalsName
     let genSaveSubIntervalsName (run: sgdRun) = run.genSaveSubIntervalsName
+    let internal withSpans setup execution value =
+        { value with baseRun = SimpleRun.withSpans setup execution value.baseRun }
 
 type run =
-    | SimpleRun of simpleRun
-    | SgdRun of sgdRun
+    | DirectRun of simpleRun
+    | PreparedRun of simpleRun
+    | EvolutionRun of sgdRun
+    | ContinuationRun of sgdRun
+    member this.HasSetup = match this with DirectRun _ -> false | _ -> true
+    member this.IsEvolution = match this with EvolutionRun _ | ContinuationRun _ -> true | _ -> false
     member this.BaseRun =
         match this with
-        | SimpleRun value -> value
-        | SgdRun value -> SgdRun.baseRun value
+        | DirectRun value | PreparedRun value -> value
+        | EvolutionRun value | ContinuationRun value -> SgdRun.baseRun value
     /// Only the source's parameter-generation configuration is needed here.
     member this.ParameterSource =
         SimpleRun.parameterSource this.BaseRun
-        |> Option.map (fun (source, spans) -> SimpleRun source, spans)
+        |> Option.map (fun (source, spans) -> PreparedRun source, spans)
     member this.DatabaseName = SimpleRun.databaseName this.BaseRun
     member this.ProjectName = SimpleRun.projectName this.BaseRun
     member this.RunName = SimpleRun.runName this.BaseRun
@@ -256,29 +302,50 @@ type run =
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
     member this.GenSaveIntervalsName =
         match this with
-        | SimpleRun _ -> None
-        | SgdRun value -> Some (SgdRun.genSaveIntervalsName value)
+        | DirectRun _ | PreparedRun _ -> None
+        | EvolutionRun value | ContinuationRun value -> Some (SgdRun.genSaveIntervalsName value)
     member this.MakerNames =
         match this with
-        | SimpleRun _ -> None
-        | SgdRun value -> Some (SgdRun.makerNames value)
+        | DirectRun _ | PreparedRun _ -> None
+        | EvolutionRun value | ContinuationRun value -> Some (SgdRun.makerNames value)
     member this.ExecuteFunctionName = SimpleRun.executeFunctionName this.BaseRun
     member this.GenSaveSubIntervalsName =
         match this with
-        | SimpleRun _ -> None
-        | SgdRun value -> Some (SgdRun.genSaveSubIntervalsName value)
+        | DirectRun _ | PreparedRun _ -> None
+        | EvolutionRun value | ContinuationRun value -> Some (SgdRun.genSaveSubIntervalsName value)
 
 
 
 
 module Run =
+    let ofSimple value =
+        if SimpleRun.executeFunctionName value = ExecuteFunctionNames.sortableTests then DirectRun (SimpleRun.asDirect value)
+        else PreparedRun value
+
+    let ofSgd value =
+        let source = SgdRun.baseRun value
+        if (SimpleRun.parameterSource source).IsSome
+           || SimpleRun.runParameterSpans source |> List.exists (fst >> (=) ParamKeys.sourceRunNameKey) then ContinuationRun value
+        else EvolutionRun value
+
     let requireSetupFunctionName (configured: run) =
         configured.SetupFunctionName
         |> Option.defaultWith (fun () -> invalidArg "configured" "Evolution setup is selected by its execution family and source, not a setup function name.")
 
     let withParameterSource (source: run) spans = function
-        | SimpleRun value -> SimpleRun (SimpleRun.withParameterSource source.BaseRun spans value)
-        | SgdRun value -> SgdRun (SgdRun.withParameterSource source.BaseRun spans value)
+        | PreparedRun value -> PreparedRun (SimpleRun.withParameterSource source.BaseRun spans value)
+        | EvolutionRun value | ContinuationRun value -> ContinuationRun (SgdRun.withParameterSource source.BaseRun spans value)
+        | DirectRun _ -> invalidArg "source" "A direct run cannot import an evolutionary checkpoint."
+
+    let parameterRole (configured: run) key =
+        RunParameterRoles.forWorkflow configured.ExecuteFunctionName
+            (configured.IsContinuationRun || configured.ParameterSource.IsSome) key
+
+    let withParameterSpans setup execution = function
+        | DirectRun value -> DirectRun (SimpleRun.withSpans [] execution value)
+        | PreparedRun value -> PreparedRun (SimpleRun.withSpans setup execution value)
+        | EvolutionRun value -> EvolutionRun (SgdRun.withSpans setup execution value)
+        | ContinuationRun value -> ContinuationRun (SgdRun.withSpans setup execution value)
 
     let makeRunParameters minReplica maxReplica spans (refiner: runParameters seq -> runParameters seq) =
         ParameterGeneration.make minReplica maxReplica spans refiner

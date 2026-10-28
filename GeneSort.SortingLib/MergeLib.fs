@@ -38,6 +38,15 @@ module MergeLibId =
 
     let create (sortingWidth: int<sortingWidth>) (mergeDimension: int<mergeDimension>) (variant: sorterLibVariant) : mergeLibId =
         { sortingWidth = sortingWidth; mergeDimension = mergeDimension; variant = variant }
+
+    /// Every merge at this width whose component sorting network exists in the library.
+    let availableForWidth (width: int<sortingWidth>) =
+        SorterLib.ids ()
+        |> Array.choose (fun sorter ->
+            if int width > 0 && int width % int sorter.SortingWidth = 0 then
+                Some (create width (UMX.tag (int width / int sorter.SortingWidth)) sorter.SorterVariant)
+            else None)
+        |> Array.sortBy (fun id -> id.MergeDimension, id.SorterLibVariant)
     let toString (key: mergeLibId) : string =
         sprintf "MergeLibId(sortingWidth=%d, mergeDimension=%d, Variant=%s)" 
                 (UMX.untag key.sortingWidth) (UMX.untag key.mergeDimension) (SorterLibVariant.toString key.variant)

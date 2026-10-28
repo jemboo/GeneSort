@@ -52,7 +52,7 @@ module SetupOutputs =
             (outputType: geneSortDataType) : Result<Guid<queryParamsId> array, string> =
         try
             ProjectCatalogs.registerAll ()
-            let configured = run.SimpleRun simple
+            let configured = Run.ofSimple simple
             let query =
                 QueryParamsCatalogSetup.get configured.SetupQueryCatalogName
                     configured.ProjectName configured.DatabaseName

@@ -54,7 +54,7 @@ module Merge =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -102,7 +102,7 @@ module Merge =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -150,7 +150,7 @@ module Merge =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -198,7 +198,7 @@ module Merge =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -239,3 +239,11 @@ module Merge =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", [|
+            runExample("Msce", Msce)
+            runExample("Mssi", Mssi)
+            runExample("Msrs", Msrs)
+            runExample("Msuf4", Msuf4)
+        |])

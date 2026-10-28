@@ -80,7 +80,8 @@ type runHost =
             { storage = storage
               run = simple
               queryParamsFromSetupParams =
-                  QueryParamsCatalogSetup.get
+                  if not run.HasSetup then fun _ _ -> None
+                  else QueryParamsCatalogSetup.get
                         run.SetupQueryCatalogName 
                         run.ProjectName 
                         run.DatabaseName
@@ -90,16 +91,16 @@ type runHost =
               bindExecution = bindExecution
               executeFunction = bindExecution storage
               runEnhancer = RunParamEnhancerBuilders.get run.RunEnhancerFunctionName
-              setupEnhancer = SetupEnhancerCatalog.get run.SetupEnhancerFunctionName }
+              setupEnhancer = if run.HasSetup then SetupEnhancerCatalog.get run.SetupEnhancerFunctionName else fun _ parameters -> parameters }
 
         let lookupInterval = RunIntervals.resolve run.RunName
 
         match run with
-        | run.SimpleRun value ->
+        | run.DirectRun value | run.PreparedRun value ->
             match execution with
             | SimpleExecution bind -> SimpleRunHost (makeSimpleHost value bind)
             | SgdExecution _ -> invalidArg "run" (sprintf "Execute function '%s' requires an SgdRun with a mutator and generation intervals." run.ExecuteFunctionName)
-        | run.SgdRun value ->
+        | run.EvolutionRun value | run.ContinuationRun value ->
             let names = SgdRun.makerNames value
             let makeTests = SortableTestsMakerCatalog.get names.SortableTests
             let makeSeedPool = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet
@@ -150,8 +151,8 @@ type runHost =
 
     member this.Run =
         match this with
-        | SimpleRunHost host -> run.SimpleRun host.run
-        | SgdRunHost host -> run.SgdRun host.run
+        | SimpleRunHost host -> Run.ofSimple host.run
+        | SgdRunHost host -> Run.ofSgd host.run
 
     member this.QueryParamsFromRunParams =
         this.Storage.QueryParamsFromRunParams
@@ -225,4 +226,5 @@ type runHost =
             this.RunEnhancer this.SetupEnhancer this.Run minReplica maxReplica
 
     member this.MakeSetupParameters minReplica maxReplica =
-        SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun
+        if not this.Run.HasSetup then [||]
+        else SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun

@@ -39,7 +39,7 @@ module Standard =
                  |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -74,7 +74,7 @@ module Standard =
                  |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -109,7 +109,7 @@ module Standard =
                  |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -147,3 +147,10 @@ module Standard =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterEval.Standard", [|
+            runExample("Test", Test)
+            runExample("Small", Small)
+            runExample("Medium", Medium)
+        |])

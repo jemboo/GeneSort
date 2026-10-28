@@ -36,6 +36,11 @@ type parameterDescription =
     member this.Maximum = this.rule.Maximum
     static member internal create key requiredInSetup executionAllowed =
         { rule = ParameterValidation.describe key; requiredInSetup = requiredInSetup; executionAllowed = executionAllowed }
+    static member forKey key requiredInSetup executionAllowed =
+        { rule = ParameterValidation.describeOrText key; requiredInSetup = requiredInSetup; executionAllowed = executionAllowed }
+    static member internal forChoices key choices requiredInSetup executionAllowed =
+        { rule = parameterRule.create key (ParameterValidation.describeOrText key).Description (Choice choices)
+          requiredInSetup = requiredInSetup; executionAllowed = executionAllowed }
 
 /// Immutable snapshots; the UI owns mutable text fields, not domain records.
 type parameterDraft =
@@ -169,7 +174,7 @@ module RunEditor =
             } {
                 MakerNames = workflow.MakerNames
                 GenSaveIntervalsName = draft.GenSaveIntervalsName; GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName
-            } |> run.SgdRun |> Ok
+            } |> Run.ofSgd |> Ok
 
     /// Reject incompatible catalogs rather than silently changing an opened run's behavior.
     let fromRun (configured: run) =

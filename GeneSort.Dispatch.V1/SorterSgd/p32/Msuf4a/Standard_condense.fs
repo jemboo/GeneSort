@@ -36,3 +36,8 @@ module Pool_32_condense =
             ExecutionParameterSpans = executionParameterSpans
         }
         |> EvoCondense.createStandard
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", [|
+            runExample("Test", Test)
+        |])

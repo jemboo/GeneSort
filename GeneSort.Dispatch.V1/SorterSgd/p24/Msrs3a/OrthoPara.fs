@@ -45,7 +45,7 @@ module OrthoPara32 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -84,7 +84,7 @@ module OrthoPara32 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -108,3 +108,9 @@ module OrthoPara32 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.OrthoPara.OrthoPara32", [|
+            runExample("PickMode2_2", PickMode2_2)
+            runExample("NoMods", NoMods)
+        |])

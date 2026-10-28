@@ -247,7 +247,7 @@ module RunEditorTests =
         Assert.Empty(RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>)
 
     [<Fact>]
-    let ``editor restrictions do not remove runtime parameters or pool overrides`` () =
+    let ``fresh runs reject fixed pool overrides in both editor and runtime`` () =
         let original = RunEditor.newDraft() |> RunEditor.build |> ok |> RunDto.fromDomain
         let configured =
             { original with
@@ -259,11 +259,10 @@ module RunEditorTests =
         let issues = configured |> RunEditor.fromRun |> ok |> RunEditor.validate
         Assert.Contains(issues, fun issue -> issue.Message = "Set pool sizes during setup.")
         Assert.Contains(issues, fun issue -> issue.Message.Contains "not supported")
-        let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
-        Assert.Equal(4, parameters.Length)
-        Assert.All(parameters, fun rp ->
-            Assert.Equal(64, int (rp.GetSorterCountPerPool().Value))
-            Assert.Equal(1, int (rp.GetSorterPoolCount().Value))
+        let error = Assert.Throws<ArgumentException>(fun () -> RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> ignore)
+        Assert.Contains("fixed by Setup", error.Message)
+        let growthOnly = { original with RunParameterSpans = [| { Key = ParamKeys.sorterPoolExpansionRateKey; Values = [|"1.1"|] } |] } |> RunDto.toDomain
+        Assert.All(RunParameterGeneration.generate growthOnly 0<replNumber> 1<replNumber>, fun rp ->
             Assert.Equal("1.1", rp.ParamMap[ParamKeys.sorterPoolExpansionRateKey]))
 
     [<Fact>]

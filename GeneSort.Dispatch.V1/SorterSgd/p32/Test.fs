@@ -50,7 +50,7 @@ module Test =
                     (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -99,7 +99,7 @@ module Test =
                     (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -125,6 +125,13 @@ module Test =
             )
 
 
+
+
+        let runType =
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool", [|
+                runExample("TestStandard", TestStandard)
+                runExample("TestSoss", TestSoss)
+            |])
 
         module SimpleR =
 
@@ -167,7 +174,7 @@ module Test =
                     [
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -217,7 +224,7 @@ module Test =
                         (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -279,6 +286,15 @@ module Test =
                     ]
                 } |> EvoCondense.createSoss
 
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleR", [|
+                    runExample("Standard", Standard)
+                    runExample("Soss", Soss)
+                    runExample("StandardAppend", StandardAppend)
+                    runExample("SossCondense", SossCondense)
+                |])
+
         module SimpleS =
 
             let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
@@ -320,7 +336,7 @@ module Test =
                     [
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -370,7 +386,7 @@ module Test =
                         (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -432,6 +448,15 @@ module Test =
                     ]
                 } |> EvoCondense.createSoss
 
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleS", [|
+                    runExample("StandardS", StandardS)
+                    runExample("SossS", SossS)
+                    runExample("StandardAppendS", StandardAppendS)
+                    runExample("SossCondenseS", SossCondenseS)
+                |])
+
         module Controlled =
 
             let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
@@ -476,7 +501,7 @@ module Test =
                     [
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -524,7 +549,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -572,7 +597,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -621,7 +646,7 @@ module Test =
                         (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -672,7 +697,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -723,7 +748,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [activatorMutationRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -771,7 +796,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [matchedFlipRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -822,7 +847,7 @@ module Test =
                         (ParamKeys.generationIntervalLastKey, [generationCount / 10 - 1] |> List.map string)
                         (ParamKeys.activatorMutationRateKey, [matchedFlipRate] |> List.map string)
                     ]
-                run.SgdRun (
+                run.EvolutionRun (
                     SgdRun.create {
                         DatabaseName = names.DatabaseName
                         ProjectName = names.ProjectName
@@ -846,6 +871,19 @@ module Test =
                         GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
                     }
                 )
+
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Controlled", [|
+                    runExample("StandardSimple", StandardSimple)
+                    runExample("StandardR", StandardR)
+                    runExample("CompareStandardS", CompareStandardS)
+                    runExample("SossSimple", SossSimple)
+                    runExample("SossR", SossR)
+                    runExample("CompareSossS", CompareSossS)
+                    runExample("MatchedStandardS", MatchedStandardS)
+                    runExample("MatchedSossS", MatchedSossS)
+                |])
 
         module Continuation =
 
@@ -937,6 +975,15 @@ module Test =
 
 
 
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Continuation", [|
+                    runExample("TestStandardAppend", TestStandardAppend)
+                    runExample("TestStandardCondense", TestStandardCondense)
+                    runExample("TestSossAppend", TestSossAppend)
+                    runExample("TestSossCondense", TestSossCondense)
+                |])
+
         module SameFamilyChain =
 
             let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
@@ -1021,6 +1068,15 @@ module Test =
                     ]
                 }
                 |> EvoAppend.createSoss
+
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SameFamilyChain", [|
+                    runExample("TestStandardAppendCondense", TestStandardAppendCondense)
+                    runExample("TestStandardCondenseAppend", TestStandardCondenseAppend)
+                    runExample("TestSossAppendCondense", TestSossAppendCondense)
+                    runExample("TestSossCondenseAppend", TestSossCondenseAppend)
+                |])
 
         module MixedFamilyChain =
 
@@ -1116,3 +1172,11 @@ module Test =
                     ]
                 }
                 |> EvoAppend.createStandard
+
+            let runType =
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.MixedFamilyChain", [|
+                    runExample("TestStandardAppendSossCondense", TestStandardAppendSossCondense)
+                    runExample("TestStandardCondenseSossAppend", TestStandardCondenseSossAppend)
+                    runExample("TestSossAppendStandardCondense", TestSossAppendStandardCondense)
+                    runExample("TestSossCondenseStandardAppend", TestSossCondenseStandardAppend)
+                |])

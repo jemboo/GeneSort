@@ -28,6 +28,9 @@
     <Compile Include="RunQueryBuilderTests.fs" />
     <Compile Include="RunNameTests.fs" />
     <Compile Include="RunEditorTests.fs" />
+    <Compile Include="RunTypeTests.fs" />
+    <Compile Include="RunWorkflowTests.fs" />
+    <None Include="WorkflowFileIds.txt" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../scripts/OnePoolAudit/Verification.fs" Link="OnePoolAuditVerification.fs" />
     <Compile Include="OnePoolAuditTests.fs" />
   </ItemGroup>

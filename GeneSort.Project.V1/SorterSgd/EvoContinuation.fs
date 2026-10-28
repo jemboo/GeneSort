@@ -24,7 +24,7 @@ type evoContinuationSource =
         _selectedSorterPoolCount: int
     }
 
-    member this.SourceRun = run.SgdRun this._run
+    member this.SourceRun = Run.ofSgd this._run
     member internal this.SourceSgdRun = this._run
     member this.GenerationInterval = this._generationInterval
     member this.SourceMutationMods = this._sourceMutationMods
@@ -33,7 +33,7 @@ type evoContinuationSource =
     static member public create (args: evoContinuationSourceArgs) : evoContinuationSource =
         let source =
             match args.SourceRun with
-            | run.SgdRun source when List.contains (SgdRun.executeFunctionName source) [ExecuteFunctionNames.standard; ExecuteFunctionNames.soss] -> source
+            | run.EvolutionRun source | run.ContinuationRun source when List.contains (SgdRun.executeFunctionName source) [ExecuteFunctionNames.standard; ExecuteFunctionNames.soss] -> source
             | _ -> invalidArg "SourceRun" "Continuation requires a Standard or Soss SGD source run."
         if args.GenerationInterval < 0 then
             invalidArg "GenerationInterval" "Source generation interval must be nonnegative."
@@ -155,7 +155,7 @@ module internal EvoContinuation =
             GenSaveIntervalsName = SgdRun.genSaveIntervalsName sourceSgd
             GenSaveSubIntervalsName = SgdRun.genSaveSubIntervalsName sourceSgd
         }
-        |> run.SgdRun
+        |> Run.ofSgd
         |> Run.withParameterSource source [
             ParamKeys.sourceMutationModKey, config.Source.SourceMutationMods |> List.map string
             ParamKeys.selectedSorterPoolCountKey, [string config.Source.SelectedSorterPoolCount]

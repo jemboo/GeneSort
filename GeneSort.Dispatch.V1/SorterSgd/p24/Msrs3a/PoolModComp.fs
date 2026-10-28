@@ -42,7 +42,7 @@ module PoolSelSz128 =
                 (ParamKeys.mutationModKey, [0 .. 1] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, ["32";] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -67,6 +67,12 @@ module PoolSelSz128 =
             }
         )
 
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", [|
+            runExample("TestSpec", TestSpec)
+        |])
+
 module Sz_2048_Of_4096 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
@@ -86,7 +92,7 @@ module Sz_2048_Of_4096 =
                 (ParamKeys.mutationModKey, [0 .. 7;] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [2048;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -111,6 +117,12 @@ module Sz_2048_Of_4096 =
             }
         )
 
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", [|
+            runExample("Sz_2048_Of_4096", Sz_2048_Of_4096)
+        |])
+
 module PoolsSelSzTest_2_vs_256 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
@@ -130,7 +142,7 @@ module PoolsSelSzTest_2_vs_256 =
                 (ParamKeys.mutationModKey, [0 .. 63;] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, ["64"; "128"; "256"] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -154,3 +166,8 @@ module PoolsSelSzTest_2_vs_256 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", [|
+            runExample("PoolSz_2n256", PoolSz_2n256)
+        |])

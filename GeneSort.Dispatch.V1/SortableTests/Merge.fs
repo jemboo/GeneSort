@@ -20,9 +20,6 @@ module Merge =
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
-    let setupFunctionName = SetupCatalogNames.merge
-    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestMerge
 
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -40,8 +37,8 @@ module Merge =
                  |> List.map MergeLibId.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
             ]
-        run.SimpleRun (
-            SimpleRun.create {
+        run.DirectRun (
+            DirectRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
                 RunName = names.RunName
@@ -52,12 +49,6 @@ module Merge =
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
-                }
-                Setup = {
-                    FunctionName = setupFunctionName
-                    ParameterSpans = parameterSpans
-                    QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -75,3 +66,8 @@ module Merge =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SortableTests.Merge", [|
+            runExample("Test", Test)
+        |])

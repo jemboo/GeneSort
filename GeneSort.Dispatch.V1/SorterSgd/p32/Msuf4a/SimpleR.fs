@@ -41,7 +41,7 @@ module Standard =
                 (ParamKeys.generationIntervalLastKey, [0] |> List.map string)
                 (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -89,7 +89,7 @@ module Standard =
                 (ParamKeys.adjustCeLengthFrequencyKey, [10] |> List.map string)
                 (ParamKeys.activatorMutationRateKey, [0.05; 0.1; 0.2] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -113,6 +113,13 @@ module Standard =
                 GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
             }
         )
+
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleR.Standard", [|
+            runExample("Test", Test)
+            runExample("ActivatorRates", ActivatorRates)
+        |])
 
 module Soss =
 
@@ -146,7 +153,7 @@ module Soss =
                 (ParamKeys.modificationRateKey, [0.035] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -197,7 +204,7 @@ module Soss =
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map MutatorVariant.toString)
                 (ParamKeys.activatorMutationRateKey, [0.05; 0.1; 0.2] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -221,3 +228,9 @@ module Soss =
                 GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleR.Soss", [|
+            runExample("Test", Test)
+            runExample("ActivatorRates", ActivatorRates)
+        |])

@@ -62,7 +62,7 @@ module Pool_X =
                 (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -200,3 +200,13 @@ module Pool_X =
             ]
         }
         |> EvoCondense.createSoss
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss_condense.Pool_X", [|
+            runExample("Base", Base)
+            runExample("Step1", Step1)
+            runExample("Step2", Step2)
+            runExample("Step3", Step3)
+            runExample("Step4", Step4)
+            runExample("Step5", Step5)
+        |])

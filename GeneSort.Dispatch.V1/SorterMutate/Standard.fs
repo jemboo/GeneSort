@@ -55,7 +55,7 @@ module Standard =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -105,7 +105,7 @@ module Standard =
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -141,3 +141,9 @@ module Standard =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", [|
+            runExample("Msrs", Msrs)
+            runExample("Msuf4", Msuf4)
+        |])

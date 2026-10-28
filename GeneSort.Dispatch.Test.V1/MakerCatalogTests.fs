@@ -68,7 +68,7 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
         GenSaveIntervalsName = GenIntervalNames.expInterval100_L50ss
         GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
     }
-    |> run.SgdRun
+    |> Run.ofSgd
 
 let private makeRun = makeRunWithExecuteName ExecuteFunctionNames.standard
 
@@ -101,7 +101,7 @@ let private makeSimpleRun executeName =
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
         }
     }
-    |> run.SimpleRun
+    |> Run.ofSimple
 
 [<Fact>]
 let ``setup spans and query catalogs survive serialization for simple and SGD runs`` () =

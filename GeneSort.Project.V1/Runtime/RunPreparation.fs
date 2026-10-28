@@ -50,8 +50,8 @@ module RunPreparation =
             |> Seq.toArray
         let paths =
             match args.Run with
-            | run.SimpleRun _ -> [||]
-            | run.SgdRun _ -> parameters |> Array.map (EvoPath.prepare args.Run)
+            | run.DirectRun _ | run.PreparedRun _ -> [||]
+            | run.EvolutionRun _ | run.ContinuationRun _ -> parameters |> Array.map (EvoPath.prepare args.Run)
         runParameterSet.create { Run = args.Run; Entries = entries; SetupFiles = setupFiles; EvolutionPaths = paths }
 
     let prepare args =

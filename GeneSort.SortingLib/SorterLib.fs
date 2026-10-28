@@ -701,3 +701,5 @@ module SorterLib =
     /// Safely attempts to find a network string by its key properties.
     let tryGet (sorterKey: sorterLibId) =
         Map.tryFind sorterKey AllNetworksList
+
+    let ids () = AllNetworksList |> Map.toArray |> Array.map fst

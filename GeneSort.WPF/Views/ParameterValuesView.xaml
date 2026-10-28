@@ -18,13 +18,27 @@
                       IsEditable="True" IsReadOnly="True" IsTextSearchEnabled="False" Width="90" Padding="5,4"
                       BorderThickness="0" AutomationProperties.Name="Choice value" />
         </DataTemplate>
+        <DataTemplate x:Key="LibraryIdEditor">
+            <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                      IsEditable="False" HorizontalAlignment="Stretch" Padding="6,4" BorderThickness="0"
+                      AutomationProperties.Name="{Binding LibraryValueName}">
+                <ComboBox.ItemTemplate><DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                </DataTemplate></ComboBox.ItemTemplate>
+            </ComboBox>
+        </DataTemplate>
     </UserControl.Resources>
     <StackPanel>
         <DockPanel LastChildFill="True">
             <Button DockPanel.Dock="Right" Content="+ value" Click="AddValue_Click" IsEnabled="{Binding CanAddValue}"
                     Padding="8,4" Margin="4,0,0,4" VerticalAlignment="Top" ToolTip="Add another value to this parameter's sweep" />
             <ItemsControl ItemsSource="{Binding Values}" HorizontalContentAlignment="Stretch">
-                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.Style><Style TargetType="ItemsControl">
+                    <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></Setter.Value></Setter>
+                    <Style.Triggers><DataTrigger Binding="{Binding IsLibraryId}" Value="True">
+                        <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter.Value></Setter>
+                    </DataTrigger></Style.Triggers>
+                </Style></ItemsControl.Style>
                 <ItemsControl.ItemTemplate><DataTemplate>
                     <Border Margin="0,0,6,4" BorderThickness="1" CornerRadius="3" Background="{DynamicResource SurfaceBrush}" ToolTip="{Binding Error}">
                         <Border.Style><Style TargetType="Border">
@@ -37,7 +51,7 @@
                             <Button DockPanel.Dock="Right" Content="×" Click="RemoveValue_Click" Padding="5,0" Margin="0"
                                     BorderThickness="0" Background="Transparent" Foreground="{DynamicResource MutedBrush}" ToolTip="Remove this value"
                                     AutomationProperties.Name="Remove value" />
-                            <ContentControl Content="{Binding}">
+                            <ContentControl Content="{Binding}" HorizontalContentAlignment="Stretch">
                                 <ContentControl.Style><Style TargetType="ContentControl">
                                     <Setter Property="ContentTemplate" Value="{StaticResource TextEditor}" />
                                     <Style.Triggers>
@@ -49,6 +63,9 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Kind}" Value="{x:Static parameters:parameterValueKind.Choice}">
                                             <Setter Property="ContentTemplate" Value="{StaticResource ChoiceEditor}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsLibraryId}" Value="True">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource LibraryIdEditor}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style></ContentControl.Style>

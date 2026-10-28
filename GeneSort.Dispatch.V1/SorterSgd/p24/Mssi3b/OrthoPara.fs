@@ -42,7 +42,7 @@ module OrthoPara64 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -82,7 +82,7 @@ module OrthoPara64 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -122,7 +122,7 @@ module OrthoPara64 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [64;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -147,6 +147,14 @@ module OrthoPara64 =
             }
         )
 
+
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara64", [|
+            runExample("NoMods", NoMods)
+            runExample("SymForceDiff1", SymForceDiff1)
+            runExample("SymForce", SymForce)
+        |])
 
 module OrthoPara128 =
 
@@ -170,7 +178,7 @@ module OrthoPara128 =
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, [128;] |> List.map string)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -194,3 +202,8 @@ module OrthoPara128 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara128", [|
+            runExample("NoMods", NoMods)
+        |])

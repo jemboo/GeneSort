@@ -43,7 +43,7 @@ module Pool_32 =
                 (ParamKeys.modificationRateKey, [0.035;]  |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2;] |> List.map (MutatorVariant.toString))
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -85,7 +85,7 @@ module Pool_32 =
                 (ParamKeys.modificationRateKey, [0.015; 0.020; 0.025; 0.030; 0.040; 0.050;] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -109,6 +109,13 @@ module Pool_32 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_32", [|
+            runExample("Test", Test)
+            runExample("V1", V1)
+        |])
 
 module Pool_512 =
 
@@ -135,7 +142,7 @@ module Pool_512 =
                 (ParamKeys.modificationRateKey, [0.020; 0.025; 0.030; 0.035; 0.040;] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V2] |> List.map (MutatorVariant.toString))
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -159,3 +166,8 @@ module Pool_512 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_512", [|
+            runExample("V2a", V2a)
+        |])

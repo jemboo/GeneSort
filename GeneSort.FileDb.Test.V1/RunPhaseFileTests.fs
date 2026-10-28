@@ -9,6 +9,7 @@ open Xunit
 open GeneSort.Core
 open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
+open GeneSort.SortingLib.Sorter
 open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Eval.V1
@@ -269,7 +270,7 @@ module RunPhaseFileTests =
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
                 ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
             }
-        } |> run.SimpleRun
+        } |> Run.ofSimple
 
     [<Fact>]
     let ``real setup creates only selected inputs reuses them and sources load from the selected folder`` () = withFolder (fun folder -> task {
@@ -316,6 +317,103 @@ module RunPhaseFileTests =
             Assert.Contains("Prepare and execute this library", message)
             Assert.Contains(Path.Combine(folder, "other"), message)
         | Ok _ -> failwith "Expected a missing source library error."
+    })
+
+    [<Theory>]
+    [<InlineData("Prefix")>]
+    [<InlineData("Merge")>]
+    let ``evaluation setup requires matching tests and accepts any source run name`` database = withFolder (fun folder -> task {
+        let prefix = prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
+        let merge = mergeLibId.create 8<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+        let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupEnhancer, runEnhancer =
+            if database = "Prefix" then
+                ParamKeys.prefixLibIdKey, PrefixLibId.toString prefix, sortableDataFormat.BitVector512,
+                QueryCatalogNamesRun.sortableTestPrefix, SetupCatalogNames.prefix,
+                QueryCatalogNamesSetup.sorterEvalPrefix, QueryCatalogNamesRun.sorterEvalPrefix,
+                SetupEnhancerFunctionNames.sorterEvalPrefix, RunParamBuilderNames.Enhancer.sorterEvalPrefix
+            else
+                ParamKeys.mergeLibIdKey, MergeLibId.toString merge, sortableDataFormat.Int8Vector512,
+                QueryCatalogNamesRun.sortableTestMerge, SetupCatalogNames.merge,
+                QueryCatalogNamesSetup.sorterEvalMerge, QueryCatalogNamesRun.sorterEvalMerge,
+                SetupEnhancerFunctionNames.sorterEval, RunParamBuilderNames.Enhancer.sorterEvalMerge
+        let inputs = [key, [library]; ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString format]]
+        let tests =
+            DirectRun.create {
+                ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
+                Description = "Tests saved under a user-selected name"; AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.sortableTests; QueryCatalogName = testCatalog
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests; ParameterSpans = inputs
+                }
+            } |> run.DirectRun
+        let evaluation =
+            SimpleRun.create {
+                ProjectName = UMX.tag "SorterEval"; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
+                Description = "Evaluation of the saved test library"; AllowOverwrite = false
+                Setup = {
+                    FunctionName = setupCatalog; QueryCatalogName = querySetup; EnhancerFunctionName = setupEnhancer
+                    ParameterSpans = inputs @ [ParamKeys.rngTypeKey, ["LCG"]; ParamKeys.sorterCountKey, ["2"];
+                                              ParamKeys.simpleSorterModelTypeKey, ["Msce"]]
+                }
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.sorterEval; QueryCatalogName = queryRun
+                    EnhancerFunctionName = runEnhancer; ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
+                }
+            } |> run.PreparedRun
+        let! rows = publish folder evaluation
+        let row = Assert.Single rows
+        let messages = ResizeArray<string>()
+        let sink = { new IProgress<runPhaseProgress> with member _.Report progress = messages.Add progress.Message }
+        let! missing = RunSetupFiles.runAsync folder evaluation rows sink
+        Assert.Equal(0, missing.Succeeded)
+        Assert.Equal(1, missing.Failed)
+        let error = Assert.Single missing.Errors
+        Assert.Contains(library, error)
+        Assert.Contains(SortableDataFormat.toString format, error)
+        Assert.Contains("Expected result:", error)
+        Assert.Contains("then rerun Setup", error)
+        Assert.DoesNotContain(messages, fun message -> message.Contains("Setup complete"))
+        Assert.Empty(Directory.GetDirectories(folder, "SortableTestsWithPrefix", SearchOption.AllDirectories))
+
+        let! testRows = publish folder tests
+        let! generated = RunExecutionFiles.runSavedAsync folder tests testRows null
+        Assert.Empty(generated.Errors)
+        Assert.Equal(1, generated.Succeeded)
+        let query = QueryParamsCatalogRun.get testCatalog tests.ProjectName tests.DatabaseName testRows[0] (geneSortDataType.SortableTests "") |> Option.get
+        let sourceRoot = Path.Combine(folder, "SortableTests", database, "Data") |> UMX.tag
+        let sourceFile = OutputDataFile.getFullOutputDataFilePath sourceRoot geneSortDataMode.Results query |> UMX.untag
+        Assert.True(File.Exists sourceFile)
+        Assert.Contains(sourceFile, error)
+        let sourceTime = File.GetLastWriteTimeUtc sourceFile
+        let sources = (WorkflowSourceFiles.create folder).Evolution
+        let load replica format =
+            if database = "Prefix" then sources.LoadPrefixTests replica prefix format
+            else sources.LoadMergeTests replica merge format
+        let! loaded = load 0<replNumber> format |> Async.StartAsTask
+        get loaded |> ignore
+        let! wrongReplica = load 1<replNumber> format |> Async.StartAsTask
+        Assert.True(Result.isError wrongReplica)
+        let! wrongFormat = load 0<replNumber> sortableDataFormat.BoolArray |> Async.StartAsTask
+        Assert.True(Result.isError wrongFormat)
+
+        let! setup = RunSetupFiles.runAsync folder evaluation rows null
+        Assert.Empty(setup.Errors)
+        Assert.Equal(1, setup.Succeeded)
+        let setupFiles = Directory.GetFiles(Path.Combine(folder, "SorterEval", database, "Data", "Setup"), "*.msgpack", SearchOption.AllDirectories) |> Array.sort
+        Assert.Equal(2, setupFiles.Length)
+        Assert.Contains(setupFiles, fun file -> Path.GetFileNameWithoutExtension file = string (row.GetSetupSortableTestsWithPrefixId().Value))
+        let setupTimes = setupFiles |> Array.map File.GetLastWriteTimeUtc
+        let! again = RunSetupFiles.runAsync folder evaluation rows null
+        Assert.Empty(again.Errors)
+        Assert.Equal<DateTime>(setupTimes, setupFiles |> Array.map File.GetLastWriteTimeUtc)
+        let! executed = RunExecutionFiles.runSavedAsync folder evaluation rows null
+        Assert.Empty(executed.Errors)
+        Assert.Equal(1, executed.Succeeded)
+        Assert.Equal(sourceTime, File.GetLastWriteTimeUtc sourceFile)
+        let! saved = RunParameterFiles.loadAllAsync folder evaluation
+        Assert.Equal(row.GetId(), saved[0].GetId())
+        Assert.Equal(row.GetSetupSortableTestsWithPrefixId(), saved[0].GetSetupSortableTestsWithPrefixId())
+        Assert.Equal(Some true, saved[0].GetRunFinished())
     })
 
     [<Fact>]

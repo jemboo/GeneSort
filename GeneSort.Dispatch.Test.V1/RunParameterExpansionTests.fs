@@ -124,7 +124,7 @@ let private configure runValues setupValues outputTypes setupQuery =
                 QueryCatalogName = name
                 EnhancerFunctionName = name
             }
-        } |> run.SimpleRun
+        } |> Run.ofSimple
     configured, setupCalls
 
 let private query project database (sp: setupParameters) outputType =

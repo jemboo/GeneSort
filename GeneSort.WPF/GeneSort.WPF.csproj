@@ -12,6 +12,7 @@
     <InternalsVisibleTo Include="RunEditorSmoke" />
     <ProjectReference Include="..\GeneSort.Project.V1\GeneSort.Project.V1.fsproj" />
     <ProjectReference Include="..\GeneSort.FileDb.V1\GeneSort.FileDb.V1.fsproj" />
+    <ProjectReference Include="..\GeneSort.Dispatch.V1\GeneSort.Dispatch.V1.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

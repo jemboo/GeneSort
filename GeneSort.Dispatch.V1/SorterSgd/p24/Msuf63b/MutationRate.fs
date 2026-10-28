@@ -60,7 +60,7 @@ module VarModR_32 =
                 (ParamKeys.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -103,7 +103,7 @@ module VarModR_32 =
                 (ParamKeys.modificationRateKey, [0.05; 0.075; 0.1; 0.125;] |> List.map string)
                 (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map MutatorVariant.toString)
             ]
-        run.SgdRun (
+        run.EvolutionRun (
             SgdRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -127,3 +127,9 @@ module VarModR_32 =
                 GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
             }
         )
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", [|
+            runExample("Test", Test)
+            runExample("WideTest", WideTest)
+        |])

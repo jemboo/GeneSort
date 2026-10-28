@@ -39,6 +39,12 @@ let Test () : run =
     |> EvoAppend.createStandard
 
 
+
+let runType =
+    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", [|
+        runExample("Test", Test)
+    |])
+
 module Pool_128 =
 
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
@@ -68,6 +74,12 @@ module Pool_128 =
         }
         |> EvoAppend.createStandard
 
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", [|
+            runExample("V1", V1)
+        |])
+
 module Pool_512 =
 
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
@@ -95,3 +107,8 @@ module Pool_512 =
             ExecutionParameterSpans = executionParameterSpans
         }
         |> EvoAppend.createStandard
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", [|
+            runExample("V1", V1)
+        |])

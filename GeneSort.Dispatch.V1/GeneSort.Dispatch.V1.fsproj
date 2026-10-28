@@ -20,6 +20,7 @@
     <Compile Include="ParamOps.fs" />
     <Compile Include="RunNaming.fs" />
     <Compile Include="RunHost.fs" />
+    <Compile Include="RunType.fs" />
     <Compile Include="SortableTests\Merge.fs" />
     <Compile Include="SortableTests\Prefix.fs" />
     <Compile Include="SortableTests\SortableTestsDbs.fs" />
@@ -55,6 +56,7 @@
     <Compile Include="SorterSgd\p24\Mssi3b\Common.fs" />
     <Compile Include="SorterSgd\p24\Mssi3b\OrthoPara.fs" />
     <Compile Include="DispatchLib.fs" />
+    <Compile Include="RunTypeCatalog.fs" />
     <Compile Include="DispatchSortableTests.fs" />
     <Compile Include="DispatchSorterEval.fs" />
     <Compile Include="DispatchSorterMutate.fs" />

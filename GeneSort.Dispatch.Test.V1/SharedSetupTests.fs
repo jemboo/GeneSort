@@ -48,7 +48,7 @@ let private configuration () =
             EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
             ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V1"; "V2"]]
         }
-    } |> run.SimpleRun
+    } |> Run.ofSimple
 
 type private TestDatabase() =
     let root = Path.Combine(Path.GetTempPath(), "GeneSort-SharedSetup-" + Guid.NewGuid().ToString("N")) |> Path.GetFullPath

@@ -14,8 +14,35 @@ public partial class RunEditorView : UserControl
     private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageDialog.Show(Window.GetWindow(this),
         "Discard the unsaved run definition changes?", "Run editor", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
+    private bool changingType;
+    private void RunType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (changingType || sender is not ComboBox combo || combo.SelectedItem is not GeneSort.Dispatch.V1.runType type
+            || ReferenceEquals(type, Model.SelectedRunType)) return;
+        changingType = true;
+        try { if (DiscardChanges()) Model.SelectRunType(type); else Model.RefreshTypeSelection(); }
+        finally { changingType = false; }
+    }
+    private void Example_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (changingType || sender is not ComboBox combo || combo.SelectedItem is not GeneSort.Dispatch.V1.runExample example
+            || ReferenceEquals(example, Model.SelectedExample)) return;
+        changingType = true;
+        try { if (DiscardChanges()) Model.SelectExample(example); else Model.RefreshTypeSelection(); }
+        finally { changingType = false; }
+    }
+
     private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
     private void Validate_Click(object sender, RoutedEventArgs e) => Model.Validate();
+    private void CopyErrors_Click(object sender, RoutedEventArgs e)
+    {
+        if (!Model.HasErrors) return;
+        try { Clipboard.SetText(Model.ErrorMessages); }
+        catch (System.Runtime.InteropServices.ExternalException)
+        {
+            Model.Status = "The clipboard is busy. Try Copy errors again, or select the error text and press Ctrl+C.";
+        }
+    }
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFolderDialog { Title = "Choose the folder containing your GeneSort projects" };

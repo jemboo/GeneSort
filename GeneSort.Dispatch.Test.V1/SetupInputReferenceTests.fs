@@ -104,7 +104,7 @@ let ``preparation inventories five directly addressed setup files without IO`` (
                 EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
                 ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V1"; "V2"]]
             }
-        } |> run.SimpleRun
+        } |> Run.ofSimple
     let prepared = RunPreparation.prepare { Run = configured; FirstReplica = 0; ReplicaCount = 2 }
     Assert.Equal(8, prepared.FileCount)
     Assert.Equal(5, prepared.SetupFiles.Length)

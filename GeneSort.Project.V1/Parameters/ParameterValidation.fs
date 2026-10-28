@@ -4,6 +4,7 @@ open System
 open System.Globalization
 open GeneSort.Core
 open GeneSort.Model.Sorting.V1
+open GeneSort.SortingLib.Sorter
 
 type validationIssue =
     private { field: string; message: string }
@@ -46,6 +47,9 @@ type parameterRule =
 module ParameterValidation =
     let private rules =
         [
+            parameterRule.create ParamKeys.mergeLibIdKey "Merge library identity with a positive width divisible by its dimension." Text
+            parameterRule.create ParamKeys.prefixLibIdKey "Prefix library identity with a positive width and stage length." Text
+            parameterRule.create ParamKeys.sorterLibIdKey "Sorter library identity with a positive width." Text
             parameterRule.create ParamKeys.sorterCountPerPoolKey "Positive number of sorters in each pool." (Integer 1)
             parameterRule.create ParamKeys.sorterCountPerPoolSetKey "Positive total number of sorters in the pool set." (Integer 1)
             parameterRule.create ParamKeys.codeModKey "Nonempty configuration label used in query identity." Text
@@ -63,12 +67,37 @@ module ParameterValidation =
         ] |> List.map (fun rule -> rule.Key, rule) |> Map.ofList
 
     let describe key = Map.find key rules
+    /// Other workflows may define keys without a specialized numeric or choice rule.
+    let describeOrText key =
+        Map.tryFind key rules
+        |> Option.defaultWith (fun () -> parameterRule.create key (sprintf "Value for %s." key) Text)
     let private parseInteger (value: string) = Int32.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture)
     let tryInteger value = match parseInteger value with true, number -> Some number | _ -> None
 
     /// Return a canonical value for duplicate detection; leave unregistered parameters to their own workflows.
     let validateValue key value =
         match Map.tryFind key rules with
+        | _ when key = ParamKeys.prefixLibIdKey ->
+            try
+                let id = PrefixLibId.fromString value
+                if int id.SortingWidth <= 0 || int id.StageLength <= 0 then
+                    Error "Choose a PrefixLibId with a positive width and stage length."
+                else Ok (PrefixLibId.toString id)
+            with _ -> Error "Choose a valid PrefixLibId."
+        | _ when key = ParamKeys.sorterLibIdKey ->
+            try
+                let id = SorterLibId.fromString value
+                if int id.SortingWidth <= 0 then Error "Choose a SorterLibId with a positive width."
+                else Ok (SorterLibId.toString id)
+            with _ -> Error "Choose a valid SorterLibId."
+        | _ when key = ParamKeys.mergeLibIdKey ->
+            try
+                let id = MergeLibId.fromString value
+                if int id.SortingWidth <= 0 || int id.MergeDimension <= 0
+                   || int id.SortingWidth % int id.MergeDimension <> 0 then
+                    Error "Choose a MergeLibId with a positive width divisible by its positive dimension."
+                else Ok (MergeLibId.toString id)
+            with _ -> Error "Choose a valid MergeLibId."
         | None -> Ok value
         | Some spec ->
             let valid, canonical =

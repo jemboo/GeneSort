@@ -49,7 +49,7 @@ module Merge =
                 (ParamKeys.sorterCountKey, [100] |> List.map string)
             ]
         let parameterSpansRun = []
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -92,7 +92,7 @@ module Merge =
                 (ParamKeys.sorterCountKey, [100000] |> List.map string)
             ]
         let parameterSpansRun = []
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -135,7 +135,7 @@ module Merge =
                 (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
         let parameterSpansRun = []
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -175,7 +175,7 @@ module Merge =
                 (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
         let parameterSpansRun = []
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -216,7 +216,7 @@ module Merge =
                 (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
         let parameterSpansRun = []
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -259,3 +259,12 @@ module Merge =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterEval.Merge", [|
+            runExample("Test", Test)
+            runExample("Small", Small)
+            runExample("MediumLd", MediumLd)
+            runExample("MediumHd", MediumHd)
+            runExample("LargeLd", LargeLd)
+        |])

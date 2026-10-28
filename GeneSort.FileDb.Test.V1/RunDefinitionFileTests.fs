@@ -7,6 +7,15 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Editing
 open GeneSort.Project.Mp.V1
 open GeneSort.FileDb.V1
+open FSharp.UMX
+open GeneSort.Core
+open GeneSort.Core.Mp
+open GeneSort.Project.V1.Catalogs.Evolution
+open GeneSort.Project.V1.Catalogs.Queries
+open GeneSort.Project.V1.Catalogs.RunParameters
+open GeneSort.Project.V1.Parameters
+open GeneSort.Project.V1.Storage
+open MessagePack
 
 module RunDefinitionFileTests =
     let private configured description =
@@ -21,6 +30,49 @@ module RunDefinitionFileTests =
         try do! test root
         finally Directory.Delete(root, true)
     }
+
+    [<Fact>]
+    let ``opening a legacy direct definition retains old redundant parameter files unchanged`` () = withFolder (fun root -> task {
+        let configured =
+            DirectRun.create {
+                ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag "Prefix"; RunName = UMX.tag "Legacy"
+                Description = "Legacy duplicate setup sweep"; AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.sortableTests
+                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    ParameterSpans = [
+                        ParamKeys.sortableDataFormatKey, ["BitVector512"]
+                        ParamKeys.prefixLibIdKey, ["PrefixLibId(sortingWidth=24, stageLength=3, Variant=PrefixA)";
+                                                  "PrefixLibId(sortingWidth=24, stageLength=3, Variant=PrefixB)"]
+                    ]
+                }
+            } |> run.DirectRun
+        let rows = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
+        // This cross-pair was created by the old redundant Cartesian expansion.
+        let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+        let oldRow = rows[0].WithSetupParametersId(rows[1].GetSetupParametersId())
+        let oldId = query oldRow (geneSortDataType.Run configured.RunName) |> Option.get
+        let oldRow = oldRow.WithId(Some oldId.Id)
+        let dataRoot = Path.Combine(root, "SortableTests", "Prefix", "Data") |> UMX.tag<pathToRootFolder>
+        let db = new GeneSortDbMp(dataRoot, configured.RunQueryCatalogName) :> IGeneSortDb
+        let address = query oldRow (geneSortDataType.RunParameters configured.RunName) |> Option.get
+        let! saved = db.saveAsync geneSortDataMode.Project address (outputData.RunParameters oldRow) (UMX.tag false) |> Async.StartAsTask
+        saved |> Result.defaultWith failwith
+        let dto = RunDto.fromDomain configured
+        let legacy = { dto with SetupParameterSpans = dto.RunParameterSpans }
+        MessagePackSetup.configure ()
+        let path = RunDefinitionFiles.pathFor root configured
+        Directory.CreateDirectory(Path.GetDirectoryName path) |> ignore
+        File.WriteAllBytes(path, MessagePackSerializer.Serialize legacy)
+        let before = Directory.GetFiles(root, "*.msgpack", SearchOption.AllDirectories) |> Array.map (fun file -> file, File.ReadAllBytes file)
+        let! opened = RunDefinitionFiles.loadAsync path
+        Assert.True(opened.IsDirectRun)
+        Assert.Empty(opened.SetupParameterSpans)
+        let! loaded = RunParameterFiles.loadAllAsync root opened
+        Assert.Equal<runParameters>([|oldRow|], loaded)
+        for file, bytes in before do Assert.Equal<byte>(bytes, File.ReadAllBytes file)
+    })
 
     [<Fact>]
     let ``save and open preserve a run and create only its definition`` () = withFolder (fun root -> task {

@@ -53,7 +53,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.25;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -95,7 +95,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -138,7 +138,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -163,6 +163,14 @@ module MutationRate =
                 }
             )
 
+
+
+        let runType =
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", [|
+                runExample("Test", Test)
+                runExample("EqualOPS", EqualOPS)
+                runExample("EqualOPS2", EqualOPS2)
+            |])
 
     module VarModR_64 =
 
@@ -189,7 +197,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.25;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -230,7 +238,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50; 0.99] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -272,7 +280,7 @@ module MutationRate =
                     (ParamKeys.modificationRateKey, [0.25; 0.30; 0.40; 0.50;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -299,6 +307,14 @@ module MutationRate =
 
 
 
+
+
+        let runType =
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", [|
+                runExample("Test", Test)
+                runExample("WideTest", WideTest)
+                runExample("NarrowTest", NarrowTest)
+            |])
 
     module MaxModR_32 =
 
@@ -324,7 +340,7 @@ module MutationRate =
                     (ParamKeys.mutationModKey, [0] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -350,6 +366,12 @@ module MutationRate =
             )
 
 
+
+
+        let runType =
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", [|
+                runExample("Test2", Test2)
+            |])
 
     module MaxModR_64 =
 
@@ -375,7 +397,7 @@ module MutationRate =
                     (ParamKeys.mutationModKey, [0] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
-            run.SgdRun (
+            run.EvolutionRun (
                 SgdRun.create {
                     DatabaseName = names.DatabaseName
                     ProjectName = names.ProjectName
@@ -399,3 +421,8 @@ module MutationRate =
                     GenSaveSubIntervalsName = GenIntervalNames.summaryInterval_C_1p5C
                 }
             )
+
+        let runType =
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", [|
+                runExample("WideTest", WideTest)
+            |])

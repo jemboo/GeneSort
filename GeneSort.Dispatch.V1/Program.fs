@@ -12,7 +12,7 @@ let main argv =
     ProjectCatalogs.registerAll ()
 
     // Each command runs exactly one phase, using the spec configured in its dispatch module.
-    //let yab = [| "setup"; "tests" |]
+    //let yab = [| "generate"; "tests" |]
     //let yab = [| "execute"; "tests" |]
     //let yab = [| "setup"; "eval" |]
     //let yab = [| "execute"; "eval" |]
@@ -29,13 +29,13 @@ let main argv =
         | [| "execute"; "eval" |] -> Some DispatchSorterEval.runRunParams
         | [| "setup"; "mutate" |] -> Some DispatchSorterMutate.prepareRun
         | [| "execute"; "mutate" |] -> Some DispatchSorterMutate.runRunParams
-        | [| "setup"; "tests" |] -> Some DispatchSortableTests.prepareRun
+        | [| "generate"; "tests" |] -> Some DispatchSortableTests.makeRunParams
         | [| "execute"; "tests" |] -> Some DispatchSortableTests.runRunParams
         | _ -> None
 
     match command with
     | None ->
-        eprintfn "Usage: GeneSort.Dispatch.V1 <setup|execute> <sgd|eval|mutate|tests>"
+        eprintfn "Usage: GeneSort.Dispatch.V1 <setup|execute> <sgd|eval|mutate>, or <generate|execute> tests"
         eprintfn "Set GENESORT_PROJECTS_ROOT to the parent of your project folders."
         2
     | Some action ->

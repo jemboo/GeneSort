@@ -116,9 +116,9 @@ module RunDto =
           | None, None when isParameterSource &&
                            (System.String.IsNullOrWhiteSpace dto.SetupFunctionName ||
                             dto.ExecuteFunctionName = ExecuteFunctionNames.standard || dto.ExecuteFunctionName = ExecuteFunctionNames.soss) ->
-            SimpleRun (SimpleRun.createEvolutionSource config)
+            Run.ofSimple (SimpleRun.createEvolutionSource config)
           | None, None ->
-            SimpleRun (SimpleRun.create {
+            Run.ofSimple (SimpleRun.create {
                 DatabaseName = config.DatabaseName
                 ProjectName = config.ProjectName
                 RunName = config.RunName
@@ -143,7 +143,7 @@ module RunDto =
                     SeedPoolSet = requireMakerName "SeedPoolSetMakerName" dto.SeedPoolSetMakerName
                     Mutator = requireMakerName "MutatorMakerName" dto.MutatorMakerName
                 }
-            SgdRun (
+            Run.ofSgd (
                 SgdRun.create config {
                     MakerNames = makerNames
                     GenSaveIntervalsName = (saveIntervals |> Option.defaultValue GenIntervalNames.expInterval100_L50ss)
@@ -158,6 +158,7 @@ module RunDto =
                 |> Array.map (fun span -> span.Key, Array.toList span.Values) |> Array.toList
             configured |> Run.withParameterSource (restore true source) spans
 
-    /// Older SGD setup labels are ignored. Simple workflows still require their
-    /// explicitly selected setup function; the saved field retains its wire shape.
+    /// The wire shape is unchanged. Legacy simple definitions become DirectRun
+    /// or PreparedRun; evolutionary definitions become fresh or continuation runs.
+    /// Old redundant spans are normalized by their constructors, never on disk.
     let toDomain dto = restore false dto

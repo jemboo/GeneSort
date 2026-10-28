@@ -45,7 +45,7 @@ module Prefix =
                 [
                     (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
                 ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -86,7 +86,7 @@ module Prefix =
                 [
                     (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
                 ]
-        run.SimpleRun (
+        run.PreparedRun (
             SimpleRun.create {
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
@@ -122,3 +122,9 @@ module Prefix =
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
+
+    let runType =
+        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", [|
+            runExample("Width24s", Width24s)
+            runExample("Width32", Width32)
+        |])

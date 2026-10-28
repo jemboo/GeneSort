@@ -40,7 +40,7 @@ let private makeRun queryCatalog setupCatalog =
             QueryCatalogName = queryCatalog
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
         }
-    } |> run.SimpleRun
+    } |> Run.ofSimple
 
 let private makeHost () = runHost.Create (makeRun QueryCatalogNamesRun.sorterMutateStandard SetupCatalogNames.mutantStandard) 1
 

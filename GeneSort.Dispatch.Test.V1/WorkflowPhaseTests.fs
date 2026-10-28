@@ -1179,7 +1179,7 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
             MakerNames = baseline.MakerNames.Value
             GenSaveIntervalsName = baseline.GenSaveIntervalsName.Value
             GenSaveSubIntervalsName = baseline.GenSaveSubIntervalsName.Value
-        } |> run.SgdRun
+        } |> Run.ofSgd
     let sourceRun =
         if chained then appendFrom original 1 2 [ParamKeys.mutationModKey, ["1"]] [ParamKeys.mutationModKey, ["4"; "5"]]
         else original
@@ -1551,10 +1551,8 @@ let ``standalone tests have no setup and generate Results during execution`` pre
         if prefix then basic.WithPrefixLibId(Some (prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA))
         else basic.WithMergeLibId(Some (mergeLibId.create 4<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA))
     use cts = new CancellationTokenSource()
-    let prepared = host.SetupExecutor rp (UMX.tag false) cts None |> Async.RunSynchronously
-    match prepared with
-    | Ok unchanged -> Assert.Equal(rp, unchanged)
-    | Error error -> failwith error
+    Assert.False(spec.HasSetup)
+    Assert.Throws<ArgumentException>(fun () -> host.SetupExecutor |> ignore) |> ignore
     Assert.Empty(memory.Reads)
     Assert.Empty(memory.Writes)
     let executed = host.ExecuteFunction rp (UMX.tag false) cts None |> Async.RunSynchronously
@@ -2188,7 +2186,7 @@ let ``Continuation source validates its generation interval at construction`` so
 [<InlineData(true)>]
 let ``Continuation source rejects a simple run with an evolution function name`` soss =
     let source = if soss then sossSource [0] else standardSource ()
-    let simple = run.SimpleRun source.BaseRun
+    let simple = Run.ofSimple source.BaseRun
     let error = Assert.Throws<ArgumentException>(fun () -> sourceSelection simple 0 [] |> ignore)
     Assert.Equal("SourceRun", error.ParamName)
     Assert.Contains("Standard or Soss SGD source run", error.Message)

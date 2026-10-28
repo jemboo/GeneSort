@@ -27,7 +27,7 @@ public sealed class RunParameterItem
         Number = number;
         state = runPhaseOutput.NewParameters(parameters);
         // This is the saved-run opening boundary. Phase updates never reconstruct the path.
-        if (configured?.IsSgdRun == true)
+        if (configured?.IsEvolution == true)
         {
             try
             {

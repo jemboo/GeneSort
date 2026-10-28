@@ -24,7 +24,7 @@ module SetupExecutorCatalog =
                 let path, initialProgress = EvoPath.fromStart configured start initialized
                 return Evolution (path, initialProgress)
             | None ->
-                let! sgd = match configured with SgdRun sgd -> Ok sgd | _ -> Error "Standard setup requires an SgdRun."
+                let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Standard setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
                 let makeTests = SortableTestsMakerCatalog.get names.SortableTests sources.Evolution
                 let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet sources.Evolution
@@ -46,7 +46,7 @@ module SetupExecutorCatalog =
                 let path, initialProgress = EvoPath.fromStart configured start initialized
                 return Evolution (path, initialProgress)
             | None ->
-                let! sgd = match configured with SgdRun sgd -> Ok sgd | _ -> Error "Soss setup requires an SgdRun."
+                let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Soss setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
                 let makeTests = SortableTestsMakerCatalog.get names.SortableTests sources.Evolution
                 let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet sources.Evolution
@@ -62,7 +62,6 @@ module SetupExecutorCatalog =
 
     let private syncRoot = obj ()
     let mutable private builders: Map<string, workflowSources -> run -> runStorage -> runPhaseFunction> = Map.ofList [
-        ExecuteFunctionNames.sortableTests, (fun _ _ _ rp _ _ _ -> async { return Ok (Parameters rp) })
         ExecuteFunctionNames.sorterEval, simple SorterEvalSetup.bind
         ExecuteFunctionNames.sorterMutate, simple SorterMutateSetup.bind
         ExecuteFunctionNames.standard, standard
@@ -78,6 +77,7 @@ module SetupExecutorCatalog =
             builders <- Map.add name builder builders)
 
     let prepare sources (configured: run) storage =
+        if not configured.HasSetup then invalidArg "configured" "A direct run has no Setup phase. Run Execution instead."
         let name = configured.ExecuteFunctionName
         let builder = lock syncRoot (fun () ->
             Map.tryFind name builders
