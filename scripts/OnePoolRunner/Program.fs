@@ -52,7 +52,7 @@ let execute maxParallel includeSummary configured =
     let host = runHost.Create configured maxParallel
     use cts = new CancellationTokenSource()
     let progress = Some { new IProgress<string> with member _.Report message = printfn "%s" message }
-    let maxReplica = if %configured.DatabaseName = "Controlled" then SorterSgd.RunCfg.p32.Test.OnePool.Controlled.replicaCount else 1
+    let maxReplica = if %configured.DatabaseName = "Controlled" then SorterSgd.p32.Test.OnePool.Controlled.replicaCount else 1
     let minReplica, maxReplica = 0<replNumber>, UMX.tag<replNumber> maxReplica
     printfn "\n=== %s / %s / %s ===" %configured.ProjectName %configured.DatabaseName %configured.RunName
     printfn "Setup"
@@ -89,13 +89,13 @@ let main argv =
         MessagePackSetup.configure ()
         ProjectCatalogs.registerAll ()
         let moduleName =
-            if msuf4r || msuf4s then "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a." + (if msuf4r then "SimpleR" else "SimpleS")
-            else "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+            if msuf4r || msuf4s then "GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a." + (if msuf4r then "SimpleR" else "SimpleS")
+            else "GeneSort.Dispatch.V1.SorterSgd.p32.Test+OnePool"
         let runs = orderedRuns moduleName |> List.filter (fun run -> not controlledOnly || %run.DatabaseName = "Controlled")
         let runs = if msuf4r || msuf4s then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
         let prerequisites = [
-            SortableTests.RunCfg.Prefix.Width32 ()
-            SorterEval.RunCfg.Prefix.Width32 ()
+            SortableTests.Prefix.Width32 ()
+            SorterEval.Prefix.Width32 ()
         ]
         printfn "%s: %d configurations; projects root: %s" moduleName runs.Length (RunHost.projectsRoot ())
         for configured in prerequisites do

@@ -17,10 +17,15 @@ type runNames =
 module RunNaming =
     let private fromMethod (method: MethodBase) : runNames =
         let container = method.DeclaringType
-        // Direct RunCfg modules are databases in the workflow's RunCfg project.
+        // Direct workflow modules are databases in that workflow's project.
         // Deeper configurations retain their enclosing module as the project.
         let isWorkflowDatabase =
-            isNull container.DeclaringType && container.Namespace.EndsWith(".RunCfg", System.StringComparison.Ordinal)
+            isNull container.DeclaringType
+            && List.contains container.Namespace [
+                "GeneSort.Dispatch.V1.SortableTests"
+                "GeneSort.Dispatch.V1.SorterEval"
+                "GeneSort.Dispatch.V1.SorterMutate"
+                "GeneSort.Dispatch.V1.SorterSgd" ]
         let hierarchy =
             if isWorkflowDatabase then container.Namespace
             elif isNull container.DeclaringType then container.FullName

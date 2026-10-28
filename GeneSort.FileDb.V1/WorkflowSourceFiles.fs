@@ -49,9 +49,9 @@ module WorkflowSourceFiles =
         let openDatabase project database catalog =
             new GeneSortDbMp(Path.Combine(projectsFolder, string project, string database, "Data") |> UMX.tag, catalog) :> IGeneSortDb
         let tests database name replica matches =
-            load projectsFolder "SortableTests.RunCfg" database name replica matches (geneSortDataType.SortableTests "") OutputData.asSortableTests
+            load projectsFolder "SortableTests" database name replica matches (geneSortDataType.SortableTests "") OutputData.asSortableTests
         let evals database name replica matches =
-            load projectsFolder "SorterEval.RunCfg" database name replica matches (geneSortDataType.SorterSetEval "") OutputData.asSorterSetEval
+            load projectsFolder "SorterEval" database name replica matches (geneSortDataType.SorterSetEval "") OutputData.asSorterSetEval
         workflowSources.create {
             OpenDatabase = openDatabase
             Evolution = {

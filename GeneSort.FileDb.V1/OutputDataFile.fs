@@ -231,7 +231,9 @@ module OutputDataFile =
             | Ok () ->
                 if sharedSetup && File.Exists %filePath then
                     return Ok ()
-                elif (not %allowOverwrite) && File.Exists %filePath then
+                // A shared Setup file may appear after the first check. In that case,
+                // let atomic publication below retain the winning file and succeed.
+                elif not sharedSetup && (not %allowOverwrite) && File.Exists %filePath then
                     return Error "Overwrite not allowed"
                 else
                     // Publish Setup atomically: concurrent processes cannot overwrite a shared source

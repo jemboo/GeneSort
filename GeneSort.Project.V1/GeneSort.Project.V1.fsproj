@@ -8,6 +8,8 @@
   <ItemGroup>
 
     <Compile Include="ProjectTypes.fs" />
+    <Compile Include="Run\RunSortableSet.fs" />
+    <Compile Include="Run\Run.fs" />
     <Compile Include="GeneSortDataType.fs" />
     <Compile Include="ParamBundles\MutatorParams.fs" />
     <Compile Include="ParamBundles\SorterTestsCycleProfile.fs" />

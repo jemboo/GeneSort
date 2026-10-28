@@ -19,7 +19,7 @@ module SorterMutateDbs =
 
     module RandomStandard =
 
-        let private sourceRun = SorterMutate.RunCfg.Standard.Msrs ()
+        let private sourceRun = SorterMutate.Standard.Msrs ()
         let projectName = sourceRun.ProjectName
 
         module Uniform =
@@ -34,7 +34,7 @@ module SorterMutateDbs =
 
     module RandomMerge =
 
-        let private sourceRun = SorterMutate.RunCfg.Merge.Msce ()
+        let private sourceRun = SorterMutate.Merge.Msce ()
         let projectName = sourceRun.ProjectName
     
         module Uniform =
@@ -49,7 +49,7 @@ module SorterMutateDbs =
 
     module RandomPrefix =
 
-        let private sourceRun = SorterMutate.RunCfg.Prefix.Msce ()
+        let private sourceRun = SorterMutate.Prefix.Msce ()
         let projectName = sourceRun.ProjectName
     
         module Uniform =

@@ -21,7 +21,7 @@ let require condition message = if not condition then failwith message
 let mutable controlledOnly = false
 let mutable msuf4Family: string option = None
 let replicaLimit (configured: run) =
-    (if %configured.DatabaseName = "Controlled" then GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.Controlled.replicaCount else 1) |> UMX.tag
+    (if %configured.DatabaseName = "Controlled" then GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.replicaCount else 1) |> UMX.tag
 let parameters (host: runHost) =
     host.RunDb.getRunParameters host.Run.RunName (Some (UMX.tag 0)) (Some (replicaLimit host.Run)) None None |> unwrap
 let query (host: runHost) rp kind = host.QueryParamsFromRunParams rp kind |> Option.get
@@ -203,8 +203,8 @@ let audit soss configured =
 let currentRuns () =
     let moduleName =
         match msuf4Family with
-        | Some family -> "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a." + family
-        | None -> "GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test+OnePool"
+        | Some family -> "GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a." + family
+        | None -> "GeneSort.Dispatch.V1.SorterSgd.p32.Test+OnePool"
     let presets = typeof<runHost>.Assembly.GetType(moduleName, true)
     let runs =
         typeof<runHost>.Assembly.GetTypes()
@@ -263,7 +263,7 @@ let combineReports () =
     for row in rows do
         combined.AppendDataRow(headers |> Array.map (fun header -> Map.tryFind header row |> Option.defaultValue ""))
     // Keep the aggregate in the base OnePool folder as new nested runs are added.
-    let baseRun = GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Test.OnePool.TestStandard()
+    let baseRun = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.TestStandard()
     let filename = if controlledOnly then "OnePool_Controlled_SummaryReport.txt" else "OnePool_SummaryReport.txt"
     let path =
         match msuf4Family with

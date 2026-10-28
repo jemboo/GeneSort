@@ -1,4 +1,4 @@
-﻿// For more information see https://aka.ms/fsharp-console-apps
+// For more information see https://aka.ms/fsharp-console-apps
 
 open System
 open FSharp.UMX
@@ -39,7 +39,7 @@ module Example =
 
     let concato() =  //C:\Projects\SorterSgd.Standard_append.32p4a.Msuf\Pool_32_Test\Data\Results\Report\TextReport_SummaryReport
 
-            let rootDir = @"C:\Projects\SorterSgd.RunCfg.p32.Msuf4a.SimpleS\Soss\Data\Results\Report\TextReport_SummaryReport"
+            let rootDir = @"C:\Projects\SorterSgd.p32.Msuf4a.SimpleS\Soss\Data\Results\Report\TextReport_SummaryReport"
 
             DataTableIO.concatenateAllFiles rootDir  $"{rootDir}\\MergeReport_report.txt"
 

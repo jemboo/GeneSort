@@ -1,11 +1,11 @@
 # Local setup and cloud execution
 
-Run configuration modules live under `RunCfg` in each workflow's folder and
-namespace: `SorterSgd.RunCfg`, `SorterEval.RunCfg`, `SorterMutate.RunCfg`, and
-`SortableTests.RunCfg`. Execution code and shared database readers stay in their
-workflow folders. Project names derived from these modules include `RunCfg`.
+Run configuration modules live directly in each workflow's folder and
+namespace: `SorterSgd`, `SorterEval`, `SorterMutate`, and
+`SortableTests`. Execution code and shared database readers stay in their
+workflow folders. Project names follow the workflow and enclosing configuration modules.
 
-`SorterSgd.RunCfg.p32.Test.OnePool` provides `TestStandard` and `TestSoss` base
+`SorterSgd.p32.Test.OnePool` provides `TestStandard` and `TestSoss` base
 runs with one pool of 32 sorters for each mutation value 0–3. Run the desired base through
 setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
 `TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
@@ -27,7 +27,7 @@ those bounds. Append and Condense inherit both settings; changing AMax requires
 new seeds, while the activator mutation rate may be overridden for execution.
 The values participate in file identities and appear in summary metadata.
 
-`SorterSgd.RunCfg.p32.Msuf4a.SimpleR` provides `Standard.Test`,
+`SorterSgd.p32.Msuf4a.SimpleR` provides `Standard.Test`,
 `Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`. Each execution
 has one pool of 32, with mutation variants 0–3. Test runs use 10 generations;
 the rate sweeps use 100 generations and cross AMax values 1, 3, 7 with activator
@@ -36,9 +36,9 @@ The `standardMsuf32R` / `sossMsuf32R` setup enhancer entries default AMax to 3;
 the `evoMsuf32R` / `sossMsuf32R` execution enhancers default activator mutation
 rate to 0.1. Explicit spans override these defaults. Invalid activation settings
 are rejected during parameter preparation. These presets use the existing prefix
-seed-evaluation and sortable-test catalogs; prepare `SorterEval.RunCfg.Prefix.Width32`
-and `SortableTests.RunCfg.Prefix.Width32` before setup. Automatic naming produces
-project `SorterSgd.RunCfg.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
+seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Width32`
+and `SortableTests.Prefix.Width32` before setup. Automatic naming produces
+project `SorterSgd.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
 and run names matching the preset functions.
 Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleR`; it prepares
 the prerequisites, runs replica 0, resumes completed work, regenerates reports,
@@ -50,7 +50,7 @@ trajectory comparisons across AMax and activator rates. The four mutation
 variants share a seed replica; these results are exploratory rather than a
 comparison across independent seed replicas.
 
-`SorterSgd.RunCfg.p32.Msuf4a.SimpleS` mirrors the four SimpleR presets:
+`SorterSgd.p32.Msuf4a.SimpleS` mirrors the four SimpleR presets:
 `Standard.Test`, `Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`.
 The test presets use 10 generations and catalog defaults of ActivationProbability
 0.5 and ActivatorMutationRate 0.1. The 100-generation sweeps cross activation
@@ -59,7 +59,7 @@ variants 0–3 (36 executions per replica). Every execution has one pool of 32.
 Setup entries `standardMsuf32S` / `sossMsuf32S` and execution entries
 `evoMsuf32S` / `sossMsuf32S` supply and validate the boolean activation settings.
 Both probabilities accept 0 through 1; AMax is rejected. The project is
-`SorterSgd.RunCfg.p32.Msuf4a.SimpleS`, with databases `Standard` and `Soss`.
+`SorterSgd.p32.Msuf4a.SimpleS`, with databases `Standard` and `Soss`.
 These use the same prefix prerequisites as SimpleR. Equal mutation-rate values
 do not imply equal effective activation flip rates between R and S.
 Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleS`; it performs
@@ -179,8 +179,8 @@ From the repository root, run the complete OnePool batch with:
 .\scripts\Run-OnePool.ps1
 ```
 
-The script builds its runner, prepares the `SortableTests.RunCfg.Prefix.Width32`
-and `SorterEval.RunCfg.Prefix.Width32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
+The script builds its runner, prepares the `SortableTests.Prefix.Width32`
+and `SorterEval.Prefix.Width32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
 and completes setup, execution, and the evolution summary report for each preset.
 Source presets finish before any dependent Append or Condense presets. It runs
 replica 0, defaults to eight parallel jobs within each phase, respects each preset's
@@ -239,11 +239,11 @@ the helper also disables inlining. The naming tests check this requirement.
 
 The project is the module hierarchy above the database module, with the common
 `GeneSort.Dispatch.V1.` prefix removed. For example, `Standard.Pool_32.Test()`
-has project `SorterSgd.RunCfg.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
-Modules directly under a workflow's `RunCfg` namespace act as databases. For example,
-`SorterEval.RunCfg.Standard.Test()` has project `SorterEval.RunCfg`, database
+has project `SorterSgd.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
+Modules directly under a workflow's namespace act as databases. For example,
+`SorterEval.Standard.Test()` has project `SorterEval`, database
 `Standard`, and run `Test`. The distinct sortable-test group is
-`SortableTests.RunCfg.PrefixTest.Test()` (database `PrefixTest`).
+`SortableTests.PrefixTest.Test()` (database `PrefixTest`).
 Top-level presets deeper in the hierarchy, such as `Standard_append.Test()`, use their entire module hierarchy
 as the project. Shared database readers obtain their project from a producing preset
 so module renames update both writing and reading locations.
@@ -262,8 +262,8 @@ for sortable tests, evaluation, and mutation. For example:
 | `Soss.Pool_4.Debug()` | `Pool_4` | `Debug` |
 | `Soss_append.Pool_4_append.Debug()` | `Pool_4_append` | `Debug` |
 | `Soss_condense.Pool_128_condense.Test()` | `Pool_128_condense` | `Test` |
-| `SorterEval.RunCfg.Standard.Test()` | `Standard` | `Test` |
-| `SorterMutate.RunCfg.Prefix.Mssi()` | `Prefix` | `Mssi` |
+| `SorterEval.Standard.Test()` | `Standard` | `Test` |
+| `SorterMutate.Prefix.Mssi()` | `Prefix` | `Mssi` |
 
 Seed pool groups describe capacity per pool, not the total pool-set size.
 Continuation groups describe the source pool family and retain workflow suffixes
@@ -332,7 +332,7 @@ Select the append spec when creating the dispatch host:
 let host = runHost.Create (Soss_append.Pool_4_append.Debug ()) 8
 ```
 
-The module is `GeneSort.Dispatch.V1.SorterSgd.RunCfg.p32.Msuf4a.Soss_append`.
+The module is `GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_append`.
 It uses `EvoAppend.createSoss` with separate `Source.ParameterSpans` and
 `ExecutionParameterSpans`. Source spans filter configured source executions;
 omitted source keys select all their configured values. Execution spans form a

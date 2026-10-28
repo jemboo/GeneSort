@@ -254,7 +254,7 @@ module RunPhaseFileTests =
 
     let private smallLibrary () =
         SimpleRun.create {
-            ProjectName = UMX.tag "SorterEval.RunCfg"; DatabaseName = UMX.tag "Standard"; RunName = UMX.tag "Test"
+            ProjectName = UMX.tag "SorterEval"; DatabaseName = UMX.tag "Standard"; RunName = UMX.tag "Test"
             Description = "Small saved source library"; AllowOverwrite = false
             Setup = {
                 FunctionName = SetupCatalogNames.standard
@@ -311,7 +311,7 @@ module RunPhaseFileTests =
         Assert.True(Result.isError absent)
         match absent with
         | Error message ->
-            Assert.Contains("Missing source library SorterEval.RunCfg/Standard/Test", message)
+            Assert.Contains("Missing source library SorterEval/Standard/Test", message)
             Assert.Contains("Expected definition:", message)
             Assert.Contains("Prepare and execute this library", message)
             Assert.Contains(Path.Combine(folder, "other"), message)

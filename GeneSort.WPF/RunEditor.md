@@ -136,8 +136,8 @@ so another editor phase, save or regeneration cannot change this run at the same
 Editing and other editor operations are disabled while it runs.
 
 Source libraries are read from the selected projects folder. For the supported prefix
-workflow these are `SortableTests.RunCfg/Prefix/Width32` and
-`SorterEval.RunCfg/Prefix/Width32`. Their saved definitions determine the queries and
+workflow these are `SortableTests/Prefix/Width32` and
+`SorterEval/Prefix/Width32`. Their saved definitions determine the queries and
 library settings; both the definitions and corresponding Results must exist. Missing
 inputs are reported with their source location. This binding lives in
 `GeneSort.FileDb.V1/WorkflowSourceFiles.fs`, alongside the selected-row setup adapter

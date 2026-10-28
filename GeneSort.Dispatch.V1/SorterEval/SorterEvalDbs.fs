@@ -20,7 +20,7 @@ module SorterEvalDbs =
 
     module Standard =
 
-        let private sourceRun = SorterEval.RunCfg.Standard.Test ()
+        let private sourceRun = SorterEval.Standard.Test ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
@@ -36,7 +36,7 @@ module SorterEvalDbs =
 
     module Merge =
 
-        let private sourceRun = SorterEval.RunCfg.Merge.Test ()
+        let private sourceRun = SorterEval.Merge.Test ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
@@ -51,7 +51,7 @@ module SorterEvalDbs =
 
     module Prefix =
 
-        let private sourceRun = SorterEval.RunCfg.Prefix.Width32 ()
+        let private sourceRun = SorterEval.Prefix.Width32 ()
         let projectName = sourceRun.ProjectName
 
         let sorterCount =
