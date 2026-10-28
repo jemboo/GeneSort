@@ -18,6 +18,13 @@ open GeneSort.Dispatch.V1
 
 module PrefixTest =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+    let executionFunctionName = ExecuteFunctionNames.sortableTests
+    let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+    let setupFunctionName = SetupCatalogNames.prefix
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test  () : run =
         let names = RunNaming.create()
@@ -36,21 +43,28 @@ module PrefixTest =
                 Description = "Bitv512 prefix sorter test sets"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sortableTests
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.prefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
 
 module Prefix =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+    let executionFunctionName = ExecuteFunctionNames.sortableTests
+    let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+    let setupFunctionName = SetupCatalogNames.prefix
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Width24s  () : run =
@@ -75,16 +89,16 @@ module Prefix =
                 Description = "Bitv512 prefix sorter test sets"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sortableTests
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.prefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -107,16 +121,16 @@ module Prefix =
                 Description = "Bitv512 prefix sorter test sets"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sortableTests
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.prefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sortableTestPrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

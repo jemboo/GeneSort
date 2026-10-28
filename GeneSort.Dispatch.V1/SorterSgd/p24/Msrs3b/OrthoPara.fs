@@ -22,6 +22,12 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3b.Common
 
 module OrthoPara32 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3bOrthoPara
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsOrthoPara
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
         let names = RunNaming.create()
@@ -44,15 +50,15 @@ module OrthoPara32 =
                 Description = "OrthroPara rate comp for 24pfx3b Msrs, NoMods"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsOrthoPara
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3bOrthoPara
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

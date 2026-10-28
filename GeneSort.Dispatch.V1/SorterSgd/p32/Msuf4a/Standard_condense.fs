@@ -12,6 +12,8 @@ open GeneSort.Dispatch.V1
 
 module Pool_32_condense =
 
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test () : run =
         let names = RunNaming.create()
@@ -24,7 +26,7 @@ module Pool_32_condense =
             ProjectName = names.ProjectName
             DatabaseName = names.DatabaseName
             RunName = names.RunName
-            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            RunQueryCatalogName = executionQueryCatalogName
             Source = evoContinuationSource.create {
                 SourceRun = Standard.Pool_32.Test ()
                 GenerationInterval = 2

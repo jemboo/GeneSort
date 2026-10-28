@@ -22,6 +22,17 @@ module Test =
 
     module OnePool =
 
+        let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+        let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+        let standardExecutionFunctionName = ExecuteFunctionNames.standard
+        let sossExecutionFunctionName = ExecuteFunctionNames.soss
+        let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+        let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+        let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+        let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+        let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+        let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let TestStandard ()  : run =
             let names = RunNaming.create()
@@ -48,14 +59,14 @@ module Test =
                     AllowOverwrite = false
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                        QueryCatalogName = standardSetupQueryCatalogName
+                        EnhancerFunctionName = standardSetupEnhancerFunctionName
                     }
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = standardExecutionFunctionName
                         ParameterSpans = []
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                        QueryCatalogName = standardExecutionQueryCatalogName
+                        EnhancerFunctionName = standardExecutionEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -97,14 +108,14 @@ module Test =
                     AllowOverwrite = false
                     Setup = {
                         ParameterSpans = parameterSpansSetup
-                        QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                        QueryCatalogName = sossSetupQueryCatalogName
+                        EnhancerFunctionName = sossSetupEnhancerFunctionName
                     }
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.soss
+                        FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                        QueryCatalogName = sossExecutionQueryCatalogName
+                        EnhancerFunctionName = sossExecutionEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix
@@ -116,6 +127,19 @@ module Test =
 
 
         module SimpleR =
+
+            let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+            let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+            let standardExecutionFunctionName = ExecuteFunctionNames.standard
+            let sossExecutionFunctionName = ExecuteFunctionNames.soss
+            let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+            let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+            let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+            let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+            let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+            let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
             // AMax belongs to setup; the independent activator mutation rate belongs to execution.
             let aMax = 3
@@ -152,14 +176,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -202,14 +226,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -225,7 +249,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Standard ()
                         GenerationInterval = 0
@@ -242,7 +266,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Soss ()
                         GenerationInterval = 0
@@ -256,6 +280,19 @@ module Test =
                 } |> EvoCondense.createSoss
 
         module SimpleS =
+
+            let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+            let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+            let standardExecutionFunctionName = ExecuteFunctionNames.standard
+            let sossExecutionFunctionName = ExecuteFunctionNames.soss
+            let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+            let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+            let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+            let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+            let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+            let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
             // ActivationProbability belongs to setup; the independent activator mutation rate belongs to execution.
             let activationProbability = 0.5
@@ -292,14 +329,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -342,14 +379,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -365,7 +402,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = StandardS ()
                         GenerationInterval = 0
@@ -382,7 +419,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = SossS ()
                         GenerationInterval = 0
@@ -396,6 +433,17 @@ module Test =
                 } |> EvoCondense.createSoss
 
         module Controlled =
+
+            let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+            let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+            let standardExecutionFunctionName = ExecuteFunctionNames.standard
+            let sossExecutionFunctionName = ExecuteFunctionNames.soss
+            let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+            let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+            let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+            let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+            let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+            let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
             let replicaCount = 5
             let generationCount = 100
@@ -437,14 +485,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -485,14 +533,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -533,14 +581,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -582,14 +630,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -633,14 +681,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -684,14 +732,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -732,14 +780,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                            QueryCatalogName = standardSetupQueryCatalogName
+                            EnhancerFunctionName = standardSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.standard
+                            FunctionName = standardExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                            QueryCatalogName = standardExecutionQueryCatalogName
+                            EnhancerFunctionName = standardExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.prefix
@@ -783,14 +831,14 @@ module Test =
                         AllowOverwrite = false
                         Setup = {
                             ParameterSpans = parameterSpansSetup
-                            QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                            EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                            QueryCatalogName = sossSetupQueryCatalogName
+                            EnhancerFunctionName = sossSetupEnhancerFunctionName
                         }
                         Execution = {
-                            FunctionName = ExecuteFunctionNames.soss
+                            FunctionName = sossExecutionFunctionName
                             ParameterSpans = parameterSpansRun
-                            QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                            QueryCatalogName = sossExecutionQueryCatalogName
+                            EnhancerFunctionName = sossExecutionEnhancerFunctionName
                         }
                     } {
                         MakerNames = EvolutionMakerNames.sossPrefix
@@ -801,6 +849,9 @@ module Test =
 
         module Continuation =
 
+            let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+
             [<MethodImpl(MethodImplOptions.NoInlining)>]
             let TestStandardAppend () : run =
                 let names = RunNaming.create()
@@ -808,7 +859,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = TestStandard ()
                         GenerationInterval = 0
@@ -829,7 +880,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = TestStandard ()
                         GenerationInterval = 0
@@ -849,7 +900,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = TestSoss ()
                         GenerationInterval = 0
@@ -870,7 +921,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = TestSoss ()
                         GenerationInterval = 0
@@ -888,6 +939,9 @@ module Test =
 
         module SameFamilyChain =
 
+            let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+
             [<MethodImpl(MethodImplOptions.NoInlining)>]
             let TestStandardAppendCondense () : run =
                 let names = RunNaming.create()
@@ -895,7 +949,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestStandardAppend ()
                         GenerationInterval = 1
@@ -915,7 +969,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestStandardCondense ()
                         GenerationInterval = 1
@@ -935,7 +989,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestSossAppend ()
                         GenerationInterval = 1
@@ -955,7 +1009,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestSossCondense ()
                         GenerationInterval = 1
@@ -970,6 +1024,9 @@ module Test =
 
         module MixedFamilyChain =
 
+            let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+            let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+
             [<MethodImpl(MethodImplOptions.NoInlining)>]
             let TestStandardAppendSossCondense () : run =
                 let names = RunNaming.create()
@@ -977,7 +1034,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestStandardAppend ()
                         GenerationInterval = 1
@@ -1001,7 +1058,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
+                    RunQueryCatalogName = sossAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestStandardCondense ()
                         GenerationInterval = 1
@@ -1025,7 +1082,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestSossAppend ()
                         GenerationInterval = 1
@@ -1046,7 +1103,7 @@ module Test =
                     ProjectName = names.ProjectName
                     DatabaseName = names.DatabaseName
                     RunName = names.RunName
-                    RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+                    RunQueryCatalogName = standardAppendExecutionQueryCatalogName
                     Source = evoContinuationSource.create {
                         SourceRun = Continuation.TestSossCondense ()
                         GenerationInterval = 1

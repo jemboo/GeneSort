@@ -35,6 +35,12 @@ let private sorterEvalMeasures =
 
 module VarModR_32 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test () : run =
@@ -62,15 +68,15 @@ module VarModR_32 =
                 Description = "Mutation rate test for Msuf6 24p3b"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -105,15 +111,15 @@ module VarModR_32 =
                 Description = "Wide mutation rate test for Msuf6 24p3b"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

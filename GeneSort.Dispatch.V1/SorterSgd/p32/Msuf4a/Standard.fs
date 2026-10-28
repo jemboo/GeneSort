@@ -20,6 +20,12 @@ open GeneSort.Dispatch.V1
 
 module Pool_32 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test ()  : run =
         let names = RunNaming.create()
@@ -46,14 +52,14 @@ module Pool_32 =
                 AllowOverwrite = false
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = []
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -88,14 +94,14 @@ module Pool_32 =
                 AllowOverwrite = false
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = []
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -105,6 +111,12 @@ module Pool_32 =
         )
 
 module Pool_512 =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let V2a ()  : run =
@@ -132,14 +144,14 @@ module Pool_512 =
                 AllowOverwrite = false
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = []
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

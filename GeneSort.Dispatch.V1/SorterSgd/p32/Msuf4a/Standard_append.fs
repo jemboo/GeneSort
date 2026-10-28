@@ -9,6 +9,9 @@ open GeneSort.Project.V1.SorterSgd
 open GeneSort.Dispatch.V1
 
 
+
+let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+
 [<MethodImpl(MethodImplOptions.NoInlining)>]
 let Test () : run =
     let names = RunNaming.create()
@@ -24,7 +27,7 @@ let Test () : run =
         ProjectName = names.ProjectName
         DatabaseName = names.DatabaseName
         RunName = names.RunName
-        RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+        RunQueryCatalogName = executionQueryCatalogName
         Source = evoContinuationSource.create {
             SourceRun = Standard.Pool_32.Test ()
             GenerationInterval = 0
@@ -37,6 +40,8 @@ let Test () : run =
 
 
 module Pool_128 =
+
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let V1 () : run =
@@ -52,7 +57,7 @@ module Pool_128 =
             ProjectName = names.ProjectName
             DatabaseName = names.DatabaseName
             RunName = names.RunName
-            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            RunQueryCatalogName = executionQueryCatalogName
             Source = evoContinuationSource.create {
                 SourceRun = Test ()
                 GenerationInterval = 1
@@ -64,6 +69,8 @@ module Pool_128 =
         |> EvoAppend.createStandard
 
 module Pool_512 =
+
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let V1 () : run =
@@ -78,7 +85,7 @@ module Pool_512 =
             ProjectName = names.ProjectName
             DatabaseName = names.DatabaseName
             RunName = names.RunName
-            RunQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
+            RunQueryCatalogName = executionQueryCatalogName
             Source = evoContinuationSource.create {
                 SourceRun = Test ()
                 GenerationInterval = 1

@@ -22,6 +22,12 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Mssi3b.Common
 
 module OrthoPara64 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
         let names = RunNaming.create()
@@ -44,15 +50,15 @@ module OrthoPara64 =
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -84,15 +90,15 @@ module OrthoPara64 =
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -124,15 +130,15 @@ module OrthoPara64 =
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -143,6 +149,12 @@ module OrthoPara64 =
 
 
 module OrthoPara128 =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let NoMods ()  : run =
@@ -166,15 +178,15 @@ module OrthoPara128 =
                 Description = "OrthroPara rate comp for 24pfx3b Mssi, NoMods"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

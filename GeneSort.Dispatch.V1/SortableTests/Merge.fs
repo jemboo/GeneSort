@@ -17,6 +17,13 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+    let executionFunctionName = ExecuteFunctionNames.sortableTests
+    let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+    let setupFunctionName = SetupCatalogNames.merge
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sortableTestMerge
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test  () : run =
@@ -41,16 +48,16 @@ module Merge =
                 Description = "Int8 merge sorter test sets"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sortableTests
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sortableTestMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sortableTests
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

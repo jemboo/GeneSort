@@ -18,6 +18,13 @@ open GeneSort.Dispatch.V1
 
 module Standard =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+    let executionFunctionName = ExecuteFunctionNames.sorterEval
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+    let setupFunctionName = SetupCatalogNames.standard
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test ()  : run =
@@ -40,16 +47,16 @@ module Standard =
                 Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -75,16 +82,16 @@ module Standard =
                 Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -110,16 +117,16 @@ module Standard =
                 Description = "Standard sorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.standard
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

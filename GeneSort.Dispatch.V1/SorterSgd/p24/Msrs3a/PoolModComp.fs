@@ -22,6 +22,12 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.Common
 
 module PoolSelSz128 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let TestSpec ()  : run =
         let names = RunNaming.create()
@@ -44,15 +50,15 @@ module PoolSelSz128 =
                 Description = "Para rate comp for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -62,6 +68,12 @@ module PoolSelSz128 =
         )
 
 module Sz_2048_Of_4096 =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Sz_2048_Of_4096 ()  : run =
@@ -82,15 +94,15 @@ module Sz_2048_Of_4096 =
                 Description = "Selection size comp for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -100,6 +112,12 @@ module Sz_2048_Of_4096 =
         )
 
 module PoolsSelSzTest_2_vs_256 =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+    let executionFunctionName = ExecuteFunctionNames.standard
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let PoolSz_2n256 ()  : run =
@@ -120,15 +138,15 @@ module PoolsSelSzTest_2_vs_256 =
                 Description = "Pool size comp (2 vs 256) for 24pfx3a Msrs"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.standard
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

@@ -20,6 +20,13 @@ open GeneSort.Dispatch.V1
 
 module Standard =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+    let executionFunctionName = ExecuteFunctionNames.sorterMutate
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+    let setupFunctionName = SetupCatalogNames.mutantStandard
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Msrs ()  : run =
         let names = RunNaming.create()
@@ -56,16 +63,16 @@ module Standard =
                 Description = "Mutation analysis for Msrs"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantStandard
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -106,16 +113,16 @@ module Standard =
                 Description = "Mutation analysis for Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantStandard
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

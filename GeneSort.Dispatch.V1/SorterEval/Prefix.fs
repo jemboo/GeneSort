@@ -18,6 +18,13 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
+    let executionFunctionName = ExecuteFunctionNames.sorterEval
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+    let setupFunctionName = SetupCatalogNames.prefix
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Width24s () : run =
@@ -46,16 +53,16 @@ module Prefix =
                 Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf6"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.prefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             }
         )
@@ -87,16 +94,16 @@ module Prefix =
                 Description = "TestPrefixFilter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Setup = {
-                    FunctionName = SetupCatalogNames.prefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             }
         )

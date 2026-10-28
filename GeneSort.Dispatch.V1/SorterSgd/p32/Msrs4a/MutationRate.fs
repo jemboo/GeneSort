@@ -29,6 +29,12 @@ module MutationRate =
 
     module VarModR_32 =
 
+        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+        let executionFunctionName = ExecuteFunctionNames.standard
+        let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
+        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
+
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -55,15 +61,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -97,15 +103,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -140,15 +146,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -159,6 +165,12 @@ module MutationRate =
 
 
     module VarModR_64 =
+
+        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+        let executionFunctionName = ExecuteFunctionNames.standard
+        let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
+        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
 
@@ -185,15 +197,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -226,15 +238,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -268,15 +280,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -289,6 +301,12 @@ module MutationRate =
 
 
     module MaxModR_32 =
+
+        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+        let executionFunctionName = ExecuteFunctionNames.standard
+        let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
+        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
 
@@ -314,15 +332,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -334,6 +352,12 @@ module MutationRate =
 
 
     module MaxModR_64 =
+
+        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+        let executionFunctionName = ExecuteFunctionNames.standard
+        let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
+        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
 
@@ -359,15 +383,15 @@ module MutationRate =
                     Description = "OrthroPara rate comp for Msrs32p4a Msrs, Test"
                     AllowOverwrite = false
                     Execution = {
-                        FunctionName = ExecuteFunctionNames.standard
+                        FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+                        QueryCatalogName = executionQueryCatalogName
+                        EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
                         ParameterSpans = parameterSpans
-                        QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
-                        EnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+                        QueryCatalogName = setupQueryCatalogName
+                        EnhancerFunctionName = setupEnhancerFunctionName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix

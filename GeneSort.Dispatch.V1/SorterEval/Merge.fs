@@ -18,6 +18,13 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+    let executionFunctionName = ExecuteFunctionNames.sorterEval
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+    let setupFunctionName = SetupCatalogNames.merge
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
+
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Test () : run =
@@ -50,16 +57,16 @@ module Merge =
                 Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -93,16 +100,16 @@ module Merge =
                 Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -136,16 +143,16 @@ module Merge =
                 Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -176,16 +183,16 @@ module Merge =
                 Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -217,16 +224,16 @@ module Merge =
                 Description = "MergeSorter eval for Msce/Mssi/Msrs/Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterEval
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.merge
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

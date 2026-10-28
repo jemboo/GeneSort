@@ -21,6 +21,13 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+    let executionFunctionName = ExecuteFunctionNames.sorterMutate
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+    let setupFunctionName = SetupCatalogNames.mutantPrefix
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Msce ()  : run =
         let names = RunNaming.create()
@@ -50,16 +57,16 @@ module Prefix =
                 Description = "Mutation analysis for merge Msce"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantPrefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -93,16 +100,16 @@ module Prefix =
                 Description = "Mutation analysis for merge Mssi"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantPrefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -136,16 +143,16 @@ module Prefix =
                 Description = "Mutation analysis for merge Msrs"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantPrefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )
@@ -179,16 +186,16 @@ module Prefix =
                 Description = "Mutation analysis for merge Msuf4"
                 AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sorterMutate
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
-                    FunctionName = SetupCatalogNames.mutantPrefix
+                    FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
-                    QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
             }
         )

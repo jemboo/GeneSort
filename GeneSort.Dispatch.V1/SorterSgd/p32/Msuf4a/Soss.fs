@@ -20,6 +20,12 @@ open GeneSort.Dispatch.V1
 
 module Pool_32 =
 
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let executionFunctionName = ExecuteFunctionNames.soss
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
+
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let Gens100 ()  : run =
         let names = RunNaming.create()
@@ -52,14 +58,14 @@ module Pool_32 =
                 AllowOverwrite = false
                 Setup = {
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
@@ -70,6 +76,12 @@ module Pool_32 =
 
 
 module Pool_512 =
+
+    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let executionFunctionName = ExecuteFunctionNames.soss
+    let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
+    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
     let V2a ()  : run =
@@ -103,14 +115,14 @@ module Pool_512 =
                 AllowOverwrite = false
                 Setup = {
                     ParameterSpans = parameterSpansSetup
-                    QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-                    EnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+                    QueryCatalogName = setupQueryCatalogName
+                    EnhancerFunctionName = setupEnhancerFunctionName
                 }
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.soss
+                    FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
-                    QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
