@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System
 open FSharp.UMX
@@ -10,20 +10,20 @@ type ceBlock =
     private { 
         ces: ce array 
         ceBlockId: Guid<ceBlockId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
     }
 
     static member create 
             (ceBlockId: Guid<ceBlockId>) 
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (ces: ce array)  = 
             { 
                 ceBlockId = ceBlockId; 
                 ces = ces;
-                sortingWidth = sortingWidth
+                channelCount = channelCount
             }
 
-    static member Empty = ceBlock.create (Guid.Empty |> UMX.tag<ceBlockId>) (0 |> UMX.tag<sortingWidth>) [||]
+    static member Empty = ceBlock.create (Guid.Empty |> UMX.tag<ceBlockId>) (0 |> UMX.tag<channelCount>) [||]
 
     member this.getCe (dex:int) = 
         //if dex < 0 || dex >= this.ces.Length then
@@ -36,25 +36,25 @@ type ceBlock =
 
     member this.CeLength with get() = this.ces.Length |> UMX.tag<ceLength>
 
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
     member this.permute (perm:permutation) : ceBlock =
         ceBlock.create 
             (Guid.NewGuid() |> UMX.tag)
-            this.sortingWidth
+            this.channelCount
             (this.ces |> Array.map(Ce.permute perm))
 
 
 module CeBlock =
 
-    let breakUpIntoBlocks (sortingWidth: int<sortingWidth>) (ces:ce[]) (blockLength:int<ceLength>) =
+    let breakUpIntoBlocks (channelCount: int<channelCount>) (ces:ce[]) (blockLength:int<ceLength>) =
         let totalCes = ces.Length
         let blocks = 
             [|
                 let mutable index = 0
                 while index < totalCes do
                     let blockCes = ces.[index .. Math.Min(index + %blockLength - 1, totalCes - 1)]
-                    yield ceBlock.create (Guid.NewGuid() |> UMX.tag) sortingWidth blockCes
+                    yield ceBlock.create (Guid.NewGuid() |> UMX.tag) channelCount blockCes
                     index <- index + %blockLength
             |]
         blocks
@@ -63,12 +63,12 @@ module CeBlock =
     let fromSorterSuffix (sorter:sorter) (offset:int<ceLength>) =
         ceBlock.create 
             (UMX.tag<ceBlockId> (Guid.NewGuid())) 
-            sorter.SortingWidth 
+            sorter.ChannelCount
             (sorter.Ces.[%offset .. %sorter.ceLength - 1 |> int])
 
 
     let fromSorter (sorter:sorter) =
         ceBlock.create 
             (UMX.tag<ceBlockId> (Guid.NewGuid())) 
-            sorter.SortingWidth 
+            sorter.ChannelCount
             sorter.Ces

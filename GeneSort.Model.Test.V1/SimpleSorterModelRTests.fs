@@ -23,11 +23,11 @@ open GeneSort.Model.Sorting.Mp.V1.Simple
 let private model kind =
     let id = UMX.tag (Guid.NewGuid())
     match kind with
-    | "Msce" -> msce.create id 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
-    | "Mssi" -> mssi.create id 4<sortingWidth> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permSi.create) |> simpleSorterModel.Mssi
-    | "Msrs" -> msrs.create id 4<sortingWidth> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permRs.create) |> simpleSorterModel.Msrs
-    | "Msuf4" -> msuf4.create id 4<sortingWidth> ([|twoOrbitPairType.Ortho; twoOrbitPairType.Para; twoOrbitPairType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf4.create seed [||])) |> simpleSorterModel.Msuf4
-    | "Msuf6" -> msuf6.create id 6<sortingWidth> ([|twoOrbitTripleType.Ortho1; twoOrbitTripleType.Ortho2; twoOrbitTripleType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf6.create seed [||])) |> simpleSorterModel.Msuf6
+    | "Msce" -> msce.create id 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
+    | "Mssi" -> mssi.create id 4<channelCount> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permSi.create) |> simpleSorterModel.Mssi
+    | "Msrs" -> msrs.create id 4<channelCount> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permRs.create) |> simpleSorterModel.Msrs
+    | "Msuf4" -> msuf4.create id 4<channelCount> ([|twoOrbitPairType.Ortho; twoOrbitPairType.Para; twoOrbitPairType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf4.create seed [||])) |> simpleSorterModel.Msuf4
+    | "Msuf6" -> msuf6.create id 6<channelCount> ([|twoOrbitTripleType.Ortho1; twoOrbitTripleType.Ortho2; twoOrbitTripleType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf6.create seed [||])) |> simpleSorterModel.Msuf6
     | _ -> failwith "Unknown test model"
 
 [<Theory>]
@@ -118,13 +118,13 @@ let ``Sorter includes whole active entries in original order before truncation``
             let sorter = paired |> SimpleSorterModelR.makeSorter limit
             let expectedCes = match limit with None -> expected | Some n -> Array.truncate (int n) expected
             Assert.Equal<ce>(expectedCes, sorter.Ces)
-            Assert.Equal(original.SortingWidth, sorter.SortingWidth)
+            Assert.Equal(original.ChannelCount, sorter.ChannelCount)
             Assert.Equal(original.SorterId, sorter.SorterId)
     Assert.Equal<ce>(original.Ces, (SimpleSorterModel.makeSorter None source).Ces)
 
 [<Fact>]
 let ``Inactive permutations are skipped before expanding their orbits`` () =
-    let source = mssi.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth>
+    let source = mssi.create (UMX.tag (Guid.NewGuid())) 4<channelCount>
                     [|permSi.create [|0; 1; 2; 3|]; permSi.create [|1; 0; 2; 3|]; permSi.create [|3; 2; 1; 0|]|]
                  |> simpleSorterModel.Mssi
     // Fixed points cannot be expanded by the existing CE converter, but are inactive.
@@ -133,7 +133,7 @@ let ``Inactive permutations are skipped before expanding their orbits`` () =
 
 [<Fact>]
 let ``Inactive entries are not converted to comparison elements`` () =
-    let source = msce.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth> [|-1; 1; -1|] |> simpleSorterModel.Msce
+    let source = msce.create (UMX.tag (Guid.NewGuid())) 4<channelCount> [|-1; 1; -1|] |> simpleSorterModel.Msce
     let sorter = (simpleSorterModelR.create source 1 [|-1; 1; 0|]).MakeSorter None
     Assert.Equal<ce>([|Ce.fromIndex 1|], sorter.Ces)
 
@@ -161,11 +161,11 @@ let ``SimpleR union helpers and MessagePack preserve active entries and model da
         Assert.Equal(5, actual.AMax)
         Assert.Equal<int>([|1; 0; 5|], actual.Activators)
         Assert.Equal(SimpleSorterModel.getId source, SorterModel.getId current)
-        Assert.Equal(SimpleSorterModel.getSortingWidth source, SorterModel.getSortingWidth current)
+        Assert.Equal(SimpleSorterModel.getChannelCount source, SorterModel.getChannelCount current)
         Assert.Equal(ceCount, int (SorterModel.getCeLength current))
         Assert.Equal(stageCount, int (SorterModel.getStageLength current))
         Assert.Equal(SorterModel.getId current, SorterModelSet.getId current)
-        Assert.Equal(SorterModel.getSortingWidth current, SorterModelSet.getSortingWidth current)
+        Assert.Equal(SorterModel.getChannelCount current, SorterModelSet.getChannelCount current)
         Assert.Equal(SorterModel.getStageLength current, SorterModelSet.getStageLength current)
         Assert.Equal<ce>((SimpleSorterModel.makeSorter None source).Ces, (SimpleSorterModel.makeSorter None actual.Model).Ces)
         for limit in [None; Some 1<ceLength>; Some 100<ceLength>] do
@@ -230,8 +230,8 @@ let private mutator kind (rate: float) =
     | "Msce" -> msceRandMutate.create rng (indelRates.create (rate, 0.0, 0.0)) (UMX.tag true) mutatorVariant.V1 |> SmmMsceRandMutate
     | "Mssi" -> SimpleSorterModelMutator.getMssiModelMutator rng (UMX.tag true) r (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
     | "Msrs" -> SimpleSorterModelMutator.getMsrsModelMutator rng (UMX.tag true) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
-    | "Msuf4" -> SimpleSorterModelMutator.getMsuf4ModelMutator 16<sortingWidth> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V2
-    | "Msuf6" -> SimpleSorterModelMutator.getMsuf6ModelMutator 12<sortingWidth> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
+    | "Msuf4" -> SimpleSorterModelMutator.getMsuf4ModelMutator 16<channelCount> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V2
+    | "Msuf6" -> SimpleSorterModelMutator.getMsuf6ModelMutator 12<channelCount> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
     | _ -> failwith "Unknown test mutator"
 
 [<Theory>]
@@ -244,8 +244,8 @@ let ``SimpleR mutation delegates model changes and reproduces bounded activators
     let id = Guid.Parse("9081a492-6ec3-42e9-a962-b14476d560b4") |> UMX.tag<sorterModelId>
     let source =
         match kind with
-        | "Msuf4" -> msuf4.create id 16<sortingWidth> (Array.init 3 (fun _ -> RandomUnfolderOps4.makeRandomTwoOrbitUf4 (fun () -> 0.5) (Uf4GenRates.makeUniform 16))) |> simpleSorterModel.Msuf4
-        | "Msuf6" -> msuf6.create id 12<sortingWidth> (Array.init 3 (fun _ -> RandomUnfolderOps6.makeRandomTwoOrbitUf6 (fun () -> 0.5) (Uf6GenRates.makeUniform 12))) |> simpleSorterModel.Msuf6
+        | "Msuf4" -> msuf4.create id 16<channelCount> (Array.init 3 (fun _ -> RandomUnfolderOps4.makeRandomTwoOrbitUf4 (fun () -> 0.5) (Uf4GenRates.makeUniform 16))) |> simpleSorterModel.Msuf4
+        | "Msuf6" -> msuf6.create id 12<channelCount> (Array.init 3 (fun _ -> RandomUnfolderOps6.makeRandomTwoOrbitUf6 (fun () -> 0.5) (Uf6GenRates.makeUniform 12))) |> simpleSorterModel.Msuf6
         | _ -> model kind
     let parent = simpleSorterModelR.create source 2 [|-2; 0; 2|]
     let underlying = mutator kind 1.0

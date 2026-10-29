@@ -22,9 +22,9 @@ module SeedPoolSetMakers =
     let private buildStandard
             (sources: evolutionSetupSources) (rp:runParameters) : Async<Result<sorterPoolSet_Standard, string>> =
         asyncResult {
-            let! sortingWidth = 
-                    rp.GetSortingWidth() 
-                    |> Result.ofOption "Missing sorting width."
+            let! channelCount =
+                    rp.GetChannelCount()
+                    |> Result.ofOption "Missing channel count."
 
             let! poolCount = 
                     rp.GetSorterPoolCount() 
@@ -63,14 +63,14 @@ module SeedPoolSetMakers =
 
             let! (parentSorterSetEval: sorterSetEval) = 
                 sources.LoadStandardSorterEvals
-                    sortingWidth 
+                    channelCount
                     simpleSorterModelType 
                     GeneSort.SortingOps.sorterEvalType.V2
 
             let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
-                    sortingWidth 
+                    channelCount
                     simpleSorterModelType
                     excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -154,7 +154,7 @@ module SeedPoolSetMakers =
             let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
-                    mrgLibid.SortingWidth 
+                    mrgLibid.ChannelCount
                     simpleSorterModelType
                     excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -239,7 +239,7 @@ module SeedPoolSetMakers =
             let! seedSorterModelGen =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                     rngType 
-                    pfxLibId.SortingWidth 
+                    pfxLibId.ChannelCount
                     simpleSorterModelType
                     excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp

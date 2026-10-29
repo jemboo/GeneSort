@@ -25,7 +25,7 @@ type simpleSorterModelRGen =
     member this.ModelGen = this.modelGen
     member this.AMax = this.aMax
     member this.Id = this.id
-    member this.SortingWidth = SimpleSorterModelGen.getSortingWidth this.ModelGen
+    member this.ChannelCount = SimpleSorterModelGen.getChannelCount this.ModelGen
     /// Maximum CE capacity; the generated sorter's actual length depends on its activators.
     member this.CeLength = SimpleSorterModelGen.getCeLength this.ModelGen
 

@@ -48,7 +48,7 @@ let ``All SimpleR generators initialize one bounded activator per entry and repl
     let restored = roundTrip wrapped
     Assert.Equal(configured.Id, SorterModelGen.getId wrapped)
     Assert.Equal(configured.Id, SorterModelGen.getId restored)
-    Assert.Equal(SimpleSorterModelGen.getSortingWidth underlying, SorterModelGen.getSortingWidth wrapped)
+    Assert.Equal(SimpleSorterModelGen.getChannelCount underlying, SorterModelGen.getChannelCount wrapped)
     Assert.Equal(SimpleSorterModelGen.getCeLength underlying, SorterModelGen.getCeLength wrapped)
     let mutable observed = Set.empty
     for index in 0 .. 31 do
@@ -65,7 +65,7 @@ let ``All SimpleR generators initialize one bounded activator per entry and repl
         Assert.Equal<ce>((SimpleSorterModel.makeSorter None ordinary).Ces, (SimpleSorterModel.makeSorter None actual.Model).Ces)
         assertSameModel child (SorterModelGen.makeSorterModelFromId id wrapped)
         assertSameModel child (SorterModelGen.makeSorterModelFromIndex (UMX.tag index) restored)
-        let cesPerEntry = if kind = "Msce" then 1 else int configured.SortingWidth / 2
+        let cesPerEntry = if kind = "Msce" then 1 else int configured.ChannelCount / 2
         let expected = (SimpleSorterModel.makeSorter None ordinary).Ces |> Array.chunkBySize cesPerEntry
                        |> Array.indexed |> Array.filter (fun (i, _) -> actual.Activators.[i] > 0) |> Array.collect snd
         Assert.Equal<ce>(expected, (SorterModel.makeSorter child None).Ces)

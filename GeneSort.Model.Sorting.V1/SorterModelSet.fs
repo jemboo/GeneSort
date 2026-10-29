@@ -38,8 +38,8 @@ type sorterModelSet =
 
 module SorterModelSet =
 
-    let getSortingWidth (model: sorterModel) : int<sortingWidth> =
-        SorterModel.getSortingWidth model
+    let getChannelCount (model: sorterModel) : int<channelCount> =
+        SorterModel.getChannelCount model
 
 
     let getStageLength (model: sorterModel) : int<stageLength> =

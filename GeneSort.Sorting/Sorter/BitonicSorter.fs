@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open FSharp.UMX
@@ -19,10 +19,10 @@ module BitonicSorter =
     
 
     ///// Generate comparators for a bitonic merge (scheme 1)
-    //// For the full merge sequence for a given soringWidth, set upperOffset = 0<sortingWidth>
-    let rec bitonicMerge1 (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
+    //// For the full merge sequence for a given soringWidth, set upperOffset = 0<channelCount>
+    let rec bitonicMerge1 (upperOffset: int<channelCount>) (fullWidth: int<channelCount>) : ce [][] =
         if %fullWidth > 1 then
-            let halfWidth = (%fullWidth / 2) |> UMX.tag<sortingWidth>
+            let halfWidth = (%fullWidth / 2) |> UMX.tag<channelCount>
             let prefix = 
                 [| for i in %upperOffset .. %upperOffset + %halfWidth - 1 -> ce.create i (i + %halfWidth) |]
             let upperSuffix = bitonicMerge1 %upperOffset halfWidth
@@ -32,10 +32,10 @@ module BitonicSorter =
 
 
     ///// Generate comparators for a bitonic merge (scheme 2)
-    //// For the full merge sequence for a given soringWidth, set upperOffset = 0<sortingWidth>
-    let bitonicMerge2 (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
+    //// For the full merge sequence for a given soringWidth, set upperOffset = 0<channelCount>
+    let bitonicMerge2 (upperOffset: int<channelCount>) (fullWidth: int<channelCount>) : ce [][] =
         if %fullWidth > 1 then
-            let halfWidth = (%fullWidth / 2) |> UMX.tag<sortingWidth>
+            let halfWidth = (%fullWidth / 2) |> UMX.tag<channelCount>
             let prefix = 
                 [| for i in %upperOffset .. %upperOffset + %halfWidth - 1 -> ce.create i (%upperOffset + %fullWidth - 1 - i) |]
             let upperSuffix = bitonicMerge1 %upperOffset halfWidth
@@ -45,12 +45,12 @@ module BitonicSorter =
 
 
     ///// Generate comparators for a bitonic sort (scheme 1)
-    let bitonicSort1 (sortingWidth: int<sortingWidth>) : ce [][] =
-        let rec bitonicSortHelper (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
+    let bitonicSort1 (channelCount: int<channelCount>) : ce [][] =
+        let rec bitonicSortHelper (upperOffset: int<channelCount>) (fullWidth: int<channelCount>) : ce [][] =
             if %fullWidth = 2 then
                 (bitonicMerge1 upperOffset fullWidth)
             else
-               let halfWidth = (%fullWidth / 2) |> UMX.tag<sortingWidth>
+               let halfWidth = (%fullWidth / 2) |> UMX.tag<channelCount>
                let middle = 
                     [| for i in 0 .. %halfWidth - 1 -> ce.create (%upperOffset + i * 2) (%upperOffset + i * 2 + 1) |]
                let suffix = bitonicMerge1 %upperOffset fullWidth
@@ -58,16 +58,16 @@ module BitonicSorter =
                let fullPrefix = (Ce.stack2d upperPrefix upperPrefix halfWidth)
                Array.append fullPrefix suffix
 
-        bitonicSortHelper 0<sortingWidth> sortingWidth
+        bitonicSortHelper 0<channelCount> channelCount
 
 
     ///// Generate comparators for a bitonic sort (scheme 2)
-    let bitonicSort2 (sortingWidth: int<sortingWidth>) : ce [][] =
-        let rec bitonicSortHelper (upperOffset: int<sortingWidth>) (fullWidth: int<sortingWidth>) : ce [][] =
+    let bitonicSort2 (channelCount: int<channelCount>) : ce [][] =
+        let rec bitonicSortHelper (upperOffset: int<channelCount>) (fullWidth: int<channelCount>) : ce [][] =
             if %fullWidth = 2 then
                 (bitonicMerge1 upperOffset fullWidth)
             else
-               let halfWidth = (%fullWidth / 2) |> UMX.tag<sortingWidth>
+               let halfWidth = (%fullWidth / 2) |> UMX.tag<channelCount>
                let middle = 
                     [| for i in 0 .. %halfWidth - 1 -> ce.create (%upperOffset + i * 2) (%upperOffset + i * 2 + 1) |]
                let suffix = bitonicMerge2 %upperOffset fullWidth
@@ -75,7 +75,7 @@ module BitonicSorter =
                let fullPrefix = (Ce.stack2d upperPrefix upperPrefix halfWidth)
                Array.append fullPrefix suffix
 
-        bitonicSortHelper 0<sortingWidth> sortingWidth
+        bitonicSortHelper 0<channelCount> channelCount
 
 
     let prefix1 : sorter =
@@ -84,9 +84,9 @@ module BitonicSorter =
                 "prefix1-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 2<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 2<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix2 : sorter =
@@ -95,9 +95,9 @@ module BitonicSorter =
                 "prefix2-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 4<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 2 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 4<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 2 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix3 : sorter =
@@ -106,9 +106,9 @@ module BitonicSorter =
                 "prefix3-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 4<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 3 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 4<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 3 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix4 : sorter =
@@ -117,9 +117,9 @@ module BitonicSorter =
                 "prefix4-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 8<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 4 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 8<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 4 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix5 : sorter =
@@ -128,9 +128,9 @@ module BitonicSorter =
                 "prefix5-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 8<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 5 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 8<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 5 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix6 : sorter =
@@ -139,9 +139,9 @@ module BitonicSorter =
                 "prefix6-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 8<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 6 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 8<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 6 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix7 : sorter =
@@ -150,9 +150,9 @@ module BitonicSorter =
                 "prefix7-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 16<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 7 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 16<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 7 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix8 : sorter =
@@ -161,9 +161,9 @@ module BitonicSorter =
                 "prefix8-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 8<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 8 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 8<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 8 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix9 : sorter =
@@ -172,9 +172,9 @@ module BitonicSorter =
                 "prefix9-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 8<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 9 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 8<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 9 |> Array.concat
+        sorter.create sorterId channelCount ces
 
 
     let prefix10 : sorter =
@@ -183,7 +183,7 @@ module BitonicSorter =
                 "prefix10-bitonic-sorter"  :> obj
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterId>
 
-        let sortingWidth = 16<sortingWidth>
-        let ces = bitonicSort1 sortingWidth |> Array.take 10 |> Array.concat
-        sorter.create sorterId sortingWidth ces
+        let channelCount = 16<channelCount>
+        let ces = bitonicSort1 channelCount |> Array.take 10 |> Array.concat
+        sorter.create sorterId channelCount ces
 

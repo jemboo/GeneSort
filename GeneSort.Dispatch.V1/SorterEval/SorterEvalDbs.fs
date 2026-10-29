@@ -51,7 +51,7 @@ module SorterEvalDbs =
 
     module Prefix =
 
-        let private sourceRun = SorterEval.Prefix.Width32 ()
+        let private sourceRun = SorterEval.Prefix.Channels32 ()
         let projectName = sourceRun.ProjectName
 
         let sorterCount =
@@ -90,14 +90,14 @@ module SorterEvalDbs =
 
 
     let getStandardSorterEvals
-                    (sortingWidth: int<sortingWidth>) 
+                    (channelCount: int<channelCount>)
                     (simpleSorterModelType: simpleSorterModelType) 
                     (sorterEvalType: sorterEvalType)
                             : Async<Result<sorterSetEval, string>> =
         let qp = Standard.makeQueryParams 
                         (0 |> UMX.tag<replNumber>) 
                         rngType.Lcg
-                        sortingWidth 
+                        channelCount
                         simpleSorterModelType 
                         sorterEvalType
                         (geneSortDataType.SorterSetEval "")

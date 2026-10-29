@@ -49,72 +49,72 @@ module RunTypeEditor =
                 let declared = allSpans |> List.filter (fst >> (=) key) |> List.collect snd
                 let choices =
                     declared
-                    |> List.choose (fun value -> try Some (MergeLibId.fromString value).SortingWidth with _ -> None)
+                    |> List.choose (fun value -> try Some (MergeLibId.fromString value).ChannelCount with _ -> None)
                     |> List.distinct |> List.sort
-                    |> List.collect (MergeLibId.availableForWidth >> Array.map MergeLibId.toString >> Array.toList)
+                    |> List.collect (MergeLibId.availableForChannelCount >> Array.map MergeLibId.toString >> Array.toList)
                 // Preserve existing declarations even when this library version lacks their network.
                 let choices = (choices @ declared) |> List.distinct
                 parameterDescription.forChoices key choices required executionAllowed
             elif key = ParamKeys.prefixLibIdKey then
                 let declared = allSpans |> List.filter (fst >> (=) key) |> List.collect snd
-                let widths = declared |> List.choose (fun value -> try Some (PrefixLibId.fromString value).SortingWidth with _ -> None)
+                let widths = declared |> List.choose (fun value -> try Some (PrefixLibId.fromString value).ChannelCount with _ -> None)
                 let choices =
                     PrefixLib.ids ()
-                    |> Array.filter (fun id -> List.contains id.SortingWidth widths)
+                    |> Array.filter (fun id -> List.contains id.ChannelCount widths)
                     |> Array.map PrefixLibId.toString |> Array.toList
                 parameterDescription.forChoices key ((choices @ declared) |> List.distinct) required executionAllowed
             elif key = ParamKeys.sorterLibIdKey then
                 let declared = allSpans |> List.filter (fst >> (=) key) |> List.collect snd
-                let widths = declared |> List.choose (fun value -> try Some (SorterLibId.fromString value).SortingWidth with _ -> None)
+                let widths = declared |> List.choose (fun value -> try Some (SorterLibId.fromString value).ChannelCount with _ -> None)
                 let choices =
                     SorterLib.ids ()
-                    |> Array.filter (fun id -> List.contains id.SortingWidth widths)
+                    |> Array.filter (fun id -> List.contains id.ChannelCount widths)
                     |> Array.map SorterLibId.toString |> Array.toList
                 parameterDescription.forChoices key ((choices @ declared) |> List.distinct) required executionAllowed
             else parameterDescription.forKey key required executionAllowed)
         |> List.toArray
 
     /// The width picker is editor state. PrefixLibId already records it in the saved run.
-    let prefixSortingWidths (configured: run) =
+    let prefixChannelCounts (configured: run) =
         let declared =
             configured.SetupParameterSpans @ configured.RunParameterSpans
             |> List.filter (fst >> (=) ParamKeys.prefixLibIdKey) |> List.collect snd
-            |> List.choose (fun value -> try Some (int (PrefixLibId.fromString value).SortingWidth) with _ -> None)
-        Array.append (PrefixLib.ids () |> Array.map (fun id -> int id.SortingWidth)) (List.toArray declared)
+            |> List.choose (fun value -> try Some (int (PrefixLibId.fromString value).ChannelCount) with _ -> None)
+        Array.append (PrefixLib.ids () |> Array.map (fun id -> int id.ChannelCount)) (List.toArray declared)
         |> Array.distinct |> Array.sort
 
-    let parametersForPrefixWidth (configured: run) (width: int) =
+    let parametersForPrefixChannelCount (configured: run) (width: int) =
         parameters configured |> Array.map (fun spec ->
             if spec.Key <> ParamKeys.prefixLibIdKey then spec
             else
                 let available =
-                    PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = width)
+                    PrefixLib.ids () |> Array.filter (fun id -> int id.ChannelCount = width)
                     |> Array.map PrefixLibId.toString |> Array.toList
                 let declared =
                     configured.SetupParameterSpans @ configured.RunParameterSpans
                     |> List.filter (fst >> (=) ParamKeys.prefixLibIdKey) |> List.collect snd
-                    |> List.filter (fun value -> try int (PrefixLibId.fromString value).SortingWidth = width with _ -> false)
+                    |> List.filter (fun value -> try int (PrefixLibId.fromString value).ChannelCount = width with _ -> false)
                 parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)
 
     /// Merge widths can be larger than their component sorter widths. These are
-    /// suggestions; the editor also accepts a typed width supported by availableForWidth.
-    let mergeSortingWidths (configured: run) =
+    /// suggestions; the editor also accepts a typed width supported by availableForChannelCount.
+    let mergeChannelCounts (configured: run) =
         let declared =
             configured.SetupParameterSpans @ configured.RunParameterSpans
             |> List.filter (fst >> (=) ParamKeys.mergeLibIdKey) |> List.collect snd
-            |> List.choose (fun value -> try Some (int (MergeLibId.fromString value).SortingWidth) with _ -> None)
-        Array.append (SorterLib.ids () |> Array.map (fun id -> int id.SortingWidth)) (List.toArray declared)
+            |> List.choose (fun value -> try Some (int (MergeLibId.fromString value).ChannelCount) with _ -> None)
+        Array.append (SorterLib.ids () |> Array.map (fun id -> int id.ChannelCount)) (List.toArray declared)
         |> Array.distinct |> Array.sort
 
-    let parametersForMergeWidth (configured: run) (width: int) =
+    let parametersForMergeChannelCount (configured: run) (width: int) =
         parameters configured |> Array.map (fun spec ->
             if spec.Key <> ParamKeys.mergeLibIdKey then spec
             else
-                let available = MergeLibId.availableForWidth (UMX.tag width) |> Array.map MergeLibId.toString |> Array.toList
+                let available = MergeLibId.availableForChannelCount (UMX.tag width) |> Array.map MergeLibId.toString |> Array.toList
                 let declared =
                     configured.SetupParameterSpans @ configured.RunParameterSpans
                     |> List.filter (fst >> (=) ParamKeys.mergeLibIdKey) |> List.collect snd
-                    |> List.filter (fun value -> try int (MergeLibId.fromString value).SortingWidth = width with _ -> false)
+                    |> List.filter (fun value -> try int (MergeLibId.fromString value).ChannelCount = width with _ -> false)
                 parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)
 
     /// Display only: these rows never become execution sweep dimensions. Resolve

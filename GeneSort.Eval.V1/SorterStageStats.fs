@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1
+namespace GeneSort.Eval.V1
 
 open FSharp.UMX
 open GeneSort.Core
@@ -65,9 +65,9 @@ module SorterStageStats =
 
     let fromSorterEval (sorterEval: sorterEval) : sorterStageStats array =
         let ces = sorterEval |> SorterEval.getCeUseArray |> Array.map (fun cd -> cd.Ce)
-        let sortingWidth = sorterEval |> SorterEval.getSortingWidth
+        let channelCount = sorterEval |> SorterEval.getChannelCount
         // 2. Process elements through your StageBuilderSequence layout pipeline
-        let stageSeq = StageBuilderSequence.toStageSequence sortingWidth ces
+        let stageSeq = StageBuilderSequence.toStageSequence channelCount ces
         let stages = stageSeq.Stages
         let totalStagesCount = stages.Length |> UMX.tag<stageLength>
 

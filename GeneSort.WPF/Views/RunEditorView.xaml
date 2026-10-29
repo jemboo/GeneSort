@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
         <DockPanel Margin="0,0,0,8" IsEnabled="{Binding IsReady}">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="Choose run…" Click="ChooseRun_Click" />
+                <Button Content="Back" Click="ChooseRun_Click" ToolTip="Back to this run module. Your editor changes are kept." />
                 <Button Content="New" Click="New_Click" />
                 <Button Content="Open…" Click="Open_Click" />
                 <Button Content="Validate" Click="Validate_Click" />
@@ -68,6 +68,7 @@
                     </StackPanel.Resources>
                 <TextBlock Text="{Binding WorkflowName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
                            ToolTip="{Binding WorkflowDescription}" Margin="0,0,0,6" />
+                <TextBlock Text="{Binding WorkflowDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,6" />
                 <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}">
                     <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
                         <DataTrigger Binding="{Binding SourceDescription}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
@@ -127,22 +128,22 @@
                                 <TextBlock Text="SorterEval database (SorterSetEvals)" Margin="0,6,0,0" />
                                 <TextBox Text="{Binding SorterSetEvalsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterSetEvals source database" />
                             </StackPanel>
-                            <StackPanel Visibility="{Binding HasPrefixWidthSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
-                                <TextBlock Text="Sorting width" FontWeight="SemiBold" />
-                                <ComboBox ItemsSource="{Binding PrefixSortingWidths}" SelectedItem="{Binding SelectedPrefixSortingWidth}"
-                                          IsEnabled="{Binding CanSelectPrefixWidth}" Width="140" HorizontalAlignment="Left"
-                                          AutomationProperties.Name="Prefix sorting width" />
-                                <TextBlock Text="Choose a width, then select PrefixLibId values below. Changing width clears prefixes from other widths."
+                            <StackPanel Visibility="{Binding HasPrefixChannelCountSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
+                                <TextBlock Text="Channel count" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding PrefixChannelCounts}" SelectedItem="{Binding SelectedPrefixChannelCount}"
+                                          IsEnabled="{Binding CanSelectPrefixChannelCount}" Width="140" HorizontalAlignment="Left"
+                                          AutomationProperties.Name="Prefix channel count" />
+                                <TextBlock Text="Choose a channel count, then select PrefixLibId values below. Changing channel count clears prefixes from other channel counts."
                                            TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
                             </StackPanel>
-                            <StackPanel Visibility="{Binding HasMergeWidthSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
-                                <TextBlock Text="Sorting width" FontWeight="SemiBold" />
-                                <ComboBox ItemsSource="{Binding MergeSortingWidths}" Text="{Binding SelectedMergeSortingWidth, UpdateSourceTrigger=PropertyChanged}"
-                                          IsEditable="True" IsEnabled="{Binding CanSelectMergeWidth}"
-                                          Width="140" HorizontalAlignment="Left" AutomationProperties.Name="Merge sorting width" />
-                                <TextBlock Text="Choose or type a width, then select MergeLibId values below. Changing width clears merges from other widths."
+                            <StackPanel Visibility="{Binding HasMergeChannelCountSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
+                                <TextBlock Text="Channel count" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding MergeChannelCounts}" Text="{Binding SelectedMergeChannelCount, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEditable="True" IsEnabled="{Binding CanSelectMergeChannelCount}"
+                                          Width="140" HorizontalAlignment="Left" AutomationProperties.Name="Merge channel count" />
+                                <TextBlock Text="Choose or type a channel count, then select MergeLibId values below. Changing channel count clears merges from other channel counts."
                                            TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
-                                <TextBlock Text="{Binding MergeWidthError}" TextWrapping="Wrap" Foreground="{DynamicResource ErrorBrush}" />
+                                <TextBlock Text="{Binding MergeChannelCountError}" TextWrapping="Wrap" Foreground="{DynamicResource ErrorBrush}" />
                             </StackPanel>
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
                             <local:ParameterSectionView DataContext="{Binding SetupSection}" Visibility="{Binding DataContext.HasSetup, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />

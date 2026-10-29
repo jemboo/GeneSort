@@ -9,7 +9,7 @@ open GeneSort.Sorting.Sortable
 /// DTO for the full SIMD-optimized test suite
 type sortableUint8v256TestsDto = {
     Id: Guid
-    SortingWidth: int
+    ChannelCount: int
     Blocks: simdSortBlockDto[]
 }
 
@@ -33,11 +33,11 @@ module SortableUint8v256TestsDto =
 
     let fromDomain (test: sortableUint8v256Tests) : sortableUint8v256TestsDto =
         { Id = %test.Id
-          SortingWidth = %test.SortingWidth
+          ChannelCount = %test.ChannelCount
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
     let toDomain (dto: sortableUint8v256TestsDto) : sortableUint8v256Tests =
         let id = UMX.tag<sortableTestsId> dto.Id
-        let sw = UMX.tag<sortingWidth> dto.SortingWidth
+        let sw = UMX.tag<channelCount> dto.ChannelCount
         let blocks = dto.Blocks |> Array.map blockToDomain
         sortableUint8v256Tests.create id sw blocks

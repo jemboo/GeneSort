@@ -34,7 +34,7 @@ module private Fixtures =
     let modelId = (UMX.tag<sorterModelId> (Guid.NewGuid()))
     let subsetId = "partition-A" |> UMX.tag<sortableTestsSubsetId>
     let evaluation =
-        sorterEvalV2.create ((UMX.tag<sorterId> (Guid.NewGuid()))) subsetId 32<sortingWidth> 3<sortableCount>
+        sorterEvalV2.create ((UMX.tag<sorterId> (Guid.NewGuid()))) subsetId 32<channelCount> 3<sortableCount>
             7<sequenceHash> 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
             (UMX.tag 1) 0<reflectiveCount> |> sorterEval.V2
     let evaluations =
@@ -125,7 +125,7 @@ module OutputUnionTests =
         Fixtures.withFolder (fun folder ->
             let models =
                 Array.init count (fun index ->
-                    msce.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth> [| 1; 2 + index |]
+                    msce.create (UMX.tag (Guid.NewGuid())) 4<channelCount> [| 1; 2 + index |]
                     |> simpleSorterModel.Msce |> sorterModel.Simple)
             let original = sorterModelSet.create (UMX.tag (Guid.NewGuid())) models 17<ceLength>
             let dataType = geneSortDataType.SorterModelSet "evaluation_setup"
@@ -158,8 +158,8 @@ module OutputUnionTests =
         MessagePackSetup.configure()
         Fixtures.withFolder (fun folder ->
             let tests =
-                GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth>
-                    [| GeneSort.Sorting.Sortable.sortableBoolArray.create([| true; false; true; false |], 4<sortingWidth>) |]
+                GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 4<channelCount>
+                    [| GeneSort.Sorting.Sortable.sortableBoolArray.create([| true; false; true; false |], 4<channelCount>) |]
                 |> GeneSort.Sorting.Sortable.sortableTests.Bools
             let prefix = if hasPrefix then [| ce.create 0 3; ce.create 1 2; ce.create 0 1 |] else [||]
             let dataType = geneSortDataType.SortableTestsWithPrefix "evaluation_setup"
@@ -307,9 +307,9 @@ module OutputUnionTests =
         let measure = stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength
         let makeMember (stageCount: int) =
             let modelId = UMX.tag<sorterModelId> (Guid.NewGuid())
-            let model = msce.create modelId 32<sortingWidth> [|1|] |> simpleSorterModel.Msce |> sorterModel.Simple
+            let model = msce.create modelId 32<channelCount> [|1|] |> simpleSorterModel.Msce |> sorterModel.Simple
             let evaluation =
-                sorterEvalV2.create (UMX.cast<sorterModelId, sorterId> modelId) Fixtures.subsetId 32<sortingWidth> 3<sortableCount>
+                sorterEvalV2.create (UMX.cast<sorterModelId, sorterId> modelId) Fixtures.subsetId 32<channelCount> 3<sortableCount>
                     7<sequenceHash> (UMX.tag<stageLength> stageCount) [||] (UMX.tag false) (UMX.tag 1) 0<reflectiveCount>
                 |> sorterEval.V2
             spMember_Standard.create (UMX.tag<sorterPoolMemberId> (Guid.NewGuid())) model 0<mutationIndex> 5<mutationMod>
@@ -379,7 +379,7 @@ module OutputUnionTests =
                 |> List.map (fun (subset, stageCount) ->
                     let subsetId = UMX.tag<sortableTestsSubsetId> subset
                     let evaluation =
-                        sorterEvalV2.create (UMX.cast<sorterPoolMemberId, sorterId> memberId) subsetId 32<sortingWidth> 3<sortableCount>
+                        sorterEvalV2.create (UMX.cast<sorterPoolMemberId, sorterId> memberId) subsetId 32<channelCount> 3<sortableCount>
                             7<sequenceHash> (UMX.tag<stageLength> stageCount) [||] (UMX.tag false) (UMX.tag 1) 0<reflectiveCount>
                         |> sorterEval.V2
                     subsetId, evaluation)
@@ -433,7 +433,7 @@ module OutputUnionTests =
         let selectedId = UMX.tag<sortableTestsSubsetId> "0"
         let tests =
             GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
-                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+                32<channelCount> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<channelCount>) |]
             |> GeneSort.Sorting.Sortable.sortableTests.Bools
         let partitions =
             [0 .. count - 1]
@@ -460,7 +460,7 @@ module OutputUnionTests =
     let ``A single partition retains the original tests without shuffling`` () =
         let tests =
             GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
-                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+                32<channelCount> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<channelCount>) |]
             |> GeneSort.Sorting.Sortable.sortableTests.Bools
         let partitions =
             GeneSort.Sorting.Sortable.PartitionOfSortableTests.partition
@@ -475,7 +475,7 @@ module OutputUnionTests =
         let selectedId = UMX.tag<sortableTestsSubsetId> selection
         let tests =
             GeneSort.Sorting.Sortable.sortableBinaryTests.create (UMX.tag<sortableTestsId> (Guid.NewGuid()))
-                32<sortingWidth> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<sortingWidth>) |]
+                32<channelCount> [| GeneSort.Sorting.Sortable.sortableBoolArray.create(Array.zeroCreate<bool> 32, 32<channelCount>) |]
             |> GeneSort.Sorting.Sortable.sortableTests.Bools
         let partitions =
             [0 .. 3]
@@ -508,7 +508,7 @@ module OutputUnionTests =
         Assert.True(Double.IsPositiveInfinity %(standard |> SpMember_Standard.withEval None).Score)
         let secondSubset = UMX.tag<sortableTestsSubsetId> "second"
         let secondEval =
-            sorterEvalV2.create (SorterEval.getSorterId Fixtures.evaluation) secondSubset 32<sortingWidth> 3<sortableCount>
+            sorterEvalV2.create (SorterEval.getSorterId Fixtures.evaluation) secondSubset 32<channelCount> 3<sortableCount>
                 7<sequenceHash> 9<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
                 (UMX.tag 1) 0<reflectiveCount> |> sorterEval.V2
         let updatedStandard = standard |> SpMember_Standard.withEval (Some secondEval)
@@ -661,7 +661,7 @@ module OutputUnionTests =
     [<Fact>]
     let ``Standard summaries and snapshots retain unevaluated pools and members`` () =
         let model =
-            msce.create Fixtures.modelId 32<sortingWidth> [|1|]
+            msce.create Fixtures.modelId 32<channelCount> [|1|]
             |> simpleSorterModel.Msce
             |> sorterModel.Simple
         let memberWithModel =

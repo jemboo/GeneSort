@@ -125,7 +125,7 @@ module RunParamEnhancerBuilders =
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
             .WithRunFinished(Some false)
-            .WithSortingWidth(Some mergeLibId.SortingWidth)
+            .WithChannelCount(Some mergeLibId.ChannelCount)
             .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
             .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
             .WithId(Some qp.Id)
@@ -152,7 +152,7 @@ module RunParamEnhancerBuilders =
         let qp = queryParamsForRun context rp
         let prefixLibId = rp.GetPrefixLibId().Value
         rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithSortingWidth(Some prefixLibId.SortingWidth)
+            .WithChannelCount(Some prefixLibId.ChannelCount)
             .WithRunName(Some context.Run.RunName)
             .WithRunFinished(Some false)
             .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
@@ -162,14 +162,14 @@ module RunParamEnhancerBuilders =
     module Sgd =
 
         let private applyPrefixDefaults
-                (sortingWidth: int<sortingWidth>)
+                (channelCount: int<channelCount>)
                 (stageLength: int<stageLength>)
                 (prefixVariant: prefixLibVariant)
                 (modelType: simpleSorterModelType)
                 (includeSorterEvalMeasure: bool)
                 (rp: runParameters) =
             let selectionType = sorterSelectionType.GuidOrder (512<sorterCount>)
-            let prefixLibId = prefixLibId.create sortingWidth stageLength prefixVariant
+            let prefixLibId = prefixLibId.create channelCount stageLength prefixVariant
             let result =
                 rp.WithRngType(Some rngType.Lcg)
                     .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
@@ -182,7 +182,7 @@ module RunParamEnhancerBuilders =
                     .WithSortedFraction(Some 0.99<sortedFraction>)
                     .WithSeedSorterPoolSelectionType(Some selectionType)
                     .WithPrefixLibId(Some prefixLibId)
-                    .WithSortingWidth(Some prefixLibId.SortingWidth)
+                    .WithChannelCount(Some prefixLibId.ChannelCount)
             if includeSorterEvalMeasure then
                 result.WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
                     .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
@@ -244,7 +244,7 @@ module RunParamEnhancerBuilders =
             parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.msufExecution
             |> ParameterValidation.ensureValid "parameters"
             fromSorterPoolSet
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msuf4 true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msuf4 true))
                 true
                 true
                 None
@@ -288,49 +288,49 @@ module RunParamEnhancerBuilders =
 
         let msrs32MutationRate =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
                 512<sorterCount>
                 true
                 None
 
         let msrs32MutationRateMax =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
                 512<sorterCount>
                 true
                 (Some 0.99<modificationRate>)
 
         let msuf624p3bMutationRate =
             let defaults rp =
-                let result = applyPrefixDefaults 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msuf6 false rp
+                let result = applyPrefixDefaults 24<channelCount> 3<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msuf6 false rp
                 let sorterEvalMeasure = result.GetSorterEvalMeasure().Value
                 result.WithSorterEvalMeasureInitial(Some sorterEvalMeasure).WithOrthoRate(Some 4.001<orthoRate>)
             fromSorterPoolSet defaults false true None
 
         let msrs24p3aOrthoPara =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
                 8192<sorterCount>
                 true
                 (Some 0.99<modificationRate>)
 
         let msrs24p3aPoolModComp =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
                 512<sorterCount>
                 false
                 None
 
         let msrs24p3bOrthoPara =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msrs true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msrs true))
                 8192<sorterCount>
                 true
                 (Some 0.99<modificationRate>)
 
         let mssi24p3bOrthoPara =
             fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Mssi true))
+                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Mssi true))
                 1024<sorterCount>
                 true
                 None

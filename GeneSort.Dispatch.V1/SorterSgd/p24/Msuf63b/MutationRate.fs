@@ -135,8 +135,10 @@ module VarModR_32 =
             }
         )
 
+    let description = "Compare mutation-rate settings for 24-input Msuf63b evolution (VarModR_32)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", description, [|
             runExample("Test", Test)
             runExample("WideTest", WideTest)
         |])

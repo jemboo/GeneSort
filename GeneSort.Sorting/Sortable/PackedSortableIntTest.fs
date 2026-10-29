@@ -8,13 +8,13 @@ open GeneSort.Sorting
 [<Struct>]
 type packedSortableIntTests =
     private { id: Guid<sortableTestsId>
-              sortingWidth: int<sortingWidth>
+              channelCount: int<channelCount>
               count: int<sortableCount>
               // All arrays flattened into one: [Test0_0..Test0_N, Test1_0..Test1_N...]
               packedValues: int[] }
 
     static member create
-                    (sw: int<sortingWidth>)
+                    (sw: int<channelCount>)
                     (arrays: sortableIntArray[]) =
 
         let n = arrays.Length
@@ -28,20 +28,20 @@ type packedSortableIntTests =
                 flat.[destinationOffset + j] <- arrays.[i].Item(j)
             
         { id = Guid.NewGuid() |> UMX.tag
-          sortingWidth = sw
+          channelCount = sw
           count = n |> UMX.tag<sortableCount>
           packedValues = flat }
 
 
     static member createFromPackedValues
-                    (sw: int<sortingWidth>)
+                    (sw: int<channelCount>)
                     (packedValues: int[]) =
         let width = %sw
         if packedValues.Length % width <> 0 then
-            invalidArg "packedValues" "Length of packedValues must be a multiple of sortingWidth."
+            invalidArg "packedValues" "Length of packedValues must be a multiple of channelCount."
         let n = packedValues.Length / width
         { id = Guid.NewGuid() |> UMX.tag
-          sortingWidth = sw
+          channelCount = sw
           count = n |> UMX.tag<sortableCount>
           packedValues = Array.copy packedValues }
 
@@ -50,6 +50,6 @@ type packedSortableIntTests =
     member this.PackedValues with get() = this.packedValues
     member this.SortableDataFormat with get() = sortableDataFormat.PackedIntArray
     member this.SortableCount with get() = this.count
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
  

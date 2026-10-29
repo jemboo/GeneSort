@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.SortingLib.Sorter
 
 open System
@@ -10,13 +10,13 @@ open GeneSort.Sorting.Sorter
 
 module Sandbox =
     let test32Pfx() =
-        let sortingWidth = 28<sortingWidth>
+        let channelCount = 28<channelCount>
         let sorterVariant = prefixLibVariant.PrefixA
-        let sorterKey = prefixLibId.create sortingWidth 4<stageLength> sorterVariant
+        let sorterKey = prefixLibId.create channelCount 4<stageLength> sorterVariant
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib sorterKey).Value
         let res = SortableBoolArray.getAllPossibleResultsFromCeArray
                     ceArray
-                    sortingWidth
+                    channelCount
                   |> Seq.toArray
         None
 
@@ -24,20 +24,20 @@ module Sandbox =
 
 
     let stackCeArrays () =
-        let sortingWidth = 4<sortingWidth>
+        let channelCount = 4<channelCount>
         let sorterVariant = sorterLibVariant.VariantA
-        let sorterKey = sorterLibId.create sortingWidth sorterVariant
+        let sorterKey = sorterLibId.create channelCount sorterVariant
         let ceArray = (SorterDataParse.get2dCeArrayFromSorterLib sorterKey).Value
 
-        let stackedCes = Ce.stack2d ceArray ceArray sortingWidth
+        let stackedCes = Ce.stack2d ceArray ceArray channelCount
         stackedCes
 
 
     let makeMergeLib() =
-        let sortingWidth = 64<sortingWidth>
+        let channelCount = 64<channelCount>
         let mergeDimension = 4<mergeDimension>
         let variant = sorterLibVariant.VariantB
-        let mergeKey = mergeLibId.create sortingWidth mergeDimension variant
+        let mergeKey = mergeLibId.create channelCount mergeDimension variant
         let ceArrayOpt = SorterDataParse.getCeArrayFromMergeLib mergeKey
         ceArrayOpt
 

@@ -175,8 +175,10 @@ module MutationRate =
 
 
 
+        let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (VarModR_32)."
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", description, [|
                 runExample("Test", Test)
                 runExample("EqualOPS", EqualOPS)
                 runExample("EqualOPS2", EqualOPS2)
@@ -329,8 +331,10 @@ module MutationRate =
 
 
 
+        let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (VarModR_64)."
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", description, [|
                 runExample("Test", Test)
                 runExample("WideTest", WideTest)
                 runExample("NarrowTest", NarrowTest)
@@ -392,8 +396,10 @@ module MutationRate =
 
 
 
+        let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (MaxModR_32)."
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", description, [|
                 runExample("Test2", Test2)
             |])
 
@@ -450,7 +456,9 @@ module MutationRate =
                 }
             )
 
+        let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (MaxModR_64)."
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", description, [|
                 runExample("WideTest", WideTest)
             |])

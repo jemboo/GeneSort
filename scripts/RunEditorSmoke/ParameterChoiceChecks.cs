@@ -57,20 +57,20 @@ internal static partial class Program
         }
         view.Width = 1060;
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix"));
-        model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
+        model.SelectExample(model.Examples.Single(example => example.Name == "Channels24"));
         CheckLibrarySelection(model, view, ParamKeys.prefixLibIdKey, "Prefix library value");
-        CheckPrefixWidthSelection(root, model, view);
-        CheckPreparedPrefixWidthSelection(root, model, view, "SorterEval.Prefix", "Width32");
+        CheckPrefixChannelCountSelection(root, model, view);
+        CheckPreparedPrefixChannelCountSelection(root, model, view, "SorterEval.Prefix", "Channels32");
         foreach (var example in new[] { "Msce", "Mssi", "Msrs", "Msuf4" })
-            CheckPreparedPrefixWidthSelection(root, model, view, "SorterMutate.Prefix", example);
-        CheckMergeWidthSelection(root, model, view);
+            CheckPreparedPrefixChannelCountSelection(root, model, view, "SorterMutate.Prefix", example);
+        CheckMergeChannelCountSelection(root, model, view);
 
         // SorterLibId is supported by saved definitions even though current Dispatch examples
         // do not declare it. Open such a definition through the actual editor boundary.
         model.New();
         var source = model.Validate()!;
         var sorterSpan = Tuple.Create(ParamKeys.sorterLibIdKey,
-            ListModule.OfArray(new[] { "SorterLibId(sortingWidth=32, Variant=VariantA)" }));
+            ListModule.OfArray(new[] { "SorterLibId(channelCount=32, Variant=VariantA)" }));
         var configured = Run.ofSimple(SimpleRun.create(new simpleRunConfig(
             source.DatabaseName, source.ProjectName, "SorterLibraryEditor", source.Description, false,
             new executionConfig(source.ExecuteFunctionName, source.RunParameterSpans, source.RunQueryCatalogName, source.RunEnhancerFunctionName),
@@ -96,25 +96,25 @@ internal static partial class Program
         Check(bindingErrors.Length == 0, "Parameter editor binding errors: " + bindingErrors);
     }
 
-    private static void CheckPrefixWidthSelection(string root, RunEditorViewModel model, RunEditorView view)
+    private static void CheckPrefixChannelCountSelection(string root, RunEditorViewModel model, RunEditorView view)
     {
-        model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
+        model.SelectExample(model.Examples.Single(example => example.Name == "Channels24"));
         model.ProjectsFolder = root;
         Layout(view);
-        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix sorting width");
-        Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 24 && Equals(widthPicker.SelectedItem, 24)
+        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix channel count");
+        Check(model.HasPrefixChannelCountSelection && model.SelectedPrefixChannelCount == 24 && Equals(widthPicker.SelectedItem, 24)
             && widthPicker.Items.Contains(32), "The width picker is restricted to the example width or has the wrong default.");
         var prefix24 = model.ExecutionParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey).Values[0].Text;
         Check(model.Validate() is not null && model.CanSave, "The example is invalid before changing its width.");
         widthPicker.SetCurrentValue(Selector.SelectedItemProperty, 32);
         Layout(view);
         var row = model.ExecutionParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
-        Check(model.SelectedPrefixSortingWidth == 32 && row.Values.Count == 1 && row.Values[0].Text == ""
+        Check(model.SelectedPrefixChannelCount == 32 && row.Values.Count == 1 && row.Values[0].Text == ""
             && model.IsDirty && !model.CanSave && model.Validate() is null,
             "Changing width retained incompatible prefixes or allowed saving before choosing new ones.");
-        var expected32 = PrefixLib.ids().Where(id => id.SortingWidth == 32).Select(PrefixLibId.toString).ToArray();
+        var expected32 = PrefixLib.ids().Where(id => id.ChannelCount == 32).Select(PrefixLibId.toString).ToArray();
         Check(row.Values[0].Choices.Where(choice => choice.Length > 0).SequenceEqual(expected32),
-            "Prefix choices did not follow the selected sorting width.");
+            "Prefix choices did not follow the selected channel count.");
         var prefixPicker = Descendants<ComboBox>(view).Single(box => box.DataContext == row.Values[0]);
         prefixPicker.SetCurrentValue(Selector.SelectedItemProperty, expected32[0]);
         Pump();
@@ -123,10 +123,10 @@ internal static partial class Program
         Check(model.Validate() is null, "A prefix from another width bypassed validation.");
         row.Values[0].Text = expected32[0];
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
-        Check(model.Snapshot().ExecutionParameters.All(parameter => parameter.Key != ParamKeys.sortingWidthKey),
+        Check(model.Snapshot().ExecutionParameters.All(parameter => parameter.Key != ParamKeys.channelCountKey),
             "The width picker created a redundant sweep parameter.");
         ProjectCatalogs.registerAll();
-        var expectedTemplate = model.Examples.Single(example => example.Name == "Width32").Run;
+        var expectedTemplate = model.Examples.Single(example => example.Name == "Channels32").Run;
         var expected = RunTypeEditor.build(expectedTemplate, RunTypeEditor.newDraft(expectedTemplate)).ResultValue;
         var actualRows = RunParameterGeneration.generate(configured, 0, 1);
         var expectedRows = RunParameterGeneration.generate(expected, 0, 1);
@@ -137,55 +137,55 @@ internal static partial class Program
         var expectedQuery = QueryParamsBuildersRun.SortableTests.Prefix.makeSortableTestsQueryParams(
             expected.ProjectName, expected.DatabaseName, expectedRows[0], "").Value;
         Check(actualQuery.Id == expectedQuery.Id, "The width picker changed the existing result file ID.");
-        model.RunName = "PrefixWidthSelection";
+        model.RunName = "PrefixChannelCountSelection";
         configured = model.Validate()!;
         Wait(model.SaveAsync(configured, false));
-        model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
+        model.SelectExample(model.Examples.Single(example => example.Name == "Channels24"));
         Wait(model.OpenAsync(RunDefinitionFiles.pathFor(root, configured)));
         Layout(view);
-        Check(model.SelectedPrefixSortingWidth == 32 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,
+        Check(model.SelectedPrefixChannelCount == 32 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,
             "Reopening a saved run lost its width, changed its values, or marked it edited.");
         // Removing and adding the parameter must also use the active width, not the example's defaults.
         row = model.ExecutionParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
         model.ExecutionParameters.Remove(row);
-        model.SelectedPrefixSortingWidth = 24;
+        model.SelectedPrefixChannelCount = 24;
         model.ExecutionSection.BeginAdd();
         model.ExecutionSection.SelectedParameter = model.ExecutionSection.AvailableParameters.Single(spec => spec.Key == ParamKeys.prefixLibIdKey);
         var pending = model.ExecutionSection.PendingRow!;
-        Check(pending.Values[0].Choices.Where(choice => choice.Length > 0).All(choice => PrefixLibId.fromString(choice).SortingWidth == 24),
+        Check(pending.Values[0].Choices.Where(choice => choice.Length > 0).All(choice => PrefixLibId.fromString(choice).ChannelCount == 24),
             "Add parameter retained the old width's prefix choices.");
-        Check(!model.CanSelectPrefixWidth, "Width changes can discard a pending parameter edit.");
+        Check(!model.CanSelectPrefixChannelCount, "Width changes can discard a pending parameter edit.");
         pending.Values[0].Text = prefix24;
         Check(model.ExecutionSection.Add(), "A matching prefix could not be added back.");
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.PrefixTest"));
-        Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 24, "PrefixTest does not support width selection.");
+        Check(model.HasPrefixChannelCountSelection && model.SelectedPrefixChannelCount == 24, "PrefixTest does not support width selection.");
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge"));
-        Check(!model.HasPrefixWidthSelection, "The prefix width picker leaked into another workflow.");
+        Check(!model.HasPrefixChannelCountSelection, "The prefix width picker leaked into another workflow.");
     }
 
-    private static void CheckPreparedPrefixWidthSelection(string root, RunEditorViewModel model, RunEditorView view, string typeName, string exampleName)
+    private static void CheckPreparedPrefixChannelCountSelection(string root, RunEditorViewModel model, RunEditorView view, string typeName, string exampleName)
     {
         model.SelectRunType(model.RunTypes.Single(type => type.Name == typeName));
         model.SelectExample(model.Examples.Single(example => example.Name == exampleName));
         model.ProjectsFolder = root;
         Layout(view);
-        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix sorting width");
+        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix channel count");
         var section = Section(view, model.SetupSection);
-        Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 32 && Equals(widthPicker.SelectedItem, 32)
-            && ((FrameworkElement)widthPicker.Parent).Visibility == Visibility.Visible, "Evaluation does not expose its Setup sorting width.");
+        Check(model.HasPrefixChannelCountSelection && model.SelectedPrefixChannelCount == 32 && Equals(widthPicker.SelectedItem, 32)
+            && ((FrameworkElement)widthPicker.Parent).Visibility == Visibility.Visible, "Evaluation does not expose its Setup channel count.");
         var original = model.Validate()!;
         var originalRows = RunParameterGeneration.generate(original, 0, 1);
         var execution = model.Snapshot().ExecutionParameters;
         var prefix32 = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey).Values[0].Text;
         widthPicker.SetCurrentValue(Selector.SelectedItemProperty, 24);
         Layout(view);
-        CheckMutatorWidth(model, original, 24);
+        CheckMutatorChannelCount(model, original, 24);
         var row = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
         Check(row.Values.Count == 1 && row.Values[0].Text == "" && !model.CanSave && model.Validate() is null,
             "Evaluation retained a width-32 prefix or allowed saving after switching to width 24.");
         Check(!model.ExecutionSection.InheritedRows.Single(row => row.Key == ParamKeys.prefixLibIdKey).DisplayValues.Contains(prefix32),
             "Execution still displays the incompatible Setup prefix.");
-        var expected24 = RunTypeEditor.parametersForPrefixWidth(GeneSort.Dispatch.V1.SortableTests.Prefix.Width24s(), 24)
+        var expected24 = RunTypeEditor.parametersForPrefixChannelCount(GeneSort.Dispatch.V1.SortableTests.Prefix.Channels24(), 24)
             .Single(spec => spec.Key == ParamKeys.prefixLibIdKey).Choices;
         Check(row.Values[0].Choices.SequenceEqual(expected24), "Evaluation and SortableTests offer different width-24 prefixes.");
         var prefixPicker = Descendants<ComboBox>(section).Single(box => box.DataContext == row.Values[0]);
@@ -213,20 +213,20 @@ internal static partial class Program
         var actualRows = RunParameterGeneration.generate(configured, 0, 1);
         Check(actualRows.Length == originalRows.Length * chosen.Length && actualRows.SequenceEqual(RunParameterGeneration.generate(expected, 0, 1)),
             "Evaluation width selection changed existing file identities or added sweep dimensions.");
-        Check(model.Snapshot().SetupParameters.All(parameter => parameter.Key != ParamKeys.sortingWidthKey),
-            "The evaluation picker added a redundant SortingWidth parameter.");
+        Check(model.Snapshot().SetupParameters.All(parameter => parameter.Key != ParamKeys.channelCountKey),
+            "The evaluation picker added a redundant ChannelCount parameter.");
         model.RunName = typeName + exampleName + "WidthSelection";
         configured = model.Validate()!;
         Wait(model.SaveAsync(configured, false));
         model.SelectExample(model.Examples.Single(example => example.Name == exampleName));
         Wait(model.OpenAsync(RunDefinitionFiles.pathFor(root, configured)));
         Layout(view);
-        Check(model.SelectedPrefixSortingWidth == 24 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,
+        Check(model.SelectedPrefixChannelCount == 24 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,
             "Reopening an evaluation run lost its Setup width or changed its saved configuration.");
         Check(model.ExecutionSection.InheritedRows.Single(row => row.Key == ParamKeys.prefixLibIdKey).Snapshot().Values.SequenceEqual(chosen),
             "Reopening lost the read-only Execution prefix values.");
         // Changing back to the original values must restore the original generated identities.
-        model.SelectedPrefixSortingWidth = 32;
+        model.SelectedPrefixChannelCount = 32;
         row = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
         row.Values[0].Text = prefix32;
         model.RunName = original.RunName;
@@ -234,11 +234,11 @@ internal static partial class Program
             "Returning to width 32 changed the original Setup references or run parameters.");
         // The Setup add panel must follow the selector too.
         model.SetupParameters.Remove(row);
-        model.SelectedPrefixSortingWidth = 24;
+        model.SelectedPrefixChannelCount = 24;
         model.SetupSection.BeginAdd();
         model.SetupSection.SelectedParameter = model.SetupSection.AvailableParameters.Single(spec => spec.Key == ParamKeys.prefixLibIdKey);
         var pending = model.SetupSection.PendingRow!;
-        Check(pending.Values[0].Choices.SequenceEqual(expected24) && !model.CanSelectPrefixWidth,
+        Check(pending.Values[0].Choices.SequenceEqual(expected24) && !model.CanSelectPrefixChannelCount,
             "The Setup add panel retained the old width or permits losing a pending edit.");
         pending.Values[0].Text = chosen[0];
         Check(model.SetupSection.Add() && model.Validate() is not null, "A matching Setup prefix could not be added back.");

@@ -47,7 +47,7 @@ module SorterSetEval =
                 |> Array.map (fun sorter ->
                         ceBlock.create 
                             (%sorter.SorterId |> UMX.tag<ceBlockId>) 
-                            sorter.SortingWidth sorter.Ces )
+                            sorter.ChannelCount sorter.Ces )
 
         let ceBlockEvals : ceBlockEval array =
                 CeBlockOps.evalWithSorterTests 

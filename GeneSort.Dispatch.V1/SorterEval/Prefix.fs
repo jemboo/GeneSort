@@ -27,13 +27,13 @@ module Prefix =
 
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Width24s () : run =
+    let Channels24 () : run =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
                     (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                     (ParamKeys.prefixLibIdKey,
-                     [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                     [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                      |> List.map PrefixLibId.toString)
                     (ParamKeys.simpleSorterModelTypeKey,
                      [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
@@ -68,13 +68,13 @@ module Prefix =
         )
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Width32 () : run =
+    let Channels32 () : run =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
                     (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                     (ParamKeys.prefixLibIdKey,
-                     [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                     [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                      |> List.map PrefixLibId.toString)
                     (ParamKeys.simpleSorterModelTypeKey,
                      [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
@@ -110,21 +110,23 @@ module Prefix =
 
     [<RequireQualifiedAccess>]
     type configType =
-        | Width24s
-        | Width32
+        | Channels24
+        | Channels32
 
     let Configs = Map.ofList
                     [
-                        (configType.Width24s, Width24s);
-                        (configType.Width32, Width32);
+                        (configType.Channels24, Channels24);
+                        (configType.Channels32, Channels32);
                     ]
 
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Evaluate sorting-network prefixes at different widths."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", [|
-            runExample("Width24s", Width24s)
-            runExample("Width32", Width32)
+        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", description, [|
+            runExample("Channels24", Channels24)
+            runExample("Channels32", Channels32)
         |])

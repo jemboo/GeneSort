@@ -48,8 +48,8 @@ let ``Merge presets generate one correctly linked execution per setup combinatio
     for rp in executions do
         let setup = settings.[rp.GetRepl(), rp.GetMergeLibId(), rp.GetSimpleSorterModelType()]
         let library = rp.GetMergeLibId().Value
-        Assert.Equal(0, int library.SortingWidth % int library.MergeDimension)
-        Assert.Equal(Some library.SortingWidth, rp.GetSortingWidth())
+        Assert.Equal(0, int library.ChannelCount % int library.MergeDimension)
+        Assert.Equal(Some library.ChannelCount, rp.GetChannelCount())
         Assert.Equal(Some configured.RunName, rp.GetRunName())
         for key, value in Map.toList setup.ParamMap do
             Assert.Equal(Some value, Map.tryFind key rp.ParamMap)
@@ -73,7 +73,7 @@ let ``Merge sweeps retain divisible width dimension combinations and omit invali
         |> Array.map (fun sp ->
             let library = sp.GetMergeLibId().Value
             Assert.Equal(sorterLibVariant.VariantA, library.SorterLibVariant)
-            int library.SortingWidth, int library.MergeDimension)
+            int library.ChannelCount, int library.MergeDimension)
         |> Set.ofArray
     let small = pairs "Small"
     Assert.Contains((18, 3), small)

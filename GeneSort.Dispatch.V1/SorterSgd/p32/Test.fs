@@ -135,8 +135,10 @@ module Test =
 
 
 
+        let description = "Small single-pool Standard and Soss evolutionary runs."
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool", [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool", description, [|
                 runExample("TestStandard", TestStandard)
                 runExample("TestSoss", TestSoss)
             |])
@@ -303,8 +305,10 @@ module Test =
                 } |> EvoCondense.createSoss
 
 
+            let description = "Single-pool SimpleR runs and their append and condense continuations."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleR", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleR", description, [|
                     runExample("Standard", Standard)
                     runExample("Soss", Soss)
                     runExample("StandardAppend", StandardAppend)
@@ -473,8 +477,10 @@ module Test =
                 } |> EvoCondense.createSoss
 
 
+            let description = "Single-pool SimpleS runs and their append and condense continuations."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleS", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SimpleS", description, [|
                     runExample("StandardS", StandardS)
                     runExample("SossS", SossS)
                     runExample("StandardAppendS", StandardAppendS)
@@ -923,8 +929,10 @@ module Test =
                 )
 
 
+            let description = "Controlled single-pool comparisons of evolutionary models and settings."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Controlled", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Controlled", description, [|
                     runExample("StandardSimple", StandardSimple)
                     runExample("StandardR", StandardR)
                     runExample("CompareStandardS", CompareStandardS)
@@ -1026,8 +1034,10 @@ module Test =
 
 
 
+            let description = "Single-pool tests that append or condense a saved evolutionary state."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Continuation", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.Continuation", description, [|
                     runExample("TestStandardAppend", TestStandardAppend)
                     runExample("TestStandardCondense", TestStandardCondense)
                     runExample("TestSossAppend", TestSossAppend)
@@ -1120,8 +1130,10 @@ module Test =
                 |> EvoAppend.createSoss
 
 
+            let description = "Chains of append and condense runs within the same workflow family."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SameFamilyChain", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.SameFamilyChain", description, [|
                     runExample("TestStandardAppendCondense", TestStandardAppendCondense)
                     runExample("TestStandardCondenseAppend", TestStandardCondenseAppend)
                     runExample("TestSossAppendCondense", TestSossAppendCondense)
@@ -1223,8 +1235,10 @@ module Test =
                 }
                 |> EvoAppend.createStandard
 
+            let description = "Chains of append and condense runs switching between Standard and Soss."
+
             let runType =
-                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.MixedFamilyChain", [|
+                GeneSort.Dispatch.V1.runType("SorterSgd.p32.Test.OnePool.MixedFamilyChain", description, [|
                     runExample("TestStandardAppendSossCondense", TestStandardAppendSossCondense)
                     runExample("TestStandardCondenseSossAppend", TestStandardCondenseSossAppend)
                     runExample("TestSossAppendStandardCondense", TestSossAppendStandardCondense)

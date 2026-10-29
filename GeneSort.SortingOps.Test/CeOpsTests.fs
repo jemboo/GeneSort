@@ -18,7 +18,7 @@ type CeOpsTests() =
     //let ``sortBy sorts bool array correctly and updates usage`` () =
     //    // Arrange
     //    let values = [| true; false; true |]
-    //    let sortingWidth = 3<sortingWidth>
+    //    let channelCount = 3<channelCount>
     //    let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
     //    let ceUseCounts = ceUseCounts.create 2<ceBlockLength>
         
@@ -33,7 +33,7 @@ type CeOpsTests() =
     //let ``sortBy sorts int array correctly and updates usage`` () =
     //    // Arrange
     //    let values = [| 2; 0; 1 |]
-    //    let sortingWidth = 3<sortingWidth>
+    //    let channelCount = 3<channelCount>
     //    let symbolSetSize = 3<symbolSetSize>
     //    let ceBlock = ceBlock.create [| createCe 0 1; createCe 1 2 |]
 
@@ -49,19 +49,19 @@ type CeOpsTests() =
     [<Fact>]
     let ``evalWithSorterTests handles bool arrays and removes duplicates`` () =
         // Arrange
-        let sortingWidth = 3<sortingWidth>
+        let channelCount = 3<channelCount>
         let boolArrays = [|
-            sortableBoolArray.create([| true; false; true |], sortingWidth)
-            sortableBoolArray.create([| false; true; false |], sortingWidth)
-            sortableBoolArray.create([| true; false; true |], sortingWidth) // Duplicate
-            sortableBoolArray.create([| false; false; true |], sortingWidth) // Already sorted
+            sortableBoolArray.create([| true; false; true |], channelCount)
+            sortableBoolArray.create([| false; true; false |], channelCount)
+            sortableBoolArray.create([| true; false; true |], channelCount) // Duplicate
+            sortableBoolArray.create([| false; false; true |], channelCount) // Already sorted
         |]
         let sortableTests = 
                 sortableBinaryTests.create 
                         (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                        sortingWidth
+                        channelCount
                         boolArrays |> sortableTests.Bools
-        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
+        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) channelCount [| createCe 0 1 |]
         
         // Act
         let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
@@ -76,21 +76,21 @@ type CeOpsTests() =
     [<Fact>]
     let ``evalWithSorterTests handles int arrays and removes duplicates`` () =
         // Arrange
-        let sortingWidth = 3<sortingWidth>
+        let channelCount = 3<channelCount>
         let symbolSetSize = 2<symbolSetSize>
         let intArrays = [|
-            sortableIntArray.create([| 1; 0; 1 |], sortingWidth, symbolSetSize)
-            sortableIntArray.create([| 0; 1; 0 |], sortingWidth, symbolSetSize)
-            sortableIntArray.create([| 1; 0; 1 |], sortingWidth, symbolSetSize) // Duplicate
-            sortableIntArray.create([| 0; 0; 1 |], sortingWidth, symbolSetSize) // Already sorted
+            sortableIntArray.create([| 1; 0; 1 |], channelCount, symbolSetSize)
+            sortableIntArray.create([| 0; 1; 0 |], channelCount, symbolSetSize)
+            sortableIntArray.create([| 1; 0; 1 |], channelCount, symbolSetSize) // Duplicate
+            sortableIntArray.create([| 0; 0; 1 |], channelCount, symbolSetSize) // Already sorted
         |]
         let sortableTests = 
             sortableIntTests.create 
                 (Guid.NewGuid() |> UMX.tag<sortableTestsId>) 
-                sortingWidth
+                channelCount
                 intArrays |> sortableTests.Ints
 
-        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |]
+        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) channelCount [| createCe 0 1 |]
         
         // Act
         let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
@@ -104,17 +104,17 @@ type CeOpsTests() =
 
 
     [<Fact>]
-    let ``evalWithSorterTests preserves sorting width and type`` () =
+    let ``evalWithSorterTests preserves channel count and type`` () =
         // Arrange
-        let sortingWidth = 2<sortingWidth>
+        let channelCount = 2<channelCount>
         let symbolSetSize = 2<symbolSetSize>
-        let intArrays = [| sortableIntArray.create([| 1; 0 |], sortingWidth, symbolSetSize) |]
+        let intArrays = [| sortableIntArray.create([| 1; 0 |], channelCount, symbolSetSize) |]
         let sortableTests = (sortableIntTests.create 
                                 (Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                                sortingWidth
+                                channelCount
                                 intArrays ) |> sortableTests.Ints
 
-        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) sortingWidth [| createCe 0 1 |] 
+        let ceBlk = ceBlock.create (Guid.NewGuid() |> UMX.tag<ceBlockId>) channelCount [| createCe 0 1 |]
 
         // Act
         let collectNewSortableTests = false |> UMX.tag<collectNewSortableTests>
@@ -122,5 +122,5 @@ type CeOpsTests() =
         
         // Assert
         let intTests = match result.SortableTests.Value with | sortableTests.Ints it -> it | _ -> failwith "Expected Ints"
-        intTests.SortingWidth |> should equal sortingWidth
+        intTests.ChannelCount |> should equal channelCount
         intTests.SortableDataFormat |> should equal sortableDataFormat.IntArray

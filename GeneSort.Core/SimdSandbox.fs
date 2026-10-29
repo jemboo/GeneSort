@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Core
+namespace GeneSort.Core
 open System
 open System.Runtime.CompilerServices
 open System.Runtime.Intrinsics
@@ -228,10 +228,10 @@ module SimdSandbox =
                 { low = hv; hi = lv }
 
         /// Gets the first TwoOrbit.
-        member this.Low with get () = this.low
+        member this.LowChannel with get () = this.low
 
         /// Gets the second TwoOrbit (if present).
-        member this.Hi with get () = this.hi
+        member this.HighChannel with get () = this.hi
 
         override this.Equals(obj) = 
             match obj with
@@ -246,11 +246,11 @@ module SimdSandbox =
 
 
     let sortBy (block: Vector256<uint32> []) (cex: ce) : unit =
-        let vLow = block.[cex.Low]
-        let vHi = block.[cex.Hi]
+        let vLow = block.[cex.LowChannel]
+        let vHi = block.[cex.HighChannel]
         // SIMD Compare-and-Swap
-        block.[cex.Low] <- Vector256.MinNumber(vLow, vHi)
-        block.[cex.Hi] <- Vector256.MaxNumber(vLow, vHi)
+        block.[cex.LowChannel] <- Vector256.MinNumber(vLow, vHi)
+        block.[cex.HighChannel] <- Vector256.MaxNumber(vLow, vHi)
 
 
     let sortBlock (block: Vector256<uint32> []) (cexs: ce []) : unit =

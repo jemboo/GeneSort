@@ -16,7 +16,7 @@ module Common =
     let seedSorterCount = 512
     let standardParams (rp:runParameters) =
         let sorterEvalSelectionType = sorterSelectionType.GuidOrder (seedSorterCount |> UMX.tag<sorterCount>)
-        let pfxLibId = prefixLibId.create (24<sortingWidth>) (4<stageLength>) prefixLibVariant.PrefixB
+        let pfxLibId = prefixLibId.create (24<channelCount>) (4<stageLength>) prefixLibVariant.PrefixB
 
         rp.WithRngType(Some rngType.Lcg)
           .WithCollectNewSortableTests(false |> UMX.tag<collectNewSortableTests> |> Some)
@@ -32,4 +32,4 @@ module Common =
           .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
           .WithSeedSorterPoolSelectionType(Some sorterEvalSelectionType)
           .WithPrefixLibId(Some pfxLibId)
-          .WithSortingWidth(Some pfxLibId.SortingWidth)
+          .WithChannelCount(Some pfxLibId.ChannelCount)

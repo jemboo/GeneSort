@@ -78,30 +78,30 @@ module PartitionOfSortableTests =
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount arrays
                 |> Map.map (fun _ values ->
-                    SortableBitv512Tests.fromBoolArrays (newId ()) bitv512Tests.SortingWidth values
+                    SortableBitv512Tests.fromBoolArrays (newId ()) bitv512Tests.ChannelCount values
                     |> Bitv512))
         | Bools binaryTests ->
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount binaryTests.SortableBinaryArrays
                 |> Map.map (fun _ values ->
-                    sortableBinaryTests.create (newId ()) binaryTests.SortingWidth values
+                    sortableBinaryTests.create (newId ()) binaryTests.ChannelCount values
                     |> Bools))
         | Ints intTests ->
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount intTests.SortableIntArrays
                 |> Map.map (fun _ values ->
-                    sortableIntTests.create (newId ()) intTests.SortingWidth values
+                    sortableIntTests.create (newId ()) intTests.ChannelCount values
                     |> Ints))
         | PackedInts packedTests ->
             let values =
                 packedTests.PackedValues
-                |> Array.chunkBySize (%packedTests.SortingWidth)
+                |> Array.chunkBySize (%packedTests.ChannelCount)
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount values
                 |> Map.map (fun _ arrays ->
                     arrays
                     |> Array.collect id
-                    |> packedSortableIntTests.createFromPackedValues packedTests.SortingWidth
+                    |> packedSortableIntTests.createFromPackedValues packedTests.ChannelCount
                     |> PackedInts))
         | Uint8v256 uint8v256Tests ->
             let arrays =
@@ -110,7 +110,7 @@ module PartitionOfSortableTests =
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount arrays
                 |> Map.map (fun _ values ->
-                    SortableUint8v256Tests.fromIntArrays (newId ()) uint8v256Tests.SortingWidth values
+                    SortableUint8v256Tests.fromIntArrays (newId ()) uint8v256Tests.ChannelCount values
                     |> Uint8v256))
         | Uint8v512 uint8v512Tests ->
             let arrays =
@@ -119,7 +119,7 @@ module PartitionOfSortableTests =
             makeSet (fun () ->
                 partitionItems indexPicker partitionCount arrays
                 |> Map.map (fun _ values ->
-                    SortableUint8v512Tests.fromIntArrays (newId ()) uint8v512Tests.SortingWidth values
+                    SortableUint8v512Tests.fromIntArrays (newId ()) uint8v512Tests.ChannelCount values
                     |> Uint8v512))
 
 

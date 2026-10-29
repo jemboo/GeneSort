@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps.Mp
+namespace GeneSort.SortingOps.Mp
 
 open System
 open FSharp.UMX
@@ -8,7 +8,7 @@ open GeneSort.SortingOps
 
 type ceBlockDto = {
     CeBlockId: Guid
-    SortingWidth: int
+    ChannelCount: int
     Ces: ceDto array
 }
 
@@ -17,11 +17,11 @@ module CeBlockDto =
         { 
             CeBlockId = %ceBlock.CeBlockId
             Ces = ceBlock.CeArray |> Array.map CeDto.fromDomain
-            SortingWidth = %ceBlock.SortingWidth 
+            ChannelCount = %ceBlock.ChannelCount
         }
 
     let fromCeBlockDto (dto: ceBlockDto) : ceBlock =
         ceBlock.create 
             (dto.CeBlockId |> UMX.tag<ceBlockId>) 
-            (dto.SortingWidth |> UMX.tag<sortingWidth>)
+            (dto.ChannelCount |> UMX.tag<channelCount>)
             (dto.Ces |> Array.map CeDto.toDomain)

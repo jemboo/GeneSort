@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open System
@@ -12,26 +12,26 @@ open GeneSort.Sorting.Sorter
 type sorter =
     private { 
         sorterId: Guid<sorterId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         ces: ce array
         mutable cesHash: int option // Lazily computed hash code for Ces
     }
 
-    static member create (sorterId: Guid<sorterId>) (width: int<sortingWidth>) (ces: ce array) : sorter =
+    static member create (sorterId: Guid<sorterId>) (width: int<channelCount>) (ces: ce array) : sorter =
         if %sorterId = Guid.Empty then
             invalidArg "sorterId" "Sorter ID must not be empty"
         if %width < 1 then
             invalidArg "width" "Width must be at least 1"
-        { sorterId = sorterId; sortingWidth = width; ces = Array.copy ces; cesHash = None }
+        { sorterId = sorterId; channelCount = width; ces = Array.copy ces; cesHash = None }
 
-    static member createWithNewId (width: int<sortingWidth>) (ces: ce array) : sorter =
+    static member createWithNewId (width: int<channelCount>) (ces: ce array) : sorter =
         sorter.create (UMX.tag<sorterId> (Guid.NewGuid())) width ces
 
     override this.ToString() : string =
-        sprintf "Sorter(Id=%A, Width=%d)" (%this.sorterId) (%this.sortingWidth)
+        sprintf "Sorter(Id=%A, Width=%d)" (%this.sorterId) (%this.channelCount)
 
     member this.SorterId with get() = this.sorterId
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
     member this.Ce (dex : int) = this.ces.[dex]
     member this.ceLength with get() : int<ceLength> = this.ces.Length |> UMX.tag<ceLength>
     member this.Ces with get() = Array.copy this.ces
@@ -39,7 +39,7 @@ type sorter =
     override this.Equals(obj) =
         match obj with
         | :? sorter as other ->
-            this.SortingWidth = other.SortingWidth &&
+            this.ChannelCount = other.ChannelCount &&
             Array.forall2 (=) this.ces other.ces
         | _ -> false
 
@@ -56,7 +56,7 @@ type sorter =
 
     interface IEquatable<sorter> with
         member this.Equals(other) =
-            this.SortingWidth = other.SortingWidth &&
+            this.ChannelCount = other.ChannelCount &&
             this.SorterId = other.SorterId &&
             Array.forall2 (=) this.ces other.ces
 
@@ -66,7 +66,7 @@ module Sorter =
     type SorterValueComparer() =
         interface IEqualityComparer<sorter> with
             member _.Equals(x, y) =
-                x.SortingWidth = y.SortingWidth && // Prevent Array.forall2 crash
+                x.ChannelCount = y.ChannelCount && // Prevent Array.forall2 crash
                 Array.forall2 (=) x.ces y.ces
             member _.GetHashCode(obj) =
                 // Use the struct's GetHashCode, which caches the hash of Ces
@@ -74,22 +74,22 @@ module Sorter =
 
     /// Concatenates two sorters by appending the suffix's CEs to the prefix's CEs.
     /// The resulting sorter has the specified new ID.
-    /// Throws an exception if the sorters have different sorting widths.
+    /// Throws an exception if the sorters have different channel counts.
     let concatSorters (prefix: sorter) (suffix: sorter) (newId: Guid<sorterId>) : sorter =
-        if prefix.SortingWidth <> suffix.SortingWidth then
-            failwith $"Cannot concatenate sorters with different sorting widths. Prefix: 
-                    {%prefix.SortingWidth}, Suffix: {%suffix.SortingWidth}"
+        if prefix.ChannelCount <> suffix.ChannelCount then
+            failwith $"Cannot concatenate sorters with different channel counts. Prefix: 
+                    {%prefix.ChannelCount}, Suffix: {%suffix.ChannelCount}"
         
         let concatenatedCes = Array.append prefix.Ces suffix.Ces
         
-        sorter.create newId prefix.SortingWidth concatenatedCes
+        sorter.create newId prefix.ChannelCount concatenatedCes
 
 
-    // returns a dataTableRecord with the sorterId, sortingWidth, and ces serialized as a string
+    // returns a dataTableRecord with the sorterId, channelCount, and ces serialized as a string
     let toDataTableRecord (sorter:sorter) : dataTableRecord =
         let ceString = sorter.Ces |> Ce.arrayToString
         
         dataTableRecord.createEmpty()
         |> dataTableRecord.addData "SorterId" ((%sorter.SorterId).ToString())
-        |> dataTableRecord.addData "SortingWidth" ((%sorter.SortingWidth).ToString())
+        |> dataTableRecord.addData "ChannelCount" ((%sorter.ChannelCount).ToString())
         |> dataTableRecord.addData "Ces" ceString

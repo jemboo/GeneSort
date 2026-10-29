@@ -19,18 +19,18 @@ module QueryParamsBuildersSetup =
         module Uf6MutationRate =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -38,12 +38,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -56,8 +56,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -87,12 +87,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -105,8 +105,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -135,9 +135,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -157,12 +157,12 @@ module QueryParamsBuildersSetup =
             let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -175,8 +175,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -209,12 +209,12 @@ module QueryParamsBuildersSetup =
             let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -227,8 +227,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -259,9 +259,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -281,12 +281,12 @@ module QueryParamsBuildersSetup =
             let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -299,8 +299,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -333,12 +333,12 @@ module QueryParamsBuildersSetup =
             let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -351,8 +351,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -817,18 +817,18 @@ module QueryParamsBuildersSetup =
         module MsrsOrthoPara =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -836,12 +836,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -854,8 +854,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -885,12 +885,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -903,8 +903,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -933,9 +933,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -955,12 +955,12 @@ module QueryParamsBuildersSetup =
             let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -973,8 +973,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1007,12 +1007,12 @@ module QueryParamsBuildersSetup =
             let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1025,8 +1025,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1057,9 +1057,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -1079,12 +1079,12 @@ module QueryParamsBuildersSetup =
             let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1097,8 +1097,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1131,12 +1131,12 @@ module QueryParamsBuildersSetup =
             let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1149,8 +1149,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1535,18 +1535,18 @@ module QueryParamsBuildersSetup =
         module MssiOrthoPara =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -1554,12 +1554,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1572,8 +1572,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1603,12 +1603,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1621,8 +1621,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1651,9 +1651,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -1673,12 +1673,12 @@ module QueryParamsBuildersSetup =
             let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1691,8 +1691,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1725,12 +1725,12 @@ module QueryParamsBuildersSetup =
             let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1743,8 +1743,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1775,9 +1775,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -1797,12 +1797,12 @@ module QueryParamsBuildersSetup =
             let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1815,8 +1815,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -1849,12 +1849,12 @@ module QueryParamsBuildersSetup =
             let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -1867,8 +1867,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2255,18 +2255,18 @@ module QueryParamsBuildersSetup =
             module Standard =
                 let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "standard-tests-v1"
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                     yield ParamKeys.sortableDataFormatKey, value
                             |]
@@ -2274,12 +2274,12 @@ module QueryParamsBuildersSetup =
 
                 let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2292,8 +2292,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2323,12 +2323,12 @@ module QueryParamsBuildersSetup =
 
                 let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2341,8 +2341,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2371,9 +2371,9 @@ module QueryParamsBuildersSetup =
                 let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                         let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -2393,12 +2393,12 @@ module QueryParamsBuildersSetup =
                 let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2411,8 +2411,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2445,12 +2445,12 @@ module QueryParamsBuildersSetup =
                 let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2463,8 +2463,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2495,9 +2495,9 @@ module QueryParamsBuildersSetup =
                 let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                         let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -2517,12 +2517,12 @@ module QueryParamsBuildersSetup =
                 let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2535,8 +2535,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -2569,12 +2569,12 @@ module QueryParamsBuildersSetup =
                 let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -2587,8 +2587,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3033,18 +3033,18 @@ module QueryParamsBuildersSetup =
             module Soss =
                 let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "standard-tests-v1"
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                     yield ParamKeys.sortableDataFormatKey, value
                             |]
@@ -3052,12 +3052,12 @@ module QueryParamsBuildersSetup =
 
                 let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3070,8 +3070,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3101,12 +3101,12 @@ module QueryParamsBuildersSetup =
 
                 let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
-                        let width = rp.GetSortingWidth()
+                        let width = rp.GetChannelCount()
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3119,8 +3119,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3149,9 +3149,9 @@ module QueryParamsBuildersSetup =
                 let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                         let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -3171,12 +3171,12 @@ module QueryParamsBuildersSetup =
                 let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3189,8 +3189,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3223,12 +3223,12 @@ module QueryParamsBuildersSetup =
                 let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetMergeLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3241,8 +3241,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3273,9 +3273,9 @@ module QueryParamsBuildersSetup =
                 let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                         let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -3295,12 +3295,12 @@ module QueryParamsBuildersSetup =
                 let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3313,8 +3313,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3347,12 +3347,12 @@ module QueryParamsBuildersSetup =
                 let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                     maybe {
                         let! library = rp.GetPrefixLibId()
-                        let width = Some library.SortingWidth
+                        let width = Some library.ChannelCount
                         let parameters =
-                            rp.WithSortingWidth(width)
+                            rp.WithChannelCount(width)
                               .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                               .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                        let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                        let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                         let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3365,8 +3365,8 @@ module QueryParamsBuildersSetup =
                                     yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                     yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                                for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                    yield ParamKeys.sortingWidthKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                    yield ParamKeys.channelCountKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                     yield ParamKeys.rngTypeKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3891,18 +3891,18 @@ module QueryParamsBuildersSetup =
         module Msrs32MutationRate =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -3910,12 +3910,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3928,8 +3928,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -3959,12 +3959,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -3977,8 +3977,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4007,9 +4007,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -4029,12 +4029,12 @@ module QueryParamsBuildersSetup =
             let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4047,8 +4047,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4081,12 +4081,12 @@ module QueryParamsBuildersSetup =
             let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4099,8 +4099,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4131,9 +4131,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -4153,12 +4153,12 @@ module QueryParamsBuildersSetup =
             let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4171,8 +4171,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4205,12 +4205,12 @@ module QueryParamsBuildersSetup =
             let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4223,8 +4223,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4629,18 +4629,18 @@ module QueryParamsBuildersSetup =
         module MsrsPoolModComp =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -4648,12 +4648,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4666,8 +4666,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4697,12 +4697,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4715,8 +4715,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4745,9 +4745,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -4767,12 +4767,12 @@ module QueryParamsBuildersSetup =
             let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4785,8 +4785,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4819,12 +4819,12 @@ module QueryParamsBuildersSetup =
             let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4837,8 +4837,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4869,9 +4869,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -4891,12 +4891,12 @@ module QueryParamsBuildersSetup =
             let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4909,8 +4909,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -4943,12 +4943,12 @@ module QueryParamsBuildersSetup =
             let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -4961,8 +4961,8 @@ module QueryParamsBuildersSetup =
                                 yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                                 yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -5961,18 +5961,18 @@ module QueryParamsBuildersSetup =
         module Standard =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -5980,12 +5980,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -5993,8 +5993,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6013,9 +6013,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -6035,12 +6035,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6048,8 +6048,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6068,9 +6068,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -6090,12 +6090,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6103,8 +6103,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6125,14 +6125,14 @@ module QueryParamsBuildersSetup =
             let makeRunQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.Run outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6150,14 +6150,14 @@ module QueryParamsBuildersSetup =
             let makeRunParametersQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.RunParameters outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6175,14 +6175,14 @@ module QueryParamsBuildersSetup =
             let makeSorterPoolSetQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6200,14 +6200,14 @@ module QueryParamsBuildersSetup =
             let makeSorterPoolSetSummarySetQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSetSummarySet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6225,14 +6225,14 @@ module QueryParamsBuildersSetup =
             let makeSorterSetQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterSet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6257,14 +6257,14 @@ module QueryParamsBuildersSetup =
             let makeSortableTestsQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SortableTests outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6289,14 +6289,14 @@ module QueryParamsBuildersSetup =
             let makeSorterSetEvalQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterSetEval outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6314,14 +6314,14 @@ module QueryParamsBuildersSetup =
             let makeSorterPoolBinsSetSeriesQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolBinsSetSeries outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6339,14 +6339,14 @@ module QueryParamsBuildersSetup =
             let makeSorterPoolSetHistoryQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSetHistory outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6364,14 +6364,14 @@ module QueryParamsBuildersSetup =
             let makeTextReportQueryParams projectName dbName (rp: setupParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.TextReport outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.aMaxKey |> Option.toList do
@@ -6401,11 +6401,11 @@ module QueryParamsBuildersSetup =
                 | geneSortDataType.TextReport name -> makeTextReportQueryParams projectName dbName parameters name
 
 
-            let makeLibraryQueryParams projectName dbName repl rng sortingWidth simpleModel evalType odt =
+            let makeLibraryQueryParams projectName dbName repl rng channelCount simpleModel evalType odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
                         (ParamKeys.rngTypeKey, rng |> RngType.toString)
-                        (ParamKeys.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
+                        (ParamKeys.channelCountKey, (Some channelCount) |> ChannelCount.toString)
                         (ParamKeys.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
                         (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
                     |]
@@ -6413,7 +6413,7 @@ module QueryParamsBuildersSetup =
             let libraryQueryFromParameters projectName dbName (rp: setupParameters) odt =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
@@ -6424,18 +6424,18 @@ module QueryParamsBuildersSetup =
         module Merge =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -6443,12 +6443,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6456,8 +6456,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6476,9 +6476,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -6498,12 +6498,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6511,8 +6511,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6531,9 +6531,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -6553,12 +6553,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6566,8 +6566,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6909,18 +6909,18 @@ module QueryParamsBuildersSetup =
         module Prefix =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -6928,12 +6928,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6941,8 +6941,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -6961,9 +6961,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -6983,12 +6983,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -6996,8 +6996,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -7016,9 +7016,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -7038,12 +7038,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.replKey
@@ -7051,8 +7051,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "uniform-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -7396,18 +7396,18 @@ module QueryParamsBuildersSetup =
         module Standard =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -7415,12 +7415,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterChildCountKey
@@ -7429,8 +7429,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -7461,9 +7461,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -7483,12 +7483,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -7498,8 +7498,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -7532,9 +7532,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -7554,12 +7554,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -7569,8 +7569,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -7607,7 +7607,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7619,7 +7619,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7642,7 +7642,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7654,7 +7654,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7677,7 +7677,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7689,7 +7689,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7712,7 +7712,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7724,7 +7724,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7747,7 +7747,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7759,7 +7759,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7789,7 +7789,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7801,7 +7801,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7831,7 +7831,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7843,7 +7843,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7866,7 +7866,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7878,7 +7878,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7901,7 +7901,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7913,7 +7913,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7936,7 +7936,7 @@ module QueryParamsBuildersSetup =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -7948,7 +7948,7 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -7984,18 +7984,18 @@ module QueryParamsBuildersSetup =
         module Merge =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -8003,12 +8003,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterChildCountKey
@@ -8017,8 +8017,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -8049,9 +8049,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -8071,12 +8071,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -8086,8 +8086,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -8120,9 +8120,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -8142,12 +8142,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -8157,8 +8157,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -8572,18 +8572,18 @@ module QueryParamsBuildersSetup =
         module Prefix =
             let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "standard-tests-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                                 yield ParamKeys.sortableDataFormatKey, value
                         |]
@@ -8591,12 +8591,12 @@ module QueryParamsBuildersSetup =
 
             let makeStandardModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
-                    let width = rp.GetSortingWidth()
+                    let width = rp.GetChannelCount()
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.sorterChildCountKey
@@ -8605,8 +8605,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -8637,9 +8637,9 @@ module QueryParamsBuildersSetup =
             let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -8659,12 +8659,12 @@ module QueryParamsBuildersSetup =
             let makeMergeModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetMergeLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -8674,8 +8674,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -8708,9 +8708,9 @@ module QueryParamsBuildersSetup =
             let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -8730,12 +8730,12 @@ module QueryParamsBuildersSetup =
             let makePrefixModelsQueryParams project database (rp: setupParameters) outputName =
                 maybe {
                     let! library = rp.GetPrefixLibId()
-                    let width = Some library.SortingWidth
+                    let width = Some library.ChannelCount
                     let parameters =
-                        rp.WithSortingWidth(width)
+                        rp.WithChannelCount(width)
                           .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                           .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                    let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                    let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                     let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -8745,8 +8745,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield "SetupRecipe", "mutant-models-v1"
-                            for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                                yield ParamKeys.sortingWidthKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                                yield ParamKeys.channelCountKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                                 yield ParamKeys.rngTypeKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9160,18 +9160,18 @@ module QueryParamsBuildersSetup =
     module SossMsuf32Seed =
         let makeStandardTestsQueryParams project database (rp: setupParameters) outputName =
             maybe {
-                let width = rp.GetSortingWidth()
+                let width = rp.GetChannelCount()
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey
                 return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                     [|
                         yield "SetupRecipe", "standard-tests-v1"
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
                             yield ParamKeys.sortableDataFormatKey, value
                     |]
@@ -9179,12 +9179,12 @@ module QueryParamsBuildersSetup =
 
         let makeStandardSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
-                let width = rp.GetSortingWidth()
+                let width = rp.GetChannelCount()
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9197,8 +9197,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9228,12 +9228,12 @@ module QueryParamsBuildersSetup =
 
         let makeStandardControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
-                let width = rp.GetSortingWidth()
+                let width = rp.GetChannelCount()
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9246,8 +9246,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9276,9 +9276,9 @@ module QueryParamsBuildersSetup =
         let makeMergeTestsQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetMergeLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                 let! _ = parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey
@@ -9298,12 +9298,12 @@ module QueryParamsBuildersSetup =
         let makeMergeSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetMergeLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9316,8 +9316,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9350,12 +9350,12 @@ module QueryParamsBuildersSetup =
         let makeMergeControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetMergeLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9368,8 +9368,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9400,9 +9400,9 @@ module QueryParamsBuildersSetup =
         let makePrefixTestsQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetPrefixLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
                 let! _ = parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey
@@ -9422,12 +9422,12 @@ module QueryParamsBuildersSetup =
         let makePrefixSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetPrefixLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9440,8 +9440,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do
@@ -9474,12 +9474,12 @@ module QueryParamsBuildersSetup =
         let makePrefixControlledSeedPoolQueryParams project database (rp: setupParameters) outputName =
             maybe {
                 let! library = rp.GetPrefixLibId()
-                let width = Some library.SortingWidth
+                let width = Some library.ChannelCount
                 let parameters =
-                    rp.WithSortingWidth(width)
+                    rp.WithChannelCount(width)
                       .WithExcludeSelfCe(Some (rp.GetExcludeSelfCe() |> Option.defaultValue (UMX.tag true)))
                       .WithSortableDataFormat(Some (rp.GetSortableDataFormat() |> Option.defaultValue GeneSort.Sorting.sortableDataFormat.BitVector512))
-                let! _ = parameters.ParamMap.TryFind ParamKeys.sortingWidthKey
+                let! _ = parameters.ParamMap.TryFind ParamKeys.channelCountKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.rngTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey
                 let! _ = parameters.ParamMap.TryFind ParamKeys.sorterPoolCountKey
@@ -9492,8 +9492,8 @@ module QueryParamsBuildersSetup =
                             yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
                             yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
-                        for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
-                            yield ParamKeys.sortingWidthKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.channelCountKey |> Option.toList do
+                            yield ParamKeys.channelCountKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
                             yield ParamKeys.rngTypeKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.simpleSorterModelTypeKey |> Option.toList do

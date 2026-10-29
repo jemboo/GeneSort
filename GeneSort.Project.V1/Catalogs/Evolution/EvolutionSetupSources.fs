@@ -12,7 +12,7 @@ open GeneSort.Project.V1
 type evolutionSetupSources = {
     LoadMergeTests: int<replNumber> -> mergeLibId -> sortableDataFormat -> Async<Result<sortableTests, string>>
     LoadPrefixTests: int<replNumber> -> prefixLibId -> sortableDataFormat -> Async<Result<sortableTests, string>>
-    LoadStandardSorterEvals: int<sortingWidth> -> simpleSorterModelType -> sorterEvalType -> Async<Result<sorterSetEval, string>>
+    LoadStandardSorterEvals: int<channelCount> -> simpleSorterModelType -> sorterEvalType -> Async<Result<sorterSetEval, string>>
     LoadMergeSorterEvals: mergeLibId -> int<replNumber> -> simpleSorterModelType -> Async<Result<sorterSetEval, string>>
     LoadPrefixSorterEvals: prefixLibId -> int<replNumber> -> simpleSorterModelType -> Async<Result<sorterSetEval, string>>
 }

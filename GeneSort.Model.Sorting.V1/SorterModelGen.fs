@@ -25,11 +25,11 @@ module SorterModelGen =
         | Unknown -> failwith "Unknown sorterModelGen"
 
 
-    let getSortingWidth (model: sorterModelGen) : int<sortingWidth> =
+    let getChannelCount (model: sorterModelGen) : int<channelCount> =
         match model with
-        | Simple ssmg -> SimpleSorterModelGen.getSortingWidth ssmg
-        | SimpleR ssmg -> ssmg.SortingWidth
-        | SimpleS ssmg -> ssmg.SortingWidth
+        | Simple ssmg -> SimpleSorterModelGen.getChannelCount ssmg
+        | SimpleR ssmg -> ssmg.ChannelCount
+        | SimpleS ssmg -> ssmg.ChannelCount
         | Unknown -> failwith "Unknown sorterModelGen"
 
 

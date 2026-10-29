@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Project.V1.ParamBundles
+namespace GeneSort.Project.V1.ParamBundles
 
 open FSharp.UMX
 open FsToolkit.ErrorHandling
@@ -38,20 +38,20 @@ type simpleMutatorCase =
 
 type simpleMutatorParams = 
     private 
-        { sortingWidth: int<sortingWidth>
+        { channelCount: int<channelCount>
           rngType: rngType
           mutVariant: mutatorVariant
           mutCase: simpleMutatorCase }
 
     static member create 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (rngType: rngType) 
             (mutVariant: mutatorVariant)
             (case: simpleMutatorCase) =
-        { sortingWidth = sortingWidth; rngType = rngType; mutVariant = mutVariant; mutCase = case }
+        { channelCount = channelCount; rngType = rngType; mutVariant = mutVariant; mutCase = case }
 
     member this.MutatorVariant = this.mutVariant
-    member this.SortingWidth = this.sortingWidth
+    member this.ChannelCount = this.channelCount
     member this.RngType = this.rngType
     member this.Case = this.mutCase
 
@@ -100,7 +100,7 @@ module SimpleMutatorParams =
 
     let toString (params': simpleMutatorParams) : string =
         sprintf "%d:%s:%s:%s" 
-            (%params'.sortingWidth) 
+            (%params'.channelCount)
             (MutatorVariant.toString params'.MutatorVariant)
             (RngType.toString params'.RngType) 
             (caseToString params'.Case)
@@ -180,7 +180,7 @@ module SimpleMutatorParams =
         | widthStr :: variantStr :: rngStr :: caseTokens when caseTokens.Length > 0 ->
             result {
                 let! rawWidth = parseInt widthStr
-                let sortingWidth = rawWidth |> UMX.tag
+                let channelCount = rawWidth |> UMX.tag
                 let! variantVal = 
                     try Ok (MutatorVariant.fromString variantStr)
                     with ex -> Error ex.Message
@@ -188,7 +188,7 @@ module SimpleMutatorParams =
                     try Ok (RngType.fromString rngStr) 
                     with ex -> Error ex.Message
                 let! caseVal = parseCase caseTokens
-                return simpleMutatorParams.create sortingWidth rngTypeVal variantVal caseVal
+                return simpleMutatorParams.create channelCount rngTypeVal variantVal caseVal
             }
         | _ -> Error $"Unrecognized or malformed simpleMutatorParams string: '{str}'"
 
@@ -197,7 +197,7 @@ module SimpleMutatorParams =
             (modificationRate: float<modificationRate>) 
             (params': simpleMutatorParams) : simpleSorterModelMutator =
         let rngFactory = RngFactory.create params'.rngType
-        let sortingWidth = params'.sortingWidth
+        let channelCount = params'.channelCount
         let mutVariant = params'.MutatorVariant
 
         match params'.Case with
@@ -215,11 +215,11 @@ module SimpleMutatorParams =
 
         | Msuf4 (excludeSelfCe, seedModificationRate, orthoRate, paraRate, selfSymRate) ->
             SimpleSorterModelMutator.getMsuf4ModelMutator 
-                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
+                channelCount rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
 
         | Msuf6 (excludeSelfCe, seedModificationRate, orthoRate, paraRate, selfSymRate) ->
             SimpleSorterModelMutator.getMsuf6ModelMutator 
-                sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
+                channelCount rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
 
 
 
@@ -230,7 +230,7 @@ type mutatorParams =
 
 module MutatorParams =
 
-    let withSortingWidth width = function
+    let withChannelCount width = function
         | SimpleMutatorParams smp ->
             simpleMutatorParams.create width smp.RngType smp.MutatorVariant smp.Case
             |> SimpleMutatorParams
@@ -272,60 +272,60 @@ module MutatorParams =
             failwith "Complex mutator parameters are not yet implemented."
 
 
-    let msceParamsR10 (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msceParamsR10 (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msce (true |> UMX.tag, 1.01 |> UMX.tag, 0.1 |> UMX.tag, 0.1 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msceParamsR5 (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msceParamsR5 (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msce (true |> UMX.tag, 1.01 |> UMX.tag, 0.2 |> UMX.tag, 0.2 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let mssiParamsRL (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
                                                              1.01 |> UMX.tag, 
                                                              1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRM (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let mssiParamsRM (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
                                                              2.01 |> UMX.tag, 
                                                              1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let mssiParamsRH (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
                                                              4.01 |> UMX.tag, 
                                                              1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let mssiParamsRVH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let mssiParamsRVH (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Mssi (true |> UMX.tag, 
                                                              6.01 |> UMX.tag, 
                                                              1.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msrsParamsRL (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
                                                                    1.0 |> UMX.tag, 
                                                                    1.0 |> UMX.tag, 
                                                                    1.0 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRM (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msrsParamsRM (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
                                                                    4.01 |> UMX.tag, 
                                                                    0.4 |> UMX.tag, 
                                                                    2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msrsParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msrsParamsRH (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msrs (true |> UMX.tag, 
                                                                    6.5 |> UMX.tag, 
                                                                    0.3 |> UMX.tag, 
                                                                    1.5 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msuf4ParamsRL (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msuf4ParamsRL (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
                                                                     0.05 |> UMX.tag, 
                                                                     3.51 |> UMX.tag, 
@@ -333,7 +333,7 @@ module MutatorParams =
                                                                     2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msuf4ParamsRC (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msuf4ParamsRC (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
                                                                     0.05 |> UMX.tag, 
                                                                     4.01 |> UMX.tag, 
@@ -341,7 +341,7 @@ module MutatorParams =
                                                                     2.01 |> UMX.tag))
         |> SimpleMutatorParams
 
-    let msuf4ParamsRH (width: int<sortingWidth>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
+    let msuf4ParamsRH (width: int<channelCount>) (rng: rngType) (variant: mutatorVariant) : mutatorParams =
         simpleMutatorParams.create width rng variant (Msuf4 (true |> UMX.tag, 
                                                                     0.05 |> UMX.tag, 
                                                                     4.51 |> UMX.tag, 

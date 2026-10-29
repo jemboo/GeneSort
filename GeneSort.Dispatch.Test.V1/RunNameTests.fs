@@ -24,7 +24,7 @@ let ``Project names follow the hierarchy above the database module`` () =
           "SorterSgd.p32.Msrs4a.MutationRate", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
           "SorterEval", SorterEval.Standard.Test
           "SorterMutate", SorterMutate.Prefix.Mssi
-          "SortableTests", SortableTests.Prefix.Width32
+          "SortableTests", SortableTests.Prefix.Channels32
           "SortableTests", SortableTests.PrefixTest.Test ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).ProjectName)
@@ -32,11 +32,11 @@ let ``Project names follow the hierarchy above the database module`` () =
 [<Fact>]
 let ``Shared source readers use the projects and databases of their producing presets`` () =
     let readers =
-        [ SortableTests.SortableTestsDbs.Merge.projectName, SortableTests.SortableTestsDbs.Merge.dbName, SortableTests.Merge.Test
-          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsDbs.Prefix.dbName, SortableTests.Prefix.Width32
+        [ SortableTests.SortableTestsDbs.Merge.projectName, SortableTests.SortableTestsDbs.Merge.dbName, SortableTests.Merge.HiMD_32
+          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsDbs.Prefix.dbName, SortableTests.Prefix.Channels32
           SorterEval.SorterEvalDbs.Standard.projectName, SorterEval.SorterEvalDbs.Standard.dbName, SorterEval.Standard.Test
           SorterEval.SorterEvalDbs.Merge.projectName, SorterEval.SorterEvalDbs.Merge.dbName, SorterEval.Merge.Test
-          SorterEval.SorterEvalDbs.Prefix.projectName, SorterEval.SorterEvalDbs.Prefix.dbName, SorterEval.Prefix.Width32
+          SorterEval.SorterEvalDbs.Prefix.projectName, SorterEval.SorterEvalDbs.Prefix.dbName, SorterEval.Prefix.Channels32
           SorterMutate.SorterMutateDbs.RandomStandard.projectName, SorterMutate.SorterMutateDbs.RandomStandard.Uniform.dbName, SorterMutate.Standard.Msrs
           SorterMutate.SorterMutateDbs.RandomMerge.projectName, SorterMutate.SorterMutateDbs.RandomMerge.Uniform.dbName, SorterMutate.Merge.Msce
           SorterMutate.SorterMutateDbs.RandomPrefix.projectName, SorterMutate.SorterMutateDbs.RandomPrefix.Uniform.dbName, SorterMutate.Prefix.Msce ]

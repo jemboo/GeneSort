@@ -36,7 +36,7 @@ let private configuration () =
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
             ParameterSpans = [
-                ParamKeys.sortingWidthKey, ["4"]
+                ParamKeys.channelCountKey, ["4"]
                 ParamKeys.rngTypeKey, ["LCG"]
                 ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]
                 ParamKeys.sorterCountKey, ["2"]
@@ -101,7 +101,7 @@ let ``parallel setup shares files across executions replicas and hosts and execu
 
 [<Theory>]
 [<InlineData("SorterCount", "3")>]
-[<InlineData("SortingWidth", "8")>]
+[<InlineData("ChannelCount", "8")>]
 [<InlineData("RngType", "SplitMix64")>]
 [<InlineData("SimpleSorterModelType", "Mssi")>]
 [<InlineData("ExcludeSelfCe", "false")>]

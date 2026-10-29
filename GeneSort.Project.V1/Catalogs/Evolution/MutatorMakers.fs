@@ -59,14 +59,14 @@ module MutatorMakers =
     let makeSimpleSorterModelMutator (path: evoPath) : Async<Result<simpleSorterModelMutator, string>> =
             async {
                 let paramsOpt = option {
-                    let! sortingWidth = path.GetSortingWidth()
+                    let! channelCount = path.GetChannelCount()
                     let! rngType = path.GetRngType()
                     let! simpleSorterModelType = path.GetSimpleSorterModelType()
-                    return (sortingWidth, rngType, simpleSorterModelType)
+                    return (channelCount, rngType, simpleSorterModelType)
                 }
 
                 match paramsOpt with
-                | Some (sortingWidth, rngType, simpleSorterModelType) ->
+                | Some (channelCount, rngType, simpleSorterModelType) ->
                     let rngFactory = RngFactory.create rngType
 
                     match simpleSorterModelType with
@@ -120,7 +120,7 @@ module MutatorMakers =
                             let! paraRate = path.GetParaRate()
                             let! selfSymRate = path.GetSelfSymRate()
                             let! mutVariant = path.GetMutatorVariant()
-                            return getMsuf4ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
+                            return getMsuf4ModelMutator channelCount rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator
@@ -135,7 +135,7 @@ module MutatorMakers =
                             let! paraRate = path.GetParaRate()
                             let! selfSymRate = path.GetSelfSymRate()
                             let! mutVariant = path.GetMutatorVariant()
-                            return getMsuf6ModelMutator sortingWidth rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
+                            return getMsuf6ModelMutator channelCount rngFactory excludeSelfCe seedModificationRate modificationRate orthoRate paraRate selfSymRate mutVariant
                         }
                         match res with
                         | Some mutator -> return Ok mutator

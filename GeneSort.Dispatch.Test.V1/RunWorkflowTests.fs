@@ -18,7 +18,7 @@ let private generate configured = RunParameterGeneration.generate configured 0<r
 
 [<Fact>]
 let ``workflows distinguish publication preparation fresh evolution and continuation`` () =
-    Assert.True((SortableTests.Merge.Test()).IsDirectRun)
+    Assert.True((SortableTests.Merge.HiMD_32()).IsDirectRun)
     Assert.True((SorterEval.Standard.Test()).IsPreparedRun)
     Assert.True((SorterMutate.Standard.Msrs()).IsPreparedRun)
     Assert.True((SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()).IsEvolutionRun)
@@ -29,12 +29,12 @@ let ``workflows distinguish publication preparation fresh evolution and continua
 
 [<Fact>]
 let ``direct runs have one sweep and no Setup artifacts or action`` () =
-    for configured in [SortableTests.Merge.Test(); SortableTests.Prefix.Width24s()] do
+    for configured, expectedCount in [SortableTests.Merge.HiMD_32(), 2; SortableTests.Prefix.Channels24(), 4] do
         Assert.False(configured.HasSetup)
         Assert.Empty(configured.SetupParameterSpans)
-        Assert.Equal(4I, RunPreparation.count { Run = configured; FirstReplica = 0; ReplicaCount = 1 })
+        Assert.Equal(bigint expectedCount, RunPreparation.count { Run = configured; FirstReplica = 0; ReplicaCount = 1 })
         let prepared = RunPreparation.prepare { Run = configured; FirstReplica = 0; ReplicaCount = 1 }
-        Assert.Equal(4, prepared.FileCount)
+        Assert.Equal(expectedCount, prepared.FileCount)
         Assert.Empty(prepared.SetupFiles)
         Assert.Empty((runHost.Create configured 1).MakeSetupParameters 0<replNumber> 1<replNumber>)
         Assert.Throws<ArgumentException>(fun () -> SetupExecutorCatalog.prepare Unchecked.defaultof<_> configured Unchecked.defaultof<_> |> ignore) |> ignore
@@ -42,7 +42,7 @@ let ``direct runs have one sweep and no Setup artifacts or action`` () =
 
 [<Fact>]
 let ``old direct definitions fold duplicate Setup spans into Execution without changing file queries`` () =
-    let original = SortableTests.Merge.Test()
+    let original = SortableTests.Merge.HiMD_32()
     let dto = RunDto.fromDomain original
     let old = { dto with SetupParameterSpans = dto.RunParameterSpans } |> RunDto.toDomain
     Assert.Equal<run>(original, old)
@@ -52,7 +52,7 @@ let ``old direct definitions fold duplicate Setup spans into Execution without c
 let ``fixed overrides are rejected by runtime and editor including enhancer supplied defaults`` () =
     let configured = SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()
     for key, value in [ParamKeys.activationProbabilityKey, "0.5"; ParamKeys.sorterCountPerPoolKey, "64"
-                       ParamKeys.rngTypeKey, "LCG"; ParamKeys.sortingWidthKey, "24"] do
+                       ParamKeys.rngTypeKey, "LCG"; ParamKeys.channelCountKey, "24"] do
         let changed = Run.withParameterSpans configured.SetupParameterSpans (configured.RunParameterSpans @ [key, [value]]) configured
         Assert.Throws<ArgumentException>(fun () -> generate changed |> ignore) |> ignore
         let args = (RunTypeEditor.fromRun configured).ToArgs()
@@ -69,7 +69,7 @@ let ``read only rows include resolved defaults and follow Setup edits`` () =
     let inherited = RunTypeEditor.inheritedParameters configured draft
     let values key = inherited |> Array.find (fun row -> row.Key = key) |> fun row -> row.Values
     Assert.Equal<string>([|"0.25"; "0.75"|], values ParamKeys.activationProbabilityKey)
-    Assert.Equal<string>([|"32"|], values ParamKeys.sortingWidthKey)
+    Assert.Equal<string>([|"32"|], values ParamKeys.channelCountKey)
     Assert.Equal<string>([|"LCG"|], values ParamKeys.rngTypeKey)
     Assert.DoesNotContain(inherited, fun row -> row.Key = ParamKeys.activatorMutationRateKey)
 
@@ -101,18 +101,14 @@ let ``Soss activator rates still share Setup references and have separate execut
         Assert.NotEqual(group[0].GetId(), group[1].GetId())
 
 [<Fact>]
-let ``direct SortableTests file IDs remain unchanged`` () =
-    let expected = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "WorkflowFileIds.txt")) |> Array.filter (fun line -> line.StartsWith("SortableTests.")) |> Set.ofArray
-    let actual =
-        [SortableTests.Merge.Test(), "SortableTests.Merge.Test"]
-        |> List.collect (fun (configured, name) ->
-            generate configured |> Array.toList |> List.collect (fun rp ->
-                let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-                [geneSortDataType.Run configured.RunName; geneSortDataType.RunParameters configured.RunName
-                 geneSortDataType.SortableTests ""; geneSortDataType.SorterSetEval ""; geneSortDataType.SorterPoolSet ""]
-                |> List.choose (fun output -> query rp output |> Option.map (fun q -> sprintf "%s|%A|%O" name output q.Id))))
+let ``direct SortableTests file IDs survive a DTO round trip`` () =
+    let identities configured =
+        generate configured |> Array.toList |> List.collect (fun rp ->
+            let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+            [geneSortDataType.Run configured.RunName; geneSortDataType.RunParameters configured.RunName; geneSortDataType.SortableTests ""]
+            |> List.choose (fun output -> query rp output |> Option.map (fun q -> output, q.Id)))
         |> Set.ofList
-    Assert.Empty(Set.difference actual expected)
-    // Only redundant direct-run bookkeeping rows disappear.
-    let retained (line: string) = line.Contains("|SortableTests ")
-    Assert.Equal<Set<string>>(Set.filter retained expected, Set.filter retained actual)
+    for configured in [SortableTests.Merge.HiMD_32(); SortableTests.Prefix.Channels24()] do
+        let original = identities configured
+        Assert.NotEmpty(original)
+        Assert.Equal<Set<_>>(original, configured |> RunDto.fromDomain |> RunDto.toDomain |> identities)

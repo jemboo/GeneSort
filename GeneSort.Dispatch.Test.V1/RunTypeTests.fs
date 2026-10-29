@@ -78,93 +78,93 @@ let ``Merge choices come from available networks and preserve all preset values`
                         Assert.True(ParameterValidation.validateValue key choice |> Result.isOk)
                         let id = MergeLibId.fromString choice
                         let declared = example.Run.SetupParameterSpans @ example.Run.RunParameterSpans |> List.filter (fst >> (=) key) |> List.collect snd
-                        Assert.True(List.contains choice declared || (SorterLib.tryGet (sorterLibId.create id.FactorSortingWidth id.SorterLibVariant) |> Option.isSome))
+                        Assert.True(List.contains choice declared || (SorterLib.tryGet (sorterLibId.create id.FactorChannelCount id.SorterLibVariant) |> Option.isSome))
 
 [<Fact>]
 let ``Equivalent merge identities and numeric values cannot create duplicate sweep entries`` () =
-    let value = "MergeLibId(sortingWidth=32, mergeDimension=2, Variant=VariantA)"
-    let equivalent = "MergeLibId(sortingWidth=032, mergeDimension=02, Variant=VariantA)"
+    let value = "MergeLibId(channelCount=32, mergeDimension=2, Variant=VariantA)"
+    let equivalent = "MergeLibId(channelCount=032, mergeDimension=02, Variant=VariantA)"
     for key, values in [ParamKeys.mergeLibIdKey, [value; equivalent]
                         ParamKeys.activatorMutationRateKey, ["0.01"; "0.010"]
                         ParamKeys.codeModKey, ["same"; "same"]] do
         let errors = ParameterValidation.validateSpans "Setup" [key, values]
         Assert.Contains(errors, fun error -> error.Message.Contains("duplicated"))
-    for invalid in ["not an ID"; "MergeLibId(sortingWidth=32, mergeDimension=0, Variant=VariantA)"
-                    "MergeLibId(sortingWidth=32, mergeDimension=3, Variant=VariantA)"
-                    "MergeLibId(sortingWidth=32, mergeDimension=16, Variant=Unknown)"] do
+    for invalid in ["not an ID"; "MergeLibId(channelCount=32, mergeDimension=0, Variant=VariantA)"
+                    "MergeLibId(channelCount=32, mergeDimension=3, Variant=VariantA)"
+                    "MergeLibId(channelCount=32, mergeDimension=16, Variant=Unknown)"] do
         Assert.True(ParameterValidation.validateValue ParamKeys.mergeLibIdKey invalid |> Result.isError)
 
 [<Theory>]
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Merge width filtering finds component networks for test and evaluation runs`` evaluation =
-    let configured = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.Test ()
+    let configured = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.HiMD_32 ()
     let before = RunTypeEditor.fromRun configured
-    Assert.Contains(24, RunTypeEditor.mergeSortingWidths configured)
-    Assert.Contains(32, RunTypeEditor.mergeSortingWidths configured)
+    Assert.Contains(24, RunTypeEditor.mergeChannelCounts configured)
+    Assert.Contains(32, RunTypeEditor.mergeChannelCounts configured)
     for width in [24; 32; 64; 96; 37] do
-        let spec = RunTypeEditor.parametersForMergeWidth configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey)
-        let expected = MergeLibId.availableForWidth (FSharp.UMX.UMX.tag width) |> Array.map MergeLibId.toString
+        let spec = RunTypeEditor.parametersForMergeChannelCount configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey)
+        let expected = MergeLibId.availableForChannelCount (FSharp.UMX.UMX.tag width) |> Array.map MergeLibId.toString
         Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
         Assert.Equal(evaluation, spec.RequiredInSetup)
         Assert.Equal(not evaluation, spec.ExecutionAllowed)
-        Assert.DoesNotContain(spec.Choices, fun value -> int (MergeLibId.fromString value).SortingWidth <> width)
+        Assert.DoesNotContain(spec.Choices, fun value -> int (MergeLibId.fromString value).ChannelCount <> width)
     Assert.Equal(before, RunTypeEditor.fromRun configured)
 
 [<Theory>]
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Merge width suggestions and filtering preserve unavailable saved library identities`` evaluation =
-    let original = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.Test ()
-    let saved = mergeLibId.create 768<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString
+    let original = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.HiMD_32 ()
+    let saved = mergeLibId.create 768<channelCount> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString
     let replace spans = spans |> List.map (fun (key, values) -> if key = ParamKeys.mergeLibIdKey then key, [saved] else key, values)
     let configured = Run.withParameterSpans (replace original.SetupParameterSpans) (replace original.RunParameterSpans) original
-    Assert.Contains(768, RunTypeEditor.mergeSortingWidths configured)
-    let choices width = RunTypeEditor.parametersForMergeWidth configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey) |> fun spec -> spec.Choices
+    Assert.Contains(768, RunTypeEditor.mergeChannelCounts configured)
+    let choices width = RunTypeEditor.parametersForMergeChannelCount configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey) |> fun spec -> spec.Choices
     Assert.Contains(saved, choices 768)
     Assert.DoesNotContain(saved, choices 24)
 
 [<Fact>]
 let ``Prefix choices include the declared IDs and library entries at the same widths`` () =
-    let configured = SortableTests.Prefix.Width24s ()
+    let configured = SortableTests.Prefix.Channels24 ()
     let spec = RunTypeEditor.parameters configured |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
     Assert.Equal(parameterValueKind.Choice, spec.ValueKind)
-    let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = 24) |> Array.map PrefixLibId.toString
+    let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.ChannelCount = 24) |> Array.map PrefixLibId.toString
     Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
 
 [<Theory>]
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Prefix test and evaluation choices can use any registered width without changing the example`` evaluation =
-    let configured = if evaluation then SorterEval.Prefix.Width32 () else SortableTests.Prefix.Width24s ()
+    let configured = if evaluation then SorterEval.Prefix.Channels32 () else SortableTests.Prefix.Channels24 ()
     let before = RunTypeEditor.fromRun configured
-    let widths = RunTypeEditor.prefixSortingWidths configured
+    let widths = RunTypeEditor.prefixChannelCounts configured
     Assert.Contains(8, widths)
     Assert.Contains(24, widths)
     Assert.Contains(32, widths)
     for width in widths do
-        let spec = RunTypeEditor.parametersForPrefixWidth configured width |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
-        let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = width) |> Array.map PrefixLibId.toString
+        let spec = RunTypeEditor.parametersForPrefixChannelCount configured width |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
+        let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.ChannelCount = width) |> Array.map PrefixLibId.toString
         Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
-        Assert.DoesNotContain(spec.Choices, fun value -> int (PrefixLibId.fromString value).SortingWidth <> width)
+        Assert.DoesNotContain(spec.Choices, fun value -> int (PrefixLibId.fromString value).ChannelCount <> width)
         Assert.Equal(evaluation, spec.RequiredInSetup)
         Assert.Equal(not evaluation, spec.ExecutionAllowed)
     Assert.Equal(before, RunTypeEditor.fromRun configured)
 
 [<Fact>]
 let ``Prefix evaluation width choices preserve saved Setup declarations outside the current library`` () =
-    let original = SorterEval.Prefix.Width32 ()
-    let savedPrefix = prefixLibId.create 12<sortingWidth> 3<stageLength> prefixLibVariant.PrefixC |> PrefixLibId.toString
+    let original = SorterEval.Prefix.Channels32 ()
+    let savedPrefix = prefixLibId.create 12<channelCount> 3<stageLength> prefixLibVariant.PrefixC |> PrefixLibId.toString
     let setup = original.SetupParameterSpans |> List.map (fun (key, values) -> if key = ParamKeys.prefixLibIdKey then key, [savedPrefix] else key, values)
     let configured = Run.withParameterSpans setup original.RunParameterSpans original
-    Assert.Contains(12, RunTypeEditor.prefixSortingWidths configured)
-    let spec = RunTypeEditor.parametersForPrefixWidth configured 12 |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
+    Assert.Contains(12, RunTypeEditor.prefixChannelCounts configured)
+    let spec = RunTypeEditor.parametersForPrefixChannelCount configured 12 |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
     Assert.Equal<string>([|savedPrefix|], spec.Choices)
 
 [<Fact>]
 let ``Sorter choices preserve saved IDs and offer other registered variants at that width`` () =
-    let original = SortableTests.Prefix.Width32 ()
-    let savedIds = ["SorterLibId(sortingWidth=32, Variant=VariantA)"; "SorterLibId(sortingWidth=32, Variant=VariantC)"]
+    let original = SortableTests.Prefix.Channels32 ()
+    let savedIds = ["SorterLibId(channelCount=32, Variant=VariantA)"; "SorterLibId(channelCount=32, Variant=VariantC)"]
     let configured =
         SimpleRun.create {
             DatabaseName = original.DatabaseName; ProjectName = original.ProjectName; RunName = original.RunName
@@ -177,8 +177,8 @@ let ``Sorter choices preserve saved IDs and offer other registered variants at t
     let spec = RunTypeEditor.parameters configured |> Array.find (fun spec -> spec.Key = ParamKeys.sorterLibIdKey)
     Assert.Equal(parameterValueKind.Choice, spec.ValueKind)
     for value in savedIds do Assert.Contains(value, spec.Choices)
-    Assert.Contains("SorterLibId(sortingWidth=32, Variant=VariantB)", spec.Choices)
-    Assert.DoesNotContain(spec.Choices, fun value -> int (SorterLibId.fromString value).SortingWidth <> 32)
+    Assert.Contains("SorterLibId(channelCount=32, Variant=VariantB)", spec.Choices)
+    Assert.DoesNotContain(spec.Choices, fun value -> int (SorterLibId.fromString value).ChannelCount <> 32)
     match RunTypeEditor.build configured (RunTypeEditor.fromRun configured) with
     | Ok rebuilt -> Assert.Equal<run>(configured, rebuilt)
     | Error _ -> failwith "Saved sorter IDs must survive editing."
@@ -186,10 +186,10 @@ let ``Sorter choices preserve saved IDs and offer other registered variants at t
 [<Fact>]
 let ``Prefix and sorter duplicates are compared by parsed identity`` () =
     for key, value, equivalent, invalid in [
-        ParamKeys.prefixLibIdKey, "PrefixLibId(sortingWidth=24, stageLength=4, Variant=PrefixA)",
-            "PrefixLibId(sortingWidth=024, stageLength=04, Variant=PrefixA)", "PrefixLibId(sortingWidth=24, stageLength=0, Variant=PrefixA)"
-        ParamKeys.sorterLibIdKey, "SorterLibId(sortingWidth=32, Variant=VariantA)",
-            "SorterLibId(sortingWidth=032, Variant=VariantA)", "SorterLibId(sortingWidth=0, Variant=VariantA)"
+        ParamKeys.prefixLibIdKey, "PrefixLibId(channelCount=24, stageLength=4, Variant=PrefixA)",
+            "PrefixLibId(channelCount=024, stageLength=04, Variant=PrefixA)", "PrefixLibId(channelCount=24, stageLength=0, Variant=PrefixA)"
+        ParamKeys.sorterLibIdKey, "SorterLibId(channelCount=32, Variant=VariantA)",
+            "SorterLibId(channelCount=032, Variant=VariantA)", "SorterLibId(channelCount=0, Variant=VariantA)"
     ] do
         Assert.True(ParameterValidation.validateValue key value |> Result.isOk)
         Assert.Contains(ParameterValidation.validateSpans "Setup" [key, [value; equivalent]], fun issue -> issue.Message.Contains("duplicated"))

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Rs
+namespace GeneSort.Model.Sorting.V1.Simple.Rs
 
 open System
 open FSharp.UMX
@@ -73,7 +73,7 @@ type msrsRandMutate =
                         (rng.NextFloat) 
                         parent.Perm_Rss
 
-        msrs.create id parent.SortingWidth mutated
+        msrs.create id parent.ChannelCount mutated
 
     member this.MakeSorterModelFromIndexAndMod 
                             (parent: msrs) 

@@ -11,6 +11,7 @@ internal static partial class Program
     private static void CheckRunSelection(string root, RunEditorViewModel model, RunEditorView view, StringBuilder errors)
     {
         var wizard = model.Selection;
+        Check(model.RunTypes.All(type => !string.IsNullOrWhiteSpace(type.Description)), "A run module has no description.");
         Check(model.IsSelectingRun && wizard.IsFolderStep && !wizard.CanContinue, "The first step must require a folder.");
         wizard.Folder = "relative-path";
         Check(!wizard.CanContinue, "A relative folder was accepted.");
@@ -25,6 +26,10 @@ internal static partial class Program
         Click(rootTile);
         Check(wizard.CurrentPath == "SortableTests", "Tile click did not navigate.");
         wizard.Navigate(wizard.Tiles.Single(tile => tile.Name == "Prefix"));
+        Check(wizard.ModuleDescription == model.RunTypes.Single(type => type.Name == wizard.CurrentPath).Description,
+            "The module page lost its description.");
+        Layout(view);
+        Check(Descendants<TextBlock>(selectionView).Any(text => text.Text == wizard.ModuleDescription), "Module description is not visible on the page.");
         var original = wizard.Tiles.First(tile => tile.Definition is not null);
         Check(original.IsCodeDefined && original.SavedPath is null && original.Status.Contains("not saved"), "Unsaved code leaf status is incorrect.");
         var codeRunName = original.Definition!.RunName;
@@ -37,6 +42,35 @@ internal static partial class Program
         Wait(model.BeginSelectionAsync());
         var saved = wizard.Tiles.Single(tile => tile.Name == original.Name);
         Check(saved.IsCodeDefined && saved.SavedPath is not null && saved.Status == "Code + saved on disk", "Saved counterpart was not merged into the code leaf.");
+        Check(!saved.IsMaterialized, "Saving a definition alone made it look completed.");
+        var completionRows = GeneSort.Project.V1.RunParameterGeneration.generate(configured, 0, 2);
+        Check(completionRows.Length >= 2, "Completion fixture needs multiple processing rows.");
+        void WriteCompletion(bool allFinished)
+        {
+            var parameterFolder = RunParameterFiles.folderFor(root, configured);
+            for (var index = 0; index < completionRows.Length; index++)
+            {
+                var row = completionRows[index].WithRunFinished(Microsoft.FSharp.Core.FSharpOption<bool>.Some(allFinished || index == 0));
+                var replicaFolder = Path.Combine(parameterFolder, row.GetRepl().Value.ToString());
+                Directory.CreateDirectory(replicaFolder);
+                File.WriteAllBytes(Path.Combine(replicaFolder, row.GetId().Value + ".msgpack"),
+                    MessagePack.MessagePackSerializer.Serialize(GeneSort.Project.Mp.V1.RunParametersDto.fromDomain(row)));
+            }
+        }
+        WriteCompletion(false);
+        Wait(wizard.LoadAsync(false));
+        Check(!wizard.Tiles.Single(tile => tile.Name == original.Name).IsMaterialized, "Partial processing made the whole run look completed.");
+        WriteCompletion(true);
+        Wait(wizard.LoadAsync(false));
+        saved = wizard.Tiles.Single(tile => tile.Name == original.Name);
+        Check(saved.IsMaterialized, "Completed processing did not materialize the run tile.");
+        Layout(view);
+        var completedButton = Descendants<Button>(selectionView).Single(button => ReferenceEquals(button.DataContext, saved));
+        Check(completedButton.BorderThickness.Left == 1, "Completed run incorrectly received a selection-like border.");
+        Check(!Descendants<TextBlock>(completedButton).Any(text => text.Text == saved.Status && text.Visibility == Visibility.Visible), "Run status text remains visible.");
+        var completionScreens = Path.Combine(Directory.GetCurrentDirectory(), "artifacts", "run-selection");
+        Directory.CreateDirectory(completionScreens);
+        Render(view, Path.Combine(completionScreens, "completed.png"));
         Wait(model.ChooseRunAsync(saved));
         Check(!model.HasUnsavedChanges && model.RunName == codeRunName, "Saved leaf did not load cleanly.");
         Check(model.Description == "Saved values take precedence over code defaults", "Code defaults replaced the saved counterpart.");
@@ -59,7 +93,11 @@ internal static partial class Program
         Wait(model.ChooseRunAsync(customTile));
         Check(model.SelectedRunType?.Name == original.ModulePath, "Custom leaf was associated with an unrelated compatible module.");
         model.Description = "Keep this draft";
-        Wait(model.BeginSelectionAsync());
+        wizard.Home(); // The editor must return to its module, not this stale wizard location.
+        Layout(view);
+        Click(Descendants<Button>(view).Single(button => Equals(button.Content, "Back") && button.ToolTip is string tip && tip.StartsWith("Back to")));
+        WaitUntil(() => model.IsSelectingRun && !wizard.IsLoading);
+        Check(wizard.CurrentPath == original.ModulePath, "Back did not return to the containing module.");
         model.CancelSelection();
         Check(model.Description == "Keep this draft" && model.HasUnsavedChanges, "Returning from the wizard discarded edits.");
         Wait(model.BeginSelectionAsync());

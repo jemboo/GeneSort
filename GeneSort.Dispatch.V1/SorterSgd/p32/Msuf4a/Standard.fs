@@ -118,8 +118,10 @@ module Pool_32 =
         )
 
 
+    let description = "Standard evolutionary runs for the 32-input Msuf4a configuration (Pool_32)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_32", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_32", description, [|
             runExample("Test", Test)
             runExample("V1", V1)
         |])
@@ -178,7 +180,9 @@ module Pool_512 =
             }
         )
 
+    let description = "Standard evolutionary runs for the 32-input Msuf4a configuration (Pool_512)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_512", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_512", description, [|
             runExample("V2a", V2a)
         |])

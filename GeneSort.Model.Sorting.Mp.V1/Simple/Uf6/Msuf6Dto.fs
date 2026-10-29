@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Model.Sorting.Mp.V1.Simple.Uf6
 
 open System
@@ -10,28 +10,28 @@ open GeneSort.Model.Sorting.V1.Simple.Uf6
 
 type msuf6Dto =
     { id: Guid
-      sortingWidth: int
+      channelCount: int
       twoOrbitUf6Dtos: twoOrbitUf6Dto array }
     
-    static member Create(id: Guid, sortingWidth: int, twoOrbitUnfolder6s: twoOrbitUf6Dto array) : msuf6Dto =
+    static member Create(id: Guid, channelCount: int, twoOrbitUnfolder6s: twoOrbitUf6Dto array) : msuf6Dto =
         if isNull twoOrbitUnfolder6s then
             raise (ArgumentNullException(nameof twoOrbitUnfolder6s, "TwoOrbitUnfolder6s array cannot be null"))
         elif twoOrbitUnfolder6s.Length < 1 then
             raise (ArgumentException($"Must have at least 1 TwoOrbitUnfolder6, got {twoOrbitUnfolder6s.Length}", nameof twoOrbitUnfolder6s))
-        elif sortingWidth < 1 then
-            raise (ArgumentException($"SortingWidth must be at least 1, got {sortingWidth}", nameof sortingWidth))
-        elif twoOrbitUnfolder6s |> Array.exists (fun tou -> (tou |> TwoOrbitUf6Dto.getOrder) <> sortingWidth) then
-            raise (ArgumentException($"All TwoOrbitUnfolder6 must have order {sortingWidth}", nameof twoOrbitUnfolder6s))
+        elif channelCount < 1 then
+            raise (ArgumentException($"ChannelCount must be at least 1, got {channelCount}", nameof channelCount))
+        elif twoOrbitUnfolder6s |> Array.exists (fun tou -> (tou |> TwoOrbitUf6Dto.getOrder) <> channelCount) then
+            raise (ArgumentException($"All TwoOrbitUnfolder6 must have order {channelCount}", nameof twoOrbitUnfolder6s))
         else
             { id = id
-              sortingWidth = sortingWidth
+              channelCount = channelCount
               twoOrbitUf6Dtos = twoOrbitUnfolder6s }
 
 module Msuf6Dto =
 
     let fromDomain (msuf6: msuf6) : msuf6Dto =
         { id = %msuf6.Id
-          sortingWidth = %msuf6.SortingWidth
+          channelCount = %msuf6.ChannelCount
           twoOrbitUf6Dtos = msuf6.TwoOrbitUnfolder6s |> Array.map TwoOrbitUf6Dto.fromDomain }
 
     let toDomain (dto: msuf6Dto) : msuf6 =
@@ -41,6 +41,6 @@ module Msuf6Dto =
         
         msuf6.create
             (UMX.tag<sorterModelId> dto.id)
-            (UMX.tag<sortingWidth> dto.sortingWidth)
+            (UMX.tag<channelCount> dto.channelCount)
             twoOrbitUnfolder6s
 

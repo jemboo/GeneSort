@@ -1,4 +1,4 @@
-﻿module Tests
+module Tests
 
 open System
 open Microsoft.FSharp.Reflection
@@ -17,12 +17,12 @@ let ``Component prefix images preserve brute force results and ordering`` () =
     |]
     for network in networks do
         let expected =
-            SortableBoolArray.getAllSortableBoolArrays 6<sortingWidth>
+            SortableBoolArray.getAllSortableBoolArrays 6<channelCount>
             |> Seq.map (fun input -> input.SortByCes network)
             |> SortableBoolArray.removeDuplicates
             |> Seq.map (fun output -> output.Values) |> Seq.toArray
         let actual =
-            SortableBoolArray.getAllPossibleResultsFromCeArray network 6<sortingWidth>
+            SortableBoolArray.getAllPossibleResultsFromCeArray network 6<channelCount>
             |> Seq.map (fun output -> output.Values) |> Seq.toArray
         Assert.True((expected = actual))
 
@@ -34,7 +34,7 @@ let ``Four stage 32 channel prefix has 28224 distinct outputs`` () =
                 if channel &&& stride = 0 then
                     yield ce.create channel (channel + stride)
     |]
-    let outputs = SortableBoolArray.getAllPossibleResultsFromCeArray network 32<sortingWidth> |> Seq.toArray
+    let outputs = SortableBoolArray.getAllPossibleResultsFromCeArray network 32<channelCount> |> Seq.toArray
     Assert.Equal(28224, outputs.Length)
     Assert.Equal(outputs.Length, outputs |> Array.distinct |> Array.length)
 

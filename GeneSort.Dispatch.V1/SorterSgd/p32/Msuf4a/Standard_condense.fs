@@ -37,7 +37,9 @@ module Pool_32_condense =
         }
         |> EvoCondense.createStandard
 
+    let description = "Condense saved pools for 32-input Msuf4a Standard evolution (Pool_32_condense)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", description, [|
             runExample("Test", Test)
         |])

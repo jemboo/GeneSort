@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.Simple.V1
+namespace GeneSort.Model.Sorting.Simple.V1
 
 open FSharp.UMX
 open GeneSort.Core
@@ -24,25 +24,25 @@ module SimpleSorterModelGen =
 
     let makeUniform
             (rngFactory: rngFactory) 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (stageLength: int<stageLength>) 
             (simpleorterModelType: simpleSorterModelType)
             (excludeSelfCe: bool<excludeSelfCe>) =
         match simpleorterModelType with
         | simpleSorterModelType.Msce -> 
-            let ceLength = stageLength |> StageLength.toCeLength sortingWidth
-            SmmMsceRandGen (msceRandGen.create rngFactory sortingWidth excludeSelfCe ceLength)
+            let ceLength = stageLength |> StageLength.toCeLength channelCount
+            SmmMsceRandGen (msceRandGen.create rngFactory channelCount excludeSelfCe ceLength)
         | simpleSorterModelType.Mssi -> 
-            SmmMssiRandGen (mssiRandGen.create rngFactory sortingWidth stageLength)
+            SmmMssiRandGen (mssiRandGen.create rngFactory channelCount stageLength)
         | simpleSorterModelType.Msrs -> 
             let opsGenRates = opsGenRates.createUniform()
-            SmmMsrsRandGen (msrsRandGen.create rngFactory sortingWidth opsGenRates stageLength)
+            SmmMsrsRandGen (msrsRandGen.create rngFactory channelCount opsGenRates stageLength)
         | simpleSorterModelType.Msuf4 ->
-            let uf4GenRates = Uf4GenRates.makeUniform %sortingWidth
-            SmmMsuf4RandGen (msuf4RandGen.create rngFactory sortingWidth stageLength uf4GenRates)
+            let uf4GenRates = Uf4GenRates.makeUniform %channelCount
+            SmmMsuf4RandGen (msuf4RandGen.create rngFactory channelCount stageLength uf4GenRates)
         | simpleSorterModelType.Msuf6 -> 
-            let uf6GenRates = Uf6GenRates.makeUniform %sortingWidth
-            SmmMsuf6RandGen (msuf6RandGen.create rngFactory sortingWidth stageLength uf6GenRates)
+            let uf6GenRates = Uf6GenRates.makeUniform %channelCount
+            SmmMsuf6RandGen (msuf6RandGen.create rngFactory channelCount stageLength uf6GenRates)
 
 
     let getId (model:simpleSorterModelGen) : Guid<sorterModelGenId> =
@@ -54,13 +54,13 @@ module SimpleSorterModelGen =
         | SmmMsuf6RandGen msuf6 -> msuf6.Id
 
 
-    let getSortingWidth (model: simpleSorterModelGen) : int<sortingWidth> =
+    let getChannelCount (model: simpleSorterModelGen) : int<channelCount> =
         match model with
-        | SmmMsceRandGen msce -> msce.SortingWidth
-        | SmmMssiRandGen mssi -> mssi.SortingWidth
-        | SmmMsrsRandGen msrs -> msrs.SortingWidth
-        | SmmMsuf4RandGen msuf4 -> msuf4.SortingWidth
-        | SmmMsuf6RandGen msuf6 -> msuf6.SortingWidth
+        | SmmMsceRandGen msce -> msce.ChannelCount
+        | SmmMssiRandGen mssi -> mssi.ChannelCount
+        | SmmMsrsRandGen msrs -> msrs.ChannelCount
+        | SmmMsuf4RandGen msuf4 -> msuf4.ChannelCount
+        | SmmMsuf6RandGen msuf6 -> msuf6.ChannelCount
 
 
     let getCeLength (model: simpleSorterModelGen) : int<ceLength> =

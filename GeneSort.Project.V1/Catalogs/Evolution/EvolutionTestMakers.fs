@@ -18,13 +18,13 @@ module EvolutionTestMakers =
     let makeStandardTests (_sources: evolutionSetupSources) (rp:runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
-                let! sortingWidth = rp.GetSortingWidth()
+                let! channelCount = rp.GetChannelCount()
                 let sortableTestsId = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-                return (sortingWidth, sortableTestsId)
+                return (channelCount, sortableTestsId)
             }
             match paramsOpt with
-            | Some (sortingWidth, sortableTestsId) ->
-                let testModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+            | Some (channelCount, sortableTestsId) ->
+                let testModel = msasF.create channelCount |> sortableTestsModel.MsasF
                 return Ok ((SortableTestsModel.makeSortableTests 
                                     sortableTestsId
                                     testModel 

@@ -205,8 +205,10 @@ module Pool_X =
         }
         |> EvoCondense.createSoss
 
+    let description = "Condense saved pools for 32-input Msuf4a Soss evolution (Pool_X)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss_condense.Pool_X", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss_condense.Pool_X", description, [|
             runExample("Base", Base)
             runExample("Step1", Step1)
             runExample("Step2", Step2)

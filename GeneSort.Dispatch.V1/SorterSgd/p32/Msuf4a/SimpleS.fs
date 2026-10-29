@@ -125,8 +125,10 @@ module Standard =
 
 
 
+    let description = "Standard evolutionary runs using SimpleS models with the 32-input Msuf4a configuration."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleS.Standard", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleS.Standard", description, [|
             runExample("Test", Test)
             runExample("ActivatorRates", ActivatorRates)
         |])
@@ -300,8 +302,10 @@ module Soss =
             }
         )
 
+    let description = "Soss evolutionary runs using SimpleS models with the 32-input Msuf4a configuration."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleS.Soss", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleS.Soss", description, [|
             runExample("Test", Test)
             runExample("ActivatorRates", ActivatorRates)
             runExample("SossS", SossS)

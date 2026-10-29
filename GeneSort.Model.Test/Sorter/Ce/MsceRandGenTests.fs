@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Test.Sorter.Ce
+namespace GeneSort.Model.Test.Sorter.Ce
 
 open System
 open FSharp.UMX
@@ -13,7 +13,7 @@ open GeneSort.Model.Sorting.V1.Simple.Ce
 type MsceRandGenTests() =
 
     // Helper to create a Model_Ce
-    let createModelCe (id: Guid<sorterModelId>) (width: int<sortingWidth>) (ceCodes: int array) : msce =
+    let createModelCe (id: Guid<sorterModelId>) (width: int<channelCount>) (ceCodes: int array) : msce =
         msce.create id width ceCodes
 
     // Helper function to create a mock random number generator

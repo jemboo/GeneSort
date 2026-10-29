@@ -87,7 +87,7 @@ module WorkflowSourceFiles =
                     loadTests projectsFolder %testsDatabase "Prefix" request query
                 LoadStandardSorterEvals = fun width model evalType ->
                     evals %evalsDatabase QueryCatalogNamesRun.sorterEvalStandard 0<replNumber> (fun row ->
-                        row.GetSortingWidth() = Some width && row.GetSimpleSorterModelType() = Some model
+                        row.GetChannelCount() = Some width && row.GetSimpleSorterModelType() = Some model
                         && row.GetRngType() = Some rngType.Lcg && row.GetSorterEvalType() = Some evalType)
                 LoadMergeSorterEvals = fun library replica model ->
                     evals %evalsDatabase QueryCatalogNamesRun.sorterEvalMerge replica (fun row ->

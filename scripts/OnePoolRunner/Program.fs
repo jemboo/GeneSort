@@ -94,8 +94,8 @@ let main argv =
         let runs = orderedRuns moduleName |> List.filter (fun run -> not controlledOnly || %run.DatabaseName = "Controlled")
         let runs = if msuf4r || msuf4s then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
         let prerequisites = [
-            SortableTests.Prefix.Width32 ()
-            SorterEval.Prefix.Width32 ()
+            SortableTests.Prefix.Channels32 ()
+            SorterEval.Prefix.Channels32 ()
         ]
         printfn "%s: %d configurations; projects root: %s" moduleName runs.Length (RunHost.projectsRoot ())
         for configured in prerequisites do

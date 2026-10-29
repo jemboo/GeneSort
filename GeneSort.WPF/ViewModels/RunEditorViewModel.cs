@@ -45,9 +45,9 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         PhaseSummary = Status;
     }
     private readonly HashSet<ParameterRow> observedRows = [];
-    private int? selectedPrefixSortingWidth;
-    private string selectedMergeSortingWidth = "";
-    private bool mergeWidthEdited;
+    private int? selectedPrefixChannelCount;
+    private string selectedMergeChannelCount = "";
+    private bool mergeChannelCountEdited;
     private bool isSelectingRun = true;
     private bool hasChosenRun;
     private string? sourceModule;
@@ -62,7 +62,11 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (IsBusy) return;
         Selection.Folder = ProjectsFolder;
         IsSelectingRun = true;
-        if (Selection.CanContinue) await Selection.LoadAsync(false);
+        if (Selection.CanContinue)
+        {
+            await Selection.LoadAsync(false);
+            if (sourceModule is not null) Selection.OpenModule(sourceModule);
+        }
         else Selection.ChangeFolder();
     }
 
@@ -96,7 +100,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             Status = tile.CreateNew ? "New leaf. Edit its name and parameters, then save." :
                 "Code definition selected. Save and generate its parameters before running.";
         }
-        sourceModule = RunTypes.Any(type => type.Name == tile.ModulePath) ? tile.ModulePath : null;
+        sourceModule = tile.ModulePath;
         hasChosenRun = true;
         IsSelectingRun = false;
     }
@@ -107,7 +111,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public runExample[] Examples => SelectedRunType?.Examples ?? [];
     public runExample? SelectedExample { get; private set; }
     public string WorkflowName => SelectedRunType?.Name ?? "Saved run configuration";
-    public string WorkflowDescription => editorTemplate.Description;
+    public string WorkflowDescription => SelectedRunType?.Description ?? editorTemplate.Description;
     public bool IsEvolution => editorTemplate.IsEvolution;
     public bool HasSgdSourceSelection => editorTemplate.IsEvolutionRun;
     public bool HasSetup => editorTemplate.HasSetup;
@@ -122,27 +126,27 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         get
         {
-            if (HasPrefixWidthSelection && SelectedPrefixSortingWidth is int prefixWidth)
-                return RunTypeEditor.parametersForPrefixWidth(editorTemplate, prefixWidth);
-            if (HasMergeWidthSelection && ParsedMergeSortingWidth is int mergeWidth)
-                return RunTypeEditor.parametersForMergeWidth(editorTemplate, mergeWidth);
+            if (HasPrefixChannelCountSelection && SelectedPrefixChannelCount is int prefixChannelCount)
+                return RunTypeEditor.parametersForPrefixChannelCount(editorTemplate, prefixChannelCount);
+            if (HasMergeChannelCountSelection && ParsedMergeChannelCount is int mergeChannelCount)
+                return RunTypeEditor.parametersForMergeChannelCount(editorTemplate, mergeChannelCount);
             return RunTypeEditor.parameters(editorTemplate);
         }
     }
-    public bool HasPrefixWidthSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestPrefix)
+    public bool HasPrefixChannelCountSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestPrefix)
         || (editorTemplate.IsPreparedRun && (editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterEvalPrefix
             || editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterMutatePrefix));
     private ParameterSectionViewModel PrefixSection => HasSetup ? SetupSection : ExecutionSection;
-    public int[] PrefixSortingWidths => RunTypeEditor.prefixSortingWidths(editorTemplate);
-    public bool CanSelectPrefixWidth => HasPrefixWidthSelection && !IsBusy && !HasPendingParameter;
-    public int? SelectedPrefixSortingWidth
+    public int[] PrefixChannelCounts => RunTypeEditor.prefixChannelCounts(editorTemplate);
+    public bool CanSelectPrefixChannelCount => HasPrefixChannelCountSelection && !IsBusy && !HasPendingParameter;
+    public int? SelectedPrefixChannelCount
     {
-        get => selectedPrefixSortingWidth;
+        get => selectedPrefixChannelCount;
         set
         {
-            if (loading || !CanSelectPrefixWidth || value is not int width || selectedPrefixSortingWidth == width
-                || !PrefixSortingWidths.Contains(width)) return;
-            selectedPrefixSortingWidth = width;
+            if (loading || !CanSelectPrefixChannelCount || value is not int width || selectedPrefixChannelCount == width
+                || !PrefixChannelCounts.Contains(width)) return;
+            selectedPrefixChannelCount = width;
             loading = true;
             try
             {
@@ -150,11 +154,11 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 var row = section.Rows.FirstOrDefault(row => row.Key == ParamKeys.prefixLibIdKey);
                 if (row is not null)
                 {
-                    var kept = row.Values.Select(value => value.Text).Where(text => PrefixWidth(text) == width).ToArray();
+                    var kept = row.Values.Select(value => value.Text).Where(text => PrefixChannelCount(text) == width).ToArray();
                     section.Rows[section.Rows.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
                         Parameters.Single(spec => spec.Key == row.Key));
                 }
-                UpdateMutatorWidth(width);
+                UpdateMutatorChannelCount(width);
                 section.Configure(Parameters.Where(spec => HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed).ToArray(),
                     section.Rows.Select(row => row.Snapshot()).ToArray());
                 RefreshFixedValues();
@@ -164,62 +168,62 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             MarkEdited();
         }
     }
-    private static int? PrefixWidth(string value)
+    private static int? PrefixChannelCount(string value)
     {
-        try { return PrefixLibId.fromString(value).SortingWidth; }
+        try { return PrefixLibId.fromString(value).ChannelCount; }
         catch (Exception) { return null; }
     }
-    public bool HasMergeWidthSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestMerge)
+    public bool HasMergeChannelCountSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestMerge)
         || (editorTemplate.IsPreparedRun && (editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterEvalMerge
             || editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterMutateMerge));
     private ParameterSectionViewModel MergeSection => HasSetup ? SetupSection : ExecutionSection;
-    public string[] MergeSortingWidths => RunTypeEditor.mergeSortingWidths(editorTemplate).Select(width => width.ToString(CultureInfo.InvariantCulture)).ToArray();
-    public bool CanSelectMergeWidth => HasMergeWidthSelection && !IsBusy && !HasPendingParameter;
-    private int? ParsedMergeSortingWidth => int.TryParse(selectedMergeSortingWidth, NumberStyles.Integer, CultureInfo.InvariantCulture, out var width)
+    public string[] MergeChannelCounts => RunTypeEditor.mergeChannelCounts(editorTemplate).Select(width => width.ToString(CultureInfo.InvariantCulture)).ToArray();
+    public bool CanSelectMergeChannelCount => HasMergeChannelCountSelection && !IsBusy && !HasPendingParameter;
+    private int? ParsedMergeChannelCount => int.TryParse(selectedMergeChannelCount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var width)
         && width > 0 ? width : null;
-    public string MergeWidthError => !HasMergeWidthSelection || (selectedMergeSortingWidth.Length == 0 && !mergeWidthEdited) ? ""
-        : ParsedMergeSortingWidth is not int ? "Enter a positive whole number for sorting width."
+    public string MergeChannelCountError => !HasMergeChannelCountSelection || (selectedMergeChannelCount.Length == 0 && !mergeChannelCountEdited) ? ""
+        : ParsedMergeChannelCount is not int ? "Enter a positive whole number for channel count."
         : (Parameters.FirstOrDefault(spec => spec.Key == ParamKeys.mergeLibIdKey)?.Choices.Length ?? 0) == 0
-            ? "No merge library entries are available at this width." : "";
-    public string SelectedMergeSortingWidth
+            ? "No merge library entries are available at this channel count." : "";
+    public string SelectedMergeChannelCount
     {
-        get => selectedMergeSortingWidth;
+        get => selectedMergeChannelCount;
         set
         {
             value ??= "";
-            if (loading || !CanSelectMergeWidth || selectedMergeSortingWidth == value) return;
-            selectedMergeSortingWidth = value;
-            mergeWidthEdited = true;
+            if (loading || !CanSelectMergeChannelCount || selectedMergeChannelCount == value) return;
+            selectedMergeChannelCount = value;
+            mergeChannelCountEdited = true;
             loading = true;
             try
             {
-                if (ParsedMergeSortingWidth is int width)
+                if (ParsedMergeChannelCount is int width)
                 {
                     var section = MergeSection;
                     var row = section.Rows.FirstOrDefault(row => row.Key == ParamKeys.mergeLibIdKey);
                     if (row is not null)
                     {
-                        var kept = row.Values.Select(value => value.Text).Where(text => MergeWidth(text) == width).ToArray();
+                        var kept = row.Values.Select(value => value.Text).Where(text => MergeChannelCount(text) == width).ToArray();
                         section.Rows[section.Rows.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
                             Parameters.Single(spec => spec.Key == row.Key));
                     }
-                    UpdateMutatorWidth(width);
+                    UpdateMutatorChannelCount(width);
                     section.Configure(Parameters.Where(spec => HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed).ToArray(),
                         section.Rows.Select(row => row.Snapshot()).ToArray());
                     RefreshFixedValues();
                 }
             }
             finally { loading = false; }
-            Changed(); Changed(nameof(Parameters)); Changed(nameof(MergeWidthError));
+            Changed(); Changed(nameof(Parameters)); Changed(nameof(MergeChannelCountError));
             MarkEdited();
         }
     }
-    private static int? MergeWidth(string value)
+    private static int? MergeChannelCount(string value)
     {
-        try { return MergeLibId.fromString(value).SortingWidth; }
+        try { return MergeLibId.fromString(value).ChannelCount; }
         catch (Exception) { return null; }
     }
-    private void UpdateMutatorWidth(int width)
+    private void UpdateMutatorChannelCount(int width)
     {
         if (editorTemplate.RunQueryCatalogName != QueryCatalogNamesRun.sorterMutatePrefix
             && editorTemplate.RunQueryCatalogName != QueryCatalogNamesRun.sorterMutateMerge) return;
@@ -229,7 +233,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         {
             var parsed = MutatorParams.fromString(value.Text);
             if (parsed.IsError) return value.Text;
-            var resized = MutatorParams.withSortingWidth(width, parsed.ResultValue);
+            var resized = MutatorParams.withChannelCount(width, parsed.ResultValue);
             return Equals(resized, parsed.ResultValue) ? value.Text : MutatorParams.toString(resized);
         }).Distinct(StringComparer.Ordinal).ToArray();
         SetupSection.Rows[SetupSection.Rows.IndexOf(row)] = new ParameterRow(row.Key, values, row.Definition);
@@ -281,7 +285,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool HasPendingParameter => SetupSection.IsAdding || ExecutionSection.IsAdding;
     public bool HasUnsavedChanges => IsDirty || HasPendingParameter;
     public string DirtyLabel => HasPendingParameter ? "Finish adding the parameter, or cancel" : IsDirty ? "Unsaved changes" : "";
-    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); Changed(nameof(IsProgressIndeterminate)); Changed(nameof(CanSelectPrefixWidth)); Changed(nameof(CanSelectMergeWidth)); SaveStateChanged(); GenerationChanged(); } }
+    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); Changed(nameof(IsProgressIndeterminate)); Changed(nameof(CanSelectPrefixChannelCount)); Changed(nameof(CanSelectMergeChannelCount)); SaveStateChanged(); GenerationChanged(); } }
     public bool IsReady => !IsBusy;
     public string Status { get => status; set { status = value; Changed(); } }
     public string FirstReplica { get => firstReplica; set => EditGeneration(ref firstReplica, value); }
@@ -447,24 +451,24 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]> Build()
     {
         var built = RunTypeEditor.build(editorTemplate, Snapshot());
-        if (HasPrefixWidthSelection && SelectedPrefixSortingWidth is int width
+        if (HasPrefixChannelCountSelection && SelectedPrefixChannelCount is int width
             && PrefixSection.Rows.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
-                .Any(value => PrefixWidth(value.Text) != width))
+                .Any(value => PrefixChannelCount(value.Text) != width))
         {
-            var issue = validationIssue.create((HasSetup ? "Setup." : "Processing.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with sorting width {width}.");
+            var issue = validationIssue.create((HasSetup ? "Setup." : "Processing.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with channel count {width}.");
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
                 built.IsError ? [.. built.ErrorValue, issue] : [issue]);
         }
-        if (HasMergeWidthSelection)
+        if (HasMergeChannelCountSelection)
         {
-            var error = MergeWidthError;
-            var field = "SortingWidth";
-            if (error.Length == 0 && ParsedMergeSortingWidth is int mergeWidth
+            var error = MergeChannelCountError;
+            var field = "ChannelCount";
+            if (error.Length == 0 && ParsedMergeChannelCount is int mergeChannelCount
                 && MergeSection.Rows.Where(row => row.Key == ParamKeys.mergeLibIdKey).SelectMany(row => row.Values)
-                    .Any(value => MergeWidth(value.Text) != mergeWidth))
+                    .Any(value => MergeChannelCount(value.Text) != mergeChannelCount))
             {
                 field = (HasSetup ? "Setup." : "Processing.") + ParamKeys.mergeLibIdKey;
-                error = $"Choose merges with sorting width {mergeWidth}.";
+                error = $"Choose merges with channel count {mergeChannelCount}.";
             }
             if (error.Length > 0)
             {
@@ -480,9 +484,9 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         foreach (var name in new[] { nameof(SelectedRunType), nameof(Examples), nameof(SelectedExample), nameof(WorkflowName),
             nameof(WorkflowDescription), nameof(Catalogs), nameof(Parameters), nameof(IsEvolution), nameof(SourceDescription),
-            nameof(HasSetup), nameof(HasSgdSourceSelection), nameof(PhaseHelp), nameof(HasPrefixWidthSelection), nameof(PrefixSortingWidths),
-            nameof(SelectedPrefixSortingWidth), nameof(CanSelectPrefixWidth), nameof(HasMergeWidthSelection), nameof(MergeSortingWidths),
-            nameof(SelectedMergeSortingWidth), nameof(CanSelectMergeWidth), nameof(MergeWidthError) }) Changed(name);
+            nameof(HasSetup), nameof(HasSgdSourceSelection), nameof(PhaseHelp), nameof(HasPrefixChannelCountSelection), nameof(PrefixChannelCounts),
+            nameof(SelectedPrefixChannelCount), nameof(CanSelectPrefixChannelCount), nameof(HasMergeChannelCountSelection), nameof(MergeChannelCounts),
+            nameof(SelectedMergeChannelCount), nameof(CanSelectMergeChannelCount), nameof(MergeChannelCountError) }) Changed(name);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -531,8 +535,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (e.PropertyName != nameof(ParameterSectionViewModel.IsAdding)) return;
         Changed(nameof(HasPendingParameter)); Changed(nameof(HasUnsavedChanges)); Changed(nameof(DirtyLabel));
-        Changed(nameof(CanSelectPrefixWidth));
-        Changed(nameof(CanSelectMergeWidth));
+        Changed(nameof(CanSelectPrefixChannelCount));
+        Changed(nameof(CanSelectMergeChannelCount));
         SaveStateChanged();
         GenerationChanged();
         if (!loading)
@@ -559,13 +563,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         try
         {
             SetupSection.CancelAdd(); ExecutionSection.CancelAdd();
-            var prefixWidths = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.prefixLibIdKey)
-                .SelectMany(row => row.Values).Select(PrefixWidth).Distinct().ToArray();
-            selectedPrefixSortingWidth = prefixWidths.Length == 1 ? prefixWidths[0] : null;
-            var mergeWidths = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.mergeLibIdKey)
-                .SelectMany(row => row.Values).Select(MergeWidth).Distinct().ToArray();
-            selectedMergeSortingWidth = mergeWidths.Length == 1 ? mergeWidths[0]?.ToString(CultureInfo.InvariantCulture) ?? "" : "";
-            mergeWidthEdited = false;
+            var prefixChannelCounts = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.prefixLibIdKey)
+                .SelectMany(row => row.Values).Select(PrefixChannelCount).Distinct().ToArray();
+            selectedPrefixChannelCount = prefixChannelCounts.Length == 1 ? prefixChannelCounts[0] : null;
+            var mergeChannelCounts = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.mergeLibIdKey)
+                .SelectMany(row => row.Values).Select(MergeChannelCount).Distinct().ToArray();
+            selectedMergeChannelCount = mergeChannelCounts.Length == 1 ? mergeChannelCounts[0]?.ToString(CultureInfo.InvariantCulture) ?? "" : "";
+            mergeChannelCountEdited = false;
             var defaults = draft.SetupParameters.Concat(draft.ExecutionParameters).ToArray();
             SetupSection.Configure(Parameters.Where(spec => RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray(), defaults);
             ExecutionSection.Configure(Parameters.Where(spec => spec.ExecutionAllowed).ToArray(), defaults);

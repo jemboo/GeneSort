@@ -16,7 +16,7 @@ module CeBlockOpsBinary =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let mutable unsortedCount = 0
             let ces = ceBlk.CeArray
-            let sw = sbts.SortingWidth
+            let sw = sbts.ChannelCount
             let pool = ArrayPool<bool>.Shared
 
             for sba in sbts.SortableBinaryArrays do
@@ -26,9 +26,9 @@ module CeBlockOpsBinary =
                 for i = 0 to ces.Length - 1 do
                     let ce = ces.[i]
                     // Boolean Comparison: true (1) > false (0)
-                    if workArray.[ce.Low] && not workArray.[ce.Hi] then
-                        workArray.[ce.Low] <- false
-                        workArray.[ce.Hi] <- true
+                    if workArray.[(int ce.LowChannel)] && not workArray.[(int ce.HighChannel)] then
+                        workArray.[(int ce.LowChannel)] <- false
+                        workArray.[(int ce.HighChannel)] <- true
                         ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
 
                 // A bool array is sorted if it's in the form [false, false, ..., true, true]
@@ -52,7 +52,7 @@ module CeBlockOpsBinary =
     let evalAndCollectNewSortableTests (sbts: sortableBinaryTests) (prefix: ceBlock) (ceBlk: ceBlock) :ceBlockEval =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let ces = ceBlk.CeArray
-            let sw = sbts.SortingWidth
+            let sw = sbts.ChannelCount
             let pool = ArrayPool<bool>.Shared
             // Ensure SortableBoolArrayValueComparer is defined similarly to the Int version
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
@@ -64,9 +64,9 @@ module CeBlockOpsBinary =
                 for i = 0 to ces.Length - 1 do
                     let ce = ces.[i]
                     // Boolean Comparison: true (1) > false (0)
-                    if workArray.[ce.Low] && not workArray.[ce.Hi] then
-                        workArray.[ce.Low] <- false
-                        workArray.[ce.Hi] <- true
+                    if workArray.[(int ce.LowChannel)] && not workArray.[(int ce.HighChannel)] then
+                        workArray.[(int ce.LowChannel)] <- false
+                        workArray.[(int ce.HighChannel)] <- true
                         ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
 
                 // A bool array is sorted if it's in the form [false, false, ..., true, true]
@@ -98,9 +98,9 @@ module CeBlockOpsBinary =
 
     let evalAndDedupeCeFetch (sbts: sortableBinaryTests) (prefix: ceBlock) (ceBlK: ceBlock) :ceBlockEval =
             let ceUseCounts = ceUseCounts.Create ceBlK.CeLength
-            let lows = Array.init %ceBlK.CeLength (fun i -> ceBlK.CeArray.[i].Low)
-            let highs = Array.init %ceBlK.CeLength (fun i -> ceBlK.CeArray.[i].Hi)
-            let sw = sbts.SortingWidth
+            let lows = Array.init %ceBlK.CeLength (fun i -> (int ceBlK.CeArray.[i].LowChannel))
+            let highs = Array.init %ceBlK.CeLength (fun i -> (int ceBlK.CeArray.[i].HighChannel))
+            let sw = sbts.ChannelCount
             let pool = ArrayPool<bool>.Shared
             let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
 
@@ -147,7 +147,7 @@ module CeBlockOpsBinary =
         let ces = ceBlK.CeArray
         let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
-        let sw = %sbts.SortingWidth
+        let sw = %sbts.ChannelCount
         let pool = ArrayPool<bool>.Shared
         let results = HashSet<sortableBoolArray>(SortableBoolArray.SortableBoolArrayValueComparer())
         
@@ -160,12 +160,12 @@ module CeBlockOpsBinary =
 
             for i = 0 to %ceLen - 1 do
                 let ce = ces.[i]
-                let a = Unsafe.Add(&baseRef, ce.Low)
-                let b = Unsafe.Add(&baseRef, ce.Hi)
+                let a = Unsafe.Add(&baseRef, (int ce.LowChannel))
+                let b = Unsafe.Add(&baseRef, (int ce.HighChannel))
                 
                 if a && not b then
-                    Unsafe.Add(&baseRef, ce.Low) <- false
-                    Unsafe.Add(&baseRef, ce.Hi) <- true
+                    Unsafe.Add(&baseRef, (int ce.LowChannel)) <- false
+                    Unsafe.Add(&baseRef, (int ce.HighChannel)) <- true
                     ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
 
             let isSortedNow = 
@@ -179,8 +179,8 @@ module CeBlockOpsBinary =
             if not isSortedNow then
                 let finalValues = Array.zeroCreate sw
                 workSpan.CopyTo(finalValues.AsSpan())
-                results.Add(sortableBoolArray.create(finalValues, sbts.SortingWidth)) |> ignore
+                results.Add(sortableBoolArray.create(finalValues, sbts.ChannelCount)) |> ignore
 
         pool.Return(workArray)
-        let newTests = Seq.toArray results |> (sortableBinaryTests.create (Guid.NewGuid() |> UMX.tag) sbts.SortingWidth)
+        let newTests = Seq.toArray results |> (sortableBinaryTests.create (Guid.NewGuid() |> UMX.tag) sbts.ChannelCount)
         ceBlockEval.create prefix ceBlK ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTests.Bools newTests))

@@ -32,7 +32,7 @@ type msasO =
     member this.Id with get() = this.id
     member this.MaxOrbit with get() = this.maxOrbit 
     member this.SeedPermutation with get() = this.seedPermutation
-    member this.SortingWidth with get() = (%this.seedPermutation.Order |> UMX.tag<sortingWidth>)
+    member this.ChannelCount with get() = (%this.seedPermutation.Order |> UMX.tag<channelCount>)
 
     override this.Equals(obj) =
         match obj with
@@ -56,14 +56,14 @@ type msasO =
             |> Array.distinct
         sortableBinaryTests.create 
                 sorterTestId 
-                this.SortingWidth
+                this.ChannelCount
                 bArrays
 
     member this.MakeSortableIntTest 
             (sorterTestId: Guid<sortableTestsId>) : sortableIntTests =
         sortableIntTests.create 
                 sorterTestId 
-                this.SortingWidth
+                this.ChannelCount
                 this.sortableIntArrays
 
 

@@ -46,6 +46,6 @@ module SorterDataParse =
         (SorterLib.tryGet sorterKey) |> Option.map (parseTo2dCeArray)
 
     let getCeArrayFromMergeLib (mergeKey:mergeLibId) : ce array array option =
-        let sorterKey = sorterLibId.create mergeKey.FactorSortingWidth mergeKey.SorterLibVariant
+        let sorterKey = sorterLibId.create mergeKey.FactorChannelCount mergeKey.SorterLibVariant
         let ceArrayOpt = (SorterLib.tryGet sorterKey) |> Option.map (parseTo2dCeArray)
-        ceArrayOpt |> Option.map (Ce.mergeN mergeKey.MergeDimension mergeKey.SortingWidth)
+        ceArrayOpt |> Option.map (Ce.mergeN mergeKey.MergeDimension mergeKey.ChannelCount)

@@ -103,8 +103,8 @@ The `standardMsuf32R` / `sossMsuf32R` setup enhancer entries default AMax to 3;
 the `evoMsuf32R` / `sossMsuf32R` execution enhancers default activator mutation
 rate to 0.1. Explicit spans override these defaults. Invalid activation settings
 are rejected during parameter preparation. These presets use the existing prefix
-seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Width32`
-and `SortableTests.Prefix.Width32` before setup. Automatic naming produces
+seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Channels32`
+and `SortableTests.Prefix.Channels32` before setup. Automatic naming produces
 project `SorterSgd.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
 and run names matching the preset functions.
 Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleR`; it prepares
@@ -246,8 +246,8 @@ From the repository root, run the complete OnePool batch with:
 .\scripts\Run-OnePool.ps1
 ```
 
-The script builds its runner, prepares the `SortableTests.Prefix.Width32`
-and `SorterEval.Prefix.Width32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
+The script builds its runner, prepares the `SortableTests.Prefix.Channels32`
+and `SorterEval.Prefix.Channels32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
 and completes setup, execution, and the evolution summary report for each preset.
 Source presets finish before any dependent Append or Condense presets. It runs
 replica 0, defaults to eight parallel jobs within each phase, respects each preset's

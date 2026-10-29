@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Sorting.Sortable
 
 open System
 open System.Collections.Generic
@@ -11,37 +11,37 @@ open GeneSort.Sorting.Sorter
 module BinaryIntArrays =
 
     let getAllBinaryIntArrays (sia:sortableIntArray) : sortableIntArray[] =
-        if sia.SortingWidth <= 1<sortingWidth> then
+        if sia.ChannelCount <= 1<channelCount> then
             [||]
         else
-            let thresholds = [| 0 .. %sia.sortingWidth |]
+            let thresholds = [| 0 .. %sia.channelCount |]
             thresholds 
             |> Array.map (
                 fun threshold ->
                     let z1Vals = sia.Values |> Array.map (fun v -> if v >= threshold then 1 else 0)
-                    sortableIntArray.create(z1Vals, sia.SortingWidth, 2 |> UMX.tag<symbolSetSize>))
+                    sortableIntArray.create(z1Vals, sia.ChannelCount, 2 |> UMX.tag<symbolSetSize>))
 
 
-    /// Returns all possible sortableBoolArray instances for a given sorting width.
-    /// <exception cref="ArgumentException">Thrown when sortingWidth is negative.</exception>
-    let getAllBinaryIntArraysForSortingWidth (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let count = pown 2 (int sortingWidth)
+    /// Returns all possible sortableBoolArray instances for a given channel count.
+    /// <exception cref="ArgumentException">Thrown when channelCount is negative.</exception>
+    let getAllBinaryIntArraysForChannelCount (channelCount: int<channelCount>) : sortableIntArray[] =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        let count = pown 2 (int channelCount)
         let result = Array.zeroCreate count
         for i = 0 to count - 1 do
-            let z1Vals = Array.init (int sortingWidth) (fun j -> (i >>> j) &&& 1)
-            result.[i] <- sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>)
+            let z1Vals = Array.init (int channelCount) (fun j -> (i >>> j) &&& 1)
+            result.[i] <- sortableIntArray.create(z1Vals, channelCount, 2 |> UMX.tag<symbolSetSize>)
         result
 
 
-    let getAllSortedBinaryIntArrays (sortingWidth: int<sortingWidth>) : sortableIntArray[] =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let n = int sortingWidth
+    let getAllSortedBinaryIntArrays (channelCount: int<channelCount>) : sortableIntArray[] =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        let n = int channelCount
         Array.init (n + 1) (fun k ->
             let z1Vals = Array.init n (fun i -> if i >= n - k then 1 else 0)
-            sortableIntArray.create(z1Vals, sortingWidth, 2 |> UMX.tag<symbolSetSize>))
+            sortableIntArray.create(z1Vals, channelCount, 2 |> UMX.tag<symbolSetSize>))
 
 
     let fromLatticePoint 
@@ -68,7 +68,7 @@ module BinaryIntArrays =
 
         sortableIntArray.create(
             z1Vals, 
-            totalWidth |> UMX.tag<sortingWidth>, 
+            totalWidth |> UMX.tag<channelCount>,
             2 |> UMX.tag<symbolSetSize>
         )
 

@@ -184,12 +184,12 @@ let ``parameter refinement enhances every parameter combination`` () =
     let host = runHost.Create configuredRun 1
     let inputs =
         [| for width in [ 3; 4; 5; 8 ] ->
-            emptyParameters.WithSortingWidth(Some (UMX.tag<sortingWidth> width))
+            emptyParameters.WithChannelCount(Some (UMX.tag<channelCount> width))
                 .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4) |]
     let results = host.ParamMapRefiner inputs |> Seq.toArray
     Assert.Equal(inputs.Length, results.Length)
     Array.iter2 (fun (input: runParameters) (result: runParameters) ->
-        Assert.Equal(input.GetSortingWidth(), result.GetSortingWidth())
+        Assert.Equal(input.GetChannelCount(), result.GetChannelCount())
         Assert.Equal(Some false, result.GetRunFinished())) inputs results
 
 [<Fact>]
@@ -480,7 +480,7 @@ let ``run labels do not change explicit maker names`` () =
 let ``seed catalogs produce the requested pool variant`` (name: string) (expectSoss: bool) =
     ProjectCatalogs.registerAll ()
     let evaluation =
-        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<sortingWidth> 3<sortableCount>
+        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<channelCount> 3<sortableCount>
             (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
             (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
     let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
@@ -491,10 +491,10 @@ let ``seed catalogs produce the requested pool variant`` (name: string) (expectS
             LoadPrefixSorterEvals = fun _ _ _ -> async { return Ok evaluations }
     }
     let parameters =
-        emptyParameters.WithSortingWidth(Some 32<sortingWidth>)
+        emptyParameters.WithChannelCount(Some 32<channelCount>)
             .WithRepl(Some 0<replNumber>)
-            .WithMergeLibId(Some (mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA))
-            .WithPrefixLibId(Some (prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA))
+            .WithMergeLibId(Some (mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA))
+            .WithPrefixLibId(Some (prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA))
             .WithSorterPoolCount(Some 1<sorterPoolCount>)
             .WithSorterCountPerPool(Some 1<sorterCountPerPool>)
             .WithSorterEvalMeasureInitial(Some (stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength))
@@ -569,7 +569,7 @@ let ``project catalogs initialize together without dispatch dependencies`` () =
 let ``Project report catalog uses supplied storage and run identity without a Dispatch host`` () =
     let configured = makeSimpleRun ExecuteFunctionNames.sorterEval
     let evaluation =
-        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<sortingWidth> 3<sortableCount>
+        sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<channelCount> 3<sortableCount>
             (UMX.tag 7) 2<stageLength> [||] (UMX.tag<isReflectionSymmetric> false)
             (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2
     let evaluations = sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) [|evaluation|]
@@ -616,7 +616,7 @@ let ``Project report catalog uses supplied storage and run identity without a Di
 
 [<Fact>]
 let ``merge test maker uses the supplied storage sources`` () =
-    let library = mergeLibId.create 16<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+    let library = mergeLibId.create 16<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
     let parameters = emptyParameters.WithMergeLibId(Some library).WithSortableDataFormat(Some sortableDataFormat.BitVector512)
     let mutable called = false
     let loadMergeTests (repl: int<replNumber>) actualLibrary format =

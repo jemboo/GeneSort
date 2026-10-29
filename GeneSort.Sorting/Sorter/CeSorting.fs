@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open System
@@ -14,8 +14,8 @@ module CeSorting =
 
         for i = 0 to ces.Length - 1 do
             let ce = ces.[i]
-            let lowIdx = ce.Low
-            let hiIdx = ce.Hi
+            let lowIdx = (int ce.LowChannel)
+            let hiIdx = (int ce.HighChannel)
             
             if values.[lowIdx] > values.[hiIdx] then
                 let temp = values.[lowIdx]
@@ -31,8 +31,8 @@ module CeSorting =
 
         for i = 0 to ces.Length - 1 do
             let ce = ces.[i]
-            let a = values.[ce.Low]
-            let b = values.[ce.Hi]
+            let a = values.[(int ce.LowChannel)]
+            let b = values.[(int ce.HighChannel)]
         
             // Tracking "uses" still requires a branch, but we can make it branchless too!
             let diff = if a > b then 1 else 0
@@ -40,8 +40,8 @@ module CeSorting =
         
             let mask = -diff
             let t = (a ^^^ b) &&& mask
-            values.[ce.Low] <- a ^^^ t
-            values.[ce.Hi] <- b ^^^ t
+            values.[(int ce.LowChannel)] <- a ^^^ t
+            values.[(int ce.HighChannel)] <- b ^^^ t
         values
 
 
@@ -54,10 +54,10 @@ module CeSorting =
 
         for i = 0 to ces.Length - 1 do
             let ce = ces.[i]
-            if values.[ce.Low] > values.[ce.Hi] then
-                let temp = values.[ce.Low]
-                values.[ce.Low] <- values.[ce.Hi]
-                values.[ce.Hi] <- temp
+            if values.[(int ce.LowChannel)] > values.[(int ce.HighChannel)] then
+                let temp = values.[(int ce.LowChannel)]
+                values.[(int ce.LowChannel)] <- values.[(int ce.HighChannel)]
+                values.[(int ce.HighChannel)] <- temp
                 useCounter.[i] <- useCounter.[i] + 1
         values
 
@@ -73,10 +73,10 @@ module CeSorting =
         for i = 0 to ces.Length - 1 do
             let ce = ces.[i]
             result.[i + 1] <- Array.copy result.[i]
-            if result.[i + 1].[ce.Low] > result.[i + 1].[ce.Hi] then
-                let temp = result.[i + 1].[ce.Low]
-                result.[i + 1].[ce.Low] <- result.[i + 1].[ce.Hi]
-                result.[i + 1].[ce.Hi] <- temp
+            if result.[i + 1].[(int ce.LowChannel)] > result.[i + 1].[(int ce.HighChannel)] then
+                let temp = result.[i + 1].[(int ce.LowChannel)]
+                result.[i + 1].[(int ce.LowChannel)] <- result.[i + 1].[(int ce.HighChannel)]
+                result.[i + 1].[(int ce.HighChannel)] <- temp
                 useCounter.[i] <- useCounter.[i] + 1
         result
 

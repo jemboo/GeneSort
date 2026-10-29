@@ -50,10 +50,10 @@ module CeBlockOpsBitv512 =
         let numNetworks = ceBlocks.Length
         if numNetworks = 0 then [||] else
 
-        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
+        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.ChannelCount) |> (fun c -> %c.ChannelCount)
         let networkData = ceBlocks |> Array.map (fun ceb -> 
-            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
-               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
+            {| Lows = ceb.CeArray |> Array.map (fun c -> (int c.LowChannel))
+               Highs = ceb.CeArray |> Array.map (fun c -> (int c.HighChannel))
                CeLen = ceb.CeArray.Length |})
 
         let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
@@ -141,11 +141,11 @@ module CeBlockOpsBitv512 =
         let numNetworks = ceBlocks.Length
         if numNetworks = 0 then [||] else
 
-        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.SortingWidth) |> (fun c -> %c.SortingWidth)
+        let maxWidth = ceBlocks |> Array.maxBy (fun c -> %c.ChannelCount) |> (fun c -> %c.ChannelCount)
         let networkData = ceBlocks |> Array.map (fun ceb -> 
-            {| Lows = ceb.CeArray |> Array.map (fun c -> c.Low)
-               Highs = ceb.CeArray |> Array.map (fun c -> c.Hi)
-               SortingWidth = ceb.SortingWidth
+            {| Lows = ceb.CeArray |> Array.map (fun c -> (int c.LowChannel))
+               Highs = ceb.CeArray |> Array.map (fun c -> (int c.HighChannel))
+               ChannelCount = ceb.ChannelCount
                CeLen = ceb.CeArray.Length |})
 
         let globalUsage = Array.init numNetworks (fun i -> ceUseCounts.Create(ceBlocks.[i].CeLength))
@@ -221,7 +221,7 @@ module CeBlockOpsBitv512 =
 
             let failTest = 
                 if uniqueFailures.Length > 0 then
-                    let sw = ceBlocks.[i].SortingWidth
+                    let sw = ceBlocks.[i].ChannelCount
                     let sss = 2 |> UMX.tag<symbolSetSize> // Bit-packed is always 0-1
                     uniqueFailures 
                     |> Array.map (fun arr -> sortableIntArray.create(arr, sw, sss))

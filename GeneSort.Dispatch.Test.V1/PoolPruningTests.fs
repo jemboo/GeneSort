@@ -15,11 +15,11 @@ open GeneSort.Eval.V1.Sgd.Standard
 open GeneSort.Eval.V1.Sgd.Soss
 
 let private prune soss debug filterUnsorted (capacity: int) (samples: (int * int) option array) =
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> [|1|] |> simpleSorterModel.Msce |> sorterModel.Simple
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> [|1|] |> simpleSorterModel.Msce |> sorterModel.Simple
     let measure = ceLengthMeasure.create filterUnsorted false |> sorterEvalMeasure.CeLength
     let evaluations = samples |> Array.mapi (fun index sample ->
         sample |> Option.map (fun (unsorted, length) ->
-            sorterEvalV1.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<sortingWidth>
+            sorterEvalV1.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 32<channelCount>
                 (UMX.tag unsorted) (UMX.tag index) (UMX.tag length) 1<stageLength> (UMX.tag length)
                 (UMX.tag false) (UMX.tag 0) (UMX.tag 0) |> sorterEval.V1))
     let chosen =

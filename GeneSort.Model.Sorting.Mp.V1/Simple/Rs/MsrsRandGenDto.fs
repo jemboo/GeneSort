@@ -1,4 +1,4 @@
-﻿
+
 
 namespace GeneSort.Model.Sorting.Mp.V1.Simple.Rs
 
@@ -9,7 +9,7 @@ open GeneSort.Sorting
 open GeneSort.Model.Sorting.V1.Simple.Rs
 
 type msrsRandGenDto = 
-    { sortingWidth: int
+    { channelCount: int
       stageLength: int 
       rngFactoryDto: rngFactoryDto
       opsGenRatesDto: opsGenRatesDto }
@@ -17,7 +17,7 @@ type msrsRandGenDto =
 module MsrsRandGenDto =
 
     let fromDomain (msrsRandGen: msrsRandGen) : msrsRandGenDto =
-        { sortingWidth = %msrsRandGen.SortingWidth
+        { channelCount = %msrsRandGen.ChannelCount
           stageLength = %msrsRandGen.StageLength
           rngFactoryDto = msrsRandGen.RngFactory |> RngFactoryDto.fromDomain
           opsGenRatesDto = OpsGenRatesDto.fromDomain msrsRandGen.OpsGenRates }
@@ -25,7 +25,7 @@ module MsrsRandGenDto =
     let toDomain (dto: msrsRandGenDto) : msrsRandGen =
         msrsRandGen.create
             (dto.rngFactoryDto |> RngFactoryDto.toDomain)
-            (UMX.tag<sortingWidth> dto.sortingWidth)
+            (UMX.tag<channelCount> dto.channelCount)
             (OpsGenRatesDto.toDomain dto.opsGenRatesDto)
             (UMX.tag<stageLength> dto.stageLength)
 

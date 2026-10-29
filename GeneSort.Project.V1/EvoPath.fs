@@ -219,9 +219,9 @@ type evoPath = private {
         this.settings.TryFind ParamKeys.sorterPoolSelectionIntervalsKey
         |> Option.map (fun v -> GenIntervalConfig.fromString(v))
 
-    member this.GetSortingWidth() =
-        ParamKeys.tryGetInt ParamKeys.sortingWidthKey this.settings
-        |> Option.map UMX.tag<sortingWidth>
+    member this.GetChannelCount() =
+        ParamKeys.tryGetInt ParamKeys.channelCountKey this.settings
+        |> Option.map UMX.tag<channelCount>
 
 /// A continuation becomes Ready only after Setup binds its validated checkpoint.
 type evoPathPreparation =

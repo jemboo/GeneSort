@@ -6,20 +6,20 @@ open GeneSort.Sorting.Sortable
 
 
 type sortableTestsModel =
-     | MsasF of msasF      // MsasF = a full bool test set for a given sorting width
+     | MsasF of msasF      // MsasF = a full bool test set for a given channel count
      | MsasO of msasO      // MsasO = generated from a seed permutation; for bool models, it's expanded from the integer permutations
-     | MsasMi of msasM     // All (sorting width)/2 merge test cases
+     | MsasMi of msasM     // All (channel count)/2 merge test cases
      | MsasPfx of msasPfx  // For testing sorters with a fixed prefix - an MsasF that's reduced by the prefix ce's.
 
 
 module SortableTestsModel =
 
-    let getSortingWidth (simpleSortableTM: sortableTestsModel): int<sortingWidth> =
+    let getChannelCount (simpleSortableTM: sortableTestsModel): int<channelCount> =
         match simpleSortableTM with
-        | MsasF msasF -> msasF.sortingWidth
-        | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<sortingWidth>
-        | MsasMi msasMi -> msasMi.sortingWidth
-        | MsasPfx msasPfx -> msasPfx.SortingWidth
+        | MsasF msasF -> msasF.channelCount
+        | MsasO msasO -> %msasO.SeedPermutation.Order |> UMX.tag<channelCount>
+        | MsasMi msasMi -> msasMi.channelCount
+        | MsasPfx msasPfx -> msasPfx.ChannelCount
 
     let makeSortableTests 
             (sorterTestId: Guid<sortableTestsId>)
@@ -31,17 +31,17 @@ module SortableTestsModel =
         | MsasF msasF -> 
                 match sortableDF with
                 | sortableDataFormat.BoolArray ->        
-                    (msasF.MakeSortableBoolTest sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Bools
+                    (msasF.MakeSortableBoolTest sorterTestId (getChannelCount sortableTM)) |> sortableTests.Bools
                 | sortableDataFormat.IntArray ->
-                    (msasF.MakeSortableIntTest sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Ints
+                    (msasF.MakeSortableIntTest sorterTestId (getChannelCount sortableTM)) |> sortableTests.Ints
                 | sortableDataFormat.BitVector256 ->
                     failwith "BitVector256 SortableArrayType not supported"
                 | sortableDataFormat.BitVector512 ->
-                    (msasF.MakeSortableBitv512Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Bitv512
+                    (msasF.MakeSortableBitv512Test sorterTestId (getChannelCount sortableTM)) |> sortableTests.Bitv512
                 | sortableDataFormat.Int8Vector256 ->
-                    (msasF.MakeSortableUint8v256Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Uint8v256
+                    (msasF.MakeSortableUint8v256Test sorterTestId (getChannelCount sortableTM)) |> sortableTests.Uint8v256
                 | sortableDataFormat.Int8Vector512  -> 
-                    (msasF.MakeSortableUint8v512Test sorterTestId (getSortingWidth sortableTM)) |> sortableTests.Uint8v512
+                    (msasF.MakeSortableUint8v512Test sorterTestId (getChannelCount sortableTM)) |> sortableTests.Uint8v512
                 | sortableDataFormat.PackedIntArray ->
                     failwith "PackedIntArray SortableArrayType not supported"
 

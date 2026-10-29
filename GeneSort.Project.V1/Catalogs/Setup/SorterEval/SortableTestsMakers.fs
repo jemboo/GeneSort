@@ -34,15 +34,15 @@ module SortableTestsMakers =
     let makeStandardTests (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {
-                let! sortingWidth = rp.GetSortingWidth()
+                let! channelCount = rp.GetChannelCount()
                 let! sdf = rp.GetSortableDataFormat()
                 let sortableTestsId = Guid.NewGuid() |> UMX.tag
-                return (sortingWidth, sdf, sortableTestsId)
+                return (channelCount, sdf, sortableTestsId)
             }
 
             match paramsOpt with
-            | Some (sortingWidth, sdf, sortableTestsId) ->
-                let testModel = msasF.create sortingWidth |> sortableTestsModel.MsasF
+            | Some (channelCount, sdf, sortableTestsId) ->
+                let testModel = msasF.create channelCount |> sortableTestsModel.MsasF
                 let test = SortableTestsModel.makeSortableTests sortableTestsId testModel sdf
                 return Ok (test, [||])
             | None ->

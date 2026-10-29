@@ -25,7 +25,7 @@ type msasPfx =
 
     member this.Id with get() = this.id
     member this.PfxLibId with get() = this.pfxLibId
-    member this.SortingWidth with get() = this.pfxLibId.SortingWidth
+    member this.ChannelCount with get() = this.pfxLibId.ChannelCount
     member this.StageLength with get() = this.pfxLibId.StageLength
 
     override this.Equals(obj) =
@@ -46,11 +46,11 @@ type msasPfx =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
-                        this.SortingWidth
+                        this.ChannelCount
                       |> Seq.toArray
         sortableBinaryTests.create 
                 sorterTestId 
-                this.SortingWidth
+                this.ChannelCount
                 bArrays
 
     member this.MakeSortableBitv512Test 
@@ -58,9 +58,9 @@ type msasPfx =
         let ceArray = (SorterDataParse.getCeArrayFromPrefixLib this.PfxLibId).Value
         let bArrays = SortableBoolArray.getAllPossibleResultsFromCeArray
                         ceArray
-                        this.SortingWidth
+                        this.ChannelCount
                       |> Seq.toArray
-        SortableBitv512Tests.fromBoolArrays sorterTestId this.SortingWidth bArrays
+        SortableBitv512Tests.fromBoolArrays sorterTestId this.ChannelCount bArrays
 
 
 

@@ -10,21 +10,21 @@ open GeneSort.Sorting
 type sortableBitv512Tests =
     private { 
         id: Guid<sortableTestsId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         simdSortBlocks: sortBlockBitv512[] 
     }
 
     static member create 
             (id: Guid<sortableTestsId>) 
-            (sw: int<sortingWidth>) 
+            (sw: int<channelCount>)
             (blocks: sortBlockBitv512[]) =
         { id = id
-          sortingWidth = sw
+          channelCount = sw
           simdSortBlocks = blocks }
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableBitv512Tests.create id 0<sortingWidth> [||]
+        sortableBitv512Tests.create id 0<channelCount> [||]
 
     member this.Id with get() = this.id
 
@@ -37,7 +37,7 @@ type sortableBitv512Tests =
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
         
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
 
 
@@ -45,7 +45,7 @@ module SortableBitv512Tests =
 
     let fromBoolArrays
         (id: Guid<sortableTestsId>)
-        (sw: int<sortingWidth>) 
+        (sw: int<channelCount>)
         (sortableBoolArrays: sortableBoolArray[]) : sortableBitv512Tests =
         
         let width = %sw

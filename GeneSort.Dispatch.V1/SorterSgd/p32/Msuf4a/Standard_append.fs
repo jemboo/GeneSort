@@ -40,8 +40,10 @@ let Test () : run =
 
 
 
+let description = "Continue Standard 32-input Msuf4a evolution from saved pools."
+
 let runType =
-    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", [|
+    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", description, [|
         runExample("Test", Test)
     |])
 
@@ -75,8 +77,10 @@ module Pool_128 =
         |> EvoAppend.createStandard
 
 
+    let description = "Continue Standard 32-input Msuf4a evolution from saved pools (Pool_128)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", description, [|
             runExample("V1", V1)
         |])
 
@@ -108,7 +112,9 @@ module Pool_512 =
         }
         |> EvoAppend.createStandard
 
+    let description = "Continue Standard 32-input Msuf4a evolution from saved pools (Pool_512)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", description, [|
             runExample("V1", V1)
         |])

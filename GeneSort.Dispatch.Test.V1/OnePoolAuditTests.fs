@@ -73,15 +73,15 @@ let ``Controlled seeds pair model arrays and masks across replicas and workflows
 [<Fact>]
 let ``Controlled audit rejects changed arrays masks IDs and missing models`` () =
     let id = UMX.tag (System.Guid.NewGuid())
-    let source = msce.create id 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
+    let source = msce.create id 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
     let plain = [|sorterModel.Simple source|]
     let bounded = [|simpleSorterModelR.create source 3 [|-3; 0; 2|] |> sorterModel.SimpleR|]
     let boolean = [|simpleSorterModelS.create source [|false; false; true|] |> sorterModel.SimpleS|]
     verifyControlledSeeds plain bounded boolean
     rejects "masks differ" (fun () -> verifyControlledSeeds plain bounded [|simpleSorterModelS.create source [|true; false; true|] |> sorterModel.SimpleS|])
-    let changed = msce.create id 4<sortingWidth> [|2; 1; 0|] |> simpleSorterModel.Msce
+    let changed = msce.create id 4<channelCount> [|2; 1; 0|] |> simpleSorterModel.Msce
     rejects "arrays differ" (fun () -> verifyControlledSeeds [|sorterModel.Simple changed|] bounded boolean)
-    let other = msce.create (UMX.tag (System.Guid.NewGuid())) 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
+    let other = msce.create (UMX.tag (System.Guid.NewGuid())) 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
     rejects "IDs differ" (fun () -> verifyControlledSeeds [|sorterModel.Simple other|] bounded boolean)
     rejects "no models" (fun () -> verifyControlledSeeds plain bounded [||])
 
@@ -99,7 +99,7 @@ let ``Reports preserve configured activator settings`` key =
 
 [<Fact>]
 let ``Saved models must match configured SimpleR bounds and model type`` () =
-    let source = msce.create (UMX.tag (System.Guid.NewGuid())) 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
+    let source = msce.create (UMX.tag (System.Guid.NewGuid())) 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
     let paired = simpleSorterModelR.create source 3 [|-3; 0; 3|] |> sorterModel.SimpleR
     let plain = sorterModel.Simple source
     verifyModelActivators (Some 3) [paired]
@@ -111,7 +111,7 @@ let ``Saved models must match configured SimpleR bounds and model type`` () =
 
 [<Fact>]
 let ``Audit rejects incorrect SimpleS family and conflicting activation settings`` () =
-    let source = msce.create (UMX.tag (System.Guid.NewGuid())) 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
+    let source = msce.create (UMX.tag (System.Guid.NewGuid())) 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
     let paired = simpleSorterModelS.create source [|true; false; true|] |> sorterModel.SimpleS
     verifyModelActivationParameters None (Some 0.5) [paired]
     rejects "Unexpected SimpleS" (fun () -> verifyModelActivationParameters None None [paired])

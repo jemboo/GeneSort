@@ -10,21 +10,21 @@ open GeneSort.Sorting
 type sortableUint8v512Tests =
     private { 
         id: Guid<sortableTestsId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         simdSortBlocks: sortBlockUint8v512[]
     }
 
     static member create 
             (id: Guid<sortableTestsId>) 
-            (sw: int<sortingWidth>) 
+            (sw: int<channelCount>)
             (blocks: sortBlockUint8v512[]) =
         { id = id
-          sortingWidth = sw
+          channelCount = sw
           simdSortBlocks = blocks }
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableUint8v512Tests.create id 0<sortingWidth> [||]
+        sortableUint8v512Tests.create id 0<channelCount> [||]
 
     member this.Id with get() = this.id
     member this.SimdSortBlocks with get() = this.simdSortBlocks
@@ -37,14 +37,14 @@ type sortableUint8v512Tests =
         |> Array.sumBy (fun block -> block.SortableCount) 
         |> UMX.tag<sortableCount>
         
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
 
 module SortableUint8v512Tests =
 
     let fromIntArrays
         (id: Guid<sortableTestsId>)
-        (sw: int<sortingWidth>) 
+        (sw: int<channelCount>)
         (allTests: sortableIntArray[]) : sortableUint8v512Tests =
 
         let totalTests = allTests.Length

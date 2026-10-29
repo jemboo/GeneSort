@@ -82,7 +82,7 @@ internal static partial class Program
             while (row.Values.Count > 1) row.Values.RemoveAt(row.Values.Count - 1);
             row.Values[0].Text = value;
         }
-        Set(ParamKeys.sortingWidthKey, "4");
+        Set(ParamKeys.channelCountKey, "4");
         Set(ParamKeys.sorterCountKey, "2");
         Set(ParamKeys.simpleSorterModelTypeKey, "Msce");
         var evalType = model.ExecutionParameters.Single(row => row.Key == ParamKeys.sorterEvalTypeKey);
@@ -115,7 +115,7 @@ internal static partial class Program
         Check(setupScroll.IsEnabled && setupList.IsEnabled, "Setup scrolling is disabled while busy.");
         setupScroll.ScrollToRightEnd(); Layout(view); Layout(view);
         Check(setupScroll.ScrollableWidth == 0 || setupScroll.HorizontalOffset > 0, "Setup table could not scroll while busy.");
-        Check(!Button(view, "Choose run…").IsEnabled && !Button(view, "Run Setup").IsEnabled,
+        Check(!Descendants<Button>(view).Single(button => button.ToolTip?.ToString() == "Back to this run module. Your editor changes are kept.").IsEnabled && !Button(view, "Run Setup").IsEnabled,
             "Run-changing controls became enabled while busy.");
         Check(!Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "Run name").IsEnabled,
             "Run metadata became editable while busy.");

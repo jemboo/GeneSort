@@ -40,10 +40,10 @@ module Prefix =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msceParamsR5 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msceParamsR5 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -83,10 +83,10 @@ module Prefix =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.mssiParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.mssiParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -126,10 +126,10 @@ module Prefix =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msrsParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msrsParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -169,10 +169,10 @@ module Prefix =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, [sorterSelectionType.ValueSpan 5<sorterCount>] |> List.map SorterSelectionType.toString)
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msuf4ParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msuf4ParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -220,8 +220,10 @@ module Prefix =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Compare mutations of sorting-network prefixes across model families."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", description, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

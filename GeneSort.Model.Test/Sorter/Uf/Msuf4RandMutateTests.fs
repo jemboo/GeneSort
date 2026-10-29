@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Test.Sorter.Uf
+namespace GeneSort.Model.Test.Sorter.Uf
 
 open System
 open EvoMergeSort.Core
@@ -21,7 +21,7 @@ type Msuf4RandMutateTests() =
         TwoOrbitUf4Ops.makeTwoOrbitUf4 (fun () -> 0.5) genRates
 
     // Helper function to create a valid Msuf4
-    let createTestMsuf4 (id: Guid<sorterModelID>) (width: int<sortingWidth>) (count: int) (seedType: SeedTypeUf4) =
+    let createTestMsuf4 (id: Guid<sorterModelID>) (width: int<channelCount>) (count: int) (seedType: SeedTypeUf4) =
         let tou = createTestTwoOrbitUnfolder4 (%width) seedType
         let touArray = Array.create count tou
         Msuf4.create id width touArray
@@ -139,7 +139,7 @@ type Msuf4RandMutateTests() =
     let ``makeId generates unique IDs`` () =
         let rngType = rngType.Lcg
         let stageCount = 1<stageCount>
-        let order = 4<sortingWidth>
+        let order = 4<channelCount>
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount %order 0.2 0.2 0.2 0.2 0.1 0.1
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order 1 SeedTypeUf4.Ortho
@@ -151,14 +151,14 @@ type Msuf4RandMutateTests() =
     let ``mutate produces Msuf4 with correct properties for order 4`` () =
         let rngType = rngType.Lcg
         let stageCount = 2<stageCount>
-        let order = 4<sortingWidth>
+        let order = 4<channelCount>
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order (%stageCount) SeedTypeUf4.Ortho
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount %order 0.1 0.1 0.1 0.1 0.05 0.05 // Sum = 0.5, NoAction = 0.5
         let mockRando = createMockRando [0] [0.6; 0.6; 0.6; 0.6; 0.6; 0.6; 0.6; 0.6] // Selects None (no mutation)
         let mutatedMsuf4 = Msuf4RandMutateOld.mutate mockRando msuf4Mutate msuf4 0
         Assert.Equal(%mutatedMsuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(mutatedMsuf4).SorterId)
-        Assert.Equal(order, mutatedMsuf4.SortingWidth)
+        Assert.Equal(order, mutatedMsuf4.ChannelCount)
         Assert.Equal(%stageCount, mutatedMsuf4.StageCount)
         Assert.Equal(2, mutatedMsuf4.TwoOrbitUnfolder4s.Length)
         // SeedType.Ortho ([0;2], [1;3]), picker selects None (0.6 > 0.5) -> no mutation
@@ -169,7 +169,7 @@ type Msuf4RandMutateTests() =
     let ``mutate produces Msuf4 with mutated SeedType for order 4`` () =
         let rngType = rngType.Lcg
         let stageCount = 1<stageCount>
-        let order = 4<sortingWidth>
+        let order = 4<channelCount>
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order (%stageCount) SeedTypeUf4.Ortho
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount %order 0.8 0.1 0.0 0.0 0.0 0.0 // Sum = 0.9, NoAction = 0.1
@@ -181,14 +181,14 @@ type Msuf4RandMutateTests() =
         let rSorter = Msuf4.makeSorter(mutatedMsuf4)
         Assert.Equal<Ce>(expectedCes, rSorter.Ces)
         Assert.Equal(%mutatedMsuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(mutatedMsuf4).SorterId)
-        Assert.Equal(order, mutatedMsuf4.SortingWidth)
+        Assert.Equal(order, mutatedMsuf4.ChannelCount)
         Assert.Equal(%stageCount, mutatedMsuf4.StageCount)
 
     [<Fact>]
     let ``mutate produces Msuf4 with mutated SeedType for order 8`` () =
         let rngType = rngType.Lcg
         let stageCount = 1<stageCount>
-        let order = 8<sortingWidth>
+        let order = 8<channelCount>
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order (%stageCount) SeedTypeUf4.Ortho
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount %order 0.08 0.1 0.0 0.0 0.0 0.0
@@ -199,14 +199,14 @@ type Msuf4RandMutateTests() =
         let rSorter = Msuf4.makeSorter(mutatedMsuf4)
         Assert.Equal<Ce>(expectedCes, rSorter.Ces)
         Assert.Equal(%mutatedMsuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(mutatedMsuf4).SorterId)
-        Assert.Equal(order, mutatedMsuf4.SortingWidth)
+        Assert.Equal(order, mutatedMsuf4.ChannelCount)
         Assert.Equal(%stageCount, mutatedMsuf4.StageCount)
 
     [<Fact>]
     let ``mutate fails with mismatched stageCount`` () =
         let rngType = rngType.Lcg
         let stageCount = 2<stageCount>
-        let order = 4<sortingWidth>
+        let order = 4<channelCount>
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order 1 SeedTypeUf4.Ortho // Count = 1
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount %order 0.2 0.2 0.2 0.2 0.1 0.1
@@ -218,7 +218,7 @@ type Msuf4RandMutateTests() =
     let ``mutate fails with mismatched mutationRates order`` () =
         let rngType = rngType.Lcg
         let stageCount = 1<stageCount>
-        let order = 4<sortingWidth>
+        let order = 4<channelCount>
         let msuf4Id = Guid.NewGuid() |> UMX.tag<sorterModelID>
         let msuf4 = createTestMsuf4 msuf4Id order (%stageCount) SeedTypeUf4.Ortho
         let msuf4Mutate = createTestMsuf4RandMutate rngType stageCount 8 0.2 0.2 0.2 0.2 0.1 0.1 // Order 8, should be 4

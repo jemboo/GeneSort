@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open System.Collections.Concurrent
@@ -14,12 +14,12 @@ type sortBlockUint8v512 =
     }
 
     static member create 
-            (sw: int<sortingWidth>) 
+            (sw: int<channelCount>)
             (arrays: Vector512<uint8>[]) 
             (count: int) =
         { vectors = arrays; sortableCount = count }
     
-    static member createFromIntArrays (sw: int<sortingWidth>) (arrays: sortableIntArray[]) =
+    static member createFromIntArrays (sw: int<channelCount>) (arrays: sortableIntArray[]) =
         let width = %sw
         let inputCount = arrays.Length
         if inputCount > 64 then 
@@ -103,7 +103,7 @@ module SortBlockUint8v512 =
             
             result.[lane] <- sortableIntArray.create(
                                 values, 
-                                s512.Length |> UMX.tag<sortingWidth>, 
+                                s512.Length |> UMX.tag<channelCount>,
                                 2 |> UMX.tag<symbolSetSize>)
         result
 
@@ -112,13 +112,13 @@ module SortBlockUint8v512 =
 
 module Simd512GoldenHashProvider =
     
-    let private goldenCache = ConcurrentDictionary<int<sortingWidth>, uint32[]>()
+    let private goldenCache = ConcurrentDictionary<int<channelCount>, uint32[]>()
 
-    let private calculateGolden (width: int<sortingWidth>) : uint32[] =
+    let private calculateGolden (width: int<channelCount>) : uint32[] =
         let w = %width
         let vectors = Array.init w (fun i -> Vector512.Create(byte i))
         let tempBlock = sortBlockUint8v512.createFromVectors vectors 64
         SortBlockUint8v512.computeLaneHashes64 tempBlock.Vectors
 
-    let GetGoldenHashes (width: int<sortingWidth>) : uint32[] =
+    let GetGoldenHashes (width: int<channelCount>) : uint32[] =
         goldenCache.GetOrAdd(width, (fun w -> calculateGolden w))

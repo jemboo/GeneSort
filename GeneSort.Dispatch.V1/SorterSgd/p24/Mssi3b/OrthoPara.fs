@@ -159,8 +159,10 @@ module OrthoPara64 =
 
 
 
+    let description = "Compare ortho and para mutation settings for 24-input Mssi3b evolution (OrthoPara64)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara64", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara64", description, [|
             runExample("NoMods", NoMods)
             runExample("SymForceDiff1", SymForceDiff1)
             runExample("SymForce", SymForce)
@@ -217,7 +219,9 @@ module OrthoPara128 =
             }
         )
 
+    let description = "Compare ortho and para mutation settings for 24-input Mssi3b evolution (OrthoPara128)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara128", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Mssi3b.OrthoPara.OrthoPara128", description, [|
             runExample("NoMods", NoMods)
         |])

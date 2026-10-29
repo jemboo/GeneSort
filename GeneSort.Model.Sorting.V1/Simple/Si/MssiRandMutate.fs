@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Si
+namespace GeneSort.Model.Sorting.V1.Simple.Si
 
 open System
 open FSharp.UMX
@@ -69,7 +69,7 @@ type mssiRandMutate =
         
         let evalo (psi:permSi) : int =
             let ces = Ce.fromPermSi psi
-            Ce.countReflectiveOrReflected parent.SortingWidth ces
+            Ce.countReflectiveOrReflected parent.ChannelCount ces
             |> UMX.untag
 
 
@@ -96,7 +96,7 @@ type mssiRandMutate =
             | mutatorVariant.V3 ->
                 failwith "V3 mutator variant not implemented for mssiRandMutate"
                         
-        mssi.create id parent.SortingWidth mutated
+        mssi.create id parent.ChannelCount mutated
 
     member this.MakeSorterModelFromIndexAndMod 
                                 (parent:mssi) 

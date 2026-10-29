@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Sorting.Sortable
 
 open System.Runtime.Intrinsics
 open FSharp.UMX
@@ -9,7 +9,7 @@ module GrayVectorGenerator =
 
     /// Seeds exactly 512 Gray code sequences into bit-packed vectors.
     /// This always generates a full 512-lane block.
-    let private generateInitialSeedBlock (sw: int<sortingWidth>) : Vector512<uint64>[] =
+    let private generateInitialSeedBlock (sw: int<channelCount>) : Vector512<uint64>[] =
         let width = %sw
         let vecs = Array.init width (fun _ -> Array.zeroCreate<uint64> 8)
         
@@ -27,7 +27,7 @@ module GrayVectorGenerator =
 
 
     /// Yields a sequence of bit-packed blocks covering exactly 2^n cases.
-    let getAllSortBlockBitv512ForSortingWidth (sw: int<sortingWidth>) : seq<sortBlockBitv512> =
+    let getAllSortBlockBitv512ForChannelCount (sw: int<channelCount>) : seq<sortBlockBitv512> =
         let width = %sw
         let totalSequences = 1uL <<< width
         

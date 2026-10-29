@@ -44,8 +44,8 @@ module SorterEvalExecution =
                 let! modelSet = savedModels |> OutputData.asSorterModelSet
 
                 let! sWidth = 
-                    rp.GetSortingWidth() 
-                    |> Result.ofOption "Missing sorting width."
+                    rp.GetChannelCount()
+                    |> Result.ofOption "Missing channel count."
 
                 let! sorterEvalType =
                     rp.GetSorterEvalType() 

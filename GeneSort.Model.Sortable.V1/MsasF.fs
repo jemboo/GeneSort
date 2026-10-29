@@ -7,90 +7,90 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sortable
 open GeneSort.Sorting.Sortable.SortableIntArray
 
-// MsasF = a full bool test set for a given sorting width
+// MsasF = a full bool test set for a given channel count
 [<Struct; CustomEquality; NoComparison>]
 type msasF = 
     private 
         { id: Guid<sorterTestModelID>
-          sortingWidth: int<sortingWidth> }
+          channelCount: int<channelCount> }
 
     static member create 
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             : msasF =
-        if %sortingWidth < 2 then
-            failwith "SortingWidth must be at least 2"
+        if %channelCount < 2 then
+            failwith "ChannelCount must be at least 2"
         else
             let id = 
                 [
                     box "msasF"
-                    box (sortingWidth |> UMX.untag)
+                    box (channelCount |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
-            { id = id; sortingWidth = sortingWidth; }
+            { id = id; channelCount = channelCount; }
 
     member this.Id with get() = this.id
 
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
     override this.Equals(obj) = 
         match obj with
         | :? msasF as other -> 
-            this.sortingWidth = other.sortingWidth
+            this.channelCount = other.channelCount
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.sortingWidth)
+        hash (this.channelCount)
 
     interface IEquatable<msasF> with
-        member this.Equals(other) =  this.sortingWidth = other.sortingWidth
+        member this.Equals(other) =  this.channelCount = other.channelCount
 
     member this.MakeSortableBoolTest 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableBinaryTests =
-        let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays sortingWidth
+                    (channelCount: int<channelCount>) : sortableBinaryTests =
+        let sortableArrays =  SortableBoolArray.getAllSortableBoolArrays channelCount
                               |> Seq.toArray
         sortableBinaryTests.create 
                 sorterTestId
-                sortingWidth
+                channelCount
                 sortableArrays
 
 
     member this.MakeSortableIntTest 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableIntTests =
-        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForSortingWidth sortingWidth
+                    (channelCount: int<channelCount>) : sortableIntTests =
+        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForChannelCount channelCount
         sortableIntTests.create
                 sorterTestId
-                sortingWidth
+                channelCount
                 sortableArrays
 
 
     member this.MakeSortableBitv512Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableBitv512Tests =
-        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth sortingWidth |> Seq.toArray
+                    (channelCount: int<channelCount>) : sortableBitv512Tests =
+        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForChannelCount channelCount |> Seq.toArray
         sortableBitv512Tests.create
                 sorterTestId
-                sortingWidth
+                channelCount
                 grayBlocks
 
 
     member this.MakeSortableUint8v256Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableUint8v256Tests =
-        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForSortingWidth sortingWidth
+                    (channelCount: int<channelCount>) : sortableUint8v256Tests =
+        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForChannelCount channelCount
         SortableUint8v256Tests.fromIntArrays
                 sorterTestId
-                sortingWidth
+                channelCount
                 sortableArrays
 
 
     member this.MakeSortableUint8v512Test 
                     (sorterTestId: Guid<sortableTestsId>)
-                    (sortingWidth: int<sortingWidth>) : sortableUint8v512Tests =
-        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForSortingWidth sortingWidth
+                    (channelCount: int<channelCount>) : sortableUint8v512Tests =
+        let sortableArrays =  BinaryIntArrays.getAllBinaryIntArraysForChannelCount channelCount
         SortableUint8v512Tests.fromIntArrays
                 sorterTestId
-                sortingWidth
+                channelCount
                 sortableArrays
 
 

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple
+namespace GeneSort.Model.Sorting.V1.Simple
 
 open System
 open FSharp.UMX
@@ -50,13 +50,13 @@ module SimpleSorterModel =
         | Msuf4 msuf4 -> msuf4.MakeSorter(maxCeLength)
         | Msuf6 msuf6 -> msuf6.MakeSorter(maxCeLength)
 
-    let getSortingWidth (model: simpleSorterModel) : int<sortingWidth> =
+    let getChannelCount (model: simpleSorterModel) : int<channelCount> =
         match model with
-        | Msce msce -> msce.SortingWidth
-        | Mssi mssi -> mssi.SortingWidth
-        | Msrs msrs -> msrs.SortingWidth
-        | Msuf4 msuf4 -> msuf4.SortingWidth
-        | Msuf6 msuf6 -> msuf6.SortingWidth
+        | Msce msce -> msce.ChannelCount
+        | Mssi mssi -> mssi.ChannelCount
+        | Msrs msrs -> msrs.ChannelCount
+        | Msuf4 msuf4 -> msuf4.ChannelCount
+        | Msuf6 msuf6 -> msuf6.ChannelCount
 
     let getCeLength (model: simpleSorterModel) : int<ceLength> =
         match model with

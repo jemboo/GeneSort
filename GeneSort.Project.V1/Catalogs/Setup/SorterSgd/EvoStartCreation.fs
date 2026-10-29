@@ -51,7 +51,7 @@ module EvoStartCreation =
         do! checkCancellation ct
         let rp = parameters.WithGenerationCurrent(Some (UMX.tag 0))
         let! start = files project database rp
-        let! width = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+        let! width = rp.GetChannelCount() |> Result.ofOption "Missing channel count."
         let! testsData = SetupArtifacts.getOrCreate db start.Tests (fun () ->
             makeTests rp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
         let! tests, ces = OutputData.asSortableTestsWithPrefix testsData
@@ -69,7 +69,7 @@ module EvoStartCreation =
         do! checkCancellation ct
         let rp = parameters.WithGenerationCurrent(Some (UMX.tag 0))
         let! start = files project database rp
-        let! width = rp.GetSortingWidth() |> Result.ofOption "Missing sorting width."
+        let! width = rp.GetChannelCount() |> Result.ofOption "Missing channel count."
         let! testsData = SetupArtifacts.getOrCreate db start.Tests (fun () ->
             makeTests rp |> Async.map (Result.map outputData.SortableTestsWithPrefix))
         let! tests, ces = OutputData.asSortableTestsWithPrefix testsData

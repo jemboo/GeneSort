@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Rs
+namespace GeneSort.Model.Sorting.V1.Simple.Rs
 
 open System
 open FSharp.UMX
@@ -12,14 +12,14 @@ open GeneSort.Model.Sorting.V1
 type msrs = 
     private 
         { id: Guid<sorterModelId>
-          sortingWidth: int<sortingWidth>
+          channelCount: int<channelCount>
           perm_Rss: permRs array } 
     with
     /// Creates an Msrs instance with the specified ID, width, and Perm_Rs array.
     /// Throws an exception if the Perm_Rs array is empty, width is less than 1, or any Perm_Rs has a mismatched width.
     static member create 
             (id: Guid<sorterModelId>) 
-            (width: int<sortingWidth>) 
+            (width: int<channelCount>)
             (perm_Rss: permRs array) : msrs =
 
         if perm_Rss.Length < 1 then
@@ -29,17 +29,17 @@ type msrs =
         else if perm_Rss |> Array.exists (fun prs -> %prs.Order <> %width) then
             failwith $"All Perm_Rs must have width {%width}"
         else
-            { id = id; sortingWidth = width; perm_Rss = perm_Rss }
+            { id = id; channelCount = width; perm_Rss = perm_Rss }
 
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.StageLength * %this.ChannelCount / 2) |> UMX.tag<ceLength>
     member this.StageLength with get () = this.perm_Rss.Length |> UMX.tag<stageLength>
-    member this.SortingWidth with get () = this.sortingWidth
+    member this.ChannelCount with get () = this.channelCount
     member this.Perm_Rss with get () = this.perm_Rss
     member this.toString() =
         sprintf "msrs(Id=%A, Width=%d, Perm_Rs_count=%d)" 
                 (%this.Id) 
-                (%this.SortingWidth) 
+                (%this.ChannelCount)
                 (this.Perm_Rss.Length)
 
     override this.Equals(obj) = 
@@ -66,7 +66,7 @@ type msrs =
             match maxCeLength with
             | Some n -> allCes |> Array.truncate %n
             | None   -> allCes
-        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.ChannelCount ces
 
 
 module Msrs =
@@ -75,7 +75,7 @@ module Msrs =
     let toString (msrs: msrs) : string =
         sprintf "Msrs(Id=%A, Width=%d, Perm_Rs_count=%d)" 
                 (%msrs.Id) 
-                (%msrs.SortingWidth) 
+                (%msrs.ChannelCount)
                 msrs.Perm_Rss.Length 
 
     /// Returns the number of Perm_Rs instances in the Msrs.
@@ -92,4 +92,4 @@ module Msrs =
                 prs.PermSi 
                 |> PermSi.getTwoOrbits
                 |> Array.map (fun tbit -> ce.create tbit.First tbit.Second))
-        sorter.create (%msrs.Id |> UMX.tag<sorterId>) msrs.SortingWidth ces
+        sorter.create (%msrs.Id |> UMX.tag<sorterId>) msrs.ChannelCount ces

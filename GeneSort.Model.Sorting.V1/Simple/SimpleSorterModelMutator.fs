@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.Simple.V1
+namespace GeneSort.Model.Sorting.Simple.V1
 
 open FSharp.UMX
 open GeneSort.Core
@@ -77,7 +77,7 @@ module SimpleSorterModelMutator =
 
 
     let getMsuf4ModelMutator 
-                (sortingWidth: int<sortingWidth>)
+                (channelCount: int<channelCount>)
                 (rngFactory: rngFactory)
                 (excludeSelfCe: bool<excludeSelfCe>)
                 (seedModificationRate: float<seedModificationRate>)
@@ -100,7 +100,7 @@ module SimpleSorterModelMutator =
                 match mutVariant with
                 | mutatorVariant.V1 ->
                         Uf4MutationRates.makeV1 
-                            %sortingWidth 
+                            %channelCount
                             %seedModificationRate
                             %modificationRate
                             %orthoRate
@@ -108,7 +108,7 @@ module SimpleSorterModelMutator =
                             %selfSymRate
                 | mutatorVariant.V2 ->
                         Uf4MutationRates.makeV2
-                            %sortingWidth 
+                            %channelCount
                             %seedModificationRate
                             %modificationRate
                             %orthoRate
@@ -125,7 +125,7 @@ module SimpleSorterModelMutator =
 
 
     let getMsuf6ModelMutator 
-                (sortingWidth: int<sortingWidth>)
+                (channelCount: int<channelCount>)
                 (rngFactory: rngFactory)
                 (excludeSelfCe: bool<excludeSelfCe>)
                 (seedModificationRate: float<seedModificationRate>)
@@ -152,7 +152,7 @@ module SimpleSorterModelMutator =
             msuf6RandMutate.create 
                    rngFactory 
                     (Uf6MutationRates.makeUniformFromRates
-                                    (%sortingWidth) 
+                                    (%channelCount)
                                     seed6TransitionRates 
                                     opsTransitionRates)
                   mutVariant

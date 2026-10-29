@@ -42,6 +42,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <TextBlock Text="{Binding ModuleDescription}" TextWrapping="Wrap" Margin="0,4,0,8" Visibility="{Binding IsHierarchyStep, Converter={StaticResource VisibleIfTrue}}" />
             <TextBlock Text="{Binding Help}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
         </StackPanel>
         <WrapPanel Grid.Row="1" Margin="0,16,0,12" IsEnabled="{Binding IsReady}"
@@ -72,31 +73,54 @@
                         <DataTemplate>
                             <Button Width="190" MinHeight="178" Margin="0,0,12,12" Padding="14" Click="Tile_Click"
                                     AutomationProperties.Name="{Binding AccessibleName}" ToolTip="{Binding Detail}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Setter Property="Background" Value="{DynamicResource CanvasBrush}" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsModule}" Value="True"><Setter Property="Background" Value="{DynamicResource SurfaceBrush}" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding IsMaterialized}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource RaisedBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <StackPanel Width="156">
-                                    <Grid Height="40" Margin="0,2,0,14">
-                                        <TextBlock Text="{Binding Icon}" FontFamily="Segoe MDL2 Assets" FontSize="38" HorizontalAlignment="Center" Foreground="{DynamicResource AccentBrush}">
-                                            <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
-                                                <DataTrigger Binding="{Binding Icon}" Value="&#xE8B7;"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
-                                            </Style.Triggers></Style></TextBlock.Style>
+                                    <Grid Height="64" Width="76" Margin="0,0,0,12">
+                                        <!-- Offset frames suggest a container of definitions, leaving its type image intact. -->
+                                        <Grid Visibility="{Binding IsModule, Converter={StaticResource VisibleIfTrue}}">
+                                            <Border Margin="18,0,0,14" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="6" Opacity="0.35" />
+                                            <Border Margin="9,7,9,7" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="6" Opacity="0.65" />
+                                            <Border Margin="0,14,18,0" Background="{DynamicResource RaisedBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" CornerRadius="6" />
+                                        </Grid>
+                                        <Border Margin="9,7" CornerRadius="25">
+                                            <Border.Style><Style TargetType="Border">
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsModule}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                                    <DataTrigger Binding="{Binding CreateNew}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsMaterialized}" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="BorderThickness" Value="3" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style></Border.Style>
+                                        </Border>
+                                        <TextBlock Text="{Binding Icon}" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock.Style><Style TargetType="TextBlock">
+                                                <Setter Property="FontSize" Value="28" />
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsModule}" Value="True"><Setter Property="Margin" Value="-18,14,0,0" /><Setter Property="FontSize" Value="26" /></DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsMaterialized}" Value="True"><Setter Property="Foreground" Value="{DynamicResource CanvasBrush}" /><Setter Property="FontWeight" Value="Bold" /></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style></TextBlock.Style>
                                         </TextBlock>
-                                        <Path Data="M 2,8 L 2,32 L 42,32 L 42,12 L 20,12 L 15,6 L 2,6 Z" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" Width="44" Height="36" HorizontalAlignment="Center">
-                                            <Path.Style><Style TargetType="Path"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers>
-                                                <DataTrigger Binding="{Binding Icon}" Value="&#xE8B7;"><Setter Property="Visibility" Value="Visible" /></DataTrigger>
-                                            </Style.Triggers></Style></Path.Style>
-                                        </Path>
                                     </Grid>
                                     <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Status}" FontSize="12" TextAlignment="Center" TextWrapping="Wrap" Margin="0,10,0,0">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Code only · not saved"><Setter Property="Foreground" Value="{DynamicResource WarningBrush}" /></DataTrigger>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Code + saved on disk"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /></DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
+                                    <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,8,0,0" />
                                 </StackPanel>
                             </Button>
                         </DataTemplate>

@@ -14,7 +14,7 @@ type sorterEvalV1Dto = {
     LastCeIndex : int
     StageLength : int
     CeLength : int
-    SortingWidth : int
+    ChannelCount : int
     ReflectionSymmetric : bool
     StageCrossingsCount : int
     ReflectiveCount : int
@@ -27,7 +27,7 @@ type sorterEvalV2Dto = {
     SequenceHash : int
     StageLength : int
     CeUseArray : ceDataDto array
-    SortingWidth : int
+    ChannelCount : int
     ReflectionSymmetric : bool
     StageCrossingsCount : int
     ReflectiveCount : int
@@ -41,7 +41,7 @@ type sorterEvalV3Dto = {
     StageLength : int
     CeUseArray : ceDataDto array
     SortableTests : sortableTestsDto
-    SortingWidth : int
+    ChannelCount : int
     ReflectionSymmetric : bool
     StageCrossingsCount : int
     ReflectiveCount : int
@@ -77,7 +77,7 @@ module SorterEvalDto =
                 LastCeIndex = %v1.LastCeIndex
                 StageLength = %v1.StageLength
                 CeLength = %v1.CeLength
-                SortingWidth = %v1.SortingWidth
+                ChannelCount = %v1.ChannelCount
                 ReflectionSymmetric = %v1.ReflectionSymmetric
                 StageCrossingsCount = %v1.StageCrossingsCount
                 ReflectiveCount = %v1.ReflectiveCount
@@ -90,7 +90,7 @@ module SorterEvalDto =
                 SequenceHash = %v2.SequenceHash
                 StageLength = %v2.StageLength
                 CeUseArray = v2.CeUseArray |> Array.map CeDataDto.fromDomain
-                SortingWidth = %v2.SortingWidth
+                ChannelCount = %v2.ChannelCount
                 ReflectionSymmetric = %v2.IsReflectionSymmetric
                 StageCrossingsCount = %v2.StageCrossingsCount
                 ReflectiveCount = %v2.ReflectiveCount
@@ -104,7 +104,7 @@ module SorterEvalDto =
                 StageLength = %v3.StageLength
                 CeUseArray = v3.CeUseArray |> Array.map CeDataDto.fromDomain
                 SortableTests = SortableTestsDto.fromDomain v3.SortableTests
-                SortingWidth = %v3.SortingWidth
+                ChannelCount = %v3.ChannelCount
                 ReflectionSymmetric = %v3.ReflectionSymmetric
                 StageCrossingsCount = %v3.StageCrossingsCount
                 ReflectiveCount = %v3.ReflectiveCount
@@ -116,7 +116,7 @@ module SorterEvalDto =
             sorterEvalV1.create
                 (v1Dto.SorterId |> UMX.tag)
                 (toSubsetId v1Dto.SortableTestsSubsetId)
-                (v1Dto.SortingWidth |> UMX.tag)
+                (v1Dto.ChannelCount |> UMX.tag)
                 (v1Dto.UnsortedCount |> Option.defaultValue 0 |> UMX.tag)
                 (v1Dto.SequenceHash |> UMX.tag)
                 (v1Dto.LastCeIndex |> UMX.tag)
@@ -130,7 +130,7 @@ module SorterEvalDto =
             sorterEvalV2.create
                 (v2Dto.SorterId |> UMX.tag)
                 (toSubsetId v2Dto.SortableTestsSubsetId)
-                (v2Dto.SortingWidth |> UMX.tag)
+                (v2Dto.ChannelCount |> UMX.tag)
                 (v2Dto.UnsortedCount |> Option.defaultValue 0 |> UMX.tag)
                 (v2Dto.SequenceHash |> UMX.tag)
                 (v2Dto.StageLength |> UMX.tag)
@@ -143,7 +143,7 @@ module SorterEvalDto =
             sorterEvalV3.create
                 (v3Dto.SorterId |> UMX.tag)
                 (toSubsetId v3Dto.SortableTestsSubsetId)
-                (v3Dto.SortingWidth |> UMX.tag)
+                (v3Dto.ChannelCount |> UMX.tag)
                 (v3Dto.UnsortedCount |> Option.defaultValue 0 |> UMX.tag)
                 (v3Dto.SequenceHash |> UMX.tag)
                 (v3Dto.StageLength |> UMX.tag)

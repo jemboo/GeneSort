@@ -8,23 +8,23 @@ open GeneSort.Sorting
 [<Struct; CustomEquality; NoComparison>]
 type sortableIntTests =
     private { id: Guid<sortableTestsId>
-              sortingWidth: int<sortingWidth>
+              channelCount: int<channelCount>
               sortableIntArrays: sortableIntArray[]
             }
 
     static member create 
                     (id: Guid<sortableTestsId>) 
-                    (sortingWidth:int<sortingWidth>)
+                    (channelCount:int<channelCount>)
                     (arrays: sortableIntArray[]) : sortableIntTests =
         { 
             id = id; 
-            sortingWidth = sortingWidth; 
+            channelCount = channelCount;
             sortableIntArrays = Array.copy arrays
         }
 
     static member Empty =
         let id = Guid.NewGuid() |> UMX.tag<sortableTestsId>
-        sortableIntTests.create id 0<sortingWidth> [||]
+        sortableIntTests.create id 0<channelCount> [||]
 
     override this.Equals(obj) =
         match obj with
@@ -41,7 +41,7 @@ type sortableIntTests =
 
     member this.Id with get() = this.id
     
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
     member this.SortableIntArrays with get() = this.sortableIntArrays
 

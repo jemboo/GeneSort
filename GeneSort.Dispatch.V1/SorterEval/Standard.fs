@@ -33,7 +33,7 @@ module Standard =
             [
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
-                (ParamKeys.sortingWidthKey, [16] |> List.map string)
+                (ParamKeys.channelCountKey, [16] |> List.map string)
                 (ParamKeys.simpleSorterModelTypeKey,
                  [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
                  |> List.map SimpleSorterModelType.toString)
@@ -68,7 +68,7 @@ module Standard =
             [
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
-                (ParamKeys.sortingWidthKey, [4; 5; 6; 7; 8; 9; 10; 11; 12] |> List.map string)
+                (ParamKeys.channelCountKey, [4; 5; 6; 7; 8; 9; 10; 11; 12] |> List.map string)
                 (ParamKeys.simpleSorterModelTypeKey,
                  [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
                  |> List.map SimpleSorterModelType.toString)
@@ -103,7 +103,7 @@ module Standard =
             [
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
-                (ParamKeys.sortingWidthKey, [14; 16; 18; 20; 22] |> List.map string)
+                (ParamKeys.channelCountKey, [14; 16; 18; 20; 22] |> List.map string)
                 (ParamKeys.simpleSorterModelTypeKey,
                  [simpleSorterModelType.Msce; simpleSorterModelType.Mssi; simpleSorterModelType.Msrs; simpleSorterModelType.Msuf4]
                  |> List.map SimpleSorterModelType.toString)
@@ -148,8 +148,10 @@ module Standard =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Evaluate sorting networks with standard test configurations."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterEval.Standard", [|
+        GeneSort.Dispatch.V1.runType("SorterEval.Standard", description, [|
             runExample("Test", Test)
             runExample("Small", Small)
             runExample("Medium", Medium)

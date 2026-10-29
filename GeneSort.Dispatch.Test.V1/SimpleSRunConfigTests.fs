@@ -62,7 +62,7 @@ let ``Msuf4a SimpleS presets expand distinct executions with boolean models and 
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
         Assert.Equal(Some query.Id, rp.GetId())
         let generator =
-            SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<sortingWidth> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
+            SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<channelCount> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
             |> SeedSorterModelGeneration.applyParameters rp |> Result.defaultWith failwith
         let parent = SorterModelGen.makeSorterModelFromIndex 0<sortingGenIndex> generator
         let path, _ = EvoPath.fromParameters configured rp
@@ -118,7 +118,7 @@ let ``SimpleS catalog entries accept probability and mutation rate endpoints`` s
             Assert.Equal(Some rate, rp.GetActivatorMutationRate())
             Assert.True(rp.GetAMax().IsNone)
             let generator =
-                SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<sortingWidth> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
+                SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<channelCount> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
                 |> SeedSorterModelGeneration.applyParameters rp |> Result.defaultWith failwith
             let model = SorterModelGen.makeSorterModelFromIndex 0<sortingGenIndex> generator |> SorterModel.asSimpleSorterModelS
             Assert.All(model.Activators, fun active -> Assert.Equal((probability = 1.0), active))

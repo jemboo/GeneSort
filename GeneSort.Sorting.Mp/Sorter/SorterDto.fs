@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Mp.Sorter
+namespace GeneSort.Sorting.Mp.Sorter
 
 open System
 open FSharp.UMX
@@ -14,7 +14,7 @@ type SorterDto = {
 module SorterDto =
     let toSorterDto (sorter: sorter) : SorterDto =
         { SorterId = %sorter.SorterId
-          Width = %sorter.SortingWidth
+          Width = %sorter.ChannelCount
           Ces = sorter.Ces |> Array.map CeDto.fromDomain }
 
     let fromSorterDto (dto: SorterDto) : sorter =
@@ -24,5 +24,5 @@ module SorterDto =
             failwith "Width must be at least 1"
         sorter.create
             (UMX.tag<sorterId> dto.SorterId)
-            (UMX.tag<sortingWidth> dto.Width)
+            (UMX.tag<channelCount> dto.Width)
             (dto.Ces |> Array.map CeDto.toDomain)

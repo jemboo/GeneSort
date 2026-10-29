@@ -8,7 +8,7 @@ open GeneSort.Sorting.Sortable
 
 type sortableUint8v512TestsDto = {
     Id: Guid
-    SortingWidth: int
+    ChannelCount: int
     Blocks: simdSortBlockDto[]
 }
 
@@ -36,11 +36,11 @@ module SortableUint8v512TestsDto =
 
     let fromDomain (test: sortableUint8v512Tests) : sortableUint8v512TestsDto =
         { Id = %test.Id
-          SortingWidth = %test.SortingWidth
+          ChannelCount = %test.ChannelCount
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
     let toDomain (dto: sortableUint8v512TestsDto) : sortableUint8v512Tests =
         let id = UMX.tag<sortableTestsId> dto.Id
-        let sw = UMX.tag<sortingWidth> dto.SortingWidth
+        let sw = UMX.tag<channelCount> dto.ChannelCount
         let blocks = dto.Blocks |> Array.map blockToDomain
         sortableUint8v512Tests.create id sw blocks

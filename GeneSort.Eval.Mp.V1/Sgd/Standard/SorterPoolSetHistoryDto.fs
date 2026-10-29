@@ -45,7 +45,7 @@ module SorterPoolMemberHistoryDto =
                     SequenceHash = %v2.SequenceHash
                     StageLength = %v2.StageLength
                     CeUseArray = v2.CeUseArray |> Array.map CeDataDto.fromDomain
-                    SortingWidth = %v2.SortingWidth
+                    ChannelCount = %v2.ChannelCount
                     ReflectionSymmetric = %v2.IsReflectionSymmetric
                     StageCrossingsCount = %v2.StageCrossingsCount
                     ReflectiveCount = %v2.ReflectiveCount
@@ -75,7 +75,7 @@ module SorterPoolMemberHistoryDto =
                 sorterEvalV2.create
                     (v2Dto.SorterId |> UMX.tag)
                     (if String.IsNullOrWhiteSpace v2Dto.SortableTestsSubsetId then SortableTestsSubsetId.Default else v2Dto.SortableTestsSubsetId |> UMX.tag<sortableTestsSubsetId>)
-                    (v2Dto.SortingWidth |> UMX.tag)
+                    (v2Dto.ChannelCount |> UMX.tag)
                     (v2Dto.UnsortedCount |> Option.defaultValue 0 |> UMX.tag)
                     (v2Dto.SequenceHash |> UMX.tag)
                     (v2Dto.StageLength |> UMX.tag)

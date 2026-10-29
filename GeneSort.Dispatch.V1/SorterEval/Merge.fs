@@ -34,10 +34,10 @@ module Merge =
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -170,7 +170,7 @@ module Merge =
                  |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.sorterEvalTypeKey, [sorterEvalType.V2] |> List.map SorterEvalType.toString)
                 (ParamKeys.mergeLibIdKey,
-                    [mergeLibId.create 96<sortingWidth> 6<mergeDimension> sorterLibVariant.VariantA]
+                    [mergeLibId.create 96<channelCount> 6<mergeDimension> sorterLibVariant.VariantA]
                     |> List.map MergeLibId.toString)
                 (ParamKeys.sorterCountKey, [10000] |> List.map string)
             ]
@@ -260,8 +260,10 @@ module Merge =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Evaluate sorting networks against merge test inputs."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterEval.Merge", [|
+        GeneSort.Dispatch.V1.runType("SorterEval.Merge", description, [|
             runExample("Test", Test)
             runExample("Small", Small)
             runExample("MediumLd", MediumLd)

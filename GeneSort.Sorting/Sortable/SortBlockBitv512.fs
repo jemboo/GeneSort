@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Sorting.Sortable
 
 open System.Runtime.Intrinsics
 open FSharp.UMX
@@ -14,7 +14,7 @@ type sortBlockBitv512 =
     /// Creates a SIMD block from a slice of 1-512 sortableIntArrays.
     /// Maps each input array to a specific bit across the Vector512 wires.
     static member createFromIntArrays 
-                (sw: int<sortingWidth>) 
+                (sw: int<channelCount>)
                 (arrays: sortableIntArray[]) : sortBlockBitv512 =
         let width = %sw
         let inputCount = arrays.Length
@@ -91,7 +91,7 @@ module SortBlockBitv512 =
 
 
     let toSortableIntArrays (s512: sortBlockBitv512) : sortableIntArray[] =
-        let sw = s512.Length |> UMX.tag<sortingWidth>
+        let sw = s512.Length |> UMX.tag<channelCount>
         let sss = 2 |> UMX.tag<symbolSetSize>
         let result = Array.zeroCreate<sortableIntArray> s512.sortableCount
 
@@ -122,7 +122,7 @@ module SortBlockBitv512 =
 
 
     let toSortableBoolArrays (s512: sortBlockBitv512) : sortableBoolArray[] =
-        let sw = s512.Length |> UMX.tag<sortingWidth>
+        let sw = s512.Length |> UMX.tag<channelCount>
         let result = Array.zeroCreate<sortableBoolArray> s512.SortableCount
         
         // Pre-extract the 8 uint64 lanes for each vector to avoid Repeated GetElement calls

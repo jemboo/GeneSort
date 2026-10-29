@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Test.Sorter.Rs
+namespace GeneSort.Model.Test.Sorter.Rs
 
 open System
 open FSharp.UMX
@@ -17,10 +17,10 @@ type MsrsRandMutateTests() =
     [<InlineData(0.25, 0.25, 0.25)>]
     member _.``Uniform mutation modes preserve reflection symmetry and replay deterministically`` ortho para selfSym =
         let input = permRs.create [|1; 0; 3; 2|]
-        let parent = msrs.create (UMX.tag (Guid.Parse "00000000-0000-0000-0000-000000000001")) 4<sortingWidth> [|input; input|]
+        let parent = msrs.create (UMX.tag (Guid.Parse "00000000-0000-0000-0000-000000000001")) 4<channelCount> [|input; input|]
         let mutator = msrsRandMutate.create rngFactory.LcgFactory (opsActionRates.create ortho para selfSym) mutatorVariant.V1
         let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
-        Assert.Equal(parent.SortingWidth, result.SortingWidth)
+        Assert.Equal(parent.ChannelCount, result.ChannelCount)
         Assert.Equal(parent.StageLength, result.StageLength)
         Assert.Equal(result, mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0))
         Assert.NotEqual(parent.Id, result.Id)
@@ -37,6 +37,6 @@ type MsrsRandMutateTests() =
     [<InlineData(3)>]
     member _.``Uniform mutator accepts parents with different stage counts`` count =
         let mutator = msrsRandMutate.create rngFactory.LcgFactory (opsActionRates.create 0.0 0.0 0.0) mutatorVariant.V1
-        let parent = msrs.create (UMX.tag Guid.Empty) 4<sortingWidth> (Array.create count (permRs.create [|1; 0; 3; 2|]))
+        let parent = msrs.create (UMX.tag Guid.Empty) 4<channelCount> (Array.create count (permRs.create [|1; 0; 3; 2|]))
         let result = mutator.MakeSorterModelFromIndexAndMod parent (UMX.tag 0) (UMX.tag 0)
         Assert.Equal<permRs[]>(parent.Perm_Rss, result.Perm_Rss)

@@ -41,14 +41,14 @@ module Merge =
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msceParamsR5 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msceParamsR5 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -89,14 +89,14 @@ module Merge =
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.mssiParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.mssiParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -137,14 +137,14 @@ module Merge =
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msrsParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msrsParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -185,14 +185,14 @@ module Merge =
                 (ParamKeys.sorterEvalMeasureKey, [SorterEvalMeasure.stageBiasedFilterUnsorted] |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msuf4ParamsRL 32<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msuf4ParamsRL 32<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.03] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
@@ -240,8 +240,10 @@ module Merge =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Compare sorting-network mutations using merge test inputs."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", description, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

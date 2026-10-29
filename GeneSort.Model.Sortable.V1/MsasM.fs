@@ -15,33 +15,33 @@ type msasM =
         { id: Guid<sorterTestModelID>
           mergeDimension: int<mergeDimension>
           mergeFillType: mergeSuffixType
-          sortingWidth: int<sortingWidth> 
+          channelCount: int<channelCount>
           libVariant: sorterLibVariant }
 
     static member create 
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (mergeDimension: int<mergeDimension>)
             (mergeSuffixType: mergeSuffixType)
             (libVariant: sorterLibVariant) 
             : msasM =
-        if %sortingWidth < 2 then
-            failwith "SortingWidth must be at least 2"
-        if (%sortingWidth) % (%mergeDimension) <> 0 then
-            failwith "mergeDimension must evenly divide sortingWidth"
+        if %channelCount < 2 then
+            failwith "ChannelCount must be at least 2"
+        if (%channelCount) % (%mergeDimension) <> 0 then
+            failwith "mergeDimension must evenly divide channelCount"
         else
             let id = 
                 [
                     box "msasM"
                     box (mergeDimension |> UMX.untag)
                     box (sprintf "%A" mergeSuffixType)
-                    box (sortingWidth |> UMX.untag)
+                    box (channelCount |> UMX.untag)
                     box (libVariant |> SorterLibVariant.toString)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterTestModelID>
             { 
                 id = id; 
                 mergeDimension = mergeDimension
                 mergeFillType = mergeSuffixType
-                sortingWidth = sortingWidth
+                channelCount = channelCount
                 libVariant = libVariant;
             }
 
@@ -49,33 +49,33 @@ type msasM =
     member this.MergeDimension with get() = this.mergeDimension
     member this.MergeFillType with get() = this.mergeFillType
     member this.SorterLibVariant with get() = this.libVariant
-    member this.SortingWidth with get() = this.sortingWidth
-    member this.SorterLibId with get() = sorterLibId.create this.SortingWidth this.libVariant
+    member this.ChannelCount with get() = this.channelCount
+    member this.SorterLibId with get() = sorterLibId.create this.ChannelCount this.libVariant
     member this.CeArray with get() : ce array option = (SorterDataParse.getCeArrayFromSorterLib this.SorterLibId)
 
 
     override this.Equals(obj) = 
         match obj with
         | :? msasM as other -> 
-            this.sortingWidth = other.sortingWidth
+            this.channelCount = other.channelCount
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.sortingWidth)
+        hash (this.channelCount)
 
     interface IEquatable<msasM> with
-        member this.Equals(other) =  this.sortingWidth = other.sortingWidth
+        member this.Equals(other) =  this.channelCount = other.channelCount
 
     member this.MakeSortableIntTest 
                     (sorterTestId: Guid<sortableTestsId>) : sortableIntTests =
         let intArrays = SortableIntArray.getMergeTestCases 
-                            this.SortingWidth
+                            this.ChannelCount
                             this.MergeDimension
                             this.mergeFillType
 
         sortableIntTests.create 
                 sorterTestId
-                this.SortingWidth
+                this.ChannelCount
                 intArrays
 
 
@@ -83,51 +83,51 @@ type msasM =
                     (sorterTestId: Guid<sortableTestsId>) : sortableBinaryTests =
 
         let sortableArrays = SortableBoolArray.getMergeTestCases
-                                    this.sortingWidth
+                                    this.channelCount
                                     this.mergeDimension
                                     this.mergeFillType  
                              |> Seq.toArray
 
         sortableBinaryTests.create 
                 sorterTestId
-                this.sortingWidth
+                this.channelCount
                 sortableArrays
 
 
     member this.MakeSortableUint8v256Test 
                     (sorterTestId: Guid<sortableTestsId>) : sortableUint8v256Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
-                            this.SortingWidth
+                            this.ChannelCount
                             this.MergeDimension
                             this.mergeFillType
 
         SortableUint8v256Tests.fromIntArrays 
                 sorterTestId
-                this.SortingWidth
+                this.ChannelCount
                 intArrays
 
 
     member this.MakeSortableUint8v512Test 
                     (sorterTestId: Guid<sortableTestsId>) : sortableUint8v512Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
-                            this.SortingWidth
+                            this.ChannelCount
                             this.MergeDimension
                             this.mergeFillType
 
         SortableUint8v512Tests.fromIntArrays 
                 sorterTestId
-                this.SortingWidth
+                this.ChannelCount
                 intArrays
 
 
     member this.MakeSortableBitv512Test 
                     (sorterTestId: Guid<sortableTestsId>) : sortableBitv512Tests =
         let intArrays = SortableIntArray.getMergeTestCases 
-                            this.SortingWidth
+                            this.ChannelCount
                             this.MergeDimension
                             this.mergeFillType
 
-        let sw = this.SortingWidth
+        let sw = this.ChannelCount
     
         // Instead of converting all to bool arrays first, we process intArrays in chunks
         let blocks = 

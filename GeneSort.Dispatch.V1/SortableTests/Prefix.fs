@@ -29,7 +29,7 @@ module PrefixTest =
             [
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 24<channelCount> 3<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
             ]
         run.DirectRun (
@@ -49,8 +49,10 @@ module PrefixTest =
         )
 
 
+    let description = "Small test configurations for prefix-based sortable inputs."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SortableTests.PrefixTest", [|
+        GeneSort.Dispatch.V1.runType("SortableTests.PrefixTest", description, [|
             runExample("Test", Test)
         |])
 
@@ -61,17 +63,17 @@ module Prefix =
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Width24s  () : run =
+    let Channels24  () : run =
         let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (ParamKeys.prefixLibIdKey,
                  [
-                     prefixLibId.create 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA
-                     prefixLibId.create 24<sortingWidth> 4<stageLength> prefixLibVariant.PrefixB
-                     prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
-                     prefixLibId.create 24<sortingWidth> 3<stageLength> prefixLibVariant.PrefixB
+                     prefixLibId.create 24<channelCount> 4<stageLength> prefixLibVariant.PrefixA
+                     prefixLibId.create 24<channelCount> 4<stageLength> prefixLibVariant.PrefixB
+                     prefixLibId.create 24<channelCount> 3<stageLength> prefixLibVariant.PrefixA
+                     prefixLibId.create 24<channelCount> 3<stageLength> prefixLibVariant.PrefixB
                  ]
                  |> List.map PrefixLibId.toString)
             ]
@@ -92,13 +94,13 @@ module Prefix =
         )
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Width32  () : run =
+    let Channels32  () : run =
         let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
                 (ParamKeys.prefixLibIdKey,
-                 [prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA]
+                 [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
                  |> List.map PrefixLibId.toString)
             ]
         run.DirectRun (
@@ -119,21 +121,23 @@ module Prefix =
 
     [<RequireQualifiedAccess>]
     type configType =
-        | Width24s
-        | Width32
+        | Channels24
+        | Channels32
 
     let Configs = Map.ofList
                     [
-                        (configType.Width24s, Width24s);
-                        (configType.Width32, Width32);
+                        (configType.Channels24, Channels24);
+                        (configType.Channels32, Channels32);
                     ]
 
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Generate sortable test inputs using sorting-network prefixes."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SortableTests.Prefix", [|
-            runExample("Width24s", Width24s)
-            runExample("Width32", Width32)
+        GeneSort.Dispatch.V1.runType("SortableTests.Prefix", description, [|
+            runExample("Channels24", Channels24)
+            runExample("Channels32", Channels32)
         |])

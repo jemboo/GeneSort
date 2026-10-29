@@ -19,14 +19,14 @@ let private project = UMX.tag<projectName> "PlanTests"
 let private database = UMX.tag<databaseName> "Shared"
 let private models = geneSortDataType.SorterModelSet ""
 let private tests = geneSortDataType.SortableTestsWithPrefix ""
-let private parameters = runParameters.create (Map.ofList ["SortingWidth", "4"; "RngType", "LCG"; "SimpleSorterModelType", "Msce"; "SorterCount", "2"; "Repl", "0"])
+let private parameters = runParameters.create (Map.ofList ["ChannelCount", "4"; "RngType", "LCG"; "SimpleSorterModelType", "Msce"; "SorterCount", "2"; "Repl", "0"])
 let private legacy value output = queryParams.create database project None None output [|"Execution", value|]
 let private setupQuery = QueryParamsBuildersSetup.SorterEval.Standard.makeQueryParams project database
 let private stored output = setupQuery (setupParameters.create parameters.ParamMap) output |> Option.get
 
 [<Fact>]
 let ``Setup constructors directly preserve stored IDs and physical paths`` () =
-    let expected = [models, "53bb8332-79a5-4b83-16c1-1cc687fc6515"; tests, "13408a82-615d-ff16-32dc-24dc457adc01"]
+    let expected = [models, "cfc9d0d9-ef27-817d-5ea5-317115b05c85"; tests, "5b1ee568-d5a4-e41e-5971-87fb7518d085"]
     let root = Path.Combine(Path.GetTempPath(), "PlanTests", "Shared", "Data")
     for output, id in expected do
         let query = stored output
@@ -96,7 +96,7 @@ let ``preparation inventories five directly addressed setup files without IO`` (
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                ParameterSpans = ["SortingWidth", ["4"]; "RngType", ["LCG"]; "SimpleSorterModelType", ["Msce"; "Msrs"]; "SorterCount", ["2"]]
+                ParameterSpans = ["ChannelCount", ["4"]; "RngType", ["LCG"]; "SimpleSorterModelType", ["Msce"; "Msrs"]; "SorterCount", ["2"]]
             }
             Execution = {
                 FunctionName = ExecuteFunctionNames.sorterEval

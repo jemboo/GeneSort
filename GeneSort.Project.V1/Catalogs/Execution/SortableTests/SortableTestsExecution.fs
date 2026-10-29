@@ -31,7 +31,7 @@ module SortableTestsExecution =
                 let! model =
                     match rp.GetMergeLibId(), rp.GetPrefixLibId() with
                     | Some merge, None ->
-                        msasM.create merge.SortingWidth merge.MergeDimension
+                        msasM.create merge.ChannelCount merge.MergeDimension
                             mergeSuffixType.NoSuffix sorterLibVariant.VariantA
                         |> sortableTestsModel.MsasMi |> Ok
                     | None, Some prefix -> msasPfx.create prefix |> sortableTestsModel.MsasPfx |> Ok

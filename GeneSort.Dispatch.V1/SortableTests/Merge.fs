@@ -23,16 +23,14 @@ module Merge =
 
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let Test  () : run =
+    let HiMD_32  () : run =
         let names = RunNaming.create()
         let parameterSpans =
             [
                 (ParamKeys.mergeLibIdKey,
                  [
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantB
-                     mergeLibId.create 32<sortingWidth> 4<mergeDimension> sorterLibVariant.VariantA
-                     mergeLibId.create 32<sortingWidth> 8<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 4<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 8<mergeDimension> sorterLibVariant.VariantA
                  ]
                  |> List.map MergeLibId.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -42,7 +40,36 @@ module Merge =
                 DatabaseName = names.DatabaseName
                 ProjectName = names.ProjectName
                 RunName = names.RunName
-                Description = "Int8 merge sorter test sets"
+                Description = "32 channels, 4 and 8 way merges"
+                AllowOverwrite = false
+                Execution = {
+                    FunctionName = executionFunctionName
+                    ParameterSpans = parameterSpans
+                    QueryCatalogName = executionQueryCatalogName
+                    EnhancerFunctionName = executionEnhancerFunctionName
+                }
+            }
+        )
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let LowMD_32  () : run =
+        let names = RunNaming.create()
+        let parameterSpans =
+            [
+                (ParamKeys.mergeLibIdKey,
+                 [
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
+                     mergeLibId.create 32<channelCount> 2<mergeDimension> sorterLibVariant.VariantB
+                 ]
+                 |> List.map MergeLibId.toString)
+                (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
+            ]
+        run.DirectRun (
+            DirectRun.create {
+                DatabaseName = names.DatabaseName
+                ProjectName = names.ProjectName
+                RunName = names.RunName
+                Description = "32 channels, 2 way merge, 2 Variants"
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = executionFunctionName
@@ -55,19 +82,23 @@ module Merge =
 
     [<RequireQualifiedAccess>]
     type configType =
-        | Test
-        | Small
+        | HiMD_32
+        | LowMD_32
 
     let Configs = Map.ofList
                     [
-                        (configType.Test, Test);
+                        (configType.HiMD_32, HiMD_32);
+                        (configType.LowMD_32, LowMD_32)
                     ]
 
     let getRun (config: configType) () : run =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Int8 tests for merge networks."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SortableTests.Merge", [|
-            runExample("Test", Test)
+        GeneSort.Dispatch.V1.runType("SortableTests.Merge", description, [|
+            runExample("LowMD_32", LowMD_32)
+            runExample("HiMD_32", HiMD_32)
         |])

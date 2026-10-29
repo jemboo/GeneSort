@@ -33,7 +33,7 @@ let sortableTestsRun prefix =
     let spans = [
         ParamKeys.sortableDataFormatKey, ["BitVector512"]
         if prefix then ParamKeys.prefixLibIdKey, [prefixId 32]
-        else ParamKeys.mergeLibIdKey, [mergeLibId.create 4<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString]
+        else ParamKeys.mergeLibIdKey, [mergeLibId.create 4<channelCount> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString]
     ]
     simpleFixture (if prefix then SortableTestsDbs.Prefix.projectName else SortableTestsDbs.Merge.projectName)
         (if prefix then SortableTestsDbs.Prefix.dbName else SortableTestsDbs.Merge.dbName)

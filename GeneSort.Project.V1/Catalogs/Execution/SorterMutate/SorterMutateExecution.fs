@@ -57,7 +57,7 @@ module SorterMutateExecution =
                     |> Result.ofOption "Failed to create QueryParams for SortableTestsWithPrefix."
                 let! savedTests = storage.RunDb.loadAsync geneSortDataMode.Setup (SetupInputReferences.resolveRecorded rp qpTests)
                 let! tests, ces = savedTests |> OutputData.asSortableTestsWithPrefix
-                let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getSortingWidth)
+                let prefixBlock = ces |> ceBlock.create (Guid.Empty |> UMX.tag) (tests |> SortableTests.getChannelCount)
 
                 let! qpSorterSet = 
                     storage.QueryParamsFromRunParams rp (geneSortDataType.SorterSet "")

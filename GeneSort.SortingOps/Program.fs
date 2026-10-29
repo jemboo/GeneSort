@@ -12,7 +12,7 @@ open GeneSort.SortingOps
 
 module Sandbox =
 
-    let makeFullBoolTest (sw:int<sortingWidth>) : sortableTests =
+    let makeFullBoolTest (sw:int<channelCount>) : sortableTests =
 
         let sortableTestsId = Guid.NewGuid() |> UMX.tag<sortableTestsId>
         let sortableModel = msasF.create sw
@@ -57,11 +57,11 @@ module Sandbox =
 
 
         let sorterId = Guid.NewGuid() |> UMX.tag<sorterId>
-        let sortingWidth = 16 |> UMX.tag<sortingWidth>
-        let sorter = CeUse.ceUseStringToSorter sorterId sortingWidth yow1
+        let channelCount = 16 |> UMX.tag<channelCount>
+        let sorter = CeUse.ceUseStringToSorter sorterId channelCount yow1
         let ceBlk = CeBlock.fromSorter sorter
 
-        let sortableTests = makeFullBoolTest sortingWidth
+        let sortableTests = makeFullBoolTest channelCount
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
         let ceBlockEval = CeBlockOps.evalWithSorterTest sortableTests 
                                         ceBlock.Empty ceBlk collectNewSortableTests
@@ -69,19 +69,19 @@ module Sandbox =
 
 
     let testTwo() =
-        let sortingWidth = 16 |> UMX.tag<sortingWidth>
-        let sortableTests = makeFullBoolTest sortingWidth
+        let channelCount = 16 |> UMX.tag<channelCount>
+        let sortableTests = makeFullBoolTest channelCount
 
 
-        let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
+        let slIdA = sorterLibId.create channelCount sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesA = (SorterDataParse.getCeArrayFromSorterLib slIdA) |> Option.get
-        let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
+        let ceBlkA = ceBlock.create blockIdA channelCount cesA
 
-        let slIdB = sorterLibId.create sortingWidth sorterLibVariant.VariantB 
+        let slIdB = sorterLibId.create channelCount sorterLibVariant.VariantB
         let blockIdB = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesB = (SorterDataParse.getCeArrayFromSorterLib slIdB) |> Option.get
-        let ceBlkB = ceBlock.create blockIdB sortingWidth cesB
+        let ceBlkB = ceBlock.create blockIdB channelCount cesB
 
 
         let collectNewSortableTests = true |> UMX.tag<collectNewSortableTests>
@@ -94,14 +94,14 @@ module Sandbox =
 
 
     let testRelabel() =
-        let sortingWidth = 16 |> UMX.tag<sortingWidth>
-        let sortableTests = makeFullBoolTest sortingWidth
+        let channelCount = 16 |> UMX.tag<channelCount>
+        let sortableTests = makeFullBoolTest channelCount
 
 
-        let slIdA = sorterLibId.create sortingWidth sorterLibVariant.VariantA
+        let slIdA = sorterLibId.create channelCount sorterLibVariant.VariantA
         let blockIdA = Guid.NewGuid() |> UMX.tag<ceBlockId>
         let cesA = (SorterDataParse.getCeArrayFromSorterLib slIdA) |> Option.get
-        let ceBlkA = ceBlock.create blockIdA sortingWidth cesA
+        let ceBlkA = ceBlock.create blockIdA channelCount cesA
 
         let perm = make16TwoCycle()
         let ceBlkB = ceBlkA.permute perm

@@ -48,23 +48,23 @@ type simpleSorterModelR =
             | Some length -> allCes |> Array.truncate (int length)
             | None -> allCes
         sorter.create (SimpleSorterModel.getId this.model |> UMX.untag |> UMX.tag<sorterId>)
-            (SimpleSorterModel.getSortingWidth this.model) ces
+            (SimpleSorterModel.getChannelCount this.model) ces
 
 module SimpleSorterModelR =
     let getId (model: simpleSorterModelR) = SimpleSorterModel.getId model.Model
 
-    let getSortingWidth (model: simpleSorterModelR) = SimpleSorterModel.getSortingWidth model.Model
+    let getChannelCount (model: simpleSorterModelR) = SimpleSorterModel.getChannelCount model.Model
 
     let getCeLength (model: simpleSorterModelR) : int<ceLength> =
         let activeCount = model.Activators |> Array.filter (fun value -> value > 0) |> Array.length
         match model.Model with
         | Msce _ -> UMX.tag activeCount
-        | _ -> UMX.tag (activeCount * int (getSortingWidth model) / 2)
+        | _ -> UMX.tag (activeCount * int (getChannelCount model) / 2)
 
     let getStageLength (model: simpleSorterModelR) : int<stageLength> =
         let activeCount = model.Activators |> Array.filter (fun value -> value > 0) |> Array.length
         match model.Model with
-        | Msce _ -> UMX.tag (2 * activeCount / int (getSortingWidth model))
+        | Msce _ -> UMX.tag (2 * activeCount / int (getChannelCount model))
         | _ -> UMX.tag activeCount
 
     let makeSorter (maxCeLength: int<ceLength> option) (model: simpleSorterModelR) : sorter =

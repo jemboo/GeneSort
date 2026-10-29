@@ -47,13 +47,13 @@ type simpleSorterModelRMutator =
             | SmmMsceRandMutate mutator, simpleSorterModel.Msce source ->
                 // Carry activators through insertion/deletion with their entries. New entries start inactive.
                 let rng = mutator.RngFactory.Create %id
-                let newCode () = Ce.generateCeCode %mutator.ExcludeSelfCe (int source.SortingWidth) rng.NextIndex
+                let newCode () = Ce.generateCeCode %mutator.ExcludeSelfCe (int source.ChannelCount) rng.NextIndex
                 let entries =
                     Array.zip source.CeCodes parent.Activators
                     |> IndelRates.mutate mutator.IndelRates (fun () -> newCode (), 0)
                         (fun (_, activator) -> newCode (), activator) rng.NextFloat
                 let codes, values = Array.unzip entries
-                msce.create id source.SortingWidth codes |> simpleSorterModel.Msce, values
+                msce.create id source.ChannelCount codes |> simpleSorterModel.Msce, values
             | _ ->
                 SimpleSorterModelMutator.makeMutantSorterModelFromId this.ModelMutator parent.Model id,
                 parent.Activators

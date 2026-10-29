@@ -95,12 +95,12 @@ renamed definitions without sidecars may match several compatible modules.
    `MergeLibId`, `PrefixLibId`, and `SorterLibId` use full-width dropdowns listing available library entries
    for the widths declared by the example (or opened definition), plus its existing
    declared IDs. For `SortableTests.Prefix`, `SortableTests.PrefixTest`, `SorterEval.Prefix`, and `SorterMutate.Prefix`, choose
-   **Sorting width** on the Parameters tab first. The PrefixLibId dropdowns then
+   **Channel count** on the Parameters tab first. The PrefixLibId dropdowns then
    offer only that width. Changing width clears incompatible selections; choose
    a matching prefix before saving. Multiple selected prefixes remain unique.
    In `SorterEval.Prefix` and `SorterMutate.Prefix`, this filters the Setup choices; Processing inherits them
    read-only. Match the PrefixLibId and SortableDataFormat to the SortableTests run.
-   `SortableTests.Merge`, `SorterEval.Merge`, and `SorterMutate.Merge` also have **Sorting width** selectors
+   `SortableTests.Merge`, `SorterEval.Merge`, and `SorterMutate.Merge` also have **Channel count** selectors
    that filter MergeLibId. Choose a suggested width or type another positive whole
    number; available choices use component sorters in the library. Widths without
    available entries are rejected. Evaluation and mutation inherit their selected Setup merges
@@ -392,3 +392,27 @@ When schedules coincide, one snapshot serves both purposes. GenerationIntervalLa
 still indexes the Snapshot schedule; the endpoint is always a snapshot. Old run
 files retain their existing save schedule as snapshots. Cloud deployment remains
 deferred. See [checkpoint retention](../GeneSort.Project.V1/EvoPath.md).
+
+### Module descriptions and return navigation
+
+Each registered run module declares a `description` alongside its `runType`.
+The wizard shows it on the module tile and above the module's run definitions;
+the editor shows the module description above the run fields. The editor's Back
+button returns to the containing module in the current projects folder and keeps
+unsaved editor changes. Return to editor restores the draft without reopening it.
+
+Module tiles use stacked frames around the module-type image to suggest a
+container. Run tiles include their descriptions and omit visible status captions.
+A run is visually materialized (solid badge and filled tile background) only when it has
+saved processing rows and every row has RunFinished=true. Saved-only, partial,
+cancelled, failed, and unreadable processing states remain light. Creating a new
+run from a completed template also remains light. Completion is refreshed from
+parameter files when the wizard loads or refreshes; Results are not scanned.
+
+### Channel terminology
+
+`ChannelCount` is the number of sorting-network channels and is used consistently
+in parameter keys, library identities, DTOs, and the editor. Comparator endpoints
+are `LowChannel` and `HighChannel` (`int<channelIndex>`); `ChannelSpan` measures
+the distance between them. Comparator counts and stage counts remain separate.
+This rename intentionally changes stored names without legacy aliases or migration.

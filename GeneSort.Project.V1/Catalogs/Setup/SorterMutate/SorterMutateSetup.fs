@@ -32,9 +32,9 @@ module SorterMutateSetup =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (channelCount: int<channelCount>) =
+                        rp.GetChannelCount()
+                        |> Result.ofOption "Missing channel count in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
@@ -74,7 +74,7 @@ module SorterMutateSetup =
 
             let! (parentSorterSetEval: sorterSetEval) =
                         sources.LoadStandardSorterEvals
-                                            sortingWidth 
+                                            channelCount
                                             simpleSorterModelType
                                             sorterEvalType.V2
 
@@ -88,7 +88,7 @@ module SorterMutateSetup =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        channelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -191,7 +191,7 @@ module SorterMutateSetup =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        mrgLibid.SortingWidth 
+                                        mrgLibid.ChannelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -295,7 +295,7 @@ module SorterMutateSetup =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        pfxLibid.SortingWidth 
+                                        pfxLibid.ChannelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp

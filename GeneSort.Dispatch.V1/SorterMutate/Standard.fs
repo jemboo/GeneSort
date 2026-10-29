@@ -48,10 +48,10 @@ module Standard =
                  ]
                  |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msrsParamsRL 16<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msrsParamsRL 16<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.90] |> List.map string)
-                (ParamKeys.sortingWidthKey, [16] |> List.map string)
+                (ParamKeys.channelCountKey, [16] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
@@ -98,10 +98,10 @@ module Standard =
                  ]
                  |> List.map SorterEvalMeasure.toCompactString)
                 (ParamKeys.mutatorParamsKey,
-                 [MutatorParams.msrsParamsRL 16<sortingWidth> rngType.Lcg mutatorVariant.V1]
+                 [MutatorParams.msrsParamsRL 16<channelCount> rngType.Lcg mutatorVariant.V1]
                  |> List.map MutatorParams.toString)
                 (ParamKeys.modificationRateKey, [0.90] |> List.map string)
-                (ParamKeys.sortingWidthKey, [16] |> List.map string)
+                (ParamKeys.channelCountKey, [16] |> List.map string)
                 (ParamKeys.sorterChildCountKey, [1000] |> List.map string)
                 (ParamKeys.mutationModKey, [1] |> List.map string)
             ]
@@ -142,8 +142,10 @@ module Standard =
         let specFunc = Configs.[config]
         specFunc ()
 
+    let description = "Compare standard sorting-network mutation configurations."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", description, [|
             runExample("Msrs", Msrs)
             runExample("Msuf4", Msuf4)
         |])

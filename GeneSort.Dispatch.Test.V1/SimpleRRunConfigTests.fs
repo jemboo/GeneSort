@@ -53,7 +53,7 @@ let ``Msuf4a SimpleR presets expand distinct executions with bounded models and 
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
         Assert.Equal(Some query.Id, rp.GetId())
         let generator =
-            SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<sortingWidth> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
+            SeedSorterModelGeneration.getSimpleUniformSorterModelGen (rp.GetRngType().Value) 32<channelCount> simpleSorterModelType.Msuf4 (rp.GetExcludeSelfCe().Value)
             |> SeedSorterModelGeneration.applyParameters rp |> Result.defaultWith failwith
         let parent = SorterModelGen.makeSorterModelFromIndex 0<sortingGenIndex> generator
         let path, _ = EvoPath.fromParameters configured rp

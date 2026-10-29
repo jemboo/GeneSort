@@ -23,11 +23,11 @@ open GeneSort.Model.Sorting.Mp.V1.Simple
 let private model kind =
     let id = UMX.tag (Guid.NewGuid())
     match kind with
-    | "Msce" -> msce.create id 4<sortingWidth> [|0; 1; 2|] |> simpleSorterModel.Msce
-    | "Mssi" -> mssi.create id 4<sortingWidth> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permSi.create) |> simpleSorterModel.Mssi
-    | "Msrs" -> msrs.create id 4<sortingWidth> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permRs.create) |> simpleSorterModel.Msrs
-    | "Msuf4" -> msuf4.create id 4<sortingWidth> ([|twoOrbitPairType.Ortho; twoOrbitPairType.Para; twoOrbitPairType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf4.create seed [||])) |> simpleSorterModel.Msuf4
-    | "Msuf6" -> msuf6.create id 6<sortingWidth> ([|twoOrbitTripleType.Ortho1; twoOrbitTripleType.Ortho2; twoOrbitTripleType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf6.create seed [||])) |> simpleSorterModel.Msuf6
+    | "Msce" -> msce.create id 4<channelCount> [|0; 1; 2|] |> simpleSorterModel.Msce
+    | "Mssi" -> mssi.create id 4<channelCount> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permSi.create) |> simpleSorterModel.Mssi
+    | "Msrs" -> msrs.create id 4<channelCount> ([|[|1; 0; 3; 2|]; [|2; 3; 0; 1|]; [|3; 2; 1; 0|]|] |> Array.map permRs.create) |> simpleSorterModel.Msrs
+    | "Msuf4" -> msuf4.create id 4<channelCount> ([|twoOrbitPairType.Ortho; twoOrbitPairType.Para; twoOrbitPairType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf4.create seed [||])) |> simpleSorterModel.Msuf4
+    | "Msuf6" -> msuf6.create id 6<channelCount> ([|twoOrbitTripleType.Ortho1; twoOrbitTripleType.Ortho2; twoOrbitTripleType.SelfRefl|] |> Array.map (fun seed -> twoOrbitUf6.create seed [||])) |> simpleSorterModel.Msuf6
     | _ -> failwith "Unknown test model"
 
 let private mutator kind (rate: float) =
@@ -37,8 +37,8 @@ let private mutator kind (rate: float) =
     | "Msce" -> msceRandMutate.create rng (indelRates.create (rate, 0.0, 0.0)) (UMX.tag true) mutatorVariant.V1 |> SmmMsceRandMutate
     | "Mssi" -> SimpleSorterModelMutator.getMssiModelMutator rng (UMX.tag true) r (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
     | "Msrs" -> SimpleSorterModelMutator.getMsrsModelMutator rng (UMX.tag true) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
-    | "Msuf4" -> SimpleSorterModelMutator.getMsuf4ModelMutator 16<sortingWidth> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V2
-    | "Msuf6" -> SimpleSorterModelMutator.getMsuf6ModelMutator 12<sortingWidth> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
+    | "Msuf4" -> SimpleSorterModelMutator.getMsuf4ModelMutator 16<channelCount> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V2
+    | "Msuf6" -> SimpleSorterModelMutator.getMsuf6ModelMutator 12<channelCount> rng (UMX.tag true) (UMX.tag rate) r (UMX.tag 1.0) (UMX.tag 1.0) (UMX.tag 1.0) mutatorVariant.V1
     | _ -> failwith "Unknown test mutator"
 
 let private options =
@@ -65,7 +65,7 @@ let ``Boolean entries filter before expansion and truncation and survive seriali
         for current in [wrapped; roundTrip wrapped] do
             Assert.Equal<bool>(mask, (SorterModel.asSimpleSorterModelS current).Activators)
             Assert.Equal(SimpleSorterModel.getId source, SorterModel.getId current)
-            Assert.Equal(SimpleSorterModel.getSortingWidth source, SorterModel.getSortingWidth current)
+            Assert.Equal(SimpleSorterModel.getChannelCount source, SorterModel.getChannelCount current)
             Assert.Equal(expected.Length, int (SorterModel.getCeLength current))
             let active = mask |> Array.filter id |> Array.length
             let stages = if kind = "Msce" then 2 * active / 4 else active
@@ -94,7 +94,7 @@ let ``Boolean activators are validated and defensively copied including decoded 
         let decoded = MessagePackSerializer.Deserialize<sorterModelDto>(bytes, options)
         Assert.Throws<Exception>(fun () -> SorterModelDto.toDomain decoded |> ignore) |> ignore
     Assert.Throws<ArgumentNullException>(fun () -> simpleSorterModelS.create Unchecked.defaultof<_> [||] |> ignore) |> ignore
-    let invalidEntry = msce.create (UMX.tag (Guid.NewGuid())) 4<sortingWidth> [|-1; 1|] |> simpleSorterModel.Msce
+    let invalidEntry = msce.create (UMX.tag (Guid.NewGuid())) 4<channelCount> [|-1; 1|] |> simpleSorterModel.Msce
     Assert.Equal<ce>([|Ce.fromIndex 1|], (simpleSorterModelS.create invalidEntry [|false; true|]).MakeSorter(None).Ces)
 
 [<Theory>]
@@ -148,7 +148,7 @@ let ``Boolean generation and mutation replay through unions and MessagePack`` ki
 [<Fact>]
 let ``Probability endpoints and invalid settings are handled explicitly`` () =
     for factory in [rngFactory.LcgFactory; rngFactory.NetFactory; rngFactory.SmxFactory] do
-        let underlying = SimpleSorterModelGen.makeUniform factory 4<sortingWidth> 20<stageLength> simpleSorterModelType.Msrs (UMX.tag true)
+        let underlying = SimpleSorterModelGen.makeUniform factory 4<channelCount> 20<stageLength> simpleSorterModelType.Msrs (UMX.tag true)
         for probability in [0.0; 1.0] do
             let gen = simpleSorterModelSGen.create underlying probability
             let paired = gen.MakeSorterModelFromIndex (UMX.tag 0)

@@ -7708,14 +7708,14 @@ module QueryParamsBuildersRun =
             let makeRunQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.Run outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7753,14 +7753,14 @@ module QueryParamsBuildersRun =
             let makeRunParametersQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.RunParameters outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7798,14 +7798,14 @@ module QueryParamsBuildersRun =
             let makeSorterPoolSetQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7843,14 +7843,14 @@ module QueryParamsBuildersRun =
             let makeSorterPoolSetSummarySetQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSetSummarySet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7888,14 +7888,14 @@ module QueryParamsBuildersRun =
             let makeSorterSetQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterSet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7933,14 +7933,14 @@ module QueryParamsBuildersRun =
             let makeSorterModelSetQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterModelSet outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -7978,14 +7978,14 @@ module QueryParamsBuildersRun =
             let makeSortableTestsQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SortableTests outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8023,14 +8023,14 @@ module QueryParamsBuildersRun =
             let makeSortableTestsWithPrefixQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8068,14 +8068,14 @@ module QueryParamsBuildersRun =
             let makeSorterSetEvalQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterSetEval outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8113,14 +8113,14 @@ module QueryParamsBuildersRun =
             let makeSorterPoolBinsSetSeriesQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolBinsSetSeries outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8158,14 +8158,14 @@ module QueryParamsBuildersRun =
             let makeSorterPoolSetHistoryQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.SorterPoolSetHistory outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8203,14 +8203,14 @@ module QueryParamsBuildersRun =
             let makeTextReportQueryParams projectName dbName (rp: runParameters) outputName =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
                     return queryParams.create dbName projectName (Some repl) None (geneSortDataType.TextReport outputName)
                         [|
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
                             for value in rp.ParamMap.TryFind ParamKeys.setupParametersIdKey |> Option.toList do
@@ -8260,11 +8260,11 @@ module QueryParamsBuildersRun =
                 | geneSortDataType.TextReport name -> makeTextReportQueryParams projectName dbName parameters name
 
 
-            let makeLibraryQueryParams projectName dbName repl rng sortingWidth simpleModel evalType odt =
+            let makeLibraryQueryParams projectName dbName repl rng channelCount simpleModel evalType odt =
                 queryParams.create dbName projectName (Some repl) None odt
                     [|
                         (ParamKeys.rngTypeKey, rng |> RngType.toString)
-                        (ParamKeys.sortingWidthKey, (Some sortingWidth) |> SortingWidth.toString)
+                        (ParamKeys.channelCountKey, (Some channelCount) |> ChannelCount.toString)
                         (ParamKeys.simpleSorterModelTypeKey, simpleModel |> SimpleSorterModelType.toString)
                         (ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString)
                     |]
@@ -8272,7 +8272,7 @@ module QueryParamsBuildersRun =
             let libraryQueryFromParameters projectName dbName (rp: runParameters) odt =
                 maybe {
                     let! repl = rp.GetRepl()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! rng = rp.GetRngType()
                     let! evalType = rp.GetSorterEvalType()
@@ -9281,7 +9281,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9293,7 +9293,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9336,7 +9336,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9348,7 +9348,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9391,7 +9391,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9403,7 +9403,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9446,7 +9446,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9458,7 +9458,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9501,7 +9501,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9513,7 +9513,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9556,7 +9556,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9568,7 +9568,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9611,7 +9611,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9623,7 +9623,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9666,7 +9666,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9678,7 +9678,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9721,7 +9721,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9733,7 +9733,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9776,7 +9776,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9788,7 +9788,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9831,7 +9831,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9843,7 +9843,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString
@@ -9886,7 +9886,7 @@ module QueryParamsBuildersRun =
                     let! repl = rp.GetRepl()
                     let! selection = rp.GetSeedSorterPoolSelectionType()
                     let! measure = rp.GetSorterEvalMeasure()
-                    let! width = rp.GetSortingWidth()
+                    let! width = rp.GetChannelCount()
                     let! model = rp.GetSimpleSorterModelType()
                     let! format = rp.GetSortableDataFormat()
                     let! rng = rp.GetRngType()
@@ -9898,7 +9898,7 @@ module QueryParamsBuildersRun =
                             yield ParamKeys.rngTypeKey, rng |> RngType.toString
                             yield ParamKeys.seedSorterPoolSelectionTypeKey, selection |> SorterSelectionType.toString
                             yield ParamKeys.sorterEvalMeasureKey, measure |> SorterEvalMeasure.toCompactString
-                            yield ParamKeys.sortingWidthKey, (Some width) |> SortingWidth.toString
+                            yield ParamKeys.channelCountKey, (Some width) |> ChannelCount.toString
                             yield ParamKeys.simpleSorterModelTypeKey, model |> SimpleSorterModelType.toString
                             yield ParamKeys.sortableDataFormatKey, format |> SortableDataFormat.toString
                             yield ParamKeys.sorterEvalTypeKey, evalType |> SorterEvalType.toString

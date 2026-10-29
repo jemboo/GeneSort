@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open System
@@ -77,9 +77,9 @@ module CeUse =
 
     let ceUseStringToSorter 
             (sorterId: Guid<sorterId>)
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (ceUseString: string) : sorter =
 
         let ces = ceUseStringToCes ceUseString
-        sorter.create sorterId sortingWidth ces
+        sorter.create sorterId channelCount ces
 

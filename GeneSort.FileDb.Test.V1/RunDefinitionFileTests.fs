@@ -43,8 +43,8 @@ module RunDefinitionFileTests =
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     ParameterSpans = [
                         ParamKeys.sortableDataFormatKey, ["BitVector512"]
-                        ParamKeys.prefixLibIdKey, ["PrefixLibId(sortingWidth=24, stageLength=3, Variant=PrefixA)";
-                                                  "PrefixLibId(sortingWidth=24, stageLength=3, Variant=PrefixB)"]
+                        ParamKeys.prefixLibIdKey, ["PrefixLibId(channelCount=24, stageLength=3, Variant=PrefixA)";
+                                                  "PrefixLibId(channelCount=24, stageLength=3, Variant=PrefixB)"]
                     ]
                 }
             } |> run.DirectRun

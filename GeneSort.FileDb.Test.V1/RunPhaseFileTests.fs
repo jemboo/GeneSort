@@ -268,7 +268,7 @@ module RunPhaseFileTests =
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                ParameterSpans = [ParamKeys.sortingWidthKey, ["4"]; ParamKeys.rngTypeKey, ["LCG"]
+                ParameterSpans = [ParamKeys.channelCountKey, ["4"]; ParamKeys.rngTypeKey, ["LCG"]
                                   ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]; ParamKeys.sorterCountKey, ["2"]]
             }
             Execution = {
@@ -314,9 +314,9 @@ module RunPhaseFileTests =
         let setupFiles = Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.filter (fun path -> path.Contains(string Path.DirectorySeparatorChar + "Setup" + string Path.DirectorySeparatorChar)) |> Array.sort
         Assert.Equal<string>(files, setupFiles)
         let sources = WorkflowSourceFiles.create folder
-        let! loaded = (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! loaded = (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.Equal(2, (get loaded).SorterEvals.Length)
-        let! absent = ((WorkflowSourceFiles.create (Path.Combine(folder, "other"))).Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! absent = ((WorkflowSourceFiles.create (Path.Combine(folder, "other"))).Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.True(Result.isError absent)
         match absent with
         | Error message ->
@@ -337,7 +337,7 @@ module RunPhaseFileTests =
         let! rows = RunParameterFiles.loadAllAsync folder evaluation
         let! executed = RunExecutionFiles.runSavedAsync folder evaluation rows null
         Assert.Empty(executed.Errors)
-        let prefix = prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
+        let prefix = prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA
         let tests =
             DirectRun.create {
                 ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag "TestBank"; RunName = UMX.tag "MyTests"
@@ -356,7 +356,7 @@ module RunPhaseFileTests =
         let host = WorkflowSourceFiles.create folder
         let sources = host.Evolution (UMX.tag "TestBank") (UMX.tag "SeedBank")
         let! loadedTests = sources.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
-        let! loadedEvals = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! loadedEvals = sources.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.True(Result.isOk loadedTests)
         Assert.Equal(2, (get loadedEvals).SorterEvals.Length)
         Assert.False(Directory.Exists(Path.Combine(folder, "SortableTests", "Prefix")))
@@ -366,7 +366,7 @@ module RunPhaseFileTests =
             RunDto.fromDomain evaluation with RunName = "DifferentFamily"; RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
         }
         let! _ = RunDefinitionFiles.saveAsync folder differentFamily false
-        let! stillStandard = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! stillStandard = sources.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.True(Result.isOk stillStandard)
         // A database with two different matching evaluations needs a narrower source choice.
         let alternative = RunDto.toDomain {
@@ -376,13 +376,13 @@ module RunPhaseFileTests =
                     if span.Key = ParamKeys.sorterCountKey then { span with Values = [|"3"|] } else span)
         }
         let! _ = RunDefinitionFiles.saveAsync folder alternative false
-        let! ambiguous = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! ambiguous = sources.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         match ambiguous with
         | Error message -> Assert.Contains("found 2", message)
         | Ok _ -> failwith "Do not choose an arbitrary evaluation from an ambiguous database."
         let wrong = host.Evolution (UMX.tag "WrongTests") (UMX.tag "WrongEvals")
         let! missingTests = wrong.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
-        let! missingEvals = wrong.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! missingEvals = wrong.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         match missingTests, missingEvals with
         | Error testsError, Error evalsError ->
             Assert.Contains("WrongTests", testsError)
@@ -395,8 +395,8 @@ module RunPhaseFileTests =
     [<InlineData("Prefix")>]
     [<InlineData("Merge")>]
     let ``evaluation setup requires matching tests and accepts any source run name`` database = withFolder (fun folder -> task {
-        let prefix = prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
-        let merge = mergeLibId.create 8<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA
+        let prefix = prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA
+        let merge = mergeLibId.create 8<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
         let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupEnhancer, runEnhancer =
             if database = "Prefix" then
                 ParamKeys.prefixLibIdKey, PrefixLibId.toString prefix, sortableDataFormat.BitVector512,

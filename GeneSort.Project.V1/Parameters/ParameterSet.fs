@@ -357,9 +357,9 @@ type parameterSet<'kind> =
         this.paramMap.TryFind ParamKeys.sorterPoolSelectionIntervalsKey
         |> Option.map (fun v -> GenIntervalConfig.fromString(v))
 
-    member this.GetSortingWidth() =
-        ParamKeys.tryGetInt ParamKeys.sortingWidthKey this.paramMap
-        |> Option.map UMX.tag<sortingWidth>
+    member this.GetChannelCount() =
+        ParamKeys.tryGetInt ParamKeys.channelCountKey this.paramMap
+        |> Option.map UMX.tag<channelCount>
 
     member this.GetSourceDbName() =
         this.paramMap.TryFind ParamKeys.sourceDbNameKey |> Option.map UMX.tag<databaseName>
@@ -621,8 +621,8 @@ type parameterSet<'kind> =
     member this.WithSorterPoolSelectionIntervals(sConfig: genIntervalConfig option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sorterPoolSelectionIntervalsKey (sConfig |> Option.map GenIntervalConfig.toString) }
 
-    member this.WithSortingWidth(w: int<sortingWidth> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sortingWidthKey (w |> Option.map UmxExt.intToRaw) }
+    member this.WithChannelCount(w: int<channelCount> option) : parameterSet<'kind> =
+        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.channelCountKey (w |> Option.map UmxExt.intToRaw) }
 
     member this.WithSourceDbName(value: string<databaseName> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sourceDbNameKey (value |> Option.map UmxExt.stringToRaw) }

@@ -149,7 +149,7 @@ let ``Continuation workflows require Soss transition settings and share explicit
 
 let private parameters =
     (runParameters.create Map.empty)
-        .WithSortingWidth(Some 2<sortingWidth>)
+        .WithChannelCount(Some 2<channelCount>)
         .WithPartitionCount(Some 1<partitionCount>)
         .WithRngType(Some Lcg)
         .WithSeedSoss(Some (UMX.tag 1UL))
@@ -157,7 +157,7 @@ let private parameters =
         .WithGenerationCurrent(Some 7<generationNumber>)
 
 let private intervals = { Name = "test"; Min = 0; MaxCount = Some 2; Scale = 1.0; Method = Constant 1 }
-let private tests = sortableBinaryTests.create (UMX.tag Guid.Empty) 2<sortingWidth> [||] |> sortableTests.Bools
+let private tests = sortableBinaryTests.create (UMX.tag Guid.Empty) 2<channelCount> [||] |> sortableTests.Bools
 let private pool soss (generation: int) =
     let standard = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) (UMX.tag generation) (Dim1 1) None
     if soss then SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss
@@ -363,9 +363,9 @@ let ``Pool 4 debug generates split parameters and completes setup and execution`
     let memory = MemoryDb(host.QueryParamsFromRunParams)
     let bound = host.WithRunDb(memory)
     let tinyTests =
-        [| sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>)
-           sortableBoolArray.create(Array.create 32 true, 32<sortingWidth>) |]
-        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
+        [| sortableBoolArray.create(Array.create 32 false, 32<channelCount>)
+           sortableBoolArray.create(Array.create 32 true, 32<channelCount>) |]
+        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
         |> sortableTests.Bools
     use cts = new CancellationTokenSource()
     EvoStartCreation.createSossStart host.Run.ProjectName host.Run.DatabaseName (fun _ -> async { return Ok (tinyTests, [||]) })
@@ -390,15 +390,15 @@ let ``Soss adjusts on merged evaluations but retains the scheduled partition for
     let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let makeTests values =
-        sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
-            [| sortableBoolArray.create(values, 32<sortingWidth>) |] |> sortableTests.Bools
+        sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
+            [| sortableBoolArray.create(values, 32<channelCount>) |] |> sortableTests.Bools
     let partitions =
         [ UMX.tag "0", makeTests (Array.init 32 (fun i -> otherPartitionUnsorted && i < 16))
           UMX.tag "1", makeTests (Array.create 32 false) ]
         |> List.filter (fun (id, _) -> partitionCount > 1 || id = UMX.tag "1")
         |> Map.ofList |> partitionOfSortableTests.create
     let model =
-        msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 1)
+        msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 150 1)
         |> simpleSorterModel.Msce
         |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue =
@@ -410,7 +410,7 @@ let ``Soss adjusts on merged evaluations but retains the scheduled partition for
     let result =
         Pipeline_Soss.runGenerationStepSoss mutator 1<sorterCountPerPool> 1<sorterCountPerPool> 0<sorterChildCount>
             (UMX.tag false) (UMX.tag false) partitions 1<generationsPerSubset> 1<generationsPerSubset>
-            (ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]) sorterEvalType.V2
+            (ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]) sorterEvalType.V2
             (stageLengthMeasure.create false false |> sorterEvalMeasure.StageLength)
             input false (UMX.tag false) 1.0<sortedFraction>
     let resultPool = result.SorterPools.[poolId]
@@ -440,15 +440,15 @@ let ``Soss length changes invalidate every subset before parent and survivor ran
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let values = Array.create 32 true
     values.[1] <- false
-    let test = sortableBoolArray.create(values, 32<sortingWidth>)
+    let test = sortableBoolArray.create(values, 32<channelCount>)
     // Two failures have a strictly worse UnsortedCount score than zero failures.
-    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> [|test; test|] |> sortableTests.Bools
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount> [|test; test|] |> sortableTests.Bools
     let partitions = [0 .. partitionCount - 1] |> List.map (fun i -> UMX.tag (string i), tests)
                      |> Map.ofList |> partitionOfSortableTests.create
     let makeMember (id: Guid) cePosition =
         let codes = Array.create 150 0
         codes.[cePosition] <- 1 // Comparator (0,1).
-        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> codes
                     |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
         spMember_Soss.create (UMX.tag id) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     // At the original length both sort; at the adjusted budget of one CE only B sorts.
@@ -459,7 +459,7 @@ let ``Soss length changes invalidate every subset before parent and survivor ran
     let pool = sorterPool_Soss.create poolId None (UMX.tag "length") (D1 0) [|memberA; memberB|] 150<ceLength> (UMX.tag 0)
     let generation = if mergedSelection then 2<generationNumber> else 0<generationNumber>
     let input = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) generation (Dim1 1) (Some [pool])
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let selectedId = if mergedSelection then CommonSgdSoss.mergedSubsetId else UMX.tag<sortableTestsSubsetId> "0"
     let adjustmentId = if partitionCount = 1 then selectedId else CommonSgdSoss.mergedSubsetId
     let evaluate selected force poolSet =
@@ -518,15 +518,15 @@ let ``Soss resume replaces legacy length caches before parent and survivor selec
                      .WithSorterEvalMeasure(Some (unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount))
     let values = Array.create 32 true
     values.[1] <- false
-    let test = sortableBoolArray.create(values, 32<sortingWidth>)
-    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 4 test) |> sortableTests.Bools
+    let test = sortableBoolArray.create(values, 32<channelCount>)
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 4 test) |> sortableTests.Bools
     let partitions = SgdEx_Soss.makeSortableTestsPartitions (baseRp.GetRngType().Value) (baseRp.GetSeedSoss().Value)
                          (UMX.tag partitionCount) tests
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let makeMember (id: Guid) cePosition =
         let codes = Array.create 150 0
         codes.[cePosition] <- 1
-        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+        let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> codes
                     |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
         spMember_Soss.create (UMX.tag id) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let memberA = makeMember Guid.Empty 140
@@ -603,8 +603,8 @@ let ``Soss parent survivor and pool rankings follow every cycle boundary`` cache
             let values = Array.init 32 (fun i -> i >= cut)
             values.[cut - 1] <- true
             values.[cut] <- false
-            sortableBoolArray.create(values, 32<sortingWidth>))
-        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth>
+            sortableBoolArray.create(values, 32<channelCount>))
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount>
         |> sortableTests.Bools
     let partitions =
         [ UMX.tag "0", makeTests [|1; 2; 3; 4; 5|]
@@ -618,10 +618,10 @@ let ``Soss parent survivor and pool rankings follow every cycle boundary`` cache
             let codes = Array.create 150 0
             cuts |> Array.iteri (fun i cut ->
                 codes.[i] <- GeneSort.Sorting.Sorter.ce.create (cut - 1) cut |> GeneSort.Sorting.Sorter.Ce.toIndex)
-            let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+            let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> codes
                         |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
             spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>)
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let measure = unsortedCountMeasure.create false |> sorterEvalMeasure.UnsortedCount
     let expectedSubset generation =
         if partitionCount = 1 || generation % 7 < 2 then "0"
@@ -736,17 +736,17 @@ let ``Soss parent survivor and pool rankings follow every cycle boundary`` cache
 let ``Soss copied members reevaluate independently at destination pool lengths`` () =
     let values = Array.create 32 true
     values.[1] <- false
-    let test = sortableBoolArray.create(values, 32<sortingWidth>)
-    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> [|test; test|] |> sortableTests.Bools
+    let test = sortableBoolArray.create(values, 32<channelCount>)
+    let tests = sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount> [|test; test|] |> sortableTests.Bools
     let partitions = Map.ofList [UMX.tag "0", tests; UMX.tag "1", tests] |> partitionOfSortableTests.create
     let codes = Array.create 150 0
     codes.[140] <- 1
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> codes
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> codes
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let original = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 5) (UMX.tag 0) None Map.empty 0<generationNumber>
     let sourcePool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 0) [|original|] 150<ceLength> (UMX.tag 0)
     let sourceSet = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [sourcePool])
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let evaluate poolSet = Pipeline_Soss.evaluateRequiredPartitions partitions prefix sorterEvalType.V2 false
                                (UMX.tag false) CommonSgdSoss.mergedSubsetId true poolSet
     let cachedSet = sourceSet |> SorterPoolSet_Soss.withSubsetIdForSelection CommonSgdSoss.mergedSubsetId |> evaluate
@@ -787,12 +787,12 @@ let ``Soss SeedSoss recreates ordered partition contents and cached evaluations 
     let rows =
         [| for value in 0 .. 1026 ->
             Array.init 32 (fun bit -> (value &&& (1 <<< bit)) <> 0)
-            |> fun values -> sortableBoolArray.create(values, 32<sortingWidth>) |]
+            |> fun values -> sortableBoolArray.create(values, 32<channelCount>) |]
     let setupTests =
         if bitVector then
-            SortableBitv512Tests.fromBoolArrays (UMX.tag (Guid.NewGuid())) 32<sortingWidth> rows |> sortableTests.Bitv512
+            SortableBitv512Tests.fromBoolArrays (UMX.tag (Guid.NewGuid())) 32<channelCount> rows |> sortableTests.Bitv512
         else
-            sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> rows |> sortableTests.Bools
+            sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount> rows |> sortableTests.Bools
     let setupBytes =
         GeneSort.Sorting.Mp.Sortable.SortableTestsDto.fromDomain setupTests
         |> MessagePack.MessagePackSerializer.Serialize
@@ -808,12 +808,12 @@ let ``Soss SeedSoss recreates ordered partition contents and cached evaluations 
                 | _ -> failwith "Unexpected test format"
             arrays |> Array.map (fun value -> value.Values))
     let model =
-        msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.init 150 (fun i -> 1 + i % 90))
+        msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.init 150 (fun i -> 1 + i % 90))
         |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let inputPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "cache") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
     let input = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 7<generationNumber> (Dim1 1) (Some [inputPool])
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let serializePool value =
         GeneSort.Eval.Mp.V1.Sgd.Soss.SorterPoolSetDto_Soss.toDto value |> MessagePack.MessagePackSerializer.Serialize
     for count in [1; 3; 7] do
@@ -867,12 +867,12 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
             let values = Array.init 32 (fun i -> i >= cut)
             values.[cut - 1] <- true
             values.[cut] <- false
-            sortableBoolArray.create(values, 32<sortingWidth>) |]
-        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth>
+            sortableBoolArray.create(values, 32<channelCount>) |]
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount>
         |> sortableTests.Bools
     // Keep a nonempty, deterministic population so evaluation caches and subset IDs
     // are checked without random child IDs obscuring exact checkpoint comparisons.
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 0)
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 150 0)
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let seedPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "resume") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
@@ -912,7 +912,7 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
     let baseline = [| for generation in 0 .. 15 -> loadCheckpoint uninterrupted generation |> serialize |]
     let partitions = SgdEx_Soss.makeSortableTestsPartitions (rp.GetRngType().Value) (rp.GetSeedSoss().Value)
                          (UMX.tag partitionCount) testSet
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     // Includes before/at/after partition transitions (2,9), Merge entry (4,11),
     // wraparound (7,14), and an already-complete checkpoint (15).
     for checkpointGeneration in 1 .. 15 do
@@ -971,9 +971,9 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
             let values = Array.init 32 (fun i -> i >= cut)
             values.[cut - 1] <- true
             values.[cut] <- false
-            sortableBoolArray.create(values, 32<sortingWidth>) |]
-        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> |> sortableTests.Bools
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 0)
+            sortableBoolArray.create(values, 32<channelCount>) |]
+        |> sortableBinaryTests.create (UMX.tag (Guid.NewGuid())) 32<channelCount> |> sortableTests.Bools
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 150 0)
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let pool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "buffered") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
@@ -1022,7 +1022,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
     initialize reference
     execute reference 1
     let partitions = SgdEx_Soss.makeSortableTestsPartitions (rp.GetRngType().Value) (rp.GetSeedSoss().Value) 2<partitionCount> tests
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let expectedSubset generation =
         let position = (generation - 1) % 7
         if position < 2 then "0" elif position < 4 then "1" else "Merge"
@@ -1146,7 +1146,7 @@ let ``Soss checkpoints label the produced generation and stop exactly at the tar
     let mutator = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
                   |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
     let partitions = PartitionOfSortableTests.partition (fun _ -> 0) 1<sortableTestsCount> tests
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 2<channelCount> [||]
     let initial = pool true startingGeneration |> SorterPoolSet.asSoss |> Result.defaultWith failwith
     let memory = MemoryDb()
     let config = { intervals with MaxCount = Some 3 }
@@ -1226,7 +1226,7 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
     persist geneSortDataMode.Results
         (sourceHost.QueryParamsFromRunParams (sourceRp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "") |> Option.get)
         (sourcePoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet)
-    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth> [||] |> sortableTests.Bools
+    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount> [||] |> sortableTests.Bools
     persist geneSortDataMode.Setup
         (sourceSetupQuery sourceHost (sourceRp.WithGenerationCurrent(Some (UMX.tag 0))) (geneSortDataType.SortableTestsWithPrefix ""))
         (outputData.SortableTestsWithPrefix(sourceTests, [||]))
@@ -1260,7 +1260,7 @@ let ``Repeated append branches share immutable setup without growing parameter h
     let mutable sourceHost = runHost.Create sourceRun 1
     let mutable sourceRp = sourceHost.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
     let mutable sourceMemory = MemoryDb(sourceHost.QueryParamsFromRunParams)
-    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth> [||] |> sortableTests.Bools
+    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount> [||] |> sortableTests.Bools
     let persist (db: IGeneSortDb) mode query data =
         db.saveAsync mode query data (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
     persist sourceMemory geneSortDataMode.Setup
@@ -1338,9 +1338,9 @@ let ``Append source branching shares one database copy of each checkpoint and te
         let generation = GenIntervalConfig.getSampleAtIndex sourceHost.GenSaveIntervals.Value 1 |> Option.get
         persist sourceDb geneSortDataMode.Project (queryParams.createForRun sourceRun.DatabaseName sourceRun.ProjectName sourceRun.RunName) (outputData.Run sourceRun)
         let tests =
-            sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
-                [| sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>)
-                   sortableBoolArray.create(Array.create 32 true, 32<sortingWidth>) |]
+            sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
+                [| sortableBoolArray.create(Array.create 32 false, 32<channelCount>)
+                   sortableBoolArray.create(Array.create 32 true, 32<channelCount>) |]
             |> sortableTests.Bools
         for sourceRp in sourceParameters do
             let sourcePool =
@@ -1503,7 +1503,7 @@ let ``Soss append copies the selected source checkpoint and tests only after val
             | _ -> generation
         persist geneSortDataMode.Results sourcePoolQuery (outputData.SorterPoolSet (pool (scenario <> "standard-pool") actualGeneration))
     let sourceTestsQuery = sourceSetupQuery sourceHost (sourceRp.WithGenerationCurrent(Some (UMX.tag 0))) (geneSortDataType.SortableTestsWithPrefix "")
-    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth> [||] |> sortableTests.Bools
+    let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount> [||] |> sortableTests.Bools
     persist geneSortDataMode.Setup sourceTestsQuery (outputData.SortableTestsWithPrefix(sourceTests, [||]))
     let originalWrites = sourceMemory.Writes.Count
     use cts = new CancellationTokenSource()
@@ -1555,8 +1555,8 @@ let ``standalone tests have no setup and generate Results during execution`` pre
     let host = (runHost.Create spec 1).WithRunDb(memory)
     let rp =
         let basic = (runParameters.create Map.empty).WithRepl(Some 0<replNumber>).WithSortableDataFormat(Some sortableDataFormat.BoolArray)
-        if prefix then basic.WithPrefixLibId(Some (prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA))
-        else basic.WithMergeLibId(Some (mergeLibId.create 4<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA))
+        if prefix then basic.WithPrefixLibId(Some (prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA))
+        else basic.WithMergeLibId(Some (mergeLibId.create 4<channelCount> 2<mergeDimension> sorterLibVariant.VariantA))
     use cts = new CancellationTokenSource()
     Assert.False(spec.HasSetup)
     Assert.Throws<ArgumentException>(fun () -> host.SetupExecutor |> ignore) |> ignore
@@ -1647,17 +1647,17 @@ let ``start creation rejects missing or invalid recorded references before acces
 [<Fact>]
 let ``Soss seed setup labels its full test evaluation Merge rather than Default`` () =
     let model =
-        msce.create (UMX.tag (Guid.NewGuid())) 2<sortingWidth> [|1|]
+        msce.create (UMX.tag (Guid.NewGuid())) 2<channelCount> [|1|]
         |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue = spMember_Soss.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None Map.empty 0<generationNumber>
     let seedPool = sorterPool_Soss.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "seed") (D1 0) [|memberValue|] 1<ceLength> (UMX.tag 0)
     let seed = sorterPoolSet_Soss.create (UMX.tag (Guid.NewGuid())) 0<generationNumber> (Dim1 1) (Some [seedPool])
     let fullTests =
-        sortableBinaryTests.create (UMX.tag Guid.Empty) 2<sortingWidth>
-            [|sortableBoolArray.create([|true; false|], 2<sortingWidth>)|] |> sortableTests.Bools
+        sortableBinaryTests.create (UMX.tag Guid.Empty) 2<channelCount>
+            [|sortableBoolArray.create([|true; false|], 2<channelCount>)|] |> sortableTests.Bools
     let result =
         EvoStartCreation.evaluateSossSeed parameters fullTests
-            (ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]) (sorterPoolSet.Soss seed)
+            (ceBlock.create (UMX.tag Guid.Empty) 2<channelCount> [||]) (sorterPoolSet.Soss seed)
         |> Result.bind SorterPoolSet.asSoss |> Result.defaultWith failwith
     let evaluated = result.SorterPools |> Map.values |> Seq.exactlyOne |> fun p -> p.SorterPoolMembers |> Seq.exactlyOne
     Assert.Equal(1, evaluated.SorterEvalMap.Count)
@@ -1839,7 +1839,7 @@ let ``Standard checkpoints label produced generations and stop at the target`` (
     let memory = MemoryDb()
     let config = { intervals with MaxCount = Some 3 }
     let final = EvoOrch_Standard.runStandardEvolutionAsync memory config config (pathFor host rp) (EvoProgress.fromParameters rp) (UMX.tag false) initial tests
-                    (ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]) mutator CancellationToken.None ignore
+                    (ceBlock.create (UMX.tag Guid.Empty) 2<channelCount> [||]) mutator CancellationToken.None ignore
                 |> Async.RunSynchronously |> Result.defaultWith failwith
     Assert.Equal(2, int final.GenerationNumber)
     Assert.Equal<(int option * int) list>([for gen in startingGeneration + 1 .. 2 -> Some gen, gen], List.ofSeq memory.PoolGenerations)
@@ -1848,11 +1848,11 @@ let ``Standard checkpoints label produced generations and stop at the target`` (
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Pool evaluation preserves copied models and their pool-specific lengths`` reEvaluateParents =
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 200 1)
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 200 1)
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
-    let tinyTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
-                        [|sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>)|] |> sortableTests.Bools
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let tinyTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
+                        [|sortableBoolArray.create(Array.create 32 false, 32<channelCount>)|] |> sortableTests.Bools
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let standardPools =
         [| for index in 0 .. 3 do
             let memberValue = spMember_Standard.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 0) (UMX.tag 0) None None 0<generationNumber>
@@ -2001,13 +2001,13 @@ let ``Standard append starts from imported setup and resumes its resulting check
     let rp = rp |> SetupFileReferences.attach [ParamKeys.setupSorterPoolSetIdKey, string %poolQuery.Id; ParamKeys.setupSortableTestsWithPrefixIdKey, string %testsQuery.Id]
     let rp = rp.WithGenerationFirst(Some 1<generationNumber>).WithGenerationCurrent(Some 1<generationNumber>)
                 .WithGenerationIntervalLast(Some (UMX.tag 2)).WithSorterChildCount(Some 0<sorterChildCount>)
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 1)
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 150 1)
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let memberValue = spMember_Standard.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 12) (UMX.tag 0) None None 1<generationNumber>
     let sourcePool = sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "source") (D1 0) [|memberValue|] 150<ceLength> (UMX.tag 0)
     let source = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) 1<generationNumber> (Dim1 1) (Some [sourcePool])
-    let tinyTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
-                        [|sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>)|] |> sortableTests.Bools
+    let tinyTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
+                        [|sortableBoolArray.create(Array.create 32 false, 32<channelCount>)|] |> sortableTests.Bools
     let memory = MemoryDb(host.QueryParamsFromRunParams)
     let db = memory :> IGeneSortDb
     let persist query value = db.saveAsync geneSortDataMode.Setup query value (UMX.tag false) |> Async.RunSynchronously |> Result.defaultWith failwith
@@ -2098,7 +2098,7 @@ let private condenseFixtureFor soss (scenario: string) =
             else [| [40; 40]; [30; 30]; [20; 20]; [10; 10] |].[modifier]
         let members = lengths |> List.map (fun length ->
             let evaluation =
-                sorterEvalV1.create (UMX.tag (Guid.NewGuid())) subset 32<sortingWidth>
+                sorterEvalV1.create (UMX.tag (Guid.NewGuid())) subset 32<channelCount>
                     0<sortableCount> (UMX.tag 1) (UMX.tag 1) (UMX.tag length) 100<ceLength>
                     (UMX.tag false) (UMX.tag 0) (UMX.tag 0) |> sorterEval.V1
             spMember_Standard.create (UMX.tag (Guid.NewGuid())) GeneSort.Model.Sorting.V1.sorterModel.Unknown
@@ -2112,7 +2112,7 @@ let private condenseFixtureFor soss (scenario: string) =
             persist geneSortDataMode.Results
                 (sourceHost.QueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSet "") |> Option.get)
                 (outputData.SorterPoolSet(if soss then SorterPoolSet_Soss.fromStandard poolSet |> SorterPoolSet_Soss.withSubsetIdForSelection subset |> sorterPoolSet.Soss else sorterPoolSet.Standard poolSet))
-        let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth> [||] |> sortableTests.Bools
+        let sourceTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount> [||] |> sortableTests.Bools
         let testsQuery = sourceHost.QueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag 0))) (geneSortDataType.SortableTestsWithPrefix "") |> Option.get
         persist geneSortDataMode.Setup ((SetupInputReferences.resolveRecorded rp testsQuery)) (outputData.SortableTestsWithPrefix(sourceTests, [||]))
     let selection = [
@@ -2288,7 +2288,7 @@ let ``Pool X Step2 ranks repeated mutation values from distinct Step1 winners wi
         let generation = GenIntervalConfig.getSampleAtIndex host.GenSaveIntervals.Value sourceInterval |> Option.get
         for rp in parameters do
             let subset = string (int (rp.GetPartitionCount().Value)) |> UMX.tag<sortableTestsSubsetId>
-            let evaluation = sorterEvalV1.create (UMX.tag (Guid.NewGuid())) subset (rp.GetSortingWidth().Value)
+            let evaluation = sorterEvalV1.create (UMX.tag (Guid.NewGuid())) subset (rp.GetChannelCount().Value)
                                  0<sortableCount> (UMX.tag 1) (UMX.tag 1) (UMX.tag (score rp)) 100<ceLength>
                                  (UMX.tag false) (UMX.tag 0) (UMX.tag 0) |> sorterEval.V1
             let members = Array.init (int (rp.GetSorterCountPerPool().Value)) (fun _ ->
@@ -2589,14 +2589,14 @@ let ``Mixed family Setup converts members and execution needs only destination d
     let sourceHost = runHost.Create sourceRun 1
     let sourceRp = sourceHost.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne
     let generation = GenIntervalConfig.getSampleAtIndex sourceHost.GenSaveIntervals.Value 1 |> Option.get
-    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<sortingWidth> (Array.create 150 1)
+    let model = msce.create (UMX.tag (Guid.NewGuid())) 32<channelCount> (Array.create 150 1)
                 |> simpleSorterModel.Msce |> GeneSort.Model.Sorting.V1.sorterModel.Simple
     let originalMembers = [| for _ in 1..2 -> spMember_Standard.create (UMX.tag (Guid.NewGuid())) model (UMX.tag 3) (UMX.tag 0) None None 0<generationNumber> |]
     let originalPool = sorterPool_Standard.create (UMX.tag (Guid.NewGuid())) None (UMX.tag "mixed") (D1 0) originalMembers 150<ceLength> (UMX.tag 0)
     let original = sorterPoolSet_Standard.create (UMX.tag (Guid.NewGuid())) (UMX.tag generation) (Dim1 1) (Some [originalPool])
-    let fullTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<sortingWidth>
-                        [|sortableBoolArray.create(Array.create 32 false, 32<sortingWidth>); sortableBoolArray.create(Array.create 32 true, 32<sortingWidth>)|] |> sortableTests.Bools
-    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<sortingWidth> [||]
+    let fullTests = sortableBinaryTests.create (UMX.tag Guid.Empty) 32<channelCount>
+                        [|sortableBoolArray.create(Array.create 32 false, 32<channelCount>); sortableBoolArray.create(Array.create 32 true, 32<channelCount>)|] |> sortableTests.Bools
+    let prefix = ceBlock.create (UMX.tag Guid.Empty) 32<channelCount> [||]
     let evaluations = PoolRunner_Standard.evaluatePoolSet fullTests prefix sorterEvalType.V2 true (UMX.tag false) original
     let evaluated = original |> SorterPoolSet_Standard.updateSorterEvals evaluations
     let sourcePool = if toSoss then sorterPoolSet.Standard evaluated else SorterPoolSet_Soss.fromStandard evaluated |> sorterPoolSet.Soss
@@ -2755,11 +2755,11 @@ let ``SimpleR parameter values distinguish setup files execution files and repor
 let ``SimpleR seed generation setup and evolution execute with bounded activators`` soss =
     let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Soss() else GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Standard()
     let host = runHost.Create configured 1
-    // Use small sorting width and complete binary tests to exercise real makers and execution without external data.
+    // Use small channel count and complete binary tests to exercise real makers and execution without external data.
     let rp =
         (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head)
-            .WithSortingWidth(Some 4<sortingWidth>)
-            .WithPrefixLibId(Some (prefixLibId.create 4<sortingWidth> 1<stageLength> prefixLibVariant.PrefixA))
+            .WithChannelCount(Some 4<channelCount>)
+            .WithPrefixLibId(Some (prefixLibId.create 4<channelCount> 1<stageLength> prefixLibVariant.PrefixA))
             .WithSimpleSorterModelType(Some GeneSort.Model.Sorting.V1.simpleSorterModelType.Msce)
             .WithMutationRate(Some (UMX.tag 1.0)).WithInsertionRate(Some (UMX.tag 0.0)).WithDeletionRate(Some (UMX.tag 0.0))
             .WithActivatorMutationRate(Some 1.0)
@@ -2774,11 +2774,11 @@ let ``SimpleR seed generation setup and evolution execute with bounded activator
     let memory = MemoryDb(host.QueryParamsFromRunParams)
     let db = memory :> IGeneSortDb
     let tinyTests =
-        Array.init 16 (fun bits -> sortableBoolArray.create(Array.init 4 (fun bit -> bits &&& (1 <<< bit) <> 0), 4<sortingWidth>))
-        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 4<sortingWidth> |> sortableTests.Bools
+        Array.init 16 (fun bits -> sortableBoolArray.create(Array.init 4 (fun bit -> bits &&& (1 <<< bit) <> 0), 4<channelCount>))
+        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 4<channelCount> |> sortableTests.Bools
     let evaluations =
         Array.init 32 (fun index ->
-            sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 4<sortingWidth> 16<sortableCount>
+            sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 4<channelCount> 16<sortableCount>
                 (UMX.tag index) 2<stageLength> [||] (UMX.tag false) (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2)
         |> sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid()))
     let mutable loads = 0
@@ -2832,7 +2832,7 @@ let ``Dispatch SimpleR settings reject missing invalid and incompatible activato
     for invalid in [rp.WithAMax None; rp.WithAMax(Some -1); rp.WithActivatorMutationRate None;
                     rp.WithActivatorMutationRate(Some Double.NaN); rp.WithActivatorMutationRate(Some 1.1); rp.WithActivatorMutationRate(Some -0.1)] do
         Assert.True(MutatorMakers.applyParameters invalid underlying |> Result.isError)
-    let generator = SeedSorterModelGeneration.getSimpleUniformSorterModelGen Lcg 4<sortingWidth>
+    let generator = SeedSorterModelGeneration.getSimpleUniformSorterModelGen Lcg 4<channelCount>
                         GeneSort.Model.Sorting.V1.simpleSorterModelType.Msce (UMX.tag true)
     Assert.True(SeedSorterModelGeneration.applyParameters (rp.WithAMax(Some -1)) generator |> Result.isError)
     let paired = SeedSorterModelGeneration.applyParameters rp generator |> Result.defaultWith failwith
@@ -2885,11 +2885,11 @@ let ``SimpleS parameter values distinguish setup files execution files and repor
 let ``SimpleS seed generation setup and evolution execute with boolean activators`` soss =
     let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleS.SossS() else GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleS.StandardS()
     let host = runHost.Create configured 1
-    // Use small sorting width and complete binary tests to exercise real makers and execution without external data.
+    // Use small channel count and complete binary tests to exercise real makers and execution without external data.
     let rp =
         (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head)
-            .WithSortingWidth(Some 4<sortingWidth>)
-            .WithPrefixLibId(Some (prefixLibId.create 4<sortingWidth> 1<stageLength> prefixLibVariant.PrefixA))
+            .WithChannelCount(Some 4<channelCount>)
+            .WithPrefixLibId(Some (prefixLibId.create 4<channelCount> 1<stageLength> prefixLibVariant.PrefixA))
             .WithSimpleSorterModelType(Some GeneSort.Model.Sorting.V1.simpleSorterModelType.Msce)
             .WithMutationRate(Some (UMX.tag 1.0)).WithInsertionRate(Some (UMX.tag 0.0)).WithDeletionRate(Some (UMX.tag 0.0))
             .WithActivatorMutationRate(Some 1.0)
@@ -2904,11 +2904,11 @@ let ``SimpleS seed generation setup and evolution execute with boolean activator
     let memory = MemoryDb(host.QueryParamsFromRunParams)
     let db = memory :> IGeneSortDb
     let tinyTests =
-        Array.init 16 (fun bits -> sortableBoolArray.create(Array.init 4 (fun bit -> bits &&& (1 <<< bit) <> 0), 4<sortingWidth>))
-        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 4<sortingWidth> |> sortableTests.Bools
+        Array.init 16 (fun bits -> sortableBoolArray.create(Array.init 4 (fun bit -> bits &&& (1 <<< bit) <> 0), 4<channelCount>))
+        |> sortableBinaryTests.create (UMX.tag Guid.Empty) 4<channelCount> |> sortableTests.Bools
     let evaluations =
         Array.init 32 (fun index ->
-            sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 4<sortingWidth> 16<sortableCount>
+            sorterEvalV2.create (UMX.tag (Guid.NewGuid())) SortableTestsSubsetId.Default 4<channelCount> 16<sortableCount>
                 (UMX.tag index) 2<stageLength> [||] (UMX.tag false) (UMX.tag 1) (UMX.tag 0) |> sorterEval.V2)
         |> sorterSetEval.create (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid())) (UMX.tag (Guid.NewGuid()))
     let mutable loads = 0
@@ -2963,7 +2963,7 @@ let ``Dispatch SimpleS settings reject missing invalid and incompatible activato
                     rp.WithAMax(Some 3); rp.WithActivatorMutationRate None;
                     rp.WithActivatorMutationRate(Some Double.NaN); rp.WithActivatorMutationRate(Some 1.1); rp.WithActivatorMutationRate(Some -0.1)] do
         Assert.True(MutatorMakers.applyParameters invalid underlying |> Result.isError)
-    let generator = SeedSorterModelGeneration.getSimpleUniformSorterModelGen Lcg 4<sortingWidth>
+    let generator = SeedSorterModelGeneration.getSimpleUniformSorterModelGen Lcg 4<channelCount>
                         GeneSort.Model.Sorting.V1.simpleSorterModelType.Msce (UMX.tag true)
     Assert.True(SeedSorterModelGeneration.applyParameters (rp.WithActivationProbability(Some -0.1)) generator |> Result.isError)
     Assert.True(SeedSorterModelGeneration.applyParameters (rp.WithAMax(Some 3)) generator |> Result.isError)
@@ -2996,7 +2996,7 @@ let ``Standard interim checkpoint resumes a complete snapshot report segment`` (
     let samples = { intervals with MaxCount = Some 11 }
     let execute seed token log =
         EvoOrch_Standard.runStandardEvolutionAsync memory snapshots samples path state (UMX.tag false) seed tests
-            (ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]) mutator token log |> Async.RunSynchronously
+            (ceBlock.create (UMX.tag Guid.Empty) 2<channelCount> [||]) mutator token log |> Async.RunSynchronously
     use cts = new CancellationTokenSource()
     let interrupted = execute initial cts.Token (fun message -> if message = "Starting evolution step. Generation 7 of 10" then cts.Cancel())
     Assert.True(Result.isError interrupted)

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Rs
+namespace GeneSort.Model.Sorting.V1.Simple.Rs
 
 open System
 open FSharp.UMX
@@ -15,40 +15,40 @@ type msrsRandGen =
               id : Guid<sorterModelGenId>
               rngFactory: rngFactory
               opsGenRates: opsGenRates
-              sortingWidth: int<sortingWidth> 
+              channelCount: int<channelCount>
               stageLength: int<stageLength>
         } 
     static member create 
             (rngFactory: rngFactory)
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (opsGenRates: opsGenRates)
             (stageLength: int<stageLength>)
             : msrsRandGen =
 
-        if %sortingWidth < 2 then
-            failwith $"SortingWidth must be at least 2, got {%sortingWidth}"
+        if %channelCount < 2 then
+            failwith $"ChannelCount must be at least 2, got {%channelCount}"
         let id =
             [
                 box "msrsRandGen"
                 box rngFactory
-                box (sortingWidth |> UMX.untag)
+                box (channelCount |> UMX.untag)
                 box (stageLength |> UMX.untag)
                 box (opsGenRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
         {
             id = id
-            sortingWidth = sortingWidth
+            channelCount = channelCount
             opsGenRates = opsGenRates
             rngFactory = rngFactory
             stageLength = stageLength
         }
         
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.ChannelCount * %this.StageLength / 2) |> UMX.tag<ceLength>
     member this.RngFactory with get () = this.rngFactory
     member this.OpsGenRates with get () = this.opsGenRates
-    member this.SortingWidth with get () = this.sortingWidth
+    member this.ChannelCount with get () = this.channelCount
     member this.StageLength with get () = this.stageLength
 
     override this.Equals(obj) = 
@@ -58,7 +58,7 @@ type msrsRandGen =
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngFactory, this.opsGenRates, this.sortingWidth, this.stageLength)
+        hash (this.rngFactory, this.opsGenRates, this.channelCount, this.stageLength)
 
     interface IEquatable<msrsRandGen> with
         member this.Equals(other) = 
@@ -72,7 +72,7 @@ type msrsRandGen =
     member this.MakeSorterModelFromId (id: Guid<sorterModelId>) : msrs =
         let rng = this.RngFactory.Create %id
         let stageLength = %this.StageLength
-        let sortingWidth = %this.SortingWidth
+        let channelCount = %this.ChannelCount
         let opsGenRates = this.OpsGenRates
         let perm_Rss =
             [| for dex in 0 .. (stageLength - 1) ->
@@ -80,9 +80,9 @@ type msrsRandGen =
                     (rng.NextIndex)
                     (rng.NextFloat)
                     (opsGenRates)
-                    (sortingWidth) |]
+                    (channelCount) |]
 
-        msrs.create id this.SortingWidth perm_Rss
+        msrs.create id this.ChannelCount perm_Rss
 
 
     member this.MakeSorterModelFromIndex (index: int<sortingGenIndex>) : msrs =
@@ -96,7 +96,7 @@ module MsrsRandGen =
     let toString (msrsGen: msrsRandGen) : string =
         sprintf "MsrsRandGen(RngType=%A, Width=%d, StageLength=%d, OpActionRatesArray=%s)" 
                 msrsGen.RngFactory 
-                (%msrsGen.SortingWidth) 
+                (%msrsGen.ChannelCount)
                 (%msrsGen.StageLength) 
                 (msrsGen.OpsGenRates.toString())
 

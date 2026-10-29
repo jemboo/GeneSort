@@ -77,12 +77,12 @@ module SetupEnhancerCatalog =
         |> ParameterValidation.ensureValid "parameters"
         let perPool = parameters.GetSorterCountPerPool().Value
         let total = parameters.GetSorterCountPerPoolSet().Value
-        let prefix = prefixLibId.create 32<sortingWidth> 4<stageLength> prefixLibVariant.PrefixA
+        let prefix = prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA
         parameters.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
                   .WithGenerationCurrent(Some 0<generationNumber>)
                   .WithRngType(Some rngType.Lcg)
                   .WithPrefixLibId(Some prefix)
-                  .WithSortingWidth(Some prefix.SortingWidth)
+                  .WithChannelCount(Some prefix.ChannelCount)
                   .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4)
                   .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
                   .WithExcludeSelfCe(Some (UMX.tag true))

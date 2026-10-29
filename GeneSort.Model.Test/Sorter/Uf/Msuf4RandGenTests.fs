@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Test.Sorter.Uf
+namespace GeneSort.Model.Test.Sorter.Uf
 
 
 open System
@@ -25,26 +25,26 @@ type Msuf4RandGenTests() =
         Uf4GenRates.biasTowards order twoOrbitType baseAmt biasAmt
 
     // Helper function to create a valid Msuf4RandGen
-    let createTestMsuf4RandGen (rngType: rngType) (sortingWidth: int<sortingWidth>) (stageCount: int<stageCount>) =
-        let genRates = Array.init (%stageCount) (fun _ -> createTestGenRates (%sortingWidth))
-        Msuf4RandGenOld.create rngType sortingWidth stageCount genRates
+    let createTestMsuf4RandGen (rngType: rngType) (channelCount: int<channelCount>) (stageCount: int<stageCount>) =
+        let genRates = Array.init (%stageCount) (fun _ -> createTestGenRates (%channelCount))
+        Msuf4RandGenOld.create rngType channelCount stageCount genRates
 
     [<Fact>]
     let ``create succeeds with valid input`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 2<stageCount>
         let genRates = [| createTestGenRates 4; createTestGenRates 4 |]
         let msuf4Gen = Msuf4RandGenOld.create rngType width stageCount genRates
         Assert.Equal(rngType, msuf4Gen.RngType)
-        Assert.Equal(width, msuf4Gen.SortingWidth)
+        Assert.Equal(width, msuf4Gen.ChannelCount)
         Assert.Equal(stageCount, msuf4Gen.StageCount)
         Assert.Equal<Uf4GenRates array>(genRates, msuf4Gen.GenRates)
 
     [<Fact>]
     let ``create fails with stageCount less than 1`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 0<stageCount>
         let genRates = [||]
         let ex = Assert.Throws<Exception>(fun () -> Msuf4RandGenOld.create rngType width stageCount genRates |> ignore)
@@ -53,7 +53,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``create fails with mismatched genRates length`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 2<stageCount>
         let genRates = [| createTestGenRates 4 |] // Length 1, should be 2
         let ex = Assert.Throws<Exception>(fun () -> Msuf4RandGenOld.create rngType width stageCount genRates |> ignore)
@@ -62,7 +62,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``create fails with genRates order mismatch`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 1<stageCount>
         let genRates = [| createTestGenRates 8 |] // Order 8, should be 4
         let ex = Assert.Throws<Exception>(fun () -> Msuf4RandGenOld.create rngType width stageCount genRates |> ignore)
@@ -71,7 +71,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``create fails with invalid seedGenRates sum`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 1<stageCount>
         let invalidGenRates = 
             { Uf4GenRates.order = 4
@@ -84,7 +84,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``equality based on all fields`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 2<stageCount>
         let genRates = [| createTestGenRates 4; createTestGenRates 4 |]
         let msuf4Gen1 = Msuf4RandGenOld.create rngType width stageCount genRates
@@ -96,7 +96,7 @@ type Msuf4RandGenTests() =
     let ``inequality with different fields`` () =
         let rngType1 = rngType.Lcg
         let rngType2 = rngType.Net
-        let width = 8<sortingWidth>
+        let width = 8<channelCount>
         let stageCount = 1<stageCount>
         let genRates1 = [| createTestGenRates 8 |]
         let genRates2 = [| Uf4GenRates.biasTowards 8 TwoOrbitType.Para (1.0/ 3.0)  0.1 |]
@@ -112,7 +112,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``makeId generates unique IDs`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 1<stageCount>
         let genRates = [| createTestGenRates 4 |]
         let msuf4Gen = Msuf4RandGenOld.create rngType width stageCount genRates
@@ -123,14 +123,14 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``makeModelUniform produces Msuf4 with correct properties`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 2<stageCount>
         let genRates = [| createTestGenRates 4; createTestGenRates 4 |]
         let msuf4Gen = Msuf4RandGenOld.create rngType width stageCount genRates
         let mockRando = createMockRando [0] [0.5; 0.5]
         let msuf4 = Msuf4RandGenOld.makeModel msuf4Gen mockRando 0
         Assert.Equal(%msuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(msuf4).SorterId)
-        Assert.Equal(width, msuf4.SortingWidth)
+        Assert.Equal(width, msuf4.ChannelCount)
         Assert.Equal(%stageCount, msuf4.StageCount)
         Assert.Equal(2, msuf4.TwoOrbitUnfolder4s.Length)
         let rSorter = Msuf4.makeSorter(msuf4)
@@ -141,7 +141,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``makeModelBiased produces Msuf4 with biased last stage`` () =
         let rngType = rngType.Lcg
-        let width = 4<sortingWidth>
+        let width = 4<channelCount>
         let stageCount = 2<stageCount>
         let baseAmt = 1.0 / 3.0
         let biasAmt = 0.1
@@ -151,7 +151,7 @@ type Msuf4RandGenTests() =
         let mockRando = createMockRando [0] [0.5; 0.5; 0.5; 0.5; 0.5; 0.5; 0.5; 0.5]
         let msuf4 = Msuf4RandGenOld.makeModel msuf4Gen mockRando 0
         Assert.Equal(%msuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(msuf4).SorterId)
-        Assert.Equal(width, msuf4.SortingWidth)
+        Assert.Equal(width, msuf4.ChannelCount)
         Assert.Equal(%stageCount, msuf4.StageCount)
         Assert.Equal(2, msuf4.TwoOrbitUnfolder4s.Length)
         // First stage: uniform rates, NextFloat = 0.5 -> SeedType.Para ([0;1], [2;3])
@@ -163,7 +163,7 @@ type Msuf4RandGenTests() =
     [<Fact>]
     let ``makeModelBiased produces Msuf4 with biased last stage for order 8`` () =
         let rngType = rngType.Lcg
-        let width = 8<sortingWidth>
+        let width = 8<channelCount>
         let stageCount = 1<stageCount>
         let baseAmt = 1.0 / 3.0
         let biasAmt = 0.1
@@ -177,5 +177,5 @@ type Msuf4RandGenTests() =
 
         Assert.Equal<Ce>(expectedCes, rSorter.Ces)
         Assert.Equal(%msuf4.Id |> UMX.tag<sorterId>, Msuf4.makeSorter(msuf4).SorterId)
-        Assert.Equal(width, msuf4.SortingWidth)
+        Assert.Equal(width, msuf4.ChannelCount)
         Assert.Equal(%stageCount, msuf4.StageCount)

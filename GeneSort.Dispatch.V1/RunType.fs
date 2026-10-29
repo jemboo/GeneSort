@@ -10,6 +10,8 @@ type runExample(name: string, create: unit -> run) =
     member _.Run = configured.Value
 
 /// One module containing run definitions. Mixed modules expose their examples explicitly.
-type runType(name: string, examples: runExample[]) =
+type runType(name: string, description: string, examples: runExample[]) =
+    do if System.String.IsNullOrWhiteSpace description then invalidArg (nameof description) "A run module requires a description."
     member _.Name = name
+    member _.Description = description
     member _.Examples = Array.copy examples

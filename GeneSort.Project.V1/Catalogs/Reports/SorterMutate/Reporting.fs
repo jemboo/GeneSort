@@ -153,9 +153,9 @@ module Reporting =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (channelCount: int<channelCount>) =
+                        rp.GetChannelCount()
+                        |> Result.ofOption "Missing channel count in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
@@ -203,7 +203,7 @@ module Reporting =
 
             let! (parentSorterSetEval: sorterSetEval) =
                         sources.LoadStandardSorterEvals
-                                            sortingWidth 
+                                            channelCount
                                             simpleSorterModelType
                                             sorterEvalType.V2
 
@@ -215,7 +215,7 @@ module Reporting =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        channelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -334,7 +334,7 @@ module Reporting =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        mrgLibId.SortingWidth 
+                                        mrgLibId.ChannelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp
@@ -376,9 +376,9 @@ module Reporting =
                         rp.GetRngType()
                         |> Result.ofOption "Missing RNG type in run parameters"
 
-            let! (sortingWidth: int<sortingWidth>) = 
-                        rp.GetSortingWidth() 
-                        |> Result.ofOption "Missing sorting width in run parameters"
+            let! (channelCount: int<channelCount>) =
+                        rp.GetChannelCount()
+                        |> Result.ofOption "Missing channel count in run parameters"
     
             let! (simpleSorterModelType: simpleSorterModelType) = 
                         rp.GetSimpleSorterModelType() 
@@ -422,7 +422,7 @@ module Reporting =
 
             let! (parentSorterSetEval: sorterSetEval) =
                         sources.LoadStandardSorterEvals
-                                            sortingWidth 
+                                            channelCount
                                             simpleSorterModelType
                                             sorterEvalType.V2
 
@@ -434,7 +434,7 @@ module Reporting =
             let! (parentSorterModelGen: sorterModelGen) =
                 SeedSorterModelGeneration.getSimpleUniformSorterModelGen 
                                         rngType 
-                                        sortingWidth 
+                                        channelCount
                                         simpleSorterModelType
                                         excludeSelfCe
                 |> SeedSorterModelGeneration.applyParameters rp

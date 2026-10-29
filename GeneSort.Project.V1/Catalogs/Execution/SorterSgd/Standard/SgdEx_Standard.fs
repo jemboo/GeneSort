@@ -45,8 +45,8 @@ module SgdEx_Standard =
 
                 log "Loading saved Setup SortableTestsWithPrefix..."
                 let! sWidth =
-                    path.GetSortingWidth()
-                    |> Result.ofOption "Missing sorting width."
+                    path.GetChannelCount()
+                    |> Result.ofOption "Missing channel count."
                 let! testsData = genDb.loadAsync geneSortDataMode.Setup start.Tests
                 let! (sortableTests, ces) = OutputData.asSortableTestsWithPrefix testsData
                 let prefix = ceBlock.create (Guid.Empty |> UMX.tag) sWidth ces

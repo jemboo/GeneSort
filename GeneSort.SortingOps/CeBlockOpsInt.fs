@@ -18,7 +18,7 @@ module CeBlockOpsInt =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let mutable unsortedCount = 0
             let ces = ceBlk.CeArray
-            let sw = sits.SortingWidth
+            let sw = sits.ChannelCount
             let pool = ArrayPool<int>.Shared
 
             for sia in sits.SortableIntArrays do
@@ -27,11 +27,11 @@ module CeBlockOpsInt =
 
                 for i = 0 to ces.Length - 1 do
                     let ce = ces.[i]
-                    let a = workArray.[ce.Low]
-                    let b = workArray.[ce.Hi]
+                    let a = workArray.[(int ce.LowChannel)]
+                    let b = workArray.[(int ce.HighChannel)]
                     if a > b then
-                        workArray.[ce.Low] <- b
-                        workArray.[ce.Hi] <- a
+                        workArray.[(int ce.LowChannel)] <- b
+                        workArray.[(int ce.HighChannel)] <- a
                         ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
 
                 let isSorted = 
@@ -55,7 +55,7 @@ module CeBlockOpsInt =
                 (prefix: ceBlock) (ceBlk: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
             let ces = ceBlk.CeArray
-            let sw = sits.SortingWidth
+            let sw = sits.ChannelCount
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
 
@@ -65,11 +65,11 @@ module CeBlockOpsInt =
 
                 for i = 0 to ces.Length - 1 do
                     let ce = ces.[i]
-                    let a = workArray.[ce.Low]
-                    let b = workArray.[ce.Hi]
+                    let a = workArray.[(int ce.LowChannel)]
+                    let b = workArray.[(int ce.HighChannel)]
                     if a > b then
-                        workArray.[ce.Low] <- b
-                        workArray.[ce.Hi] <- a
+                        workArray.[(int ce.LowChannel)] <- b
+                        workArray.[(int ce.HighChannel)] <- a
                         ceUseCounts.Increment (i |> UMX.tag<ceIndex>) 
 
                 let isSorted = 
@@ -101,9 +101,9 @@ module CeBlockOpsInt =
     let evalAndDedupeCeFetch (sits: sortableIntTests) 
                              (prefix: ceBlock) (ceBlk: ceBlock) =
             let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
-            let lows = Array.init %ceBlk.CeLength (fun i -> ceBlk.CeArray.[i].Low)
-            let highs = Array.init %ceBlk.CeLength (fun i -> ceBlk.CeArray.[i].Hi)
-            let sw = sits.SortingWidth
+            let lows = Array.init %ceBlk.CeLength (fun i -> (int ceBlk.CeArray.[i].LowChannel))
+            let highs = Array.init %ceBlk.CeLength (fun i -> (int ceBlk.CeArray.[i].HighChannel))
+            let sw = sits.ChannelCount
             let pool = ArrayPool<int>.Shared
             let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
 
@@ -153,7 +153,7 @@ module CeBlockOpsInt =
         let ces = ceBlk.CeArray
         let ceLen = ces.Length |> UMX.tag<ceLength>
         let ceUseCounts = ceUseCounts.Create ceLen
-        let sw = %sits.SortingWidth
+        let sw = %sits.ChannelCount
         let pool = ArrayPool<int>.Shared
         let results = HashSet<sortableIntArray>(SortableIntArray.SortableIntArrayValueComparer())
         
@@ -171,8 +171,8 @@ module CeBlockOpsInt =
                 // POINT 1: Inner HOT LOOP with Unsafe Access
                 for i = 0 to %ceLen - 1 do
                     let ce = ces.[i]
-                    let lIdx = ce.Low
-                    let hIdx = ce.Hi
+                    let lIdx = (int ce.LowChannel)
+                    let hIdx = (int ce.HighChannel)
                     
                     // Direct pointer offset access
                     let a = Unsafe.Add(&baseRef, lIdx)
@@ -195,10 +195,10 @@ module CeBlockOpsInt =
                 if not isSortedNow then
                     let finalValues = Array.zeroCreate sw
                     workSpan.CopyTo(finalValues.AsSpan())
-                    results.Add(sortableIntArray.create(finalValues, sits.SortingWidth, sia.SymbolSetSize)) |> ignore
+                    results.Add(sortableIntArray.create(finalValues, sits.ChannelCount, sia.SymbolSetSize)) |> ignore
 
         pool.Return(workArray)
-        let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.SortingWidth
+        let newTests = Seq.toArray results |> sortableIntTests.create (Guid.NewGuid() |> UMX.tag) sits.ChannelCount
         ceBlockEval.create prefix ceBlk ceUseCounts (results.Count |> UMX.tag<sortableCount>) (Some (sortableTests.Ints newTests))
 
 

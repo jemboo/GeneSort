@@ -32,7 +32,7 @@ module SeedSorterModelGeneration =
 
     let getStageLength 
                 (smt: simpleSorterModelType) 
-                (sw: int<sortingWidth>) : int<stageLength> =
+                (sw: int<channelCount>) : int<stageLength> =
         match %sw with
         | 4 -> 15
         | 5 -> 25
@@ -59,21 +59,21 @@ module SeedSorterModelGeneration =
         | 192 -> 2000
         | 256 -> match smt with | simpleSorterModelType.Msuf4 -> 6000 | _ -> 3000
         | 512 -> match smt with | simpleSorterModelType.Msuf4 -> 8000 | _ -> 8000
-        | _ -> failwithf "Unsupported sorting width: %d" %sw
+        | _ -> failwithf "Unsupported channel count: %d" %sw
         |> UMX.tag
 
 
     let getSimpleUniformSorterModelGen
             (rngType: rngType) 
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (simpleSorterModelType: simpleSorterModelType) 
             (excludeSelfCe: bool<excludeSelfCe>)
                             : sorterModelGen =
-            let stageLength = getStageLength simpleSorterModelType sortingWidth
+            let stageLength = getStageLength simpleSorterModelType channelCount
             let rngFactory = rngType |> RngFactory.create
             SimpleSorterModelGen.makeUniform 
                                     rngFactory 
-                                    sortingWidth 
+                                    channelCount
                                     stageLength 
                                     simpleSorterModelType
                                     excludeSelfCe
@@ -93,7 +93,7 @@ module SeedSorterModelGeneration =
             | _ -> invalidArg "ControlledSeedAMax" "AMax must match the controlled bound, or ActivationProbability must equal AMax/(2*AMax+1)."
             if rp.GetSorterPoolCount() <> Some (UMX.tag 1) then invalidArg "SorterPoolCount" "Controlled comparisons require one pool."
             let generator =
-                getSimpleUniformSorterModelGen (rp.GetRngType().Value) (rp.GetSortingWidth().Value)
+                getSimpleUniformSorterModelGen (rp.GetRngType().Value) (rp.GetChannelCount().Value)
                     (rp.GetSimpleSorterModelType().Value) (rp.GetExcludeSelfCe().Value)
             let underlying = match generator with sorterModelGen.Simple g -> g | _ -> failwith "Expected Simple generator."
             let paired = simpleSorterModelRGen.create underlying maximum

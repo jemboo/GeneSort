@@ -34,14 +34,14 @@ module SortableTests =
         | Uint8v256 uint8v256Test -> uint8v256Test.SortableDataFormat
         | Uint8v512 uint8v512Test -> uint8v512Test.SortableDataFormat
 
-    let getSortingWidth (test: sortableTests) =
+    let getChannelCount (test: sortableTests) =
         match test with
-        | Bitv512 bitv512Test -> bitv512Test.SortingWidth
-        | Bools boolTest -> boolTest.SortingWidth
-        | Ints intTest -> intTest.SortingWidth
-        | PackedInts packedIntTest -> packedIntTest.SortingWidth
-        | Uint8v256 uint8v256Test -> uint8v256Test.SortingWidth
-        | Uint8v512 uint8v512Test -> uint8v512Test.SortingWidth
+        | Bitv512 bitv512Test -> bitv512Test.ChannelCount
+        | Bools boolTest -> boolTest.ChannelCount
+        | Ints intTest -> intTest.ChannelCount
+        | PackedInts packedIntTest -> packedIntTest.ChannelCount
+        | Uint8v256 uint8v256Test -> uint8v256Test.ChannelCount
+        | Uint8v512 uint8v512Test -> uint8v512Test.ChannelCount
 
     let getSortableCount (test: sortableTests) : int<sortableCount> =
         match test with
@@ -68,7 +68,7 @@ module SortableTests =
                             |> UMX.tag<sortableCount>
 
         | PackedInts packed -> 
-            let width = %packed.SortingWidth
+            let width = %packed.ChannelCount
             let totalElements = packed.PackedValues.Length
             let values = packed.PackedValues
             let mutable unsortedCount = 0
@@ -97,50 +97,50 @@ module SortableTests =
 
 
     let mergeSortableTests (test1: sortableTests) (test2: sortableTests) : sortableTests =
-        let requireMatchingSortingWidths sortingWidth1 sortingWidth2 =
-            if sortingWidth1 <> sortingWidth2 then
-                invalidArg "test2" "Sortable tests must have the same sorting width."
+        let requireMatchingChannelCounts channelCount1 channelCount2 =
+            if channelCount1 <> channelCount2 then
+                invalidArg "test2" "Sortable tests must have the same channel count."
 
         match test1, test2 with
         | Bitv512 bitv512Test1, Bitv512 bitv512Test2 ->
-            requireMatchingSortingWidths bitv512Test1.SortingWidth bitv512Test2.SortingWidth
+            requireMatchingChannelCounts bitv512Test1.ChannelCount bitv512Test2.ChannelCount
             sortableBitv512Tests.create
                 (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                bitv512Test1.SortingWidth
+                bitv512Test1.ChannelCount
                 (Array.append bitv512Test1.SimdSortBlocks bitv512Test2.SimdSortBlocks)
             |> Bitv512
         | Bools boolTest1, Bools boolTest2 ->
-            requireMatchingSortingWidths boolTest1.SortingWidth boolTest2.SortingWidth
+            requireMatchingChannelCounts boolTest1.ChannelCount boolTest2.ChannelCount
             sortableBinaryTests.create
                 (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                boolTest1.SortingWidth
+                boolTest1.ChannelCount
                 (Array.append boolTest1.SortableBinaryArrays boolTest2.SortableBinaryArrays)
             |> Bools
         | Ints intTest1, Ints intTest2 ->
-            requireMatchingSortingWidths intTest1.SortingWidth intTest2.SortingWidth
+            requireMatchingChannelCounts intTest1.ChannelCount intTest2.ChannelCount
             sortableIntTests.create
                 (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                intTest1.SortingWidth
+                intTest1.ChannelCount
                 (Array.append intTest1.SortableIntArrays intTest2.SortableIntArrays)
             |> Ints
         | PackedInts packedIntTest1, PackedInts packedIntTest2 ->
-            requireMatchingSortingWidths packedIntTest1.SortingWidth packedIntTest2.SortingWidth
+            requireMatchingChannelCounts packedIntTest1.ChannelCount packedIntTest2.ChannelCount
             packedSortableIntTests.createFromPackedValues
-                packedIntTest1.SortingWidth
+                packedIntTest1.ChannelCount
                 (Array.append packedIntTest1.PackedValues packedIntTest2.PackedValues)
             |> PackedInts
         | Uint8v256 uint8v256Test1, Uint8v256 uint8v256Test2 ->
-            requireMatchingSortingWidths uint8v256Test1.SortingWidth uint8v256Test2.SortingWidth
+            requireMatchingChannelCounts uint8v256Test1.ChannelCount uint8v256Test2.ChannelCount
             sortableUint8v256Tests.create
                 (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                uint8v256Test1.SortingWidth
+                uint8v256Test1.ChannelCount
                 (Array.append uint8v256Test1.SimdSortBlocks uint8v256Test2.SimdSortBlocks)
             |> Uint8v256
         | Uint8v512 uint8v512Test1, Uint8v512 uint8v512Test2 ->
-            requireMatchingSortingWidths uint8v512Test1.SortingWidth uint8v512Test2.SortingWidth
+            requireMatchingChannelCounts uint8v512Test1.ChannelCount uint8v512Test2.ChannelCount
             sortableUint8v512Tests.create
                 (System.Guid.NewGuid() |> UMX.tag<sortableTestsId>)
-                uint8v512Test1.SortingWidth
+                uint8v512Test1.ChannelCount
                 (Array.append uint8v512Test1.SimdSortBlocks uint8v512Test2.SimdSortBlocks)
             |> Uint8v512
         | _ -> failwith "Cannot merge tests of different types."

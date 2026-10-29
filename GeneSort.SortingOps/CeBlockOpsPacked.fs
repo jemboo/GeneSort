@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open System
 open System.Buffers    
@@ -34,7 +34,7 @@ module CeBlockOpsPacked =
 
     // non-inline version, not used in hot path
     let deduplicatePacked (packedTs: packedSortableIntTests) (resultsBuffer: int[]) =
-        let sw = %packedTs.SortingWidth
+        let sw = %packedTs.ChannelCount
         let totalTests = packedTs.SortableCount
     
         // 1. HashSet stores ONLY the starting index (offset) of unique unsorted tests
@@ -66,19 +66,19 @@ module CeBlockOpsPacked =
             targetOffset <- targetOffset + sw
 
         packedSortableIntTests.createFromPackedValues 
-                        packedTs.SortingWidth 
+                        packedTs.ChannelCount
                         newPackedData
                                            
 
     let eval (tests: packedSortableIntTests) 
              (prefix: ceBlock) (ceBlk: ceBlock) : ceBlockEval =
-        let sw = %tests.SortingWidth
+        let sw = %tests.ChannelCount
         let totalTests = tests.SortableCount
         let ces = ceBlk.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlk.CeLength (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlk.CeLength (fun i -> ces.[i].Hi)
+        let lows = Array.init %ceBlk.CeLength (fun i -> (int ces.[i].LowChannel))
+        let highs = Array.init %ceBlk.CeLength (fun i -> (int ces.[i].HighChannel))
         let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
         let mutable unsortedCount = 0
     
@@ -117,13 +117,13 @@ module CeBlockOpsPacked =
 
     let evalAndCollectNewSortableTests (tests: packedSortableIntTests) 
                                        (prefix: ceBlock) (ceBlk: ceBlock) : ceBlockEval =
-        let sw = %tests.SortingWidth
+        let sw = %tests.ChannelCount
         let totalTests = tests.SortableCount
         let ces = ceBlk.CeArray
     
         // Pre-deconstruct CEs for the hot loop
-        let lows = Array.init %ceBlk.CeLength (fun i -> ces.[i].Low)
-        let highs = Array.init %ceBlk.CeLength (fun i -> ces.[i].Hi)
+        let lows = Array.init %ceBlk.CeLength (fun i -> (int ces.[i].LowChannel))
+        let highs = Array.init %ceBlk.CeLength (fun i -> (int ces.[i].HighChannel))
         let ceUseCounts = ceUseCounts.Create ceBlk.CeLength
     
         // Work on a mutable copy
@@ -168,7 +168,7 @@ module CeBlockOpsPacked =
             targetOffset <- targetOffset + sw
 
         let newPacked = packedSortableIntTests.createFromPackedValues
-                                                    tests.SortingWidth
+                                                    tests.ChannelCount
                                                     newPackedData
        
         ceBlockEval.create 

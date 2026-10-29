@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Model.Sorting.Mp.V1.Simple.Si
 
 open System
@@ -10,7 +10,7 @@ open GeneSort.Model.Sorting.V1.Simple.Si
 
 type mssiDto =
     { id: Guid
-      sortingWidth: int
+      channelCount: int
       permSiDtos: permSiDto array }
 
 module MssiDto =
@@ -18,12 +18,12 @@ module MssiDto =
     let fromDomain (mssi: mssi) : mssiDto =
         let mssiDtos = mssi.Perm_Sis |> Array.map PermSiDto.fromDomain
         { id = %mssi.Id
-          sortingWidth = %mssi.SortingWidth
+          channelCount = %mssi.ChannelCount
           permSiDtos = mssiDtos }
 
     let toDomain (mssiDto: mssiDto) : mssi =
         let perm_Sis = mssiDto.permSiDtos |> Array.map (PermSiDto.toDomain)
         mssi.create
             (UMX.tag<sorterModelId> mssiDto.id)
-            (UMX.tag<sortingWidth> mssiDto.sortingWidth)
+            (UMX.tag<channelCount> mssiDto.channelCount)
             perm_Sis

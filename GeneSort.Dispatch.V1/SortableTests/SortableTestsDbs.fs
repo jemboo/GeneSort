@@ -16,7 +16,7 @@ module SortableTestsDbs =
 
     module Merge =
 
-        let private sourceRun = SortableTests.Merge.Test ()
+        let private sourceRun = SortableTests.Merge.HiMD_32 ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
@@ -49,7 +49,7 @@ module SortableTestsDbs =
 
     module Prefix =
 
-        let private sourceRun = SortableTests.Prefix.Width32 ()
+        let private sourceRun = SortableTests.Prefix.Channels32 ()
         let projectName = sourceRun.ProjectName
     
         let dbNameTest = "PrefixTest" |> UMX.tag<databaseName>

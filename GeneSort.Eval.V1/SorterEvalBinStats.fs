@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Eval.V1
+namespace GeneSort.Eval.V1
 
 open System
 open FSharp.UMX
@@ -59,7 +59,7 @@ module SorterEvalBinStats =
                 sortedItems.[lowerIdx] + remainder * (sortedItems.[upperIdx] - sortedItems.[lowerIdx])
 
 
-    /// Divides the ceData.CeIndex range into bins of size (sortingWidth/2)
+    /// Divides the ceData.CeIndex range into bins of size (channelCount/2)
     /// and calculates metrics to support graph generation.
     let makeBins (sorterEvals: sorterEval seq) : ceBinSummaryStats array =
         
@@ -70,8 +70,8 @@ module SorterEvalBinStats =
             |> Seq.filter (fun eval -> 
                 match eval with | V1 _ -> false | _ -> true)
             |> Seq.collect (fun eval ->
-                let sortingWidth = % (SorterEval.getSortingWidth eval)
-                let binSize = Math.Max(1, sortingWidth / 2) // Guard against division by 0
+                let channelCount = % (SorterEval.getChannelCount eval)
+                let binSize = Math.Max(1, channelCount / 2) // Guard against division by 0
                 let ceSequence = SorterEval.getCeUseArray eval
                 
                 ceSequence 

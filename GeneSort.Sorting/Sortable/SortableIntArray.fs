@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Sorting.Sortable
 
 open System
 open System.Collections
@@ -13,17 +13,17 @@ open GeneSort.Sorting.Sorter
 type sortableIntArray =
     private { 
         values: int[] 
-        sortingWidth: int<sortingWidth> 
+        channelCount: int<channelCount>
         symbolSetSize: int<symbolSetSize>
         // Eagerly computed hash for thread-safety and struct consistency
         vHash: int 
     }
 
-    static member create(values: int[], sortingWidth: int<sortingWidth>, symbolSetSize: int<symbolSetSize>) =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        if values.Length <> int sortingWidth then
-            invalidArg "values" $"Values length ({values.Length}) must equal sorting width ({int sortingWidth})."
+    static member create(values: int[], channelCount: int<channelCount>, symbolSetSize: int<symbolSetSize>) =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        if values.Length <> int channelCount then
+            invalidArg "values" $"Values length ({values.Length}) must equal channel count ({int channelCount})."
         if %symbolSetSize <= 0 then
             invalidArg "symbolSetSize" "Symbol set size must be positive."
         let storedValues = Array.copy values
@@ -31,7 +31,7 @@ type sortableIntArray =
         for v in storedValues do
             h <- h * 23 + v.GetHashCode()
 
-        { values = storedValues; sortingWidth = sortingWidth; 
+        { values = storedValues; channelCount = channelCount;
           symbolSetSize = symbolSetSize; vHash = h }
 
     override this.GetHashCode() = this.vHash
@@ -42,17 +42,17 @@ type sortableIntArray =
             // Check hash first for fast short-circuit
             if this.vHash <> other.vHash then false
             else
-                this.sortingWidth = other.sortingWidth &&
+                this.channelCount = other.channelCount &&
                 ReadOnlySpan<int>(this.values).SequenceEqual(ReadOnlySpan<int>(other.values))
         | _ -> false
 
     member this.ToSortableBoolArrays() : sortableBoolArray[] =
-        if this.SortingWidth <= 1<sortingWidth> then
+        if this.ChannelCount <= 1<channelCount> then
             [||]
         else
-            let thresholds = [| 0 .. %this.sortingWidth |]
+            let thresholds = [| 0 .. %this.channelCount |]
             let vals = this.values
-            let sw = this.SortingWidth
+            let sw = this.ChannelCount
             thresholds 
             |> Array.map (
                 fun threshold ->
@@ -62,13 +62,13 @@ type sortableIntArray =
 
 
     static member createFromPermutation(perm: permutation) =
-        sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<sortingWidth>), (%perm.Order |> UMX.tag<symbolSetSize>))
+        sortableIntArray.create(perm.Array, (%perm.Order |> UMX.tag<channelCount>), (%perm.Order |> UMX.tag<symbolSetSize>))
 
-    static member createSorted(sortingWidth: int<sortingWidth>) =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let values = [| 0 .. (%sortingWidth - 1) |]
-        sortableIntArray.create(values, sortingWidth, %sortingWidth |> UMX.tag<symbolSetSize>)
+    static member createSorted(channelCount: int<channelCount>) =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        let values = [| 0 .. (%channelCount - 1) |]
+        sortableIntArray.create(values, channelCount, %channelCount |> UMX.tag<symbolSetSize>)
 
     /// Gets a copy of the values array.
     member this.Values with get() = Array.copy this.values
@@ -79,16 +79,16 @@ type sortableIntArray =
     
     member this.ArrayLength with get() = this.values.Length
 
-    /// Gets the sorting width.
-    member this.SortingWidth = this.sortingWidth
+    /// Gets the channel count.
+    member this.ChannelCount = this.channelCount
 
     /// Gets the symbol set size.
     member this.SymbolSetSize = this.symbolSetSize
 
     /// Computes the squared distance between this array and another sortableIntArray.
     member this.DistanceSquared(other: sortableIntArray) =
-        if other.sortingWidth <> this.sortingWidth then
-            invalidArg "other" $"Other array sorting width ({int other.sortingWidth}) must equal this sorting width ({int this.sortingWidth})."
+        if other.channelCount <> this.channelCount then
+            invalidArg "other" $"Other array channel count ({int other.channelCount}) must equal this channel count ({int this.channelCount})."
         ArrayUtils.distanceSquared this.values other.values
 
     /// Checks if the values array is sorted in non-decreasing order.
@@ -98,13 +98,13 @@ type sortableIntArray =
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray =
         let sortedValues = CeSorting.sortByWithUses ces useCounter (Array.copy this.values)
-        sortableIntArray.create(sortedValues, this.SortingWidth, this.SymbolSetSize)
+        sortableIntArray.create(sortedValues, this.ChannelCount, this.SymbolSetSize)
 
     member this.SortByCesWithHistory 
                 (ces: ce[])
                 (useCounter: int[]) : sortableIntArray[] =
         let history = CeSorting.sortByWithHistoryAndUses ces useCounter this.values
-        let sw = this.SortingWidth
+        let sw = this.ChannelCount
         let sss = this.SymbolSetSize
         history |> Array.map (fun values -> sortableIntArray.create(values, sw, sss))
 
@@ -132,7 +132,7 @@ module SortableIntArray =
                 // Check hash first: if they differ, they cannot be equal.
                 if x.GetHashCode() <> y.GetHashCode() then false
                 else
-                    x.SortingWidth = y.SortingWidth && 
+                    x.ChannelCount = y.ChannelCount &&
                     ReadOnlySpan<int>(x.Values).SequenceEqual(ReadOnlySpan<int>(y.Values))
             
             member _.GetHashCode(obj) = obj.GetHashCode()
@@ -157,22 +157,22 @@ module SortableIntArray =
         |> Seq.map sortableIntArray.createFromPermutation
 
 
-    let randomSortableIntArray (indexShuffler: int -> int) (sortingWidth: int<sortingWidth>) : sortableIntArray =
-        let perm = Permutation.randomPermutation indexShuffler %sortingWidth
+    let randomSortableIntArray (indexShuffler: int -> int) (channelCount: int<channelCount>) : sortableIntArray =
+        let perm = Permutation.randomPermutation indexShuffler %channelCount
         sortableIntArray.createFromPermutation perm
       
 
     let getMergeTestCases 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (mergeDimension: int<mergeDimension>)
             (mergeFillType: mergeSuffixType)
             : sortableIntArray [] =
 
-        if %sortingWidth % %mergeDimension <> 0 then
-            invalidArg "sortingWidth" (sprintf "Sorting width: %d must be divisible by mergeDimension : %d " %sortingWidth  %mergeDimension)
+        if %channelCount % %mergeDimension <> 0 then
+            invalidArg "channelCount" (sprintf "Channel count: %d must be divisible by mergeDimension : %d " %channelCount  %mergeDimension)
 
         let latticeDimension = %mergeDimension |> UMX.tag<latticeDimension>
-        let edgeLength = %sortingWidth / %mergeDimension |> UMX.tag<latticeDistance>
+        let edgeLength = %channelCount / %mergeDimension |> UMX.tag<latticeDistance>
         let mergeLattice = MergeLattice.create latticeDimension edgeLength
         let sortableIntArrays =
             match mergeFillType with

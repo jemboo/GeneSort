@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Model.Sorting.Mp.V1.Simple.Rs
 
 open System
@@ -32,7 +32,7 @@ module MsrsDto =
 
     let fromDomain (msrs: msrs) : msrsDto =
         { Id = %msrs.Id
-          Width = %msrs.SortingWidth
+          Width = %msrs.ChannelCount
           Perm_Rss = msrs.Perm_Rss |> Array.map PermRsDto.toPerm_RsDto }
 
     let toDomain (dto: msrsDto) : msrs =
@@ -42,5 +42,5 @@ module MsrsDto =
         
         msrs.create
             (UMX.tag<sorterModelId> dto.Id)
-            (UMX.tag<sortingWidth> dto.Width)
+            (UMX.tag<channelCount> dto.Width)
             permRss

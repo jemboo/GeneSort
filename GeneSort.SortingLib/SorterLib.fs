@@ -30,20 +30,20 @@ module SorterLibVariant =
 
 type sorterLibId = 
     private 
-        { sortingWidth: int<sortingWidth>
+        { channelCount: int<channelCount>
           sorterVariant: sorterLibVariant }
 
-    static member create (sortingWidth: int<sortingWidth>) 
+    static member create (channelCount: int<channelCount>)
                          (sorterVariant: sorterLibVariant) : sorterLibId =
-        { sortingWidth = sortingWidth; sorterVariant = sorterVariant }  
+        { channelCount = channelCount; sorterVariant = sorterVariant }
 
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
     member this.SorterVariant with get() = this.sorterVariant
     
     interface IStableSerializable with
         member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
             // 1. Write the underlying integer from the UMX tag
-            writer.Write(UMX.untag this.sortingWidth)
+            writer.Write(UMX.untag this.channelCount)
             // 2. Write the variant as a consistent string or integer tag
             writer.Write(sprintf "%A" this.sorterVariant)
 
@@ -51,18 +51,18 @@ type sorterLibId =
 module SorterLibId =
 
     let toString (key: sorterLibId) : string =
-        sprintf "SorterLibId(sortingWidth=%d, Variant=%s)" 
-                (UMX.untag key.sortingWidth) (SorterLibVariant.toString key.sorterVariant)
+        sprintf "SorterLibId(channelCount=%d, Variant=%s)"
+                (UMX.untag key.channelCount) (SorterLibVariant.toString key.sorterVariant)
     let fromString (s: string) : sorterLibId =
         // This is a simple parser; in a real implementation, you might want to use a more robust parsing method
         let parts = s.Trim().Split([|','|], StringSplitOptions.RemoveEmptyEntries)
         if parts.Length <> 2 then
             failwith "Invalid sorterLibId string format"
         else
-            let sortingWidthPart = parts.[0].Trim().Replace("SorterLibId(sortingWidth=", "").Replace(")", "")
+            let channelCountPart = parts.[0].Trim().Replace("SorterLibId(channelCount=", "").Replace(")", "")
             let variantPart = parts.[1].Trim().Replace("Variant=", "").Replace(")", "")
-            let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
-            sorterLibId.create sortingWidth (SorterLibVariant.fromString variantPart)
+            let channelCount = Int32.Parse(channelCountPart) |> UMX.tag<channelCount>
+            sorterLibId.create channelCount (SorterLibVariant.fromString variantPart)
 
 
 
@@ -71,34 +71,34 @@ module SorterLib =
     let private AllNetworksList = 
     
         [
-            { sortingWidth = 2<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 2<channelCount>; sorterVariant = VariantA },
             "[(0,1)]"
 
-            { sortingWidth = 3<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 3<channelCount>; sorterVariant = VariantA },
             "[(0,2)]
              [(0,1)]
              [(1,2)]"
 
-            { sortingWidth = 4<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 4<channelCount>; sorterVariant = VariantA },
             "[(0,2),(1,3)]
              [(0,1),(2,3)]
              [(1,2)]"
 
-            { sortingWidth = 5<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 5<channelCount>; sorterVariant = VariantA },
             "[(0,3),(1,4)]
              [(0,2),(1,3)]
              [(0,1),(2,4)]
              [(1,2),(3,4)]
              [(2,3)]"
 
-            { sortingWidth = 6<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 6<channelCount>; sorterVariant = VariantA },
             "[(0,5),(1,3),(2,4)]
              [(1,2),(3,4)]
              [(0,3),(2,5)]
              [(0,1),(2,3),(4,5)]
              [(1,2),(3,4)]"
 
-            { sortingWidth = 7<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 7<channelCount>; sorterVariant = VariantA },
             "[(0,6),(2,3),(4,5)]
              [(0,2),(1,4),(3,6)]
              [(0,1),(2,5),(3,4)]
@@ -106,7 +106,7 @@ module SorterLib =
              [(2,3),(4,5)]
              [(1,2),(3,4),(5,6)]"
 
-            { sortingWidth = 8<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 8<channelCount>; sorterVariant = VariantA },
             "[(0,2),(1,3),(4,6),(5,7)]
              [(0,4),(1,5),(2,6),(3,7)]
              [(0,1),(2,3),(4,5),(6,7)]
@@ -115,7 +115,7 @@ module SorterLib =
              [(1,2),(3,4),(5,6)]"
 
 
-            { sortingWidth = 9<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 9<channelCount>; sorterVariant = VariantA },
             "[(0,3),(1,7),(2,5),(4,8)]
              [(0,7),(2,4),(3,8),(5,6)]
              [(0,2),(1,3),(4,5),(7,8)]
@@ -124,7 +124,7 @@ module SorterLib =
              [(2,3),(4,5),(6,7)]
              [(1,2),(3,4),(5,6)]"
 
-            { sortingWidth = 10<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 10<channelCount>; sorterVariant = VariantA },
             "[(0,8),(1,9),(2,7),(3,5),(4,6)]
              [(0,2),(1,4),(5,8),(7,9)]
              [(0,3),(2,4),(5,7),(6,9)]
@@ -134,7 +134,7 @@ module SorterLib =
              [(2,3),(4,5),(6,7)]
              [(3,4),(5,6)]"
 
-            { sortingWidth = 10<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 10<channelCount>; sorterVariant = VariantB },
             "[(0,1),(2,5),(3,6),(4,7),(8,9)]
              [(0,6),(1,8),(2,4),(3,9),(5,7)]
              [(0,2),(1,3),(4,5),(6,8),(7,9)]
@@ -144,7 +144,7 @@ module SorterLib =
              [(2,3),(4,5),(6,7)]"
 
 
-            { sortingWidth = 11<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 11<channelCount>; sorterVariant = VariantA },
             "[(0,9),(1,6),(2,4),(3,7),(5,8)]
              [(0,1),(3,5),(4,10),(6,9),(7,8)]
              [(1,3),(2,5),(4,7),(8,10)]
@@ -154,7 +154,7 @@ module SorterLib =
              [(1,2),(3,4),(5,6),(7,8)]
              [(2,3),(4,5),(6,7)]"
 
-            { sortingWidth = 12<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 12<channelCount>; sorterVariant = VariantA },
             "[(0,8),(1,7),(2,6),(3,11),(4,10),(5,9)]
              [(0,1),(2,5),(3,4),(6,9),(7,8),(10,11)]
              [(0,2),(1,6),(5,10),(9,11)]
@@ -165,7 +165,7 @@ module SorterLib =
              [(4,6),(5,7)]
              [(3,4),(5,6),(7,8)]"
 
-            { sortingWidth = 12<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 12<channelCount>; sorterVariant = VariantB },
             "[(0,8),(1,7),(2,6),(3,11),(4,10),(5,9)]
              [(0,2),(1,4),(3,5),(6,8),(7,10),(9,11)]
              [(0,1),(2,9),(4,7),(5,6),(10,11)]
@@ -175,7 +175,7 @@ module SorterLib =
              [(2,4),(3,6),(5,8),(7,9)]
              [(1,2),(3,4),(5,6),(7,8),(9,10)]"
 
-            { sortingWidth = 13<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 13<channelCount>; sorterVariant = VariantA },
             "[(0,12),(1,10),(2,9),(3,7),(5,11),(6,8)]
              [(1,6),(2,3),(4,11),(7,9),(8,10)]
              [(0,4),(1,2),(3,6),(7,8),(9,10),(11,12)]
@@ -187,7 +187,7 @@ module SorterLib =
              [(2,3),(4,5),(6,7),(8,9)]
              [(3,4),(5,6)]"
 
-            { sortingWidth = 13<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 13<channelCount>; sorterVariant = VariantB },
             "[(0,11),(1,7),(2,4),(3,5),(8,9),(10,12)]
              [(0,2),(3,6),(4,12),(5,7),(8,10)]
              [(0,8),(1,3),(2,5),(4,9),(6,11),(7,12)]
@@ -198,7 +198,7 @@ module SorterLib =
              [(4,5),(6,7),(8,9),(10,11)]
              [(3,4),(5,6),(7,8),(9,10)]"
 
-            { sortingWidth = 14<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 14<channelCount>; sorterVariant = VariantA },
             "[(0,6),(1,11),(2,12),(3,10),(4,5),(7,13),(8,9)]
              [(1,2),(3,7),(4,8),(5,9),(6,10),(11,12)]
              [(0,4),(1,3),(5,6),(7,8),(9,13),(10,12)]
@@ -211,7 +211,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10)]"
 
 
-            { sortingWidth = 14<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 14<channelCount>; sorterVariant = VariantB },
             "[(0,3),(1,9),(2,6),(4,12),(5,10),(7,11),(8,13)]
              [(0,2),(3,12),(4,5),(6,10),(7,8),(11,13)]
              [(0,1),(2,11),(3,6),(4,7),(5,9),(10,12)]
@@ -222,7 +222,7 @@ module SorterLib =
              [(4,6),(5,7),(8,9),(10,11)]
              [(3,4),(5,6),(7,8),(9,10),(11,12)]"
 
-            { sortingWidth = 15<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 15<channelCount>; sorterVariant = VariantA },
             "[(1,2),(3,10),(4,14),(5,8),(6,13),(7,12),(9,11)]
              [(0,14),(1,5),(2,8),(3,7),(6,9),(10,12),(11,13)]
              [(0,7),(1,6),(2,9),(4,10),(5,11),(8,13),(12,14)]
@@ -234,7 +234,7 @@ module SorterLib =
              [(2,3),(4,5),(6,7),(8,9),(10,11)]
              [(5,6),(7,8)]"
 
-            { sortingWidth = 15<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 15<channelCount>; sorterVariant = VariantB },
             "[(0,6),(1,10),(2,14),(3,9),(4,12),(5,13),(7,11)]
              [(0,7),(2,5),(3,4),(6,11),(8,10),(9,12),(13,14)]
              [(1,13),(2,3),(4,6),(5,9),(7,8),(10,14),(11,12)]
@@ -245,7 +245,7 @@ module SorterLib =
              [(3,5),(4,6),(7,8),(9,10)]
              [(2,3),(4,5),(6,7),(8,9),(10,11)]"
 
-            { sortingWidth = 16<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 16<channelCount>; sorterVariant = VariantA },
             "[(0,13),(1,12),(2,15),(3,14),(4,8),(5,6),(7,11),(9,10)]
              [(0,5),(1,7),(2,9),(3,4),(6,13),(8,14),(10,15),(11,12)]
              [(0,1),(2,3),(4,5),(6,8),(7,9),(10,11),(12,13),(14,15)]
@@ -257,7 +257,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10),(11,12)]
              [(6,7),(8,9)]"
 
-            { sortingWidth = 16<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 16<channelCount>; sorterVariant = VariantB },
             "[(0,5),(1,4),(2,12),(3,13),(6,7),(8,9),(10,15),(11,14)]
              [(0,2),(1,10),(3,6),(4,7),(5,14),(8,11),(9,12),(13,15)]
              [(0,8),(1,3),(2,11),(4,13),(5,9),(6,10),(7,15),(12,14)]
@@ -268,7 +268,7 @@ module SorterLib =
              [(4,6),(5,7),(8,10),(9,11)]
              [(3,4),(5,6),(7,8),(9,10),(11,12)]"
 
-            { sortingWidth = 17<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 17<channelCount>; sorterVariant = VariantA },
             "[(0,11),(1,15),(2,10),(3,5),(4,6),(8,12),(9,16),(13,14)]
              [(0,6),(1,13),(2,8),(4,14),(5,15),(7,11)]
              [(0,8),(3,7),(4,9),(6,16),(10,11),(12,14)]
@@ -282,7 +282,7 @@ module SorterLib =
              [(5,6),(7,8),(9,10),(11,12)]
              [(4,5),(6,7),(8,9),(10,11),(12,13)]"
 
-            { sortingWidth = 17<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 17<channelCount>; sorterVariant = VariantB },
             "[(0,8),(1,3),(2,6),(4,15),(5,13),(9,16),(10,11),(12,14)]
              [(0,2),(1,4),(3,15),(5,8),(6,14),(7,9),(13,16)]
              [(2,13),(3,11),(5,10),(6,9),(7,12),(8,15),(14,16)]
@@ -295,7 +295,7 @@ module SorterLib =
              [(2,4),(5,6),(7,8),(9,10),(11,12)]
              [(2,3),(4,5),(6,7),(8,9),(10,11),(12,13)]"
 
-            { sortingWidth = 17<sortingWidth>; sorterVariant = VariantC }, 
+            { channelCount = 17<channelCount>; sorterVariant = VariantC },
             "[(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]
              [(1,3),(2,4),(5,7),(6,8),(9,11),(10,12),(13,15),(14,16)]
              [(1,5),(2,6),(3,7),(4,8),(9,13),(10,14),(11,15),(12,16)]
@@ -307,7 +307,7 @@ module SorterLib =
              [(2,3),(4,5),(6,8),(7,9),(10,11),(12,13),(14,15)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]"
 
-            { sortingWidth = 18<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 18<channelCount>; sorterVariant = VariantA },
             "[(0,6),(1,10),(2,15),(3,5),(4,9),(7,16),(8,13),(11,17),(12,14)]
              [(0,12),(1,4),(3,11),(5,17),(6,14),(7,8),(9,10),(13,16)]
              [(1,13),(2,7),(4,16),(6,9),(8,11),(10,15)]
@@ -320,7 +320,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14)]
              [(4,5),(6,7),(8,9),(10,11),(12,13)]"
 
-            { sortingWidth = 19<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 19<channelCount>; sorterVariant = VariantA },
             "[(0,12),(1,4),(2,8),(3,5),(6,17),(7,11),(9,14),(10,13),(15,16)]
              [(0,2),(1,7),(3,6),(4,11),(5,17),(8,12),(10,15),(13,16),(14,18)]
              [(3,10),(4,14),(5,15),(6,13),(7,9),(11,17),(16,18)]
@@ -334,7 +334,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10),(11,13),(12,14)]
              [(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15)]"
 
-            { sortingWidth = 19<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 19<channelCount>; sorterVariant = VariantB },
             "[(0,12),(1,13),(2,14),(3,15),(4,16),(5,17),(6,18),(8,10),(9,11)]
              [(0,2),(1,3),(4,6),(5,7),(8,9),(10,11),(12,14),(13,15),(16,18)]
              [(0,1),(2,3),(4,5),(6,7),(12,13),(14,15),(16,17)]
@@ -347,7 +347,7 @@ module SorterLib =
              [(1,2),(3,5),(6,7),(8,9),(10,11),(12,13),(14,16),(17,18)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]"
 
-            { sortingWidth = 20<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 20<channelCount>; sorterVariant = VariantA },
             "[(0,3),(1,7),(2,5),(4,8),(6,9),(10,13),(11,15),(12,18),(14,17),(16,19)]
              [(0,14),(1,11),(2,16),(3,17),(4,12),(5,19),(6,10),(7,15),(8,18),(9,13)]
              [(0,4),(1,2),(3,8),(5,7),(11,16),(12,14),(15,19),(17,18)]
@@ -361,7 +361,7 @@ module SorterLib =
              [(4,5),(6,8),(7,10),(9,12),(11,13),(14,15)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]"
 
-            { sortingWidth = 20<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 20<channelCount>; sorterVariant = VariantB },
             "[(0,12),(1,13),(2,14),(3,15),(4,16),(5,17),(6,18),(7,19),(8,10),(9,11)]
              [(0,2),(1,3),(4,6),(5,7),(8,9),(10,11),(12,14),(13,15),(16,18),(17,19)]
              [(0,1),(2,3),(4,5),(6,7),(12,13),(14,15),(16,17),(18,19)]
@@ -374,7 +374,7 @@ module SorterLib =
              [(1,2),(3,5),(6,7),(8,9),(10,11),(12,13),(14,16),(17,18)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]"
 
-            { sortingWidth = 21<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 21<channelCount>; sorterVariant = VariantA },
             "[(0,20),(1,19),(2,18),(3,17),(4,16),(5,15),(6,14),(7,13),(8,12),(9,11)]
              [(0,7),(1,2),(3,6),(5,9),(10,16),(11,15),(13,20),(14,17),(18,19)]
              [(0,5),(1,3),(2,13),(4,10),(6,18),(7,9),(11,14),(15,20),(17,19)]
@@ -389,7 +389,7 @@ module SorterLib =
              [(4,5),(6,8),(7,9),(10,11),(12,14),(13,15),(16,17)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16)]"
 
-            { sortingWidth = 21<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 21<channelCount>; sorterVariant = VariantB },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19)]
              [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15),(17,19),(18,20)]
              [(0,4),(1,5),(2,8),(3,9),(6,10),(7,11),(12,16),(13,17),(14,18),(15,19)]
@@ -403,7 +403,7 @@ module SorterLib =
              [(3,5),(6,8),(7,10),(9,12),(11,14),(13,16),(15,17),(18,20)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20)]"
 
-            { sortingWidth = 22<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 22<channelCount>; sorterVariant = VariantA },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21)]
              [(0,20),(1,21),(2,4),(3,5),(6,12),(7,13),(8,14),(9,15),(16,18),(17,19)]
              [(0,10),(2,8),(3,9),(4,14),(5,15),(6,16),(7,17),(11,21),(12,18),(13,19)]
@@ -419,7 +419,7 @@ module SorterLib =
              [(4,6),(5,8),(7,9),(12,14),(13,16),(15,17)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18)]"
 
-            { sortingWidth = 22<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 22<channelCount>; sorterVariant = VariantB },
             "[(0,10),(1,7),(2,12),(3,6),(4,5),(8,13),(9,19),(11,21),(14,20),(15,18),(16,17)]
              [(0,8),(1,15),(2,16),(3,14),(4,9),(5,19),(6,20),(7,18),(12,17),(13,21)]
              [(0,11),(1,4),(2,3),(5,7),(6,12),(9,15),(10,21),(14,16),(17,20),(18,19)]
@@ -434,7 +434,7 @@ module SorterLib =
              [(5,7),(6,8),(9,10),(11,12),(13,15),(14,16)]
              [(6,7),(8,9),(10,11),(12,13),(14,15)]"
 
-            { sortingWidth = 22<sortingWidth>; sorterVariant = VariantC }, 
+            { channelCount = 22<channelCount>; sorterVariant = VariantC },
             "[(0,11),(1,12),(2,13),(3,14),(4,15),(5,16),(6,17),(7,18),(8,19),(9,20),(10,21)]
              [(0,10),(1,9),(2,8),(3,7),(4,6),(11,21),(12,20),(13,19),(14,18),(15,17)]
              [(0,5),(1,2),(3,4),(6,7),(8,12),(9,13),(14,15),(16,21),(17,18),(19,20)]
@@ -448,7 +448,7 @@ module SorterLib =
              [(3,4),(5,7),(6,8),(9,10),(11,12),(13,15),(14,16),(17,18)]
              [(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17)]"
 
-            { sortingWidth = 23<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 23<channelCount>; sorterVariant = VariantA },
             "[(0,20),(1,12),(2,16),(4,6),(5,10),(7,21),(8,14),(9,15),(11,22),(13,18),(17,19)]
              [(0,3),(1,11),(2,7),(4,17),(5,13),(6,19),(8,9),(10,18),(12,22),(14,15),(16,21)]
              [(0,1),(2,4),(3,12),(5,8),(6,9),(7,10),(11,20),(13,16),(14,17),(15,18),(19,21)]
@@ -463,7 +463,7 @@ module SorterLib =
              [(4,6),(8,10),(9,12),(11,14),(13,15),(17,19)]
              [(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18)]"
 
-            { sortingWidth = 23<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 23<channelCount>; sorterVariant = VariantB },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21)]
              [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15),(16,18),(17,19),(20,22)]
              [(0,4),(1,5),(2,8),(3,9),(6,10),(7,11),(12,16),(13,17),(14,20),(15,21),(18,22)]
@@ -477,7 +477,7 @@ module SorterLib =
              [(3,5),(6,8),(7,10),(9,12),(11,14),(13,16),(15,17),(18,20)]
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20)]"
 
-            { sortingWidth = 24<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 24<channelCount>; sorterVariant = VariantA },
             "[(0,20),(1,12),(2,16),(3,23),(4,6),(5,10),(7,21),(8,14),(9,15),(11,22),(13,18),(17,19)]
              [(0,3),(1,11),(2,7),(4,17),(5,13),(6,19),(8,9),(10,18),(12,22),(14,15),(16,21),(20,23)]
              [(0,1),(2,4),(3,12),(5,8),(6,9),(7,10),(11,20),(13,16),(14,17),(15,18),(19,21),(22,23)]
@@ -492,7 +492,7 @@ module SorterLib =
              [(4,6),(8,10),(9,12),(11,14),(13,15),(17,19)]
              [(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18)]"
 
-            { sortingWidth = 24<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 24<channelCount>; sorterVariant = VariantB },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),(22,23)]
              [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15),(16,18),(17,19),(20,22),(21,23)]
              [(0,4),(1,5),(2,6),(3,7),(8,12),(9,13),(10,14),(11,15),(16,20),(17,21),(18,22),(19,23)]
@@ -507,7 +507,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20)]"
 
 
-            { sortingWidth = 25<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 25<channelCount>; sorterVariant = VariantA },
             "[(0,2),(1,8),(3,18),(4,17),(5,20),(6,19),(7,9),(10,11),(12,13),(14,16),(15,22),(21,23)]
              [(0,3),(1,15),(2,18),(4,12),(5,21),(6,10),(7,14),(8,22),(9,16),(11,19),(13,17),(20,23)]
              [(0,4),(1,7),(2,13),(3,12),(5,6),(8,14),(9,15),(10,21),(11,20),(16,22),(17,18),(19,23)]
@@ -524,7 +524,7 @@ module SorterLib =
              [(3,5),(4,6),(7,8),(9,10),(11,12),(13,15),(14,17),(16,19)]
              [(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19)]"
 
-            { sortingWidth = 25<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 25<channelCount>; sorterVariant = VariantB },
             "[(0,2),(1,8),(3,18),(4,17),(5,20),(6,19),(7,9),(10,11),(12,13),(14,16),(15,22),(21,23)]
              [(0,3),(1,15),(2,18),(4,12),(5,21),(6,10),(7,14),(8,22),(9,16),(11,19),(13,17),(20,23)]
              [(0,4),(1,7),(2,13),(3,12),(5,6),(8,14),(9,15),(10,21),(11,20),(16,22),(17,18),(19,23)]
@@ -540,7 +540,7 @@ module SorterLib =
              [(3,5),(4,6),(7,8),(9,10),(11,13),(12,15),(14,16),(17,18)]
              [(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19)]"
 
-            { sortingWidth = 26<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 26<channelCount>; sorterVariant = VariantA },
             "[(0,25),(1,3),(2,9),(4,19),(5,18),(6,21),(7,20),(8,10),(11,12),(13,14),(15,17),(16,23),(22,24)]
              [(1,4),(2,16),(3,19),(5,13),(6,22),(7,11),(8,15),(9,23),(10,17),(12,20),(14,18),(21,24)]
              [(1,5),(2,8),(3,14),(4,13),(6,7),(9,15),(10,16),(11,22),(12,21),(17,23),(18,19),(20,24)]
@@ -557,7 +557,7 @@ module SorterLib =
              [(5,6),(7,8),(9,10),(11,13),(12,14),(15,16),(17,18),(19,20)]
              [(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21)]"
 
-            { sortingWidth = 26<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 26<channelCount>; sorterVariant = VariantB },
             "[(0,25),(1,3),(2,9),(4,19),(5,18),(6,21),(7,20),(8,10),(11,12),(13,14),(15,17),(16,23),(22,24)]
              [(1,4),(2,16),(3,19),(5,13),(6,22),(7,11),(8,15),(9,23),(10,17),(12,20),(14,18),(21,24)]
              [(1,5),(2,8),(3,14),(4,13),(6,7),(9,15),(10,16),(11,22),(12,21),(17,23),(18,19),(20,24)]
@@ -573,7 +573,7 @@ module SorterLib =
              [(4,6),(7,8),(9,10),(11,13),(12,14),(15,16),(17,18),(19,21)]
              [(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21)]"
 
-            { sortingWidth = 27<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 27<channelCount>; sorterVariant = VariantA },
             "[(0,9),(1,6),(2,4),(3,7),(5,8),(11,24),(12,23),(13,26),(14,25),(15,19),(16,17),(18,22),(20,21)]
              [(0,1),(3,5),(4,10),(6,9),(7,8),(11,16),(12,18),(13,20),(14,15),(17,24),(19,25),(21,26),(22,23)]
              [(1,3),(2,5),(4,7),(8,10),(11,12),(13,14),(15,16),(17,19),(18,20),(21,22),(23,24),(25,26)]
@@ -590,7 +590,7 @@ module SorterLib =
              [(2,4),(3,5),(6,8),(7,9),(10,11),(12,14),(13,15),(16,18),(17,19),(20,22),(21,23),(25,26)]
              [(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24)]"
 
-            { sortingWidth = 28<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 28<channelCount>; sorterVariant = VariantA },
             "[(0,9),(1,20),(2,21),(3,22),(4,19),(5,24),(6,25),(7,26),(8,23),(10,15),(11,13),(12,17),(14,16),(18,27)]
              [(0,18),(1,7),(2,6),(3,5),(4,8),(9,27),(10,12),(11,14),(13,16),(15,17),(19,23),(20,26),(21,25),(22,24)]
              [(1,2),(3,4),(5,19),(6,20),(7,21),(8,22),(9,18),(10,11),(12,14),(13,15),(16,17),(23,24),(25,26)]
@@ -608,7 +608,7 @@ module SorterLib =
              [(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24)]"
 
 
-            { sortingWidth = 29<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 29<channelCount>; sorterVariant = VariantA },
             "[(0,12),(1,10),(2,9),(3,7),(5,11),(6,8),(13,26),(14,25),(15,28),(16,27),(17,21),(18,19),(20,24),(22,23)]
              [(1,6),(2,3),(4,11),(7,9),(8,10),(13,18),(14,20),(15,22),(16,17),(19,26),(21,27),(23,28),(24,25)]
              [(0,4),(1,2),(3,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,21),(20,22),(23,24),(25,26),(27,28)]
@@ -625,7 +625,7 @@ module SorterLib =
              [(2,4),(3,5),(6,8),(7,9),(10,12),(11,14),(13,15),(16,18),(17,19),(20,22),(21,23),(24,26),(25,27)]
              [(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24),(25,26),(27,28)]"
 
-            { sortingWidth = 30<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 30<channelCount>; sorterVariant = VariantA },
             "[(1,2),(3,10),(4,14),(5,8),(6,13),(7,12),(9,11),(16,17),(18,25),(19,29),(20,23),(21,28),(22,27),(24,26)]
              [(0,14),(1,5),(2,8),(3,7),(6,9),(10,12),(11,13),(15,29),(16,20),(17,23),(18,22),(21,24),(25,27),(26,28)]
              [(0,7),(1,6),(2,9),(4,10),(5,11),(8,13),(12,14),(15,22),(16,21),(17,24),(19,25),(20,26),(23,28),(27,29)]
@@ -642,7 +642,7 @@ module SorterLib =
              [(2,4),(6,8),(10,12),(11,13),(14,15),(16,18),(17,19),(20,22),(21,23),(24,26),(25,27)]
              [(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24),(25,26),(27,28)]"
 
-            { sortingWidth = 31<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 31<channelCount>; sorterVariant = VariantA },
             "[(1,2),(3,10),(4,14),(5,8),(6,13),(7,12),(9,11),(15,28),(16,27),(17,30),(18,29),(19,23),(20,21),(22,26),(24,25)]
              [(0,14),(1,5),(2,8),(3,7),(6,9),(10,12),(11,13),(15,20),(16,22),(17,24),(18,19),(21,28),(23,29),(25,30),(26,27)]
              [(0,7),(1,6),(2,9),(4,10),(5,11),(8,13),(12,14),(15,16),(17,18),(19,20),(21,23),(22,24),(25,26),(27,28),(29,30)]
@@ -659,7 +659,7 @@ module SorterLib =
              [(2,4),(3,5),(6,8),(7,9),(10,12),(11,13),(14,15),(16,18),(17,19),(20,22),(21,23),(24,26),(25,27),(28,30)]
              [(1,2),(3,4),(5,6),(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24),(25,26),(27,28),(29,30)]"
 
-            { sortingWidth = 32<sortingWidth>; sorterVariant = VariantA }, 
+            { channelCount = 32<channelCount>; sorterVariant = VariantA },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),(22,23),(24,25),(26,27),(28,29),(30,31)]
              [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15),(16,18),(17,19),(20,22),(21,23),(24,26),(25,27),(28,30),(29,31)]
              [(0,4),(1,5),(2,6),(3,7),(8,12),(9,13),(10,14),(11,15),(16,20),(17,21),(18,22),(19,23),(24,28),(25,29),(26,30),(27,31)]
@@ -676,7 +676,7 @@ module SorterLib =
              [(6,8),(7,10),(9,12),(11,14),(13,16),(15,18),(17,20),(19,22),(21,24),(23,25)]
              [(7,8),(9,10),(11,12),(13,14),(15,16),(17,18),(19,20),(21,22),(23,24)]"
 
-            { sortingWidth = 32<sortingWidth>; sorterVariant = VariantB }, 
+            { channelCount = 32<channelCount>; sorterVariant = VariantB },
             "[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17),(18,19),(20,21),(22,23),(24,25),(26,27),(28,29),(30,31)]
              [(0,2),(1,3),(4,6),(5,7),(8,10),(9,11),(12,14),(13,15),(16,18),(17,19),(20,22),(21,23),(24,26),(25,27),(28,30),(29,31)]
              [(0,4),(1,5),(2,6),(3,7),(8,12),(9,13),(10,14),(11,15),(16,20),(17,21),(18,22),(19,23),(24,28),(25,29),(26,30),(27,31)]

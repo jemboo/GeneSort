@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sortable
 
 open System
@@ -16,7 +16,7 @@ type sortBlockUint8v256 =
     }
     
     /// Creates a SIMD block from a slice of 1-32 sortableIntArrays.
-    static member createFromIntArrays (sw: int<sortingWidth>) (arrays: sortableIntArray[]) =
+    static member createFromIntArrays (sw: int<channelCount>) (arrays: sortableIntArray[]) =
         let width = %sw
         let inputCount = arrays.Length
         if inputCount > 32 then 
@@ -59,7 +59,7 @@ module SortBlockUint8v256 =
             result.[lane] <-
                 sortableIntArray.create(
                     values,
-                    s256.Length |> UMX.tag<sortingWidth>,
+                    s256.Length |> UMX.tag<channelCount>,
                     2 |> UMX.tag<symbolSetSize>)
 
         result
@@ -107,15 +107,15 @@ module SortBlockUint8v256 =
 
 module Simd256GoldenHashProvider =
     
-    // Cache to store the 32-bit fingerprint for each sortingWidth
-    // key: int<sortingWidth>, value: uint32[] (32 hashes)
-    let private goldenCache = ConcurrentDictionary<int<sortingWidth>, uint32[]>()
+    // Cache to store the 32-bit fingerprint for each channelCount
+    // key: int<channelCount>, value: uint32[] (32 hashes)
+    let private goldenCache = ConcurrentDictionary<int<channelCount>, uint32[]>()
 
     /// Calculates the 32-bit hash fingerprint for a perfectly sorted block.
-    let private calculateGolden (width: int<sortingWidth>) : uint32[] =
+    let private calculateGolden (width: int<channelCount>) : uint32[] =
         let w = %width
         if w > 256 then 
-            failwithf "Sorting width %d exceeds uint8 capacity (256) for SIMD golden hashing." w
+            failwithf "Channel count %d exceeds uint8 capacity (256) for SIMD golden hashing." w
 
         // Create a 'fake' block where every lane is [0, 1, 2, ..., w-1]
         let vectors = Array.init w (fun i -> Vector256.Create(byte i))
@@ -128,5 +128,5 @@ module Simd256GoldenHashProvider =
 
     /// Memoized access to the golden hashes. 
     /// Returns 32 uint32 values representing the 'sorted' state of each lane.
-    let GetGoldenHashes (width: int<sortingWidth>) : uint32[] =
+    let GetGoldenHashes (width: int<channelCount>) : uint32[] =
         goldenCache.GetOrAdd(width, (fun w -> calculateGolden w))

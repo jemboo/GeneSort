@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Uf6
+namespace GeneSort.Model.Sorting.V1.Simple.Uf6
 
 open System
 open FSharp.UMX
@@ -69,7 +69,7 @@ type msuf6RandMutate =
             |> Array.map (fun unfolder ->
                 RandomUnfolderOps6.mutateTwoOrbitUf6 rng.NextFloat rates unfolder)
                 
-        msuf6.create id parent.SortingWidth mutatedUnfolders
+        msuf6.create id parent.ChannelCount mutatedUnfolders
 
     member this.MakeSorterModelFromIndexAndMod 
                         (parent: msuf6)

@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Sortable
+namespace GeneSort.Sorting.Sortable
 
 open System
 open System.Collections
@@ -13,18 +13,18 @@ open GeneSort.Sorting.Sorter
 type sortableBoolArray =
     private { 
         values: bool[] 
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         mutable valuesHash: int option // Lazily computed hash code for Values
     }
 
     /// Creates a sortableBoolArray, throwing if values length does not match order.
     /// <exception cref="ArgumentException">Thrown when order is negative or values length does not equal order.</exception>
-    static member create(values: bool[], sortingWidth: int<sortingWidth>) =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "order" "SortingWidth must be non-negative."
-        if values.Length <> int sortingWidth then
-            invalidArg "values" $"Values length ({values.Length}) must equal order ({int sortingWidth})."
-        { values = Array.copy values; sortingWidth = sortingWidth; valuesHash = None }
+    static member create(values: bool[], channelCount: int<channelCount>) =
+        if channelCount < 0<channelCount> then
+            invalidArg "order" "ChannelCount must be non-negative."
+        if values.Length <> int channelCount then
+            invalidArg "values" $"Values length ({values.Length}) must equal order ({int channelCount})."
+        { values = Array.copy values; channelCount = channelCount; valuesHash = None }
 
     /// Gets a copy of the values array.
     member this.Values with get() = Array.copy this.values
@@ -36,12 +36,12 @@ type sortableBoolArray =
     member this.ArrayLength with get() = this.values.Length
 
     /// Gets the sorting order.
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
     /// Computes the squared distance between this array and another sortableBoolArray, treating true as 1 and false as 0.
     member this.DistanceSquared(other: sortableBoolArray) =
-        if other.SortingWidth <> this.SortingWidth then
-            invalidArg "other" $"Other array SortingWidth ({int other.SortingWidth}) must equal this SortingWidth ({int this.SortingWidth})."
+        if other.ChannelCount <> this.ChannelCount then
+            invalidArg "other" $"Other array ChannelCount ({int other.ChannelCount}) must equal this ChannelCount ({int this.ChannelCount})."
         let thisNumeric = this.values |> Array.map (fun b -> if b then 1 else 0)
         let otherNumeric = other.values |> Array.map (fun b -> if b then 1 else 0)
         ArrayUtils.distanceSquared thisNumeric otherNumeric
@@ -52,12 +52,12 @@ type sortableBoolArray =
     /// Mutates and creates a new sortableBoolArray by sorting with CEs. (No use counters tracked)
     member this.SortByCes (ces: ce[]) : sortableBoolArray =
         let sortedValues = CeSorting.sortBy ces (Array.copy this.values)
-        sortableBoolArray.create(sortedValues, this.SortingWidth)
+        sortableBoolArray.create(sortedValues, this.ChannelCount)
 
     override this.Equals(obj) =
         match obj with
         | :? sortableBoolArray as other ->
-            this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
+            this.channelCount = other.channelCount && Array.forall2 (=) this.values other.values
         | _ -> false
 
     override this.GetHashCode() =
@@ -72,7 +72,7 @@ type sortableBoolArray =
 
     interface IEquatable<sortableBoolArray> with
         member this.Equals(other) =
-            this.sortingWidth = other.sortingWidth && Array.forall2 (=) this.values other.values
+            this.channelCount = other.channelCount && Array.forall2 (=) this.values other.values
 
     interface IEnumerable<bool> with
         member this.GetEnumerator() =
@@ -88,7 +88,7 @@ module SortableBoolArray =
     type SortableBoolArrayValueComparer() =
         interface IEqualityComparer<sortableBoolArray> with
             member _.Equals(x, y) =
-                x.SortingWidth = y.SortingWidth && 
+                x.ChannelCount = y.ChannelCount &&
                 Array.forall2 (=) x.Values y.Values
             member _.GetHashCode(obj) =
                 obj.GetHashCode()
@@ -112,7 +112,7 @@ module SortableBoolArray =
                 if (mVal - 1 - j) < x then
                     result.[offset + j] <- true
 
-        sortableBoolArray.create(result, totalWidth |> UMX.tag<sortingWidth>)
+        sortableBoolArray.create(result, totalWidth |> UMX.tag<channelCount>)
 
     let fromLatticeCubeFull 
                 (dim:int<latticeDimension>) 
@@ -128,38 +128,38 @@ module SortableBoolArray =
         |> Seq.map (fun p -> fromLatticePoint p maxValue)
 
     /// Streams all possible combinations on-demand using 64-bit integer limits.
-    let getAllSortableBoolArrays (sortingWidth: int<sortingWidth>) : seq<sortableBoolArray> =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let w = int sortingWidth
+    let getAllSortableBoolArrays (channelCount: int<channelCount>) : seq<sortableBoolArray> =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        let w = int channelCount
         let count = 1UL <<< w
         seq {
             for i = 0UL to count - 1UL do
                 let boolArray = Array.init w (fun j -> (i >>> j) &&& 1UL = 1UL)
-                yield sortableBoolArray.create(boolArray, sortingWidth)
+                yield sortableBoolArray.create(boolArray, channelCount)
         }
 
-    let getAllSortedSortableBoolArrays (sortingWidth: int<sortingWidth>) : seq<sortableBoolArray> =
-        if sortingWidth < 0<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be non-negative."
-        let n = int sortingWidth
+    let getAllSortedSortableBoolArrays (channelCount: int<channelCount>) : seq<sortableBoolArray> =
+        if channelCount < 0<channelCount> then
+            invalidArg "channelCount" "Channel count must be non-negative."
+        let n = int channelCount
         seq {
             for k = 0 to n do
                 let boolArray = Array.init n (fun i -> i >= n - k)
-                yield sortableBoolArray.create(boolArray, sortingWidth)
+                yield sortableBoolArray.create(boolArray, channelCount)
         }
 
     let getMergeTestCases 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (mergeDimension: int<mergeDimension>)
             (mergeFillType: mergeSuffixType)
             : seq<sortableBoolArray> =
 
-        if %sortingWidth % %mergeDimension <> 0 then
-            invalidArg "sortingWidth" (sprintf "Sorting width: %d must be divisible by mergeDimension : %d " %sortingWidth %mergeDimension)
+        if %channelCount % %mergeDimension <> 0 then
+            invalidArg "channelCount" (sprintf "Channel count: %d must be divisible by mergeDimension : %d " %channelCount %mergeDimension)
 
         let latticeDimension = %mergeDimension |> UMX.tag<latticeDimension>
-        let edgeLength = %sortingWidth / %mergeDimension |> UMX.tag<latticeDistance>
+        let edgeLength = %channelCount / %mergeDimension |> UMX.tag<latticeDistance>
 
         match mergeFillType with
         | NoSuffix -> fromLatticeCubeFull latticeDimension edgeLength
@@ -169,11 +169,11 @@ module SortableBoolArray =
     /// Ordering is the same as sorting all binary inputs and keeping each first occurrence.
     let getAllPossibleResultsFromCeArray
             (ces: ce[])
-            (sortingWidth: int<sortingWidth>) : seq<sortableBoolArray> =
+            (channelCount: int<channelCount>) : seq<sortableBoolArray> =
         
-        if sortingWidth < 0<sortingWidth> || sortingWidth >= 64<sortingWidth> then
-            invalidArg "sortingWidth" "Sorting width must be between 0 and 63."
-        let width = int sortingWidth
+        if channelCount < 0<channelCount> || channelCount >= 64<channelCount> then
+            invalidArg "channelCount" "Channel count must be between 0 and 63."
+        let width = int channelCount
         let parents = Array.init width id
         let rec root i =
             if parents.[i] = i then i
@@ -181,12 +181,12 @@ module SortableBoolArray =
                 parents.[i] <- root parents.[i]
                 parents.[i]
         for comparator in ces do
-            if comparator.Hi >= width then
-                invalidArg "ces" "Comparator index exceeds sorting width."
-            parents.[root comparator.Hi] <- root comparator.Low
+            if (int comparator.HighChannel) >= width then
+                invalidArg "ces" "Comparator index exceeds channel count."
+            parents.[root (int comparator.HighChannel)] <- root (int comparator.LowChannel)
         let components = [| 0 .. width - 1 |] |> Array.groupBy root |> Array.map snd
         if ces.Length = 0 || components.Length <= 1 then
-            getAllSortableBoolArrays sortingWidth
+            getAllSortableBoolArrays channelCount
             |> Seq.map (fun arr -> arr.SortByCes ces)
             |> removeDuplicates
         else
@@ -195,10 +195,10 @@ module SortableBoolArray =
                     components |> Array.map (fun channels ->
                         let localIndex = channels |> Array.mapi (fun i channel -> channel, i) |> Map.ofArray
                         let localCes =
-                            ces |> Array.filter (fun comparator -> Map.containsKey comparator.Low localIndex)
-                                |> Array.map (fun comparator -> ce.create localIndex.[comparator.Low] localIndex.[comparator.Hi])
+                            ces |> Array.filter (fun comparator -> Map.containsKey (int comparator.LowChannel) localIndex)
+                                |> Array.map (fun comparator -> ce.create localIndex.[(int comparator.LowChannel)] localIndex.[(int comparator.HighChannel)])
                         let seen = HashSet<sortableBoolArray>()
-                        getAllSortableBoolArrays (channels.Length |> UMX.tag<sortingWidth>)
+                        getAllSortableBoolArrays (channels.Length |> UMX.tag<channelCount>)
                         |> Seq.map (fun input -> input, input.SortByCes localCes)
                         |> Seq.choose (fun (input, output) ->
                             if seen.Add output then
@@ -217,5 +217,5 @@ module SortableBoolArray =
                             yield! combine (componentIndex + 1) (firstInput ||| input) (result ||| output)
                 }
                 for _, result in combine 0 0UL 0UL |> Seq.sortBy fst do
-                    yield sortableBoolArray.create(Array.init width (fun i -> (result >>> i) &&& 1UL <> 0UL), sortingWidth)
+                    yield sortableBoolArray.create(Array.init width (fun i -> (result >>> i) &&& 1UL <> 0UL), channelCount)
             }

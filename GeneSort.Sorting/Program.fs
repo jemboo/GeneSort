@@ -1,4 +1,4 @@
-﻿
+
 
 namespace GeneSort.Sorting
 
@@ -33,10 +33,10 @@ open GeneSort.Sorting.Sorter
 module Program =
 
     let grayBlockTester () :int =
-        let stWidth = 11<sortingWidth>
+        let stWidth = 11<channelCount>
 
         // Keep this as a sequence if possible, or an array of blocks
-        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForSortingWidth stWidth
+        let grayBlocks = Sortable.GrayVectorGenerator.getAllSortBlockBitv512ForChannelCount stWidth
 
         let mutable totalCount = 0
     
@@ -68,11 +68,11 @@ module Program =
         let cesS = CeUse.ceUseStringToCes initalGuy
 
 
-        let sortingWidth = 32 |> UMX.tag<sortingWidth>
+        let channelCount = 32 |> UMX.tag<channelCount>
 
         let ces = [| ce.create 0 1; ce.create 2 3; ce.create 0 3; ce.create 4 5; |]
 
-        let stages, moves = StageBuilderSequence.toStageSequenceWithMoveInfo sortingWidth cesS
+        let stages, moves = StageBuilderSequence.toStageSequenceWithMoveInfo channelCount cesS
 
         let sym = stages.Stages |> Array.map(fun st -> st |> Stage.isReflectionSymmetric)
 
@@ -84,12 +84,12 @@ module Program =
 
     let batch2 () : int =
 
-        let sortingWidth = 16 |> UMX.tag<sortingWidth>
+        let channelCount = 16 |> UMX.tag<channelCount>
         let niner = "[0, 64, (0, 15)]; [1, 64, (1, 14)]; [2, 128, (2, 3)]; [3, 128, (4, 5)]; [4, 64, (6, 9)]; [5, 128, (7, 8)]; [6, 32, (10, 11)]; [7, 32, (12, 13)]; [8, 64, (0, 7)]; [9, 64, (1, 6)]; [10, 96, (2, 10)]; [11, 32, (3, 11)]; [12, 96, (4, 12)]; [13, 32, (5, 13)]; [14, 64, (8, 15)]; [15, 64, (9, 14)]; [16, 64, (0, 2)]; [17, 32, (1, 4)]; [18, 72, (3, 9)]; [19, 96, (5, 7)]; [20, 72, (6, 12)]; [21, 96, (8, 10)]; [22, 32, (11, 14)]; [23, 64, (13, 15)]; [24, 16, (0, 1)]; [25, 80, (2, 4)]; [26, 96, (3, 5)]; [27, 96, (6, 8)]; [28, 96, (7, 9)]; [29, 96, (10, 12)]; [30, 80, (11, 13)]; [31, 16, (14, 15)]; [33, 23, (1, 6)]; [34, 35, (2, 3)]; [35, 101, (4, 5)]; [37, 23, (9, 14)]; [38, 101, (10, 11)]; [39, 35, (12, 13)]; [42, 83, (3, 6)]; [44, 122, (5, 10)]; [45, 128, (7, 8)]; [46, 83, (9, 12)]; [52, 80, (4, 8)]; [54, 80, (7, 11)]; [65, 19, (1, 2)]; [67, 96, (4, 7)]; [68, 125, (5, 6)]; [69, 96, (8, 11)]; [70, 125, (9, 10)]; [71, 19, (13, 14)]; [73, 35, (2, 3)]; [74, 96, (4, 5)]; [75, 127, (6, 7)]; [76, 127, (8, 9)]; [77, 96, (10, 11)]; [78, 35, (12, 13)]; [83, 69, (3, 4)]; [84, 128, (7, 8)]; [87, 69, (11, 12)]; [396, 119, (5, 6)]; [398, 119, (9, 10)]"
         let tenner = "[0, 64, (0, 15)]; [1, 64, (1, 14)]; [2, 64, (2, 13)]; [3, 64, (3, 11)]; [4, 64, (4, 12)]; [5, 64, (5, 10)]; [6, 64, (6, 9)]; [7, 128, (7, 8)]; [8, 64, (0, 7)]; [9, 64, (1, 6)]; [10, 64, (2, 5)]; [11, 64, (3, 4)]; [12, 64, (8, 15)]; [13, 64, (9, 14)]; [14, 64, (10, 13)]; [15, 64, (11, 12)]; [16, 64, (0, 2)]; [17, 32, (1, 3)]; [18, 72, (4, 9)]; [19, 96, (5, 7)]; [20, 72, (6, 11)]; [21, 96, (8, 10)]; [22, 32, (12, 14)]; [23, 64, (13, 15)]; [24, 16, (0, 1)]; [25, 80, (2, 4)]; [26, 56, (3, 5)]; [27, 96, (6, 8)]; [28, 96, (7, 9)]; [29, 56, (10, 12)]; [30, 80, (11, 13)]; [31, 16, (14, 15)]; [33, 23, (1, 6)]; [34, 60, (2, 3)]; [35, 104, (4, 11)]; [36, 92, (5, 10)]; [38, 23, (9, 14)]; [39, 60, (12, 13)]; [45, 128, (7, 8)]; [67, 78, (3, 6)]; [70, 78, (9, 12)]; [73, 19, (1, 2)]; [74, 116, (4, 7)]; [75, 110, (5, 6)]; [76, 116, (8, 11)]; [77, 110, (9, 10)]; [79, 19, (13, 14)]; [81, 35, (2, 3)]; [82, 116, (4, 5)]; [83, 124, (6, 7)]; [84, 124, (8, 9)]; [85, 116, (10, 11)]; [86, 35, (12, 13)]; [107, 70, (3, 4)]; [110, 128, (7, 8)]; [111, 70, (11, 12)]; [148, 123, (5, 6)]; [150, 123, (9, 10)]; [157, 122, (6, 7)]; [158, 122, (8, 9)]"
         let cesS = CeUse.ceUseStringToCes tenner
 
-        let stages, moves = StageBuilderSequence.toStageSequenceWithMoveInfo sortingWidth cesS
+        let stages, moves = StageBuilderSequence.toStageSequenceWithMoveInfo channelCount cesS
 
         let sym = stages.Stages |> Array.map(fun st -> st |> Stage.isReflectionSymmetric)
 

@@ -12,12 +12,13 @@ public sealed record RunBreadcrumb(string Name, string ModulePath, bool IsRoot, 
 
 public sealed record RunSelectionTile(string Name, string Icon, string Detail,
     string ModulePath, run? Definition = null, string? SavedPath = null,
-    bool IsCodeDefined = false, bool CreateNew = false)
+    bool IsCodeDefined = false, bool CreateNew = false, bool ProcessingCompleted = false)
 {
     public bool IsModule => Definition is null && !CreateNew;
     public string Status => IsModule ? "Module" : CreateNew ? "Create your own" :
         SavedPath is null ? "Code only · not saved" : IsCodeDefined ? "Code + saved on disk" : "Saved on disk";
-    public string AccessibleName => $"{Name}. {Status}. {Detail}";
+    public bool IsMaterialized => !IsModule && !CreateNew && ProcessingCompleted;
+    public string AccessibleName => $"{Name}. {Status}. {(IsMaterialized ? "Processing completed." : "")} {Detail}";
 }
 
 /// Folder-scoped navigation; browsing never writes definitions or starts a run.
@@ -43,6 +44,16 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
         set { folder = value; Changed(); Changed(nameof(CanContinue)); }
     }
     public string CurrentPath => currentPath;
+    public string ModuleDescription => folderStep ? "" : DescribeModule(currentPath);
+    private string DescribeModule(string path) => types.FirstOrDefault(type => type.Name == path)?.Description
+        ?? (path.StartsWith("Saved runs", StringComparison.Ordinal) ? "Run definitions saved in this projects folder." : "Explore modules and run definitions.");
+    public void OpenModule(string path)
+    {
+        if (isLoading || folderStep || !leaves.Any(leaf => leaf.ModulePath == path)) return;
+        currentPath = path;
+        creating = false;
+        Refresh();
+    }
     public bool IsFolderStep => folderStep;
     public bool IsHierarchyStep => !folderStep;
     public bool IsLoading => isLoading;
@@ -84,23 +95,22 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
     {
         var here = leaves.Where(leaf => leaf.ModulePath == currentPath).ToArray();
         if (creating)
-            Tiles = here.Select(leaf => leaf with { CreateNew = true, Detail = "Start from " + leaf.Name }).ToArray();
+            Tiles = here.Select(leaf => leaf with { CreateNew = true }).ToArray();
         else
         {
             var prefix = currentPath.Length == 0 ? "" : currentPath + ".";
             var modules = leaves.Where(leaf => leaf.ModulePath.StartsWith(prefix, StringComparison.Ordinal) && leaf.ModulePath != currentPath)
                 .Select(leaf => leaf.ModulePath[prefix.Length..].Split('.')[0]).Distinct().Order(StringComparer.OrdinalIgnoreCase)
-                .Select(name => new RunSelectionTile(name, ModuleIcon(name), "Explore modules and run definitions", prefix + name));
+                .Select(name => new RunSelectionTile(name, ModuleIcon(prefix + name), DescribeModule(prefix + name), prefix + name));
             Tiles = [.. modules, .. here.OrderBy(leaf => leaf.Name, StringComparer.OrdinalIgnoreCase),
                 .. (here.Length == 0 ? Array.Empty<RunSelectionTile>() : [new RunSelectionTile("Create your own", "\uE710", "Start with a definition in this module", currentPath, CreateNew: true)])];
         }
-        foreach (var property in new[] { nameof(Tiles), nameof(Heading), nameof(Breadcrumb), nameof(Breadcrumbs), nameof(Help), nameof(IsFolderStep), nameof(IsHierarchyStep), nameof(CurrentPath) }) Changed(property);
+        foreach (var property in new[] { nameof(ModuleDescription), nameof(Tiles), nameof(Heading), nameof(Breadcrumb), nameof(Breadcrumbs), nameof(Help), nameof(IsFolderStep), nameof(IsHierarchyStep), nameof(CurrentPath) }) Changed(property);
     }
-    private static string ModuleIcon(string name) => name switch
+    private static string ModuleIcon(string path) => path.Split('.')[0] switch
     {
         "SortableTests" => "\uE9D9", "SorterEval" => "\uE9D2", "SorterMutate" => "\uE8AB",
-        "SorterSgd" => "\uE9D9", _ when name.StartsWith('p') && int.TryParse(name[1..], out _) => "\uE80A",
-        _ => "\uE8B7"
+        "SorterSgd" => "\uE9D9", _ => "\uE8F1"
     };
     public void ChangeFolder() { if (isLoading) return; folderStep = true; creating = false; Refresh(); }
     public void Back()
@@ -159,7 +169,7 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
                 try { result.Add(new(example.Name, "\uE943", example.Run.Description, type.Name, example.Run, IsCodeDefined: true)); }
                 catch (Exception error) { errors.Add($"{type.Name}.{example.Name}: {error.GetBaseException().Message}"); }
         var code = result.ToArray();
-        // Only inspect definition directories; parameter/results trees can contain millions of files.
+        // Discover definitions without scanning Results. Completion comes from saved parameter rows.
         string[] Directories(string path)
         {
             try { return Directory.Exists(path) ? Directory.GetDirectories(path).Where(p => (File.GetAttributes(p) & FileAttributes.ReparsePoint) == 0).ToArray() : []; }
@@ -178,13 +188,20 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
                             var definition = await RunDefinitionFiles.loadAsync(path);
                             if (!string.Equals(RunDefinitionFiles.pathFor(root, definition), path, StringComparison.OrdinalIgnoreCase))
                                 throw new InvalidDataException("Definition identity does not match its storage location.");
+                            var completed = false;
+                            try
+                            {
+                                var rows = await RunParameterFiles.loadAllAsync(root, definition);
+                                completed = rows.Length > 0 && rows.All(row => row.GetRunFinished()?.Value == true);
+                            }
+                            catch (Exception error) { errors.Add($"{path}: could not read processing state ({error.GetBaseException().Message})."); }
                             var matches = code.Where(leaf => SameIdentity(leaf.Definition!, definition)).ToArray();
                             if (matches.Length > 0)
                             {
                                 foreach (var match in matches)
                                 {
                                     result.Remove(match);
-                                    result.Add(match with { Definition = definition, SavedPath = path, Icon = "\uE74E", Detail = definition.Description });
+                                    result.Add(match with { Definition = definition, SavedPath = path, Icon = "\uE943", Detail = definition.Description, ProcessingCompleted = completed });
                                 }
                                 continue;
                             }
@@ -197,7 +214,7 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
                                     .Select(leaf => leaf.ModulePath).Distinct().ToArray();
                                 module = candidates.Length == 1 ? candidates[0] : $"Saved runs.{definition.ProjectName}.{definition.DatabaseName}";
                             }
-                            result.Add(new(definition.RunName, "\uE74E", definition.Description, module, definition, path));
+                            result.Add(new(definition.RunName, "\uE943", definition.Description, module, definition, path, ProcessingCompleted: completed));
                         }
                         catch (Exception error) { errors.Add($"{path}: {error.GetBaseException().Message}"); }
                 }

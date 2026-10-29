@@ -7,7 +7,7 @@ open GeneSort.Sorting.Sortable
 
 type sortableIntTestsDto = {
     Id: Guid
-    SortingWidth: int
+    ChannelCount: int
     SortableArrays: sortableIntArrayDto[]
 }
 
@@ -15,11 +15,11 @@ module SortableIntTestsDto =
 
     let fromDomain (sit: sortableIntTests) : sortableIntTestsDto =
         { Id = %sit.Id
-          SortingWidth = int sit.SortingWidth
+          ChannelCount = int sit.ChannelCount
           SortableArrays = sit.SortableIntArrays |> Array.map SortableIntArrayDto.fromDomain }
 
     let toDomain (dto: sortableIntTestsDto) : sortableIntTests =
         sortableIntTests.create
             (UMX.tag<sortableTestsId> dto.Id)
-            (UMX.tag<sortingWidth> dto.SortingWidth)
+            (UMX.tag<channelCount> dto.ChannelCount)
             (dto.SortableArrays |> Array.map SortableIntArrayDto.toDomain)

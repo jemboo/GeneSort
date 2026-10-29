@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open System
@@ -11,39 +11,39 @@ open GeneSort.Sorting
 [<Measure>] type reflectiveCount
 
 [<Struct>]
-type ce = private { low: int; hi: int } with
+type ce = private { lowChannel: int<channelIndex>; highChannel: int<channelIndex> } with
 
     static member create (lhs: int) (rhs: int) : ce =
         if lhs < 0 || rhs < 0 then
             failwith "Indices must be non-negative"
         else if lhs < rhs then
-            { low = lhs; hi = rhs }
+            { lowChannel = ChannelIndex.create lhs; highChannel = ChannelIndex.create rhs }
         else
-            { low = rhs; hi = lhs }
+            { lowChannel = ChannelIndex.create rhs; highChannel = ChannelIndex.create lhs }
 
-    /// Gets the first TwoOrbit.
-    member this.Low with get () = this.low
+    /// The lower channel endpoint.
+    member this.LowChannel with get () = this.lowChannel
 
-    /// Gets the second TwoOrbit (if present).
-    member this.Hi with get () = this.hi
+    /// The higher channel endpoint.
+    member this.HighChannel with get () = this.highChannel
 
-    member this.Length with get() = this.Hi - this.Low
+    member this.ChannelSpan : int<channelCount> = UMX.tag (int this.HighChannel - int this.LowChannel)
 
 
 
 module Ce =
 
     let toString (ce: ce) : string =
-        sprintf "(%d, %d)" ce.Low ce.Hi
+        sprintf "(%d, %d)" (int ce.LowChannel) (int ce.HighChannel)
 
     let fromString (s: string) : ce =
         let parts = s.Trim('(', ')').Split(',')
         if parts.Length <> 2 then
             failwith "Invalid ce string format"
         else
-            let low = Int32.Parse(parts.[0].Trim())
-            let hi = Int32.Parse(parts.[1].Trim())
-            ce.create low hi
+            let lowChannel = Int32.Parse(parts.[0].Trim())
+            let highChannel = Int32.Parse(parts.[1].Trim())
+            ce.create lowChannel highChannel
 
     let arrayToString (ces: ce[]) : string =
         let ceStrings = ces |> Array.map toString
@@ -64,15 +64,15 @@ module Ce =
         |> Array.map (fun tbit -> ce.create tbit.First tbit.Second)
 
 
-    // combine the upper and lower arrays, but increase the low and hi indexes of the ce's in cesLower
-    // by lowerOffset. Verify that ce.Low, and ce.Hi in cesUpper are between 0 and (sortingWidthUpper - 1).
-    // Verify that ce.Low, and ce.Hi in cesLower are between 0 and (sortingWidthLower - 1).
+    // combine the upper and lower arrays, but increase the lowChannel and highChannel indexes of the ce's in cesLower
+    // by channelOffset. Verify that ce.LowChannel, and ce.HighChannel in cesUpper are between 0 and (channelCountUpper - 1).
+    // Verify that ce.LowChannel, and ce.HighChannel in cesLower are between 0 and (channelCountLower - 1).
     let stack (cesUpper: ce[]) (cesLower: ce[]) 
-              (lowerOffset: int<sortingWidth>)  : ce[] =
+              (channelOffset: int<channelCount>)  : ce[] =
 
-        // Shift cesLower indices by lowerOffset
+        // Shift cesLower indices by channelOffset
         let shiftedLower =
-            cesLower |> Array.map (fun _ce -> ce.create (_ce.Low + %lowerOffset) (_ce.Hi + %lowerOffset))
+            cesLower |> Array.map (fun _ce -> ce.create ((int _ce.LowChannel) + %channelOffset) ((int _ce.HighChannel) + %channelOffset))
 
         // Combine the arrays
         Array.append cesUpper shiftedLower
@@ -80,25 +80,25 @@ module Ce =
 
     // use stack to combine arrays of ce arrays
     let stack2d (cesUpper: ce[][]) (cesLower: ce[][]) 
-                (lowerOffset: int<sortingWidth>) : ce[][] =
+                (channelOffset: int<channelCount>) : ce[][] =
 
         if cesUpper.Length <> cesLower.Length then
             failwith "cesUpper and cesLower must have the same length"
         
         Array.map2 (fun upper lower -> 
-            stack upper lower lowerOffset
+            stack upper lower channelOffset
         ) cesUpper cesLower
 
 
-    let inline private validateDivisibility (width: int<sortingWidth>) (divisor: int) (funcName: string) =
+    let inline private validateDivisibility (width: int<channelCount>) (divisor: int) (funcName: string) =
             let rawWidth = UMX.untag width
             if rawWidth % divisor <> 0 then
-                invalidArg (nameof width) $"{funcName} requires mergedSortingWidth ({rawWidth}) to be divisible by {divisor}."
+                invalidArg (nameof width) $"{funcName} requires mergedChannelCount ({rawWidth}) to be divisible by {divisor}."
 
 
-    let mergeN (dim: int<mergeDimension>) (mergedSortingWidth: int<sortingWidth>) (cesA: ce[][]) : ce[][] =
-            validateDivisibility mergedSortingWidth %dim $"merge{dim}"
-            let subWidth = mergedSortingWidth / %dim
+    let mergeN (dim: int<mergeDimension>) (mergedChannelCount: int<channelCount>) (cesA: ce[][]) : ce[][] =
+            validateDivisibility mergedChannelCount %dim $"merge{dim}"
+            let subWidth = mergedChannelCount / %dim
             let mutable current = cesA
             for i in 1 .. (%dim - 1) do
                 current <- stack2d current cesA (subWidth * i)
@@ -108,28 +108,28 @@ module Ce =
     /// Returns an array of self-reflective CEs covering all remaining unused indices in 0 .. (sWidth - 1).
     /// Each index in 0 .. (sWidth - 1) will be covered exactly once across input 'ces' and returned 'ces'.
     /// Throws an exception if duplicate indices exist or if an unused index's mirror is already occupied.
-    let getSelfReflectiveComplement (sWidth: int<sortingWidth>) (ces: ce[]) : ce[] =
+    let getSelfReflectiveComplement (sWidth: int<channelCount>) (ces: ce[]) : ce[] =
         let rawWidth = %sWidth
         if rawWidth <= 0 then
-            invalidArg (nameof sWidth) "Sorting width must be positive"
+            invalidArg (nameof sWidth) "Channel count must be positive"
 
         let occupied = Array.create rawWidth false
 
         // Mark indices occupied by input CEs and validate input bounds & uniqueness
         for c in ces do
-            if c.Low < 0 || c.Low >= rawWidth then
-                invalidArg "ces" $"CE index {c.Low} is out of bounds for sorting width {rawWidth}"
-            if c.Hi < 0 || c.Hi >= rawWidth then
-                invalidArg "ces" $"CE index {c.Hi} is out of bounds for sorting width {rawWidth}"
+            if (int c.LowChannel) < 0 || (int c.LowChannel) >= rawWidth then
+                invalidArg "ces" $"CE index {(int c.LowChannel)} is out of bounds for channel count {rawWidth}"
+            if (int c.HighChannel) < 0 || (int c.HighChannel) >= rawWidth then
+                invalidArg "ces" $"CE index {(int c.HighChannel)} is out of bounds for channel count {rawWidth}"
             
-            if occupied.[c.Low] then
-                invalidArg "ces" $"Index {c.Low} is used multiple times in input CEs"
-            occupied.[c.Low] <- true
+            if occupied.[(int c.LowChannel)] then
+                invalidArg "ces" $"Index {(int c.LowChannel)} is used multiple times in input CEs"
+            occupied.[(int c.LowChannel)] <- true
 
-            if c.Low <> c.Hi then
-                if occupied.[c.Hi] then
-                    invalidArg "ces" $"Index {c.Hi} is used multiple times in input CEs"
-                occupied.[c.Hi] <- true
+            if (int c.LowChannel) <> (int c.HighChannel) then
+                if occupied.[(int c.HighChannel)] then
+                    invalidArg "ces" $"Index {(int c.HighChannel)} is used multiple times in input CEs"
+                occupied.[(int c.HighChannel)] <- true
 
         let complement = ResizeArray()
 
@@ -144,18 +144,18 @@ module Ce =
                 let newCe = ce.create i mirror
                 complement.Add(newCe)
                 
-                // Mark both low and high mirror indices as processed
+                // Mark both lowChannel and high mirror indices as processed
                 occupied.[i] <- true
                 occupied.[mirror] <- true
 
         complement.ToArray()
 
 
-    let maxIndexForWidth (width: int) : int =  width * (width - 1) / 2
+    let maxIndexForChannelCount (width: int) : int =  width * (width - 1) / 2
 
     let toIndex (ce: ce) : int =
-        let i = ce.Low
-        let j = ce.Hi
+        let i = (int ce.LowChannel)
+        let j = (int ce.HighChannel)
         (j * (j + 1)) / 2 + i
 
     let fromIndex (dex:int) : ce = 
@@ -169,33 +169,33 @@ module Ce =
             ce.create (pfloor - 1) (pfloor - 1)
         else
             let lo = (float dex) - (float (pfloor * (pfloor + 1))) / 2.0 |> int
-            let hi = (int pfloor)
-            ce.create (lo) (hi)
+            let highChannel = (int pfloor)
+            ce.create (lo) (highChannel)
 
 
     let permute (perm: permutation) (cer:ce) =
-        ce.create (perm.permute cer.Low) (perm.permute cer.Hi)
+        ce.create (perm.permute (int cer.LowChannel)) (perm.permute (int cer.HighChannel))
 
 
-    let reflect (sortingWidth: int<sortingWidth>) (cer: ce) : ce =
+    let reflect (channelCount: int<channelCount>) (cer: ce) : ce =
             ce.create 
-                (cer.Hi |> GeneSort.Core.Combinatorics.reflect %sortingWidth) 
-                (cer.Low |>  GeneSort.Core.Combinatorics.reflect %sortingWidth)
+                ((int cer.HighChannel) |> GeneSort.Core.Combinatorics.reflect %channelCount)
+                ((int cer.LowChannel) |>  GeneSort.Core.Combinatorics.reflect %channelCount)
 
 
-    let isSelfReflection (sortingWidth: int<sortingWidth>) (cer: ce) : bool =
-            let reflected = reflect sortingWidth cer
+    let isSelfReflection (channelCount: int<channelCount>) (cer: ce) : bool =
+            let reflected = reflect channelCount cer
             reflected = cer
 
 
     /// Counts the number of CEs in the array that are either self-reflective OR are 
     /// the reflection of at least one CE (including itself) present in the array.
-    let countReflectiveOrReflected (sortingWidth: int<sortingWidth>) (ces: ce[]) : int<reflectiveCount> =
+    let countReflectiveOrReflected (channelCount: int<channelCount>) (ces: ce[]) : int<reflectiveCount> =
         if ces.Length = 0 then
             0 |> UMX.tag
         else
-            let w = %sortingWidth
-            let maxIdx = maxIndexForWidth (w + 1)
+            let w = %channelCount
+            let maxIdx = maxIndexForChannelCount (w + 1)
         
             // Create bit-presence mask (extremely fast bitwise operations)
             let presence = BitArray(maxIdx + 1, false)
@@ -205,7 +205,7 @@ module Ce =
             let mutable count = 0
             for i in 0 .. ces.Length - 1 do
                 let c = ces.[i]
-                let reflected = reflect sortingWidth c
+                let reflected = reflect channelCount c
                 let reflectedIdx = toIndex reflected
             
                 if presence.Get(reflectedIdx) then
@@ -216,7 +216,7 @@ module Ce =
 
     /// Counts the number of CEs in the array that are either self-reflective OR are 
     /// the reflection of at least one CE (including itself) present in the array.
-    let countReflectiveOrReflected_Old (sortingWidth: int<sortingWidth>) (ces: ce[]) : int<reflectiveCount> =
+    let countReflectiveOrReflected_Old (channelCount: int<channelCount>) (ces: ce[]) : int<reflectiveCount> =
         if ces.Length = 0 then
             0 |> UMX.tag<reflectiveCount>
         else
@@ -224,7 +224,7 @@ module Ce =
             ces
             |> Array.filter (fun c ->
                 // Check if the CE is self-reflective OR its reflection exists in the array
-                isSelfReflection sortingWidth c || Set.contains (reflect sortingWidth c) ceSet)
+                isSelfReflection channelCount c || Set.contains (reflect channelCount c) ceSet)
             |> Array.length |> UMX.tag<reflectiveCount>
 
 
@@ -234,51 +234,51 @@ module Ce =
         if width < 1 then
             failwith "Width must be at least 1"
         let ww = if excludeSelfCe then width else width + 1
-        let indexMax = maxIndexForWidth ww
+        let indexMax = maxIndexForChannelCount ww
         let dex = indexPicker indexMax
         if excludeSelfCe then
             let ceTemp = fromIndex dex
-            ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
+            ce.create ((int ceTemp.LowChannel)) ((int ceTemp.HighChannel) + 1) |> toIndex
         else
             dex
 
 
-    /// returns random Ce's to make Sorters, including Ce's where low=hi
+    /// returns random Ce's to make Sorters, including Ce's where lowChannel=highChannel
     /// <param name="width">The Sorter width</param>
     let generateCeCodes (indexPicker: int -> int) 
                         (width:int) : int seq =
         if width < 1 then
             failwith "Width must be at least 1"
-        let indexMax = maxIndexForWidth width
+        let indexMax = maxIndexForChannelCount width
         seq {
             while true do
                 indexPicker indexMax
         }
 
 
-    /// returns random Ce's to make Sorters, excluding Ce's where low=hi
+    /// returns random Ce's to make Sorters, excluding Ce's where lowChannel=highChannel
     /// <param name="width">The Sorter width</param>
     let generateCeCodesExcludeSelf 
                     (indexPicker: int -> int) 
                     (width:int) : int seq =
         if width < 2 then
             failwith "Width must be at least 2"
-        let indexMax = maxIndexForWidth width
+        let indexMax = maxIndexForChannelCount width
         seq {
             while true do
                 let ceTemp = indexPicker indexMax |> fromIndex
-                ce.create (ceTemp.Low) (ceTemp.Hi + 1) |> toIndex
+                ce.create ((int ceTemp.LowChannel)) ((int ceTemp.HighChannel) + 1) |> toIndex
         }
 
 
-    /// returns random Ce's to make Sorters, including Ce's where low=hi
+    /// returns random Ce's to make Sorters, including Ce's where lowChannel=highChannel
     /// <param name="width">The Sorter width</param>
     let generateCes (indexPicker: int -> int) 
                     (width:int) : ce seq =
         generateCeCodes indexPicker width |> Seq.map(fromIndex)
 
 
-    /// returns random Ce's to make Sorters, excluding Ce's where low=hi
+    /// returns random Ce's to make Sorters, excluding Ce's where lowChannel=highChannel
     /// <param name="width">The Sorter width</param>
     let generateCesExcludeSelf 
                     (indexPicker: int -> int) 

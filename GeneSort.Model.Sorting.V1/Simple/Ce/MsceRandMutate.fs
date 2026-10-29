@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Ce
+namespace GeneSort.Model.Sorting.V1.Simple.Ce
 
 open System
 open FSharp.UMX
@@ -70,10 +70,10 @@ type msceRandMutate =
                             : msce =
         let rng = this.RngFactory.Create %id
         let excludeSelfCe = this.ExcludeSelfCe
-        let sortingWidth = %parent.SortingWidth
+        let channelCount = %parent.ChannelCount
         
-        let ceCodeInserter = fun () -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
-        let ceCodeMutator = fun _ -> Ce.generateCeCode %excludeSelfCe sortingWidth (rng.NextIndex)
+        let ceCodeInserter = fun () -> Ce.generateCeCode %excludeSelfCe channelCount (rng.NextIndex)
+        let ceCodeMutator = fun _ -> Ce.generateCeCode %excludeSelfCe channelCount (rng.NextIndex)
         
         let ceCodes = IndelRates.mutate 
                         this.IndelRates 
@@ -82,7 +82,7 @@ type msceRandMutate =
                         (rng.NextFloat) 
                         parent.CeCodes
 
-        msce.create id parent.SortingWidth ceCodes
+        msce.create id parent.ChannelCount ceCodes
 
 
     member this.MakeSorterModelFromIndexAndMod 

@@ -15,8 +15,8 @@ open FsToolkit.ErrorHandling
 
 module EvoStartImport =
     let private validate (configured: run) (rp: runParameters) (checkpoint: evoCheckpoint) = result {
-        let! width = rp.GetSortingWidth() |> Result.ofOption "Missing SortingWidth."
-        do! if SortableTests.getSortingWidth checkpoint.Tests = width then Ok () else Error "Source test width does not match the destination."
+        let! width = rp.GetChannelCount() |> Result.ofOption "Missing ChannelCount."
+        do! if SortableTests.getChannelCount checkpoint.Tests = width then Ok () else Error "Source test width does not match the destination."
         let! intervals = Runtime.RunIntervals.forRun configured |> Result.ofOption "An evolutionary start requires an SgdRun."
         let! last = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing GenerationIntervalLast."
         let! final = GenIntervalConfig.getSampleAtIndex intervals (int last) |> Result.ofOption "Destination GenerationIntervalLast is unavailable."

@@ -80,7 +80,7 @@ module QueryProperties =
                 failwith "Standard sortable test type is not supported."
 
             | qpSortableTestsType.Merge restriction ->
-                let keys = [ ParamKeys.sortingWidthKey; 
+                let keys = [ ParamKeys.channelCountKey;
                              ParamKeys.mergeDimensionKey; 
                              ParamKeys.mergeSuffixTypeKey; 
                              ParamKeys.sortableDataFormatKey ]
@@ -103,7 +103,7 @@ module QueryProperties =
                             let keys = [ ParamKeys.rngTypeKey; 
                                          ParamKeys.sorterEvalTypeKey; 
                                          ParamKeys.simpleSorterModelTypeKey;
-                                         ParamKeys.sortingWidthKey;]
+                                         ParamKeys.channelCountKey;]
                             tryExtractKeys keys props
                         | Split ->
                             failwith "Standard sortable test type with Split restriction is not supported."
@@ -151,7 +151,7 @@ module QueryProperties =
                                              ParamKeys.sorterEvalTypeKey; 
                                              ParamKeys.seedSorterPoolSelectionTypeKey;
                                              ParamKeys.simpleSorterModelTypeKey;
-                                             ParamKeys.sortingWidthKey;]
+                                             ParamKeys.channelCountKey;]
                                 tryExtractKeys keys props
                             | Split ->
                                 failwith "Standard sortable test type with Split restriction is not supported."

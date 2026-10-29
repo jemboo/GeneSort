@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Ce
+namespace GeneSort.Model.Sorting.V1.Simple.Ce
 
 open System
 open FSharp.UMX
@@ -13,39 +13,39 @@ type msceRandGen =
         { 
           id : Guid<sorterModelGenId>
           rngFactory: rngFactory
-          sortingWidth: int<sortingWidth>
+          channelCount: int<channelCount>
           excludeSelfCe: bool<excludeSelfCe>
           ceLength: int<ceLength> } 
     with
     static member create 
             (rngFactory: rngFactory) 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (excludeSelfCe: bool<excludeSelfCe>) 
             (ceLength: int<ceLength>) : msceRandGen =
         if %ceLength < 1 then
             failwith "ceLength length must be at least 1"
-        else if %sortingWidth < 1 then
+        else if %channelCount < 1 then
             failwith "Width must be at least 1"
         else
             let id =
                 [
                     box "msceRandGen"
                     box rngFactory
-                    box (sortingWidth |> UMX.untag)
+                    box (channelCount |> UMX.untag)
                     box (excludeSelfCe |> UMX.untag)
                     box (ceLength |> UMX.untag)
                 ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
 
             { id = id;
               rngFactory = rngFactory; 
-              sortingWidth = sortingWidth; 
+              channelCount = channelCount;
               excludeSelfCe = excludeSelfCe; 
               ceLength = ceLength }
     
 
     member this.Id with get () = this.id
     member this.RngFactory with get () = this.rngFactory
-    member this.SortingWidth with get () = this.sortingWidth
+    member this.ChannelCount with get () = this.channelCount
     member this.ExcludeSelfCe with get () = this.excludeSelfCe
     member this.CeLength with get () = this.ceLength
 
@@ -53,18 +53,18 @@ type msceRandGen =
         match obj with
         | :? msceRandGen as other -> 
             this.rngFactory = other.rngFactory && 
-            this.sortingWidth = other.sortingWidth && 
+            this.channelCount = other.channelCount &&
             this.excludeSelfCe = other.excludeSelfCe && 
             this.ceLength = other.ceLength
         | _ -> false
 
     override this.GetHashCode() = 
-        hash (this.rngFactory, this.sortingWidth, this.excludeSelfCe, this.ceLength)
+        hash (this.rngFactory, this.channelCount, this.excludeSelfCe, this.ceLength)
 
     interface IEquatable<msceRandGen> with
         member this.Equals(other) = 
             this.rngFactory = other.rngFactory && 
-            this.sortingWidth = other.sortingWidth && 
+            this.channelCount = other.channelCount &&
             this.excludeSelfCe = other.excludeSelfCe && 
             this.ceLength = other.ceLength
 
@@ -76,17 +76,17 @@ type msceRandGen =
         let rando = this.RngFactory.Create %id
         let ceCodes = 
             if %this.ExcludeSelfCe then
-                Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.SortingWidth
+                Ce.generateCeCodesExcludeSelf (rando.NextIndex) %this.ChannelCount
                 |> Seq.take %this.ceLength
                 |> Seq.toArray
             else
-                Ce.generateCeCodes (rando.NextIndex) %this.SortingWidth
+                Ce.generateCeCodes (rando.NextIndex) %this.ChannelCount
                 |> Seq.take %this.ceLength
                 |> Seq.toArray
 
         msce.create
             id 
-            this.SortingWidth
+            this.ChannelCount
             ceCodes
 
 
@@ -100,5 +100,5 @@ module MsceRandGen =
 
     let toString (msceRandGen: msceRandGen) : string =
         sprintf "Model_CeGen(rngType=%A, Width=%d, Length=[%d])" 
-                    (msceRandGen.RngFactory) (%msceRandGen.SortingWidth) (%msceRandGen.ceLength)
+                    (msceRandGen.RngFactory) (%msceRandGen.ChannelCount) (%msceRandGen.ceLength)
 

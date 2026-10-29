@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorter.Tests
+namespace GeneSort.Sorter.Tests
 
 open FsUnit.Xunit
 open Xunit
@@ -9,8 +9,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe to empty sequence creates new stage`` () =
-        let sortingWidth = 4<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 4<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let ce = ce.create 0 1
         
         stageSeq.AddCe(ce)
@@ -23,8 +23,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe to existing stage when possible`` () =
-        let sortingWidth = 4<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 4<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let firstCe = ce.create 0 1
         let secondCe = ce.create 2 3
         stageSeq.AddCe(firstCe)
@@ -42,8 +42,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe creates new stage when existing stage is occupied`` () =
-        let sortingWidth = 4<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 4<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let firstCe = ce.create 0 1
         let secondCe = ce.create 0 2 // Overlaps with first CE at index 0
         stageSeq.AddCe(firstCe)
@@ -58,8 +58,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe adds to earliest possible stage`` () =
-        let sortingWidth = 4<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 4<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let ce1 = ce.create 0 1 // Stage 0
         let ce2 = ce.create 2 3 // Stage 0
         let ce3 = ce.create 0 2 // Stage 1 (overlaps with ce1)
@@ -80,8 +80,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe adds to earliest possible stage v2`` () =
-        let sortingWidth = 6<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 6<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let ce1 = ce.create 0 1 // Stage 0
         let ce2 = ce.create 2 3 // Stage 0
         let ce3 = ce.create 0 2 // Stage 1 (overlaps with ce1)
@@ -102,8 +102,8 @@ type StageSequenceTests() =
 
     [<Fact>]
     let ``AddCe with out-of-bounds indices throws exception`` () =
-        let sortingWidth = 4<sortingWidth>
-        let stageSeq = stageBuilderSequence.create(sortingWidth)
+        let channelCount = 4<channelCount>
+        let stageSeq = stageBuilderSequence.create(channelCount)
         let invalidCe = ce.create 3 4 // 4 is out of bounds
         
         (fun () -> stageSeq.AddCe(invalidCe)) |> should throw typeof<System.ArgumentException>

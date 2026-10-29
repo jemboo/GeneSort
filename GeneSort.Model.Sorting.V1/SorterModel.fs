@@ -15,11 +15,11 @@ type sorterModel =
 
 module SorterModel =
 
-    let getSortingWidth (model: sorterModel) : int<sortingWidth> =
+    let getChannelCount (model: sorterModel) : int<channelCount> =
         match model with
-        | Simple sms -> sms |> SimpleSorterModel.getSortingWidth
-        | SimpleR sms -> sms |> SimpleSorterModelR.getSortingWidth
-        | SimpleS sms -> sms |> SimpleSorterModelS.getSortingWidth
+        | Simple sms -> sms |> SimpleSorterModel.getChannelCount
+        | SimpleR sms -> sms |> SimpleSorterModelR.getChannelCount
+        | SimpleS sms -> sms |> SimpleSorterModelS.getChannelCount
         | Unknown -> failwith "Unknown sorterModel"
 
 

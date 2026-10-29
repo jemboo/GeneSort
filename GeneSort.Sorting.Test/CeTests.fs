@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Sorting.Tests
+namespace GeneSort.Sorting.Tests
 
 open System
 open FSharp.UMX
@@ -12,13 +12,26 @@ open GeneSort.Sorting.Sorter
 type CeTests() =
 
     [<Fact>]
+    let ``channel endpoints normalize order and expose their span`` () =
+        let comparator = ce.create 7 2
+        let lower: int<channelIndex> = comparator.LowChannel
+        let upper: int<channelIndex> = comparator.HighChannel
+        let span: int<channelCount> = comparator.ChannelSpan
+        Assert.Equal(2<channelIndex>, lower)
+        Assert.Equal(7<channelIndex>, upper)
+        Assert.Equal(5<channelCount>, span)
+        Assert.Equal(0<channelCount>, (ce.create 3 3).ChannelSpan)
+        Assert.Throws<ArgumentException>(fun () -> ChannelIndex.create -1 |> ignore) |> ignore
+
+
+    [<Fact>]
     let ``generateCeCode with excludeSelfCe false returns indexPicker value`` () =
         let width = 4
         let indices = [|0 .. 20|] // Corresponds to Ces: (0,1), (0,2), (1,2), (0,3), (1,3), (2,3)
         let picker = indexPicker indices
         let result = Ce.generateCeCode false width picker
         result |> should equal 0 // First index from picker
-        let maxIndex = Ce.maxIndexForWidth width
+        let maxIndex = Ce.maxIndexForChannelCount width
         result |> should be (lessThanOrEqualTo maxIndex)
 
     [<Fact>]
@@ -31,7 +44,7 @@ type CeTests() =
         let expectedIndex = Ce.toIndex expectedCe
         result |> should equal expectedIndex
         let ce = Ce.fromIndex result
-        ce.Low |> should not' (equal ce.Hi)
+        (int ce.LowChannel) |> should not' (equal (int ce.HighChannel))
 
     [<Fact>]
     let ``generateCeCode with excludeSelfCe true produces valid Ce within width`` () =
@@ -41,9 +54,9 @@ type CeTests() =
         let results = [ for _ in 1..6 -> Ce.generateCeCode true width picker]
         results |> List.iter (fun idx ->
             let ce = Ce.fromIndex idx
-            ce.Low |> should be (lessThanOrEqualTo (width - 1))
-            ce.Hi |> should be (lessThanOrEqualTo (width - 1))
-            ce.Low |> should not' (equal ce.Hi))
+            (int ce.LowChannel) |> should be (lessThanOrEqualTo (width - 1))
+            (int ce.HighChannel) |> should be (lessThanOrEqualTo (width - 1))
+            (int ce.LowChannel) |> should not' (equal (int ce.HighChannel)))
 
     [<Fact>]
     let ``generateCeCode throws for width less than 1`` () =
@@ -59,7 +72,7 @@ type CeTests() =
         let result = Ce.generateCeCode true width picker
         let cet = Ce.fromIndex result
         cet |> should equal (ce.create 0 1)
-        cet.Low |> should not' (equal cet.Hi)
+        (int cet.LowChannel) |> should not' (equal (int cet.HighChannel))
 
 
     [<Fact>]
@@ -109,8 +122,8 @@ type CeTests() =
         ]
         ces |> should equal expected
         ces |> List.iter (fun ce -> 
-            ce.Low |> should be (lessThanOrEqualTo (width - 1))
-            ce.Hi |> should be (lessThanOrEqualTo (width - 1)))
+            (int ce.LowChannel) |> should be (lessThanOrEqualTo (width - 1))
+            (int ce.HighChannel) |> should be (lessThanOrEqualTo (width - 1)))
 
     [<Fact>]
     let ``generateCes includes low equals hi when index maps to it`` () =
@@ -145,9 +158,9 @@ type CeTests() =
         ]
         ces |> should equal expected
         ces |> List.iter (fun ce -> 
-            ce.Low |> should not' (equal ce.Hi)
-            ce.Low |> should be (lessThanOrEqualTo (width - 1))
-            ce.Hi |> should be (lessThanOrEqualTo (width - 1)))
+            (int ce.LowChannel) |> should not' (equal (int ce.HighChannel))
+            (int ce.LowChannel) |> should be (lessThanOrEqualTo (width - 1))
+            (int ce.HighChannel) |> should be (lessThanOrEqualTo (width - 1)))
 
     [<Fact>]
     let ``generateCesExcludeSelf throws for width less than 2`` () =
@@ -163,12 +176,12 @@ type CeTests() =
         let ces = Ce.generateCesExcludeSelf picker width |> Seq.take 6 |> Seq.toList
         let distinctCes = ces |> List.distinct
         distinctCes.Length |> should equal ces.Length
-        ces |> List.iter (fun ce -> ce.Low |> should not' (equal ce.Hi))
+        ces |> List.iter (fun ce -> (int ce.LowChannel) |> should not' (equal (int ce.HighChannel)))
 
 
     [<Fact>]
     let ``getSelfReflectiveComplement fills all unused index pairs on even width - simple case`` () =
-        let width = 6<sortingWidth>
+        let width = 6<channelCount>
         // Input occupies indices 0 and 5: ce(0, 5)
         let inputCes = [| ce.create 0 5 |]
         let result = Ce.getSelfReflectiveComplement width inputCes
@@ -181,7 +194,7 @@ type CeTests() =
 
     [<Fact>]
     let ``getSelfReflectiveComplement fills all unused index pairs on even width`` () =
-        let width = 8<sortingWidth>
+        let width = 8<channelCount>
         // Input occupies indices 0 and 5: ce(0, 5)
         let inputCes = [| ce.create 0 2; ce.create 5 7 |]
         let result = Ce.getSelfReflectiveComplement width inputCes

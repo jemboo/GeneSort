@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Uf4
+namespace GeneSort.Model.Sorting.V1.Simple.Uf4
 
 open System
 open FSharp.UMX
@@ -7,38 +7,38 @@ open GeneSort.Sorting
 open GeneSort.Sorting.Sorter
 open GeneSort.Model.Sorting.V1
 
-/// Represents a collection of TwoOrbitUnfolder4 instances with a consistent sorting width.
+/// Represents a collection of TwoOrbitUnfolder4 instances with a consistent channel count.
 [<Struct; CustomEquality; NoComparison>]
 type msuf4 = 
     private 
         { id: Guid<sorterModelId>
-          sortingWidth: int<sortingWidth>
+          channelCount: int<channelCount>
           twoOrbitUnfolder4s: twoOrbitUf4 array } 
     with
-    /// Creates an Msuf4 instance with the specified ID, sorting width, and array of TwoOrbitUnfolder4 instances.
+    /// Creates an Msuf4 instance with the specified ID, channel count, and array of TwoOrbitUnfolder4 instances.
     /// Throws an exception if the array is empty, width is less than 1, or any TwoOrbitUnfolder4 has a mismatched order.
     static member create 
             (id: Guid<sorterModelId>) 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (twoOrbitUf4s: twoOrbitUf4 array) : msuf4 =
         if twoOrbitUf4s.Length < 1 then
             failwith $"Must have at least 1 TwoOrbitUnfolder4, got %d{twoOrbitUf4s.Length}"
-        else if %sortingWidth < 1 then
-            failwith $"SortingWidth must be at least 1, got {%sortingWidth}"
-        else if twoOrbitUf4s |> Array.exists (fun tou -> tou.Order <> %sortingWidth) then
-            failwith $"All TwoOrbitUnfolder4 must have order {%sortingWidth}"
+        else if %channelCount < 1 then
+            failwith $"ChannelCount must be at least 1, got {%channelCount}"
+        else if twoOrbitUf4s |> Array.exists (fun tou -> tou.Order <> %channelCount) then
+            failwith $"All TwoOrbitUnfolder4 must have order {%channelCount}"
         else
-            { id = id; sortingWidth = sortingWidth; twoOrbitUnfolder4s = twoOrbitUf4s }
+            { id = id; channelCount = channelCount; twoOrbitUnfolder4s = twoOrbitUf4s }
 
     member this.Id with get () = this.id
-    member this.CeLength with get () = (this.StageLength * %this.SortingWidth / 2) |> UMX.tag<ceLength>
-    member this.SortingWidth with get () = this.sortingWidth
+    member this.CeLength with get () = (this.StageLength * %this.ChannelCount / 2) |> UMX.tag<ceLength>
+    member this.ChannelCount with get () = this.channelCount
     member this.TwoOrbitUnfolder4s with get () = this.twoOrbitUnfolder4s
     member this.StageLength with get () = (this.twoOrbitUnfolder4s.Length |> UMX.tag<stageLength>)
     member this.toString() =
-        sprintf "msuf4(Id=%A, SortingWidth=%d, TwoOrbitUnfolder4Count=%d)" 
+        sprintf "msuf4(Id=%A, ChannelCount=%d, TwoOrbitUnfolder4Count=%d)"
                 (%this.Id) 
-                (%this.SortingWidth) 
+                (%this.ChannelCount)
                 (this.TwoOrbitUnfolder4s.Length)
 
     override this.Equals(obj) = 
@@ -65,7 +65,7 @@ type msuf4 =
             match maxCeLength with
             | Some n -> allCes |> Array.truncate %n
             | None   -> allCes
-        sorter.create (%this.Id |> UMX.tag<sorterId>) this.SortingWidth ces
+        sorter.create (%this.Id |> UMX.tag<sorterId>) this.ChannelCount ces
 
 
 
@@ -73,7 +73,7 @@ module Msuf4 =
 
     /// Returns a string representation of the Msuf4 instance.
     let toString (msuf4: msuf4) : string =
-        sprintf "Msuf4(Id=%A, SortingWidth=%d, TwoOrbitUnfolder4Count=%d)" 
+        sprintf "Msuf4(Id=%A, ChannelCount=%d, TwoOrbitUnfolder4Count=%d)"
                 (%msuf4.Id) 
-                (%msuf4.SortingWidth) 
+                (%msuf4.ChannelCount)
                 msuf4.StageLength

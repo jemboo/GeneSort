@@ -72,8 +72,10 @@ module PoolSelSz128 =
         )
 
 
+    let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolSelSz128)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", description, [|
             runExample("TestSpec", TestSpec)
         |])
 
@@ -126,8 +128,10 @@ module Sz_2048_Of_4096 =
         )
 
 
+    let description = "Compare pool and selection settings for 24-input Msrs3a evolution (Sz_2048_Of_4096)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", description, [|
             runExample("Sz_2048_Of_4096", Sz_2048_Of_4096)
         |])
 
@@ -179,7 +183,9 @@ module PoolsSelSzTest_2_vs_256 =
             }
         )
 
+    let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolsSelSzTest_2_vs_256)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, [|
             runExample("PoolSz_2n256", PoolSz_2n256)
         |])

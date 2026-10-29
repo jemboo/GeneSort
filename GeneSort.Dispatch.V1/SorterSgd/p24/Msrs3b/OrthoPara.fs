@@ -71,7 +71,9 @@ module OrthoPara32 =
             }
         )
 
+    let description = "Compare ortho and para mutation settings for 24-input Msrs3b evolution (OrthoPara32)."
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3b.OrthoPara.OrthoPara32", [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3b.OrthoPara.OrthoPara32", description, [|
             runExample("NoMods", NoMods)
         |])

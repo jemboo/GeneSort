@@ -15,7 +15,7 @@ type sortBlockBitv512Dto = {
 
 type sortableBitv512TestsDto = {
     Id: Guid
-    SortingWidth: int
+    ChannelCount: int
     Blocks: sortBlockBitv512Dto[]
 }
 
@@ -47,11 +47,11 @@ module SortableBitv512TestsDto =
 
     let fromDomain (test: sortableBitv512Tests) : sortableBitv512TestsDto =
         { Id = %test.Id
-          SortingWidth = %test.SortingWidth
+          ChannelCount = %test.ChannelCount
           Blocks = test.SimdSortBlocks |> Array.map blockFromDomain }
 
     let toDomain (dto: sortableBitv512TestsDto) : sortableBitv512Tests =
         let id = UMX.tag<sortableTestsId> dto.Id
-        let sw = UMX.tag<sortingWidth> dto.SortingWidth
+        let sw = UMX.tag<channelCount> dto.ChannelCount
         let blocks = dto.Blocks |> Array.map blockToDomain
         sortableBitv512Tests.create id sw blocks

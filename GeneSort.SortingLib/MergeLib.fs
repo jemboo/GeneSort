@@ -8,26 +8,26 @@ open GeneSort.Sorting
 
 type mergeLibId = 
     private 
-        { sortingWidth: int<sortingWidth>
+        { channelCount: int<channelCount>
           mergeDimension: int<mergeDimension>
           variant: sorterLibVariant }
 
-    static member create (sortingWidth: int<sortingWidth>) 
+    static member create (channelCount: int<channelCount>)
                          (mergeDimension: int<mergeDimension>)
                          (variant: sorterLibVariant) : mergeLibId =
-        if %sortingWidth % %mergeDimension <> 0 then
-                failwith "sortingWidth must be divisible by mergeDimension."
-        { sortingWidth = sortingWidth; mergeDimension = mergeDimension; variant = variant }  
+        if %channelCount % %mergeDimension <> 0 then
+                failwith "channelCount must be divisible by mergeDimension."
+        { channelCount = channelCount; mergeDimension = mergeDimension; variant = variant }
 
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
     member this.MergeDimension with get() = this.mergeDimension
     member this.SorterLibVariant with get() = this.variant
-    member this.FactorSortingWidth with get() = (%this.sortingWidth / %this.mergeDimension) |> UMX.tag<sortingWidth>
+    member this.FactorChannelCount with get() = (%this.channelCount / %this.mergeDimension) |> UMX.tag<channelCount>
 
     interface IStableSerializable with
         member this.WriteStableBytes (writer: System.IO.BinaryWriter) =
             // 1. Write the underlying integer from the UMX tag
-            writer.Write(UMX.untag this.sortingWidth)
+            writer.Write(UMX.untag this.channelCount)
             // 2. Write the mergeDimension as a consistent string or integer tag
             writer.Write(UMX.untag this.mergeDimension)
             // 3. Write the variant as a consistent string or integer tag
@@ -36,29 +36,29 @@ type mergeLibId =
 
 module MergeLibId =
 
-    let create (sortingWidth: int<sortingWidth>) (mergeDimension: int<mergeDimension>) (variant: sorterLibVariant) : mergeLibId =
-        { sortingWidth = sortingWidth; mergeDimension = mergeDimension; variant = variant }
+    let create (channelCount: int<channelCount>) (mergeDimension: int<mergeDimension>) (variant: sorterLibVariant) : mergeLibId =
+        { channelCount = channelCount; mergeDimension = mergeDimension; variant = variant }
 
     /// Every merge at this width whose component sorting network exists in the library.
-    let availableForWidth (width: int<sortingWidth>) =
+    let availableForChannelCount (width: int<channelCount>) =
         SorterLib.ids ()
         |> Array.choose (fun sorter ->
-            if int width > 0 && int width % int sorter.SortingWidth = 0 then
-                Some (create width (UMX.tag (int width / int sorter.SortingWidth)) sorter.SorterVariant)
+            if int width > 0 && int width % int sorter.ChannelCount = 0 then
+                Some (create width (UMX.tag (int width / int sorter.ChannelCount)) sorter.SorterVariant)
             else None)
         |> Array.sortBy (fun id -> id.MergeDimension, id.SorterLibVariant)
     let toString (key: mergeLibId) : string =
-        sprintf "MergeLibId(sortingWidth=%d, mergeDimension=%d, Variant=%s)" 
-                (UMX.untag key.sortingWidth) (UMX.untag key.mergeDimension) (SorterLibVariant.toString key.variant)
+        sprintf "MergeLibId(channelCount=%d, mergeDimension=%d, Variant=%s)"
+                (UMX.untag key.channelCount) (UMX.untag key.mergeDimension) (SorterLibVariant.toString key.variant)
     let fromString (s: string) : mergeLibId =
         // This is a simple parser; in a real implementation, you might want to use a more robust parsing method
         let parts = s.Trim().Split([|','|], StringSplitOptions.RemoveEmptyEntries)
         if parts.Length <> 3 then
             failwith "Invalid mergeLibId string format"
         else
-            let sortingWidthPart = parts.[0].Trim().Replace("MergeLibId(sortingWidth=", "").Replace(")", "")
+            let channelCountPart = parts.[0].Trim().Replace("MergeLibId(channelCount=", "").Replace(")", "")
             let mergeDimensionPart = parts.[1].Trim().Replace("mergeDimension=", "").Replace(")", "")
             let variantPart = parts.[2].Trim().Replace("Variant=", "").Replace(")", "")
-            let sortingWidth = Int32.Parse(sortingWidthPart) |> UMX.tag<sortingWidth>
+            let channelCount = Int32.Parse(channelCountPart) |> UMX.tag<channelCount>
             let mergeDimension = Int32.Parse(mergeDimensionPart) |> UMX.tag<mergeDimension>
-            create sortingWidth mergeDimension (SorterLibVariant.fromString variantPart)
+            create channelCount mergeDimension (SorterLibVariant.fromString variantPart)

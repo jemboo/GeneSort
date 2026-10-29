@@ -213,7 +213,7 @@ module ParamKeys =
     [<Literal>]
     let sorterPoolSelectionIntervalsKey = "SorterPoolSelectionIntervals"
     [<Literal>]
-    let sortingWidthKey = "SortingWidth"
+    let channelCountKey = "ChannelCount"
     [<Literal>]
     let sourceDbNameKey = "SourceDbName"
     [<Literal>]

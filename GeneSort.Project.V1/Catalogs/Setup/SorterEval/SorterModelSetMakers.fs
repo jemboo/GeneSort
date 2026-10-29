@@ -21,7 +21,7 @@ module SorterModelSetMakers =
             (rp: runParameters) : Async<Result<unit, string>> =
         asyncResult {
           try
-            let! sortingWidth = rp.GetSortingWidth() |> Result.ofOption "Missing SortingWidth."
+            let! channelCount = rp.GetChannelCount() |> Result.ofOption "Missing ChannelCount."
             let! simpleSorterModelType = rp.GetSimpleSorterModelType() |> Result.ofOption "Missing SimpleSorterModelType."
             let! rngType = rp.GetRngType() |> Result.ofOption "Missing RngType."
             let! excludeSelfCe = rp.GetExcludeSelfCe() |> Result.ofOption "Missing ExcludeSelfCe."
@@ -31,7 +31,7 @@ module SorterModelSetMakers =
                 storage.QueryParamsFromRunParams rp (geneSortDataType.SorterModelSet "")
                 |> Result.ofOption "Failed to create QueryParams for SorterModelSet."
             return! SetupArtifacts.saveOnce storage.RunDb (SetupInputReferences.resolveRecorded rp query) (fun () -> asyncResult {
-                let! modelGen = SeedSorterModelGeneration.getSimpleUniformSorterModelGen rngType sortingWidth simpleSorterModelType excludeSelfCe
+                let! modelGen = SeedSorterModelGeneration.getSimpleUniformSorterModelGen rngType channelCount simpleSorterModelType excludeSelfCe
                                 |> SeedSorterModelGeneration.applyParameters rp
                 let baseFirstIdx = (%repl * %totalSorterCount) |> UMX.tag<sorterCount>
                 let modelSet = SorterModelGen.makeSorterModelSetFromIndexSpan (Guid.Empty |> UMX.tag) baseFirstIdx totalSorterCount modelGen

@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open FSharp.UMX
@@ -7,33 +7,33 @@ open GeneSort.Sorting
 
 type stageBuilder = 
         private { 
-                    sortingWidth: int<sortingWidth>; 
+                    channelCount: int<channelCount>;
                     ces: ResizeArray<ce>;  
                     occupied: bool[] 
                 } with
 
-        member this.SortingWidth with get() = this.sortingWidth
+        member this.ChannelCount with get() = this.channelCount
 
         member this.Ces with get() = this.ces.ToArray()
 
         member this.CeCount with get() = this.ces.Count
 
         member this.IsOccupied(index: int) = 
-            if index < 0 || index >= %this.sortingWidth then
+            if index < 0 || index >= %this.channelCount then
                 invalidArg "index" $"Index {index} is out of bounds for Ce array of length {this.ces.Count}."
             this.occupied.[index]
 
         member this.AddCe(ce: ce) =
-            if this.occupied.[ce.Low] then
-                invalidArg "ce" $"Cannot add CE {ce} because position {ce.Low} is already occupied."
-            if this.occupied.[ce.Hi] then 
-                invalidArg "ce" $"Cannot add CE {ce} because position {ce.Hi} is already occupied."
+            if this.occupied.[(int ce.LowChannel)] then
+                invalidArg "ce" $"Cannot add CE {ce} because position {(int ce.LowChannel)} is already occupied."
+            if this.occupied.[(int ce.HighChannel)] then
+                invalidArg "ce" $"Cannot add CE {ce} because position {(int ce.HighChannel)} is already occupied."
             this.ces.Add(ce)
-            this.occupied.[ce.Low] <- true
-            this.occupied.[ce.Hi] <- true
+            this.occupied.[(int ce.LowChannel)] <- true
+            this.occupied.[(int ce.HighChannel)] <- true
 
         member this.CanAddCe(ce: ce) =
-            not (this.occupied.[ce.Low] || this.occupied.[ce.Hi])
+            not (this.occupied.[(int ce.LowChannel)] || this.occupied.[(int ce.HighChannel)])
 
 // Core module for Stage operations
 module StageBuilder = ()
@@ -42,24 +42,24 @@ module StageBuilder = ()
 
 type stageBuilderSequence = 
         private { 
-                    sortingWidth: int<sortingWidth>; 
+                    channelCount: int<channelCount>;
                     stageBuilders: ResizeArray<stageBuilder>;  
                 } with
 
-        static member create (sortingWidth: int<sortingWidth>) : stageBuilderSequence =
-            if sortingWidth <= 1<sortingWidth> then
-                invalidArg "sortingWidth" "Sorting width must be greater than 1."
-            { sortingWidth = sortingWidth; stageBuilders = ResizeArray<stageBuilder>() }
+        static member create (channelCount: int<channelCount>) : stageBuilderSequence =
+            if channelCount <= 1<channelCount> then
+                invalidArg "channelCount" "Channel count must be greater than 1."
+            { channelCount = channelCount; stageBuilders = ResizeArray<stageBuilder>() }
 
-        member this.SortingWidth with get() = this.sortingWidth
+        member this.ChannelCount with get() = this.channelCount
 
         member this.StageBuilders with get() = this.stageBuilders.ToArray()
 
         member this.StageLength with get() = this.stageBuilders.Count |> UMX.tag<stageLength>
 
         member this.AddCe (ce: ce) :  unit =
-            if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
-                invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."
+            if (int ce.LowChannel) >= (this.channelCount |> int) || (int ce.HighChannel) >= (this.channelCount |> int) then
+                invalidArg "ce" $"CE {ce} has indices out of bounds for channel count {this.channelCount}."
 
             // Find the last stage that CANNOT accept the CE
             let firstBlockedIndex = 
@@ -78,9 +78,9 @@ type stageBuilderSequence =
             if targetStageIndex >= this.stageBuilders.Count then
                 let newStage = 
                     { 
-                        sortingWidth = this.sortingWidth
+                        channelCount = this.channelCount
                         ces = ResizeArray<ce>()
-                        occupied = Array.create (this.sortingWidth |> int) false
+                        occupied = Array.create (this.channelCount |> int) false
                     }
                 newStage.AddCe(ce)
                 this.stageBuilders.Add(newStage)
@@ -90,8 +90,8 @@ type stageBuilderSequence =
 
         /// Adds a CE and returns the index of the stage it was placed into.
         member this.AddCeIndexed (ce: ce) : int =
-            if ce.Low >= (this.sortingWidth |> int) || ce.Hi >= (this.sortingWidth |> int) then
-                invalidArg "ce" $"CE {ce} has indices out of bounds for sorting width {this.sortingWidth}."
+            if (int ce.LowChannel) >= (this.channelCount |> int) || (int ce.HighChannel) >= (this.channelCount |> int) then
+                invalidArg "ce" $"CE {ce} has indices out of bounds for channel count {this.channelCount}."
 
             let firstBlockedIndex = 
                 this.stageBuilders 
@@ -105,9 +105,9 @@ type stageBuilderSequence =
             if targetStageIndex >= this.stageBuilders.Count then
                 let newStage = 
                     { 
-                        sortingWidth = this.sortingWidth
+                        channelCount = this.channelCount
                         ces = ResizeArray<ce>()
-                        occupied = Array.create (this.sortingWidth |> int) false
+                        occupied = Array.create (this.channelCount |> int) false
                     }
                 newStage.AddCe(ce)
                 this.stageBuilders.Add(newStage)
@@ -130,16 +130,16 @@ type CeDisplacement = {
 
 module StageBuilderSequence =
 
-    let fromCes (sortingWidth : int<sortingWidth>) (ces: ce array) : stageBuilderSequence =
-        let stageBuilderSeq = stageBuilderSequence.create(sortingWidth)
+    let fromCes (channelCount : int<channelCount>) (ces: ce array) : stageBuilderSequence =
+        let stageBuilderSeq = stageBuilderSequence.create(channelCount)
         ces |> Array.iter stageBuilderSeq.AddCe
         stageBuilderSeq
 
 
-    let toStageSequence (sortingWidth: int<sortingWidth>) (ces: ce array) : stageSequence =
-        let stageBuilderSeq = fromCes sortingWidth ces
-        let stages = stageBuilderSeq.StageBuilders |> Array.map(fun st -> stage.create st.Ces sortingWidth)
-        stageSequence.create stages sortingWidth
+    let toStageSequence (channelCount: int<channelCount>) (ces: ce array) : stageSequence =
+        let stageBuilderSeq = fromCes channelCount ces
+        let stages = stageBuilderSeq.StageBuilders |> Array.map(fun st -> stage.create st.Ces channelCount)
+        stageSequence.create stages channelCount
 
     /// From Grok
     /// Returns (stageSequence, movedStages)
@@ -151,8 +151,8 @@ module StageBuilderSequence =
     /// 
     /// movedStages : int[][] matches the structure of stageSeq.Stages
     /// movedStages.[stageIdx].[posInStage] = how many stages back this CE was moved.
-    let toStageSequenceWithMoveInfo (sortingWidth: int<sortingWidth>) (ces: ce array) =
-        let stageBuilderSeq = stageBuilderSequence.create(sortingWidth)
+    let toStageSequenceWithMoveInfo (channelCount: int<channelCount>) (ces: ce array) =
+        let stageBuilderSeq = stageBuilderSequence.create(channelCount)
         
         // Per-stage lists of (stagesMoved, originalIndex)
         let moveTracker = ResizeArray<ResizeArray<int * int>>()
@@ -185,9 +185,9 @@ module StageBuilderSequence =
             if targetIdx >= currentCount then
                 let newSb =
                     {
-                        sortingWidth = sortingWidth
+                        channelCount = channelCount
                         ces = ResizeArray<ce>()
-                        occupied = Array.create (sortingWidth |> int) false
+                        occupied = Array.create (channelCount |> int) false
                     }
                 newSb.AddCe(ce)
                 stageBuilderSeq.stageBuilders.Add(newSb)
@@ -198,9 +198,9 @@ module StageBuilderSequence =
         // Build final immutable stageSequence
         let stages = 
             stageBuilderSeq.StageBuilders 
-            |> Array.map (fun sb -> stage.create sb.Ces sortingWidth)
+            |> Array.map (fun sb -> stage.create sb.Ces channelCount)
 
-        let stageSeq = stageSequence.create stages sortingWidth
+        let stageSeq = stageSequence.create stages channelCount
 
         // Build movedStages array-of-arrays aligned with final sorted stages
         let movedStages =
@@ -211,7 +211,7 @@ module StageBuilderSequence =
                 // Sort in the same order as the stage (by Low, Hi)
                 let paired =
                     Array.zip sb.Ces (movesWithOrig |> Seq.toArray)
-                    |> Array.sortBy (fun (c, _) -> c.Low, c.Hi)
+                    |> Array.sortBy (fun (c, _) -> (int c.LowChannel), (int c.HighChannel))
                 
                 paired |> Array.map (fun (_, (moved, _)) -> moved)
             )
@@ -227,18 +227,18 @@ module StageBuilderSequence =
     /// (AddCe never pushes a CE later than the number of stages that exist so far), so this
     /// value is always >= 0. The inner arrays are ordered to match each stage's `.Ces`
     /// (sorted by Low, Hi), so movedBack.[s].[k] corresponds to stages.[s].Ces.[k].
-    let toStageSequenceWithMovement (sortingWidth: int<sortingWidth>) (ces: ce array) 
+    let toStageSequenceWithMovement (channelCount: int<channelCount>) (ces: ce array)
         : stageSequence * int array array =
 
-        let stageBuilderSeq = stageBuilderSequence.create(sortingWidth)
+        let stageBuilderSeq = stageBuilderSequence.create(channelCount)
 
         // For each input CE, record which stage it actually landed in.
         let stageIndexOfOriginal = Array.zeroCreate<int> ces.Length
         ces |> Array.iteri (fun i ce ->
             stageIndexOfOriginal.[i] <- stageBuilderSeq.AddCeIndexed ce)
 
-        let stages = stageBuilderSeq.StageBuilders |> Array.map (fun st -> stage.create st.Ces sortingWidth)
-        let stageSeq = stageSequence.create stages sortingWidth
+        let stages = stageBuilderSeq.StageBuilders |> Array.map (fun st -> stage.create st.Ces channelCount)
+        let stageSeq = stageSequence.create stages channelCount
 
         // Group original indices by the stage they landed in.
         let originalIndicesByStage = Array.init stages.Length (fun _ -> ResizeArray<int>())
@@ -251,7 +251,7 @@ module StageBuilderSequence =
             originalIndicesByStage
             |> Array.mapi (fun stageIdx origIndices ->
                 origIndices.ToArray()
-                |> Array.sortBy (fun i -> let c = ces.[i] in c.Low, c.Hi)
+                |> Array.sortBy (fun i -> let c = ces.[i] in (int c.LowChannel), (int c.HighChannel))
                 |> Array.map (fun origIdx -> origIdx - stageIdx))
 
         stageSeq, movedBack
@@ -262,11 +262,11 @@ module StageBuilderSequence =
     /// Converts input CEs into a stageSequence and returns a matching array of arrays 
     /// describing how many stages back each CE moved during stage packing.
     let toStageSequenceWithDisplacements 
-        (sortingWidth: int<sortingWidth>) 
+        (channelCount: int<channelCount>)
         (ces: ce array) 
         : stageSequence * CeDisplacement array array =
         
-        let stageBuilderSeq = stageBuilderSequence.create(sortingWidth)
+        let stageBuilderSeq = stageBuilderSequence.create(channelCount)
         
         // Track the target stage each input CE ended up in during packing
         let placements = ResizeArray<int * ce>() // (TargetStageIndex, Ce)
@@ -296,7 +296,7 @@ module StageBuilderSequence =
             |> Array.mapi (fun stageIdx sb ->
                 // Sort CEs to match `stage.create` canonical ordering
                 sb.Ces
-                |> Array.sortBy (fun c -> c.Low, c.Hi)
+                |> Array.sortBy (fun c -> (int c.LowChannel), (int c.HighChannel))
                 |> Array.map (fun c ->
                     // Find original placement info
                     let inputIdx = placements.FindIndex(fun (_, originalCe) -> originalCe = c)
@@ -316,8 +316,8 @@ module StageBuilderSequence =
 
         let sequence = 
             stageBuilderSeq.StageBuilders 
-            |> Array.map (fun sb -> stage.create sb.Ces sortingWidth)
-            |> fun stages -> stageSequence.create stages sortingWidth
+            |> Array.map (fun sb -> stage.create sb.Ces channelCount)
+            |> fun stages -> stageSequence.create stages channelCount
 
         sequence, displacementsPerStage
 

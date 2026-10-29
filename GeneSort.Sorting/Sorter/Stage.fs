@@ -1,4 +1,4 @@
-﻿
+
 namespace GeneSort.Sorting.Sorter
 
 open FSharp.UMX
@@ -13,12 +13,12 @@ type stage =
     private { 
         ces: ce array 
         hashCode: int
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
     } with
 
-    static member create (ces: ce array) (sortingWidth: int<sortingWidth>) =
+    static member create (ces: ce array) (channelCount: int<channelCount>) =
         // Sort CEs to ensure order-independent equality
-        let sortedCes = ces |> Array.sortBy (fun c -> c.Low, c.Hi)
+        let sortedCes = ces |> Array.sortBy (fun c -> (int c.LowChannel), (int c.HighChannel))
         let mutable h = 17
         for ce in sortedCes do
             h <- h * 23 + (ce |> Ce.toIndex)
@@ -26,19 +26,19 @@ type stage =
         { 
             ces = sortedCes; 
             hashCode = h 
-            sortingWidth = sortingWidth}
+            channelCount = channelCount}
 
     member this.Ces = this.ces
 
     member this.AverageCeLength with get() =
         if this.ces.Length = 0 then 0.0
-        else this.ces |> Array.averageBy (fun c -> float c.Length)
+        else this.ces |> Array.averageBy (fun c -> float c.ChannelSpan)
 
 
     member this.GetReflectiveCount() : int<reflectiveCount>  =
-            Ce.countReflectiveOrReflected this.SortingWidth this.ces
+            Ce.countReflectiveOrReflected this.ChannelCount this.ces
 
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
 
     override this.GetHashCode() = this.hashCode
 
@@ -47,14 +47,14 @@ type stage =
         | :? stage as other ->
             this.hashCode = other.hashCode &&
             this.ces.Length = other.ces.Length &&
-            Array.forall2 (fun (a: ce) (b: ce) -> a.Low = b.Low && a.Hi = b.Hi) this.ces other.ces
+            Array.forall2 (fun (a: ce) (b: ce) -> (int a.LowChannel) = (int b.LowChannel) && (int a.HighChannel) = (int b.HighChannel)) this.ces other.ces
         | _ -> false
 
 
 module Stage =
 
    let reflect (stg: stage) : stage =
-       stage.create (stg.Ces |> Array.map(Ce.reflect stg.SortingWidth)) stg.SortingWidth
+       stage.create (stg.Ces |> Array.map(Ce.reflect stg.ChannelCount)) stg.ChannelCount
 
    let isReflectionSymmetric (stg: stage) : bool =
         stg = (reflect stg)
@@ -64,18 +64,18 @@ module Stage =
 [<CustomEquality; NoComparison>]
 type stageSequence = 
     private { 
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         stages: stage array 
         hashCode: int 
     } with
 
-    static member create (stages: stage array) (sortingWidth:int<sortingWidth>) =
+    static member create (stages: stage array) (channelCount:int<channelCount>) =
         let mutable h = 17
         for stage in stages do
             h <- h * 23 + stage.GetHashCode()
 
         { 
-            sortingWidth = sortingWidth
+            channelCount = channelCount
             stages = stages 
             hashCode = h
         }
@@ -83,7 +83,7 @@ type stageSequence =
     member this.GetReflectiveCount() : int<reflectiveCount>  =
         this.stages |> Array.sumBy(fun stg -> %stg.GetReflectiveCount())
         
-    member this.SortingWidth = this.sortingWidth
+    member this.ChannelCount = this.channelCount
     member this.Stages = this.stages
     member this.StageLength = this.stages.Length |> UMX.tag<stageLength>
 
@@ -94,7 +94,7 @@ type stageSequence =
         | :? stageSequence as other ->
             // Order matters here: we check length then verify each stage matches in sequence
             this.hashCode = other.hashCode &&
-            this.sortingWidth = other.sortingWidth &&
+            this.channelCount = other.channelCount &&
             this.stages.Length = other.stages.Length &&
             Array.forall2 (fun (s1: stage) (s2: stage) -> s1.Equals(s2)) this.stages other.stages
         | _ -> false

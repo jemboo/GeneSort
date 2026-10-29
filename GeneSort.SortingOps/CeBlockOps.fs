@@ -1,4 +1,4 @@
-﻿namespace GeneSort.SortingOps
+namespace GeneSort.SortingOps
 
 open FSharp.UMX
 open GeneSort.Sorting.Sortable
@@ -14,10 +14,10 @@ module CeBlockOps =
 
     //    for i = 0 to %ceBlock.Length - 1 do
     //        let ce = ceBlock.getCe i
-    //        if values.[ce.Low] > values.[ce.Hi] then
-    //            let temp = values.[ce.Low]
-    //            values.[ce.Low] <- values.[ce.Hi]
-    //            values.[ce.Hi] <- temp
+    //        if values.[ce.LowChannel] > values.[ce.HighChannel] then
+    //            let temp = values.[ce.LowChannel]
+    //            values.[ce.LowChannel] <- values.[ce.HighChannel]
+    //            values.[ce.HighChannel] <- temp
     //            ceUseCounts.Increment (i |> UMX.tag<ceIndex>)
     //    values
 
@@ -29,10 +29,10 @@ module CeBlockOps =
     //    let localCounts = Array.zeroCreate %ceBlock.Length
     //    for i = 0 to %ceBlock.Length - 1 do
     //        let ce = ceBlock.getCe i
-    //        if values.[ce.Low] > values.[ce.Hi] then
-    //            let temp = values.[ce.Low]
-    //            values.[ce.Low] <- values.[ce.Hi]
-    //            values.[ce.Hi] <- temp
+    //        if values.[ce.LowChannel] > values.[ce.HighChannel] then
+    //            let temp = values.[ce.LowChannel]
+    //            values.[ce.LowChannel] <- values.[ce.HighChannel]
+    //            values.[ce.HighChannel] <- temp
     //            localCounts.[i] <- localCounts.[i] + 1
     //    (values, localCounts)
 

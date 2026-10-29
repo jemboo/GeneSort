@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.Mp.V1.Simple.Ce
+namespace GeneSort.Model.Sorting.Mp.V1.Simple.Ce
 
 open System
 open FSharp.UMX
@@ -8,26 +8,26 @@ open GeneSort.Model.Sorting.V1.Simple.Ce
 
 type msceDto =
     { id: Guid
-      sortingWidth: int
+      channelCount: int
       ceCodes: int array }
     
-    static member Create(id: Guid, sortingWidth: int, ceCodes: int array) : msceDto =
+    static member Create(id: Guid, channelCount: int, ceCodes: int array) : msceDto =
         if isNull ceCodes || ceCodes.Length < 1 then
             invalidArg "ceCodes" "Must be at least 1 Ce"
-        if sortingWidth < 1 then
-            invalidArg "sortingWidth" "SortingWidth must be at least 1"
+        if channelCount < 1 then
+            invalidArg "channelCount" "ChannelCount must be at least 1"
         
-        { id = id; sortingWidth = sortingWidth; ceCodes = ceCodes }
+        { id = id; channelCount = channelCount; ceCodes = ceCodes }
 
 module MsceDto =
 
     let fromDomain (msce: msce) : msceDto =
         { id = %msce.Id
-          sortingWidth = %msce.SortingWidth
+          channelCount = %msce.ChannelCount
           ceCodes = msce.CeCodes }
 
     let toDomain (msceDto: msceDto) : msce =
         msce.create
             (UMX.tag<sorterModelId> msceDto.id)
-            (UMX.tag<sortingWidth> msceDto.sortingWidth)
+            (UMX.tag<channelCount> msceDto.channelCount)
             msceDto.ceCodes

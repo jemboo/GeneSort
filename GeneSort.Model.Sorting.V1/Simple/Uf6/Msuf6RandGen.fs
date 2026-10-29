@@ -1,4 +1,4 @@
-﻿namespace GeneSort.Model.Sorting.V1.Simple.Uf6
+namespace GeneSort.Model.Sorting.V1.Simple.Uf6
 
 open System
 open FSharp.UMX
@@ -11,28 +11,28 @@ type msuf6RandGen =
     private 
         { id: Guid<sorterModelGenId>
           rngFactory: rngFactory
-          sortingWidth: int<sortingWidth>
+          channelCount: int<channelCount>
           stageLength: int<stageLength> 
           genRates: uf6GenRates } // Changed from uf6GenRatesArray
 
     static member create 
             (rngFactory: rngFactory) 
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (stageLength: int<stageLength>) 
             (genRates: uf6GenRates) : msuf6RandGen =
         
-        if %sortingWidth < 6 || %sortingWidth % 2 <> 0 then
-            failwith $"SortingWidth must be at least 6 and even, got {%sortingWidth}"
+        if %channelCount < 6 || %channelCount % 2 <> 0 then
+            failwith $"ChannelCount must be at least 6 and even, got {%channelCount}"
         if %stageLength < 1 then
             failwith $"StageLength must be at least 1, got {%stageLength}"
-        if genRates.Order <> %sortingWidth then
-            failwith $"Uf6GenRates order (%d{genRates.Order}) must match sortingWidth ({%sortingWidth})"
+        if genRates.Order <> %channelCount then
+            failwith $"Uf6GenRates order (%d{genRates.Order}) must match channelCount ({%channelCount})"
 
         let id =
             [
                 box "msuf6RandGen"
                 box rngFactory
-                box (sortingWidth |> UMX.untag)
+                box (channelCount |> UMX.untag)
                 box (stageLength |> UMX.untag)
                 box (genRates.GetHashCode())
             ] |> GuidUtils.guidFromObjs |> UMX.tag<sorterModelGenId>
@@ -40,15 +40,15 @@ type msuf6RandGen =
         { 
           id = id
           rngFactory = rngFactory
-          sortingWidth = sortingWidth
+          channelCount = channelCount
           stageLength = stageLength
           genRates = genRates 
         }
 
     member this.Id with get() = this.id
-    member this.CeLength with get () = (this.SortingWidth * %this.StageLength / 2) |> UMX.tag<ceLength>
+    member this.CeLength with get () = (this.ChannelCount * %this.StageLength / 2) |> UMX.tag<ceLength>
     member this.RngFactory with get() = this.rngFactory
-    member this.SortingWidth with get() = this.sortingWidth
+    member this.ChannelCount with get() = this.channelCount
     member this.StageLength with get() = this.stageLength
     member this.GenRates with get() = this.genRates
 
@@ -71,7 +71,7 @@ type msuf6RandGen =
         // HOIST: Local bindings for closure safety and performance
         let rates = this.genRates
         let sc = %this.stageLength
-        let width = this.sortingWidth
+        let width = this.channelCount
 
         let twoOrbitUnfolder6s =
             Array.init sc (fun _ ->
@@ -93,9 +93,9 @@ module Msuf6RandGen =
         // Simplified reporting for uniform rates
         let ratesStr = sprintf "[Uniform: Order=%d]" gr.Order
         
-        sprintf "Msuf6RandGen(Id=%A, RngType=%A, SortingWidth=%d, StageLength=%d, GenRates=%s)"
+        sprintf "Msuf6RandGen(Id=%A, RngType=%A, ChannelCount=%d, StageLength=%d, GenRates=%s)"
                 (%msuf6RandGen.Id)
                 msuf6RandGen.RngFactory
-                (%msuf6RandGen.SortingWidth)
+                (%msuf6RandGen.ChannelCount)
                 (%msuf6RandGen.StageLength)
                 ratesStr

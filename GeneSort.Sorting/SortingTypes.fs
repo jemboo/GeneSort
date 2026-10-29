@@ -2,7 +2,15 @@ namespace GeneSort.Sorting
 
 open FSharp.UMX
 
-[<Measure>] type sortingWidth
+[<Measure>] type channelIndex
+
+module ChannelIndex =
+    /// Construct a zero-based channel position; a network supplies its upper bound.
+    let create (value: int) : int<channelIndex> =
+        if value < 0 then invalidArg (nameof value) "Channel index must be non-negative."
+        UMX.tag value
+
+[<Measure>] type channelCount
 [<Measure>] type sorterCount
 [<Measure>] type sorterId
 [<Measure>] type stageLength
@@ -92,8 +100,8 @@ module GenerationsPerSubset =
         | Some v -> %v |> string
         | None -> "None"
 
-module SortingWidth =
-    let toString (w: int<sortingWidth> option) : string =
+module ChannelCount =
+    let toString (w: int<channelCount> option) : string =
        match w with
         | Some v -> sprintf "%d" %v
         | None -> "None"
@@ -131,21 +139,21 @@ module MergeSuffixType =
 
 module CeLength =
     
-    let toStageLength (sortingWidth:int<sortingWidth>) (ceLength: int<ceLength>) 
+    let toStageLength (channelCount:int<channelCount>) (ceLength: int<ceLength>)
             : int<stageLength> =
         if %ceLength < 1 then
             failwith "ceLength must be at least 1"
         else
-            ((%ceLength * 2) / %sortingWidth) |> UMX.tag<stageLength> 
+            ((%ceLength * 2) / %channelCount) |> UMX.tag<stageLength>
 
 module StageLength =
 
-    let toCeLength (sortingWidth:int<sortingWidth>) (stageLength: int<stageLength>) 
+    let toCeLength (channelCount:int<channelCount>) (stageLength: int<stageLength>)
             : int<ceLength> =
         if %stageLength < 1 then
             failwith "StageLength must be at least 1"
         else
-            ((%stageLength * %sortingWidth) / 2) |> UMX.tag<ceLength> 
+            ((%stageLength * %channelCount) / 2) |> UMX.tag<ceLength>
 
 
 

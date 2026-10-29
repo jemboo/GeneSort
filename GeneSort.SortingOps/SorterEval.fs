@@ -10,7 +10,7 @@ type sorterEvalV1 =
     private { 
         sorterId: Guid<sorterId>
         sortableTestsSubsetId: string<sortableTestsSubsetId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         lastCeIndex: int<ceIndex>
@@ -24,7 +24,7 @@ type sorterEvalV1 =
     static member create 
             (sorterId: Guid<sorterId>)
             (sortableTestsSubsetId: string<sortableTestsSubsetId>)
-            (sortingWidth: int<sortingWidth>) 
+            (channelCount: int<channelCount>)
             (unsortedCount: int<sortableCount>)
             (sequenceKey: int<sequenceHash>) 
             (lastCeIndex: int<ceIndex>) 
@@ -36,7 +36,7 @@ type sorterEvalV1 =
         { 
                 sorterId = sorterId; 
                 sortableTestsSubsetId = sortableTestsSubsetId
-                sortingWidth = sortingWidth;
+                channelCount = channelCount;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
                 lastCeIndex = lastCeIndex;
@@ -50,7 +50,7 @@ type sorterEvalV1 =
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
-    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
+    member this.ChannelCount with get() : int<channelCount> = this.channelCount
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceLength
@@ -64,7 +64,7 @@ type sorterEvalV1 =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
             |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
-            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "ChannelCount" (string %this.channelCount)
             |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.ceLength)
@@ -80,7 +80,7 @@ type sorterEvalV1 =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
             |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
-            |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+            |> dataTableRecord.addData (prefix + "ChannelCount") (string %this.channelCount)
             |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
             |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
             |> dataTableRecord.addData (prefix + "CeLength") (string %this.ceLength)
@@ -96,7 +96,7 @@ type sorterEvalV2 =
     private { 
         sorterId: Guid<sorterId>
         sortableTestsSubsetId: string<sortableTestsSubsetId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
@@ -109,7 +109,7 @@ type sorterEvalV2 =
     static member create 
                     (sorterId: Guid<sorterId>) 
                     (sortableTestsSubsetId: string<sortableTestsSubsetId>)
-                    (sortingWidth: int<sortingWidth>) 
+                    (channelCount: int<channelCount>)
                     (unsortedCount: int<sortableCount>)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
@@ -120,7 +120,7 @@ type sorterEvalV2 =
         { 
                 sorterId = sorterId; 
                 sortableTestsSubsetId = sortableTestsSubsetId
-                sortingWidth = sortingWidth;
+                channelCount = channelCount;
                 unsortedCount = unsortedCount;
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
@@ -133,7 +133,7 @@ type sorterEvalV2 =
     member this.IsReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.isReflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
-    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
+    member this.ChannelCount with get() : int<channelCount> = this.channelCount
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
@@ -150,7 +150,7 @@ type sorterEvalV2 =
         sorterEvalV1.create
             this.sorterId
             this.sortableTestsSubsetId
-            this.sortingWidth
+            this.channelCount
             this.unsortedCount
             this.sequenceHash
             this.LastCeIndex
@@ -165,7 +165,7 @@ type sorterEvalV2 =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
             |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
-            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "ChannelCount" (string %this.channelCount)
             |> dataTableRecord.addData "UnsortedCount" (string %this.unsortedCount)
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.CeLength)
@@ -182,7 +182,7 @@ type sorterEvalV2 =
         dataTableRecord.createEmpty()
         |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
         |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
-        |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+        |> dataTableRecord.addData (prefix + "ChannelCount") (string %this.channelCount)
         |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.unsortedCount)
         |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength)
         |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
@@ -199,7 +199,7 @@ type sorterEvalV3 =
     private { 
         sorterId: Guid<sorterId>
         sortableTestsSubsetId: string<sortableTestsSubsetId>
-        sortingWidth: int<sortingWidth>
+        channelCount: int<channelCount>
         unsortedCount: int<sortableCount>
         sequenceHash: int<sequenceHash>
         stageLength: int<stageLength>
@@ -213,7 +213,7 @@ type sorterEvalV3 =
     static member create 
                     (sorterId: Guid<sorterId>)
                     (sortableTestsSubsetId: string<sortableTestsSubsetId>)
-                    (sortingWidth: int<sortingWidth>) 
+                    (channelCount: int<channelCount>)
                     (unsortedCount: int<sortableCount>)
                     (sequenceKey: int<sequenceHash>)
                     (stageLength: int<stageLength>)
@@ -225,7 +225,7 @@ type sorterEvalV3 =
         { 
                 sorterId = sorterId;
                 sortableTestsSubsetId = sortableTestsSubsetId
-                sortingWidth = sortingWidth;
+                channelCount = channelCount;
                 unsortedCount = unsortedCount
                 sequenceHash = sequenceKey; 
                 stageLength = stageLength;
@@ -239,7 +239,7 @@ type sorterEvalV3 =
     member this.ReflectionSymmetric with get() : bool<isReflectionSymmetric> = this.reflectionSymmetric
     member this.SorterId with get() : Guid<sorterId>  = this.sorterId
     member this.SortableTestsSubsetId with get() : string<sortableTestsSubsetId> = this.sortableTestsSubsetId
-    member this.SortingWidth with get() : int<sortingWidth> = this.sortingWidth
+    member this.ChannelCount with get() : int<channelCount> = this.channelCount
     member this.StageCrossingsCount with get() : int<stageCrossings> = this.stageCrossingsCount
     member this.StageLength with get() : int<stageLength> = this.stageLength
     member this.CeLength with get() : int<ceLength> = this.ceUseArray.Length |> UMX.tag<ceLength>
@@ -257,7 +257,7 @@ type sorterEvalV3 =
         sorterEvalV2.create
             this.sorterId
             this.sortableTestsSubsetId
-            this.sortingWidth
+            this.channelCount
             this.UnsortedCount
             this.sequenceHash
             this.stageLength
@@ -271,7 +271,7 @@ type sorterEvalV3 =
         sorterEvalV1.create
             this.sorterId
             this.sortableTestsSubsetId
-            this.sortingWidth
+            this.channelCount
             this.UnsortedCount
             this.sequenceHash
             this.LastCeIndex
@@ -286,7 +286,7 @@ type sorterEvalV3 =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData "SorterId" (string %this.sorterId)
             |> dataTableRecord.addData "SortableTestsSubsetId" (string %this.sortableTestsSubsetId)
-            |> dataTableRecord.addData "SortingWidth" (string %this.sortingWidth)
+            |> dataTableRecord.addData "ChannelCount" (string %this.channelCount)
             |> dataTableRecord.addData "UnsortedCount" (string %this.UnsortedCount)
             |> dataTableRecord.addData "StageLength" (string %this.stageLength)
             |> dataTableRecord.addData "CeLength" (string %this.CeLength)
@@ -303,7 +303,7 @@ type sorterEvalV3 =
             dataTableRecord.createEmpty()
             |> dataTableRecord.addData (prefix + "SorterId") (string %this.sorterId)
             |> dataTableRecord.addData (prefix + "SortableTestsSubsetId") (string %this.sortableTestsSubsetId)
-            |> dataTableRecord.addData (prefix + "SortingWidth") (string %this.sortingWidth)
+            |> dataTableRecord.addData (prefix + "ChannelCount") (string %this.channelCount)
             |> dataTableRecord.addData (prefix + "UnsortedCount") (string %this.UnsortedCount)
             |> dataTableRecord.addData (prefix + "StageLength") (string %this.stageLength) 
             |> dataTableRecord.addData (prefix + "CeLength") (string %this.CeLength)
@@ -379,11 +379,11 @@ module SorterEval =
         | V2 v2 -> V2 { v2 with sortableTestsSubsetId = subsetId }
         | V3 v3 -> V3 { v3 with sortableTestsSubsetId = subsetId }
 
-    let getSortingWidth (eval: sorterEval) : int<sortingWidth> =
+    let getChannelCount (eval: sorterEval) : int<channelCount> =
         match eval with
-        | V1 v1 -> v1.SortingWidth
-        | V2 v2 -> v2.SortingWidth
-        | V3 v3 -> v3.SortingWidth
+        | V1 v1 -> v1.ChannelCount
+        | V2 v2 -> v2.ChannelCount
+        | V3 v3 -> v3.ChannelCount
 
     let getStageLength (eval: sorterEval) : int<stageLength> =
         match eval with
@@ -479,7 +479,7 @@ module SorterEval =
             (ceBlockEval: ceBlockEval) : sorterEval =
         let stageSequence, moves = 
             StageBuilderSequence.toStageSequenceWithMoveInfo 
-                                  ceBlockEval.CeBlock.SortingWidth 
+                                  ceBlockEval.CeBlock.ChannelCount
                                   ceBlockEval.UsedCes
         let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
 
@@ -492,7 +492,7 @@ module SorterEval =
         sorterEvalV1.create 
             sorterId 
             SortableTestsSubsetId.Default
-            ceBlockEval.CeBlock.SortingWidth
+            ceBlockEval.CeBlock.ChannelCount
             ceBlockEval.UnsortedCount
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             ceBlockEval.LastUsedIndex
@@ -508,7 +508,7 @@ module SorterEval =
             (ceBlockEval: ceBlockEval) : sorterEval =
         let stageSequence, moves = 
             StageBuilderSequence.toStageSequenceWithMoveInfo 
-                                  ceBlockEval.CeBlock.SortingWidth 
+                                  ceBlockEval.CeBlock.ChannelCount
                                   ceBlockEval.UsedCes
         let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
         let ceUseArray = ceBlockEval.extractCeUseArray
@@ -522,7 +522,7 @@ module SorterEval =
         sorterEvalV2.create 
             sorterId 
             SortableTestsSubsetId.Default
-            ceBlockEval.CeBlock.SortingWidth
+            ceBlockEval.CeBlock.ChannelCount
             ceBlockEval.UnsortedCount
             (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
             stageSequence.StageLength  
@@ -537,7 +537,7 @@ module SorterEval =
             (ceBlockEval: ceBlockEval) : sorterEval =
         let stageSequence, moves = 
             StageBuilderSequence.toStageSequenceWithMoveInfo 
-                                  ceBlockEval.CeBlock.SortingWidth 
+                                  ceBlockEval.CeBlock.ChannelCount
                                   ceBlockEval.UsedCes
         let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
 
@@ -556,7 +556,7 @@ module SorterEval =
             sorterEvalV3.create 
                 sorterId 
                 SortableTestsSubsetId.Default
-                ceBlockEval.CeBlock.SortingWidth
+                ceBlockEval.CeBlock.ChannelCount
                 ceBlockEval.UnsortedCount
                 (stageSequence.GetHashCode() |> UMX.tag<sequenceHash>) 
                 stageSequence.StageLength 
@@ -596,11 +596,11 @@ module SorterEval =
         |> Array.map snd
 
     let private calculateMetrics
-            (sortingWidth: int<sortingWidth>)
+            (channelCount: int<channelCount>)
             (ceUseArray: ceUse[]) =
         let ces = ceUseArray |> Array.map (fun ceUse -> ceUse.Ce)
         let stageSequence, moves =
-            StageBuilderSequence.toStageSequenceWithMoveInfo sortingWidth ces
+            StageBuilderSequence.toStageSequenceWithMoveInfo channelCount ces
         let stageCrossingsCount = moves |> Array.sumBy Array.sum |> UMX.tag<stageCrossings>
         let reflectionSymmetric =
             stageSequence.Stages
@@ -621,25 +621,25 @@ module SorterEval =
         | _ ->
             if getSorterId first <> getSorterId second then
                 invalidArg "second" "Sorter evaluations must belong to the same sorter."
-            if getSortingWidth first <> getSortingWidth second then
-                invalidArg "second" "Sorter evaluations must have the same sorting width."
+            if getChannelCount first <> getChannelCount second then
+                invalidArg "second" "Sorter evaluations must have the same channel count."
 
     /// Combines two evaluations of the same sorter over separate sortable-test partitions.
     let merge (first: sorterEval) (second: sorterEval) : sorterEval =
         validateMergeInputs first second
 
         let sorterId = getSorterId first
-        let sortingWidth = getSortingWidth first
+        let channelCount = getChannelCount first
         let ceUseArray = mergeCeUseArrays (getCeUseArray first) (getCeUseArray second)
         let sequenceHash, stageLength, reflectionSymmetric, stageCrossingsCount, reflectiveCount =
-            calculateMetrics sortingWidth ceUseArray
+            calculateMetrics channelCount ceUseArray
 
         match first, second with
         | V2 firstV2, V2 secondV2 ->
             sorterEvalV2.create
                 sorterId
                 SortableTestsSubsetId.Default
-                sortingWidth
+                channelCount
                 (firstV2.UnsortedCount + secondV2.UnsortedCount)
                 sequenceHash
                 stageLength
@@ -652,7 +652,7 @@ module SorterEval =
             sorterEvalV3.create
                 sorterId
                 SortableTestsSubsetId.Default
-                sortingWidth
+                channelCount
                 (firstV3.UnsortedCount + secondV3.UnsortedCount)
                 sequenceHash
                 stageLength
@@ -666,7 +666,7 @@ module SorterEval =
             sorterEvalV2.create
                 sorterId
                 SortableTestsSubsetId.Default
-                sortingWidth
+                channelCount
                 (firstV2.UnsortedCount + secondV3.UnsortedCount)
                 sequenceHash
                 stageLength
@@ -679,7 +679,7 @@ module SorterEval =
             sorterEvalV2.create
                 sorterId
                 SortableTestsSubsetId.Default
-                sortingWidth
+                channelCount
                 (firstV3.UnsortedCount + secondV2.UnsortedCount)
                 sequenceHash
                 stageLength
