@@ -58,7 +58,7 @@ let moduleParameters =
 
 
 let runType =
-    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", description, channelCount, [|
+    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", description, channelCount, executionQueryCatalogName, [|
         runExample("Test", Test)
     |])
 
@@ -110,7 +110,7 @@ module Pool_128 =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", description, channelCount, executionQueryCatalogName, [|
             runExample("V1", V1)
         |])
 
@@ -160,6 +160,6 @@ module Pool_512 =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", description, channelCount, executionQueryCatalogName, [|
             runExample("V1", V1)
         |])

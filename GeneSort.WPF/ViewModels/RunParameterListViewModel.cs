@@ -16,19 +16,31 @@ public sealed class RunParameterItem : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     private int? liveGeneration;
     private string[] columnKeys = [];
-    public string Status { get; private set; } = "Waiting";
+    private runRowStatus runStatus = runRowStatus.Waiting;
+    private runRowStatus setupStatus = runRowStatus.Waiting;
+    private static string StatusText(runRowStatus value) => value is runRowStatus.Waiting or runRowStatus.Cancelled ? "Pending" : value.ToString();
+    public string RunStatus => StatusText(runStatus);
+    public string SetupStatus => StatusText(setupStatus);
+    public string Status => RunStatus;
+    internal void ShowSetupStatus(runRowStatus value)
+    {
+        setupStatus = value;
+        PropertyChanged?.Invoke(this, new(nameof(SetupStatus)));
+        SetColumns(columnKeys);
+    }
     public string FailureMessage { get; private set; } = "";
     public string FailureDetails => $"Run: {Parameters.GetRunName()?.Value}\nReplica: {Parameters.GetRepl()?.Value}\nID: {Parameters.GetId()?.Value}\n\n{FailureMessage}";
     internal void ShowStatus(runRowStatus status, string? error = null)
     {
         // Cancellation stops this attempt; the unfinished row is available to run again.
-        Status = status == runRowStatus.Cancelled ? "Waiting" : status.ToString();
+        runStatus = status;
         FailureMessage = status == runRowStatus.Failed
             ? string.IsNullOrWhiteSpace(error) ? ProcessingFailureStore.MissingMessage : error
             : "";
         PropertyChanged?.Invoke(this, new(nameof(FailureMessage)));
         PropertyChanged?.Invoke(this, new(nameof(FailureDetails)));
         PropertyChanged?.Invoke(this, new(nameof(Status)));
+        PropertyChanged?.Invoke(this, new(nameof(RunStatus)));
         SetColumns(columnKeys);
     }
     public int Number { get; }
@@ -44,7 +56,8 @@ public sealed class RunParameterItem : INotifyPropertyChanged
     internal RunParameterItem(int number, RunParameters parameters, run? configured)
     {
         Number = number;
-        Status = parameters.GetRunFinished()?.Value == true ? "Completed" : "Waiting";
+        runStatus = parameters.GetRunFinished()?.Value == true ? runRowStatus.Completed : runRowStatus.Waiting;
+        setupStatus = parameters.GetSetupCompleted()?.Value == true ? runRowStatus.Completed : runRowStatus.Waiting;
         state = runPhaseOutput.NewParameters(parameters);
         // This is the saved-run opening boundary. Phase updates never reconstruct the path.
         if (configured?.IsEvolution == true)
@@ -69,7 +82,7 @@ public sealed class RunParameterItem : INotifyPropertyChanged
     internal void SetColumns(string[] keys)
     {
         columnKeys = keys;
-        Cells = keys.Select(key => key == "Status" ? Status : key == ParamKeys.generationCurrentKey && liveGeneration is int generation
+        Cells = keys.Select(key => key == "RunStatus" ? RunStatus : key == "SetupStatus" ? SetupStatus : key == ParamKeys.generationCurrentKey && liveGeneration is int generation
             ? generation.ToString(CultureInfo.InvariantCulture) : Values.GetValueOrDefault(key)).ToArray();
         PropertyChanged?.Invoke(this, new(nameof(Cells)));
     }
@@ -131,9 +144,9 @@ public sealed class RunParameterListViewModel : INotifyPropertyChanged
 
     private void ShowItems(RunParameterItem[] data)
     {
-        string[] leading = ["Status", ParamKeys.replKey, ParamKeys.mutationModKey, ParamKeys.sourceMutationModKey,
+        string[] leading = ["RunStatus", "SetupStatus", ParamKeys.replKey, ParamKeys.mutationModKey, ParamKeys.sourceMutationModKey,
             ParamKeys.partitionCountKey, ParamKeys.generationCurrentKey, ParamKeys.runNameKey];
-        var keys = data.SelectMany(row => row.Values.Keys).Concat(data.Length > 0 ? ["Status"] : Array.Empty<string>()).Distinct(StringComparer.Ordinal).ToArray();
+        var keys = data.SelectMany(row => row.Values.Keys).Where(key => key != ParamKeys.runFinishedKey && key != "SetupCompleted").Concat(data.Length > 0 ? ["RunStatus", "SetupStatus"] : Array.Empty<string>()).Distinct(StringComparer.Ordinal).ToArray();
         Keys = leading.Where(keys.Contains).Concat(keys.Except(leading).Order(StringComparer.Ordinal)).ToArray();
         foreach (var item in data) item.SetColumns(Keys);
         Items = new(data.ToList());

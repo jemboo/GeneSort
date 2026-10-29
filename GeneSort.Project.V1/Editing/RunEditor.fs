@@ -54,8 +54,8 @@ type parameterDraft =
 type runDraftArgs = {
     ProjectName: string
     DatabaseName: string
-    SortableTestsDatabaseName: string
-    SorterSetEvalsDatabaseName: string
+    SortableTestsModule: string
+    SorterEvalModule: string
     RunName: string
     Description: string
     AllowOverwrite: bool
@@ -70,8 +70,8 @@ type runDraft =
     private { settings: runDraftArgs }
     member this.ProjectName = this.settings.ProjectName
     member this.DatabaseName = this.settings.DatabaseName
-    member this.SortableTestsDatabaseName = this.settings.SortableTestsDatabaseName
-    member this.SorterSetEvalsDatabaseName = this.settings.SorterSetEvalsDatabaseName
+    member this.SortableTestsModule = this.settings.SortableTestsModule
+    member this.SorterEvalModule = this.settings.SorterEvalModule
     member this.RunName = this.settings.RunName
     member this.Description = this.settings.Description
     member this.AllowOverwrite = this.settings.AllowOverwrite
@@ -117,7 +117,7 @@ module RunEditor =
         let parameter key values = parameterDraft.create key values
         runDraft.create {
             ProjectName = "SorterSgd.p32.Msuf4a.Standard"; DatabaseName = "Test"; RunName = "NewRun"
-            SortableTestsDatabaseName = "Prefix"; SorterSetEvalsDatabaseName = "Prefix"
+            SortableTestsModule = "SortableTests.Prefix.Channels32"; SorterEvalModule = "SorterEval.Prefix"
             Description = "Standard Msuf32p4a run"; AllowOverwrite = false
             CheckpointIntervalsName = GenIntervalNames.uniformInterval1
             GenSaveIntervalsName = GenIntervalNames.uniformInterval10
@@ -165,8 +165,10 @@ module RunEditor =
         issues.AddRange(SgdParameterValidation.standardMsuf (spans draft.SetupParameters) (spans draft.ExecutionParameters))
         for field, value in ["ProjectName", draft.ProjectName; "DatabaseName", draft.DatabaseName; "RunName", draft.RunName] do
             issues.AddRange(RunIdentity.validate field value)
-        for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
-            issues.AddRange(RunIdentity.validate field value)
+        for key, value in [ParamKeys.sortableTestsModuleKey, draft.SortableTestsModule; ParamKeys.sorterEvalModuleKey, draft.SorterEvalModule] do
+            match ParameterValidation.validateValue key value with
+            | Ok _ -> ()
+            | Error error -> issues.Add(validationIssue.create ("Setup." + key) error)
         if not (String.IsNullOrWhiteSpace draft.CheckpointIntervalsName) && not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey draft.CheckpointIntervalsName) then
             add "CheckpointIntervalsName" "Choose a registered generation interval."
         for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
@@ -202,7 +204,7 @@ module RunEditor =
             SgdRun.create {
                 DatabaseName = UMX.tag draft.DatabaseName; ProjectName = UMX.tag draft.ProjectName; RunName = UMX.tag draft.RunName
                 Description = draft.Description; AllowOverwrite = draft.AllowOverwrite
-                Setup = workflow.SetupConfig (UMX.tag draft.SortableTestsDatabaseName) (UMX.tag draft.SorterSetEvalsDatabaseName) (spans draft.SetupParameters)
+                Setup = workflow.SetupConfig (UMX.tag draft.SortableTestsModule) (UMX.tag draft.SorterEvalModule) (spans draft.SetupParameters)
                 Execution = workflow.ExecutionConfig (spans draft.ExecutionParameters)
             } {
                 MakerNames = workflow.MakerNames
@@ -218,8 +220,8 @@ module RunEditor =
             let rows spans = spans |> List.map (fun (key, values) -> parameterDraft.create key (List.toArray values)) |> List.toArray
             runDraft.create {
                 ProjectName = %configured.ProjectName; DatabaseName = %configured.DatabaseName; RunName = %configured.RunName
-                SortableTestsDatabaseName = string configured.SgdSetup.Value.SortableTestsDatabaseName
-                SorterSetEvalsDatabaseName = string configured.SgdSetup.Value.SorterSetEvalsDatabaseName
+                SortableTestsModule = string configured.SgdSetup.Value.SortableTestsModule
+                SorterEvalModule = string configured.SgdSetup.Value.SorterEvalModule
                 Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
                 CheckpointIntervalsName = configured.CheckpointIntervalsName |> Option.defaultValue configured.GenSaveIntervalsName.Value
                 GenSaveIntervalsName = configured.GenSaveIntervalsName.Value; GenSaveSubIntervalsName = configured.GenSaveSubIntervalsName.Value

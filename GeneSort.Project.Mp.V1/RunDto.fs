@@ -33,8 +33,8 @@ type runDto =
         SeedPoolSetMakerName: string
         MutatorMakerName: string
         SetupFunctionName: string
-        SetupSortableTestsDatabaseName: string
-        SetupSorterSetEvalsDatabaseName: string
+        SetupSortableTestsModule: string
+        SetupSorterEvalModule: string
         ExecuteFunctionName: string
         ParameterSource: runDto option
         SourceParameterSpans: parameterSpanDto []
@@ -61,8 +61,8 @@ module RunDto =
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
                 |> List.toArray
             SetupFunctionName = project.SetupFunctionName |> Option.toObj
-            SetupSortableTestsDatabaseName = project.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsDatabaseName) |> Option.toObj
-            SetupSorterSetEvalsDatabaseName = project.SgdSetup |> Option.map (fun setup -> string setup.SorterSetEvalsDatabaseName) |> Option.toObj
+            SetupSortableTestsModule = project.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsModule) |> Option.toObj
+            SetupSorterEvalModule = project.SgdSetup |> Option.map (fun setup -> string setup.SorterEvalModule) |> Option.toObj
             ExecuteFunctionName = project.ExecuteFunctionName
             ParameterSource = project.ParameterSource |> Option.map (fst >> fromDomain)
             SourceParameterSpans =
@@ -113,8 +113,8 @@ module RunDto =
             }
             Setup = {
                 FunctionName = dto.SetupFunctionName
-                SortableTestsDatabaseName = UMX.tag dto.SetupSortableTestsDatabaseName
-                SorterSetEvalsDatabaseName = UMX.tag dto.SetupSorterSetEvalsDatabaseName
+                SortableTestsModule = UMX.tag dto.SetupSortableTestsModule
+                SorterEvalModule = UMX.tag dto.SetupSorterEvalModule
                 ParameterSpans = setupParameterSpans
                 QueryCatalogName = dto.SetupQueryCatalogName
                 EnhancerFunctionName = dto.SetupEnhancerFunctionName
@@ -122,7 +122,7 @@ module RunDto =
         }
         let configured =
           match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
-          | None, None when isParameterSource && not (System.String.IsNullOrWhiteSpace dto.SetupSortableTestsDatabaseName) ->
+          | None, None when isParameterSource && not (System.String.IsNullOrWhiteSpace dto.SetupSortableTestsModule) ->
             Run.ofSimple (SimpleRun.createEvolutionSource config)
           | None, None ->
             Run.ofSimple (SimpleRun.create {

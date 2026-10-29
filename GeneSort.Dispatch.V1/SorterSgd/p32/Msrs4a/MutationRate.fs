@@ -21,6 +21,8 @@ open GeneSort.Dispatch.V1.SorterSgd.p32.Msrs4a.Common
 module MutationRate =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -92,8 +94,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -145,8 +147,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -199,8 +201,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -219,7 +221,7 @@ module MutationRate =
 
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", description, channelCount, executionQueryCatalogName, [|
                 runExample("Test", Test)
                 runExample("EqualOPS", EqualOPS)
                 runExample("EqualOPS2", EqualOPS2)
@@ -275,8 +277,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -328,8 +330,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -382,8 +384,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -404,7 +406,7 @@ module MutationRate =
 
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", description, channelCount, executionQueryCatalogName, [|
                 runExample("Test", Test)
                 runExample("WideTest", WideTest)
                 runExample("NarrowTest", NarrowTest)
@@ -460,8 +462,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -481,7 +483,7 @@ module MutationRate =
 
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", description, channelCount, executionQueryCatalogName, [|
                 runExample("Test2", Test2)
             |])
 
@@ -535,8 +537,8 @@ module MutationRate =
                     }
                     Setup = {
                         FunctionName = setupFunctionName
-                        SortableTestsDatabaseName = UMX.tag "Prefix"
-                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                        SortableTestsModule = sortableTestsModule
+                        SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -553,6 +555,6 @@ module MutationRate =
 
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", description, channelCount, executionQueryCatalogName, [|
                 runExample("WideTest", WideTest)
             |])

@@ -355,7 +355,9 @@ module SorterMutateSetup =
                     do! checkCancellation cts.Token
                     return outputData.SorterModelSet modelSet
                 })
-            with error ->
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | error ->
                 return! Error (sprintf "Failed to generate or save mutant SorterModelSet: %s" error.Message)
         }
 
@@ -368,13 +370,13 @@ module SorterMutateSetup =
         let context =
             setupContext.create {
                 MakeSorterModelSets = Map.ofList [
-                    SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet (makeMutantStandardSorterModels (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard"))) storage allowOverwrite cts
-                    SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet (makeMutantMergeSorterModels (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite cts
-                    SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet (makeMutantPrefixSorterModels (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet (fun rp -> makeMutantStandardSorterModels (sources.EvolutionModules (setupParameters.create rp.ParamMap)) rp) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet (fun rp -> makeMutantMergeSorterModels (sources.EvolutionModules (setupParameters.create rp.ParamMap)) rp) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet (fun rp -> makeMutantPrefixSorterModels (sources.EvolutionModules (setupParameters.create rp.ParamMap)) rp) storage allowOverwrite cts
                 ]
                 MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests storage allowOverwrite |> checkedSetup
-                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite |> checkedSetup
-                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (fun rp -> SortableTestsMakers.getMergeTests (sources.EvolutionModules (setupParameters.create rp.ParamMap)) rp) storage allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (fun rp -> SortableTestsMakers.getPrefixTests (sources.EvolutionModules (setupParameters.create rp.ParamMap)) rp) storage allowOverwrite |> checkedSetup
             }
         SetupCatalog.get (Run.requireSetupFunctionName configured) context
 

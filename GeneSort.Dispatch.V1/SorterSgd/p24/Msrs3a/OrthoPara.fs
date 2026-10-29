@@ -26,6 +26,8 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.Common
 module OrthoPara32 =
 
     let channelCount = 24<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -85,8 +87,8 @@ module OrthoPara32 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -136,8 +138,8 @@ module OrthoPara32 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -152,7 +154,7 @@ module OrthoPara32 =
     let description = "Compare ortho and para mutation settings for 24-input Msrs3a evolution (OrthoPara32)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.OrthoPara.OrthoPara32", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.OrthoPara.OrthoPara32", description, channelCount, executionQueryCatalogName, [|
             runExample("PickMode2_2", PickMode2_2)
             runExample("NoMods", NoMods)
         |])

@@ -119,8 +119,8 @@ let standardSource () =
         AllowOverwrite = false
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard
-            SortableTestsDatabaseName = UMX.tag "Prefix"
-            SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+            SortableTestsModule = UMX.tag "SortableTests.Prefix.Channels32"
+            SorterEvalModule = UMX.tag "SorterEval.Prefix"
             ParameterSpans = [
                 ParamKeys.orthoRateKey, ["4.001"]
                 ParamKeys.sorterChildCountKey, ["1"]
@@ -174,8 +174,8 @@ let sossSource (modifiers: int list) =
         AllowOverwrite = false
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdSoss
-            SortableTestsDatabaseName = UMX.tag "Prefix"
-            SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+            SortableTestsModule = UMX.tag "SortableTests.Prefix.Channels32"
+            SorterEvalModule = UMX.tag "SorterEval.Prefix"
             ParameterSpans = [
                 ParamKeys.orthoRateKey, ["4.001"]
                 ParamKeys.sorterChildCountKey, ["1"]

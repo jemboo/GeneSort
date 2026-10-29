@@ -319,7 +319,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
 
 [<Fact>]
 let ``Evolution clones cannot change or remove module owned settings`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.TestStandard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Standard.TestStandard ()
     let draft = RunTypeEditor.cloneDraft source
     let args = draft.ToArgs()
     for row in args.SetupParameters |> Array.filter (fun row -> RunTypeEditor.isModuleOwnedParameter source row.Key) do
@@ -362,7 +362,7 @@ let ``Initial measure follows each evaluation sweep choice without a Cartesian p
 
 [<Fact>]
 let ``Explicit evolution controls survive enhancement and separate execution identities`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Standard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Standard.Standard ()
     let first spans = spans |> List.map (fun (key, values) -> key, List.take 1 values)
     let replace key values spans = (key, values) :: (spans |> List.filter (fst >> (<>) key))
     let setup = first source.SetupParameterSpans

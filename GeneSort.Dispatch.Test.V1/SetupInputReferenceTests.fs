@@ -117,3 +117,47 @@ let ``preparation inventories five directly addressed setup files without IO`` (
             Assert.Equal(rp.ParamMap[SetupFileReferences.keyForOutputType output], string query.Id)
 
 
+
+[<Fact>]
+let ``Evaluation source database changes setup identity but is absent from processing queries`` () =
+    ProjectCatalogs.registerAll ()
+    for configured in [GeneSort.Dispatch.V1.SorterEval.Merge.Channels32.Test (); GeneSort.Dispatch.V1.SorterEval.Prefix.Channels32 ()] do
+        let original = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber> |> Array.head
+        let path = original.ParamMap[ParamKeys.sortableTestsModuleKey]
+        let alternate = runParameters.create (original.ParamMap |> Map.add ParamKeys.sortableTestsModuleKey "OtherProject.OtherModule")
+        let setup = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
+        let first = setup (setupParameters.create original.ParamMap) tests |> Option.get
+        let second = setup (setupParameters.create alternate.ParamMap) tests |> Option.get
+        Assert.Equal(path, first.Properties[ParamKeys.sortableTestsModuleKey])
+        Assert.NotEqual(first.Id, second.Id)
+        let processing = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
+        for output in [geneSortDataType.Run configured.RunName; geneSortDataType.RunParameters configured.RunName; geneSortDataType.SorterSetEval ""] do
+            let query = processing original output |> Option.get
+            let changed = processing alternate output |> Option.get
+            Assert.False(query.Properties.ContainsKey ParamKeys.sortableTestsModuleKey)
+            Assert.Equal(query.Id, changed.Id)
+        Assert.Equal(parameterRole.SetupOnly, Run.parameterRole configured ParamKeys.sortableTestsModuleKey)
+
+[<Theory>]
+[<InlineData("")>]
+[<InlineData("Channels32")>]
+[<InlineData("../Channels32")>]
+[<InlineData("Project/Database")>]
+[<InlineData("Project..Database")>]
+let ``SortableTestsModule requires a qualified module name`` value =
+    Assert.True(ParameterValidation.validateValue ParamKeys.sortableTestsModuleKey value |> Result.isError)
+
+[<Fact>]
+let ``Run modules expose the catalog and database of every example`` () =
+    for kind in GeneSort.Dispatch.V1.RunTypeCatalog.all do
+        let catalogName = kind.ExecutionQueryCatalogName
+        let source = RunModuleCatalog.resolve kind.Name |> function Ok value -> value | Error error -> failwith error
+        for example in kind.Examples do
+            Assert.Equal(string example.Run.ProjectName, string source.ProjectName)
+            Assert.Equal(string example.Run.DatabaseName, string source.DatabaseName)
+            Assert.Equal(example.Run.RunQueryCatalogName, source.ExecutionQueryCatalogName)
+        let moduleTypeName = "GeneSort.Dispatch.V1." + kind.Name
+        let moduleType = typeof<GeneSort.Dispatch.V1.runHost>.Assembly.GetTypes() |> Array.find (fun t -> t.FullName.Replace('+', '.') = moduleTypeName)
+        let catalog = moduleType.GetProperty("executionQueryCatalogName", System.Reflection.BindingFlags.Public ||| System.Reflection.BindingFlags.Static ||| System.Reflection.BindingFlags.DeclaredOnly)
+        Assert.NotNull(catalog)
+        Assert.Equal(catalogName, catalog.GetValue(null) :?> string)

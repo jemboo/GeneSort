@@ -18,9 +18,10 @@ open GeneSort.Project.V1.ParamBundles
 module ParamKeys =
 
     [<Literal>]
-    let setupSortableTestsDatabaseNameKey = "SetupSortableTestsDatabaseName"
+    let sortableTestsModuleKey = "SortableTestsModule"
+
     [<Literal>]
-    let setupSorterSetEvalsDatabaseNameKey = "SetupSorterSetEvalsDatabaseName"
+    let sorterEvalModuleKey = "SorterEvalModule"
 
     let addOrRemove key valueOpt map =
         match valueOpt with

@@ -13,7 +13,7 @@ public partial class RunParameterListView : UserControl
     public RunParameterListView()
     {
         columnLayout = new(nameof(RunParameterItem.Number), key => model?.Sort(key),
-            key => key == "Status" ? (DataTemplate)FindResource("ProcessingStatusTemplate") : null);
+            key => key == "RunStatus" ? (DataTemplate)FindResource("ProcessingStatusTemplate") : null);
         InitializeComponent();
         DataContextChanged += (_, _) => Attach();
         Loaded += (_, _) => Attach();

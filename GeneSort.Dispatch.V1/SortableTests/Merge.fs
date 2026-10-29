@@ -24,6 +24,8 @@ module Merge =
 
     module Channels16 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 16<channelCount>
 
 
@@ -71,11 +73,13 @@ module Merge =
         let description = "Int8 tests for merge networks."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels16", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels16", description, channelCount, executionQueryCatalogName, [|
                 runExample("All_16", All_16)
             |])
 
     module Channels24 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 24<channelCount>
 
@@ -157,12 +161,14 @@ module Merge =
         let description = "Int8 tests for merge networks."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels24", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels24", description, channelCount, executionQueryCatalogName, [|
                 runExample("HiMD_24", HiMD_24)
                 runExample("LowMD_24", LowMD_24)
             |])
 
     module Channels32 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 32<channelCount>
 
@@ -242,12 +248,14 @@ module Merge =
         let description = "Int8 tests for merge networks."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels32", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels32", description, channelCount, executionQueryCatalogName, [|
                 runExample("HiMD_32", HiMD_32)
                 runExample("LowMD_32", LowMD_32)
             |])
 
     module Channels48 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 48<channelCount>
 
@@ -328,12 +336,14 @@ module Merge =
         let description = "Int8 tests for merge networks."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels48", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels48", description, channelCount, executionQueryCatalogName, [|
                 runExample("HiMD_48", HiMD_48)
                 runExample("LowMD_48", LowMD_48)
             |])
 
     module Channels64 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 64<channelCount>
 
@@ -414,7 +424,7 @@ module Merge =
         let description = "Int8 tests for merge networks."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels64", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Merge.Channels64", description, channelCount, executionQueryCatalogName, [|
                 runExample("HiMD_64", HiMD_64)
                 runExample("LowMD_64", LowMD_64)
             |])

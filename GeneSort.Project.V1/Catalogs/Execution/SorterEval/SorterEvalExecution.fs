@@ -103,7 +103,9 @@ module SorterEvalExecution =
                 log "Run Complete."
                 return rp.WithRunFinished (Some true)
 
-            with e -> 
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | e ->
                 let errorMsg = sprintf "Fatal Error in %s: %s" (rp |> RunParameters.getIdString) e.Message
                 log errorMsg 
                 return! Error errorMsg

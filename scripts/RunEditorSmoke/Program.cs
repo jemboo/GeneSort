@@ -462,10 +462,10 @@ internal static partial class Program
             tabs.SelectedIndex = 0;
             view.Width = 700; view.Height = 400;
             Layout(view);
-            var save = Descendants<Button>(view).Single(button => Equals(button.Content, "Save"));
-            var bounds = save.TransformToAncestor(view).TransformBounds(new Rect(save.RenderSize));
-            Check(save.Visibility == Visibility.Visible && bounds.Width > 0 && bounds.Left >= 0 && bounds.Right <= view.Width
-                && bounds.Top >= 0 && bounds.Bottom <= view.Height, $"Save is outside the minimum layout: {bounds}; view {view.RenderSize}; visibility {save.Visibility}.");
+            var back = Descendants<Button>(view).Single(button => Equals(button.Content, "Back"));
+            var bounds = back.TransformToAncestor(view).TransformBounds(new Rect(back.RenderSize));
+            Check(back.Visibility == Visibility.Visible && bounds.Width > 0 && bounds.Left >= 0 && bounds.Right <= view.Width
+                && bounds.Top >= 0 && bounds.Bottom <= view.Height, $"Back is outside the minimum layout: {bounds}; view {view.RenderSize}; visibility {back.Visibility}.");
             ((ScrollViewer)view.FindName("EditorScroll")).ScrollToVerticalOffset(300);
             Layout(view);
             var firstValues = Descendants<ParameterValuesView>(view).First(editor => editor.DataContext == model.SetupParameters[0]);

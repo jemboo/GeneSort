@@ -16,26 +16,8 @@ type runNames =
 
 module RunNaming =
     let private fromMethod (method: MethodBase) : runNames =
-        // Channel-specific modules share the workflow's library database. Their
-        // run names are unique across these sibling modules.
-        let declared = method.DeclaringType
-        let container =
-            if not (isNull declared.DeclaringType) && declared.Name.StartsWith("Channels", System.StringComparison.Ordinal) then
-                declared.DeclaringType
-            else declared
-        // Direct workflow modules are databases in that workflow's project.
-        // Deeper configurations retain their enclosing module as the project.
-        let isWorkflowDatabase =
-            isNull container.DeclaringType
-            && List.contains container.Namespace [
-                "GeneSort.Dispatch.V1.SortableTests"
-                "GeneSort.Dispatch.V1.SorterEval"
-                "GeneSort.Dispatch.V1.SorterMutate"
-                "GeneSort.Dispatch.V1.SorterSgd" ]
-        let hierarchy =
-            if isWorkflowDatabase then container.Namespace
-            elif isNull container.DeclaringType then container.FullName
-            else container.DeclaringType.FullName
+        let container = method.DeclaringType
+        let hierarchy = container.FullName
         let prefix = "GeneSort.Dispatch.V1."
         let hierarchy = hierarchy.Replace('+', '.')
         if not (hierarchy.StartsWith(prefix, System.StringComparison.Ordinal)) then
@@ -46,7 +28,7 @@ module RunNaming =
             else method.Name
         {
             _projectName = hierarchy.Substring(prefix.Length) |> UMX.tag<projectName>
-            _databaseName = (if isNull container.DeclaringType && not isWorkflowDatabase then name else container.Name) |> UMX.tag<databaseName>
+            _databaseName = container.Name |> UMX.tag<databaseName>
             _runName = name |> UMX.tag<runName>
         }
 

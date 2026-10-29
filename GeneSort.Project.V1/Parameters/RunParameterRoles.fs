@@ -13,6 +13,7 @@ type parameterRole =
 /// Explicit policies for the workflows, independent of presentation and storage.
 module RunParameterRoles =
     let sorterEval = Map.ofList [
+        ParamKeys.sortableTestsModuleKey, parameterRole.SetupOnly
         ParamKeys.channelCountKey, parameterRole.InheritedReadOnly
         ParamKeys.prefixLibIdKey, parameterRole.InheritedReadOnly
         ParamKeys.mergeLibIdKey, parameterRole.InheritedReadOnly
@@ -30,6 +31,8 @@ module RunParameterRoles =
     ]
 
     let sorterMutate = Map.ofList [
+        ParamKeys.sortableTestsModuleKey, parameterRole.SetupOnly
+        ParamKeys.sorterEvalModuleKey, parameterRole.SetupOnly
         ParamKeys.channelCountKey, parameterRole.InheritedReadOnly
         ParamKeys.prefixLibIdKey, parameterRole.InheritedReadOnly
         ParamKeys.mergeLibIdKey, parameterRole.InheritedReadOnly
@@ -54,8 +57,8 @@ module RunParameterRoles =
     ]
 
     let evolution = Map.ofList [
-        ParamKeys.setupSortableTestsDatabaseNameKey, parameterRole.SetupOnly
-        ParamKeys.setupSorterSetEvalsDatabaseNameKey, parameterRole.SetupOnly
+        ParamKeys.sortableTestsModuleKey, parameterRole.SetupOnly
+        ParamKeys.sorterEvalModuleKey, parameterRole.SetupOnly
         ParamKeys.channelCountKey, parameterRole.InheritedReadOnly
         ParamKeys.prefixLibIdKey, parameterRole.InheritedReadOnly
         ParamKeys.mergeLibIdKey, parameterRole.InheritedReadOnly

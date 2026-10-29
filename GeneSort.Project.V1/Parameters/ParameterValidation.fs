@@ -47,6 +47,8 @@ type parameterRule =
 module ParameterValidation =
     let private rules =
         [
+            parameterRule.create ParamKeys.sorterEvalModuleKey "Producing SorterEval module; supplies its database and execution query catalog." Text
+            parameterRule.create ParamKeys.sortableTestsModuleKey "Producing module, for example SortableTests.Prefix.Channels32. Its metadata supplies the database and execution query catalog." Text
             parameterRule.create ParamKeys.excludeSelfCeKey "Module policy: exclude self comparators." (Choice ["true"; "false"])
             parameterRule.create ParamKeys.collectSortableTestsKey "Module policy: collect new sortable tests." (Choice ["true"; "false"])
             parameterRule.create ParamKeys.orthoRateKey "Nonnegative orthogonal mutation weight." (Number (0.0, None))
@@ -123,6 +125,13 @@ module ParameterValidation =
                     Error "Choose a MergeLibId with a positive channel count divisible by its positive dimension."
                 else Ok (MergeLibId.toString id)
             with _ -> Error "Choose a valid MergeLibId."
+        | _ when List.contains key [ParamKeys.sortableTestsModuleKey; ParamKeys.sorterEvalModuleKey] ->
+            let parts = if isNull value then [||] else value.Split('.')
+            if parts.Length < 2 || parts |> Array.exists (fun part ->
+                String.IsNullOrWhiteSpace part || not (Char.IsLetter part[0] || part[0] = '_')
+                || part |> Seq.exists (fun c -> not (Char.IsLetterOrDigit c || c = '_'))) then
+                Error "Use a module name such as SortableTests.Prefix.Channels32."
+            else Ok value
         | None -> Ok value
         | Some spec ->
             let valid, canonical =

@@ -72,7 +72,48 @@ module WorkflowSourceFiles =
             new GeneSortDbMp(Path.Combine(projectsFolder, string project, string database, "Data") |> UMX.tag, catalog) :> IGeneSortDb
         let evals database queryCatalog replica matches =
             load projectsFolder "SorterEval" database queryCatalog replica matches (geneSortDataType.SorterSetEval "") OutputData.asSorterSetEval
+        let resolveSource key (parameters: setupParameters) =
+            parameters.ParamMap.TryFind key
+            |> Result.ofOption (sprintf "Setup requires %s." key)
+            |> Result.bind (ParameterValidation.validateValue key)
+            |> Result.bind RunModuleCatalog.resolve
+        let moduleTests (parameters: setupParameters) (row: runParameters) = asyncResult {
+            let! source = resolveSource ParamKeys.sortableTestsModuleKey parameters
+            let db = openDatabase source.ProjectName source.DatabaseName source.ExecutionQueryCatalogName
+            let! query = db.makeQueryParamsFromRunParams row (geneSortDataType.SortableTests "")
+                         |> Result.ofOption "The SortableTestsModule catalog cannot query tests with these setup parameters."
+            let! data = db.loadAsync geneSortDataMode.Results query
+            return! OutputData.asSortableTests data
+        }
+        let moduleEvals (parameters: setupParameters) replica matches = asyncResult {
+            let! source = resolveSource ParamKeys.sorterEvalModuleKey parameters
+            let matching (row: runParameters) =
+                matches row
+                && (parameters.GetRngType() |> Option.forall (fun value -> row.GetRngType() = Some value))
+                && (parameters.GetSortableDataFormat() |> Option.forall (fun value -> row.GetSortableDataFormat() = Some value))
+                && (parameters.GetSorterEvalType() |> Option.forall (fun value -> row.GetSorterEvalType() = Some value))
+            return! load projectsFolder (string source.ProjectName) (string source.DatabaseName)
+                        source.ExecutionQueryCatalogName replica matching (geneSortDataType.SorterSetEval "") OutputData.asSorterSetEval
+        }
         workflowSources.create {
+            EvolutionModules = fun parameters -> {
+                LoadMergeTests = fun replica library format ->
+                    let row = (runParameters.create parameters.ParamMap).WithRepl(Some replica).WithMergeLibId(Some library).WithSortableDataFormat(Some format)
+                    moduleTests parameters row
+                LoadPrefixTests = fun replica library format ->
+                    let row = (runParameters.create parameters.ParamMap).WithRepl(Some replica).WithPrefixLibId(Some library).WithSortableDataFormat(Some format)
+                    moduleTests parameters row
+                LoadStandardSorterEvals = fun width model evalType -> asyncResult {
+                    let! replica = parameters.GetRepl() |> Result.ofOption "Setup requires Repl."
+                    return! moduleEvals parameters replica (fun row ->
+                        row.GetChannelCount() = Some width && row.GetSimpleSorterModelType() = Some model
+                        && row.GetSorterEvalType() = Some evalType)
+                }
+                LoadMergeSorterEvals = fun library replica model ->
+                    moduleEvals parameters replica (fun row -> row.GetMergeLibId() = Some library && row.GetSimpleSorterModelType() = Some model)
+                LoadPrefixSorterEvals = fun library replica model ->
+                    moduleEvals parameters replica (fun row -> row.GetPrefixLibId() = Some library && row.GetSimpleSorterModelType() = Some model)
+            }
             OpenDatabase = openDatabase
             Evolution = fun testsDatabase evalsDatabase -> {
                 LoadMergeTests = fun replica library format ->

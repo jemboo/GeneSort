@@ -26,7 +26,7 @@ module Standard =
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
 
 
-    let private makeSmall (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeSmall (channelCount: int<channelCount>) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpans =
             [
                 (ParamKeys.excludeSelfCeKey, ["true"])
@@ -63,7 +63,7 @@ module Standard =
             }
         )
 
-    let private makeMedium (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeMedium (channelCount: int<channelCount>) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpans =
             [
                 (ParamKeys.excludeSelfCeKey, ["true"])
@@ -102,12 +102,14 @@ module Standard =
 
     module Channels4 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 4<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_4 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -122,18 +124,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels4", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels4", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_4", Small_4)
             |])
 
     module Channels5 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 5<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_5 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -148,18 +152,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels5", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels5", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_5", Small_5)
             |])
 
     module Channels6 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 6<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_6 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -174,18 +180,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels6", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels6", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_6", Small_6)
             |])
 
     module Channels7 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 7<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_7 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -200,18 +208,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels7", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels7", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_7", Small_7)
             |])
 
     module Channels8 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 8<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_8 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -226,18 +236,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels8", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels8", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_8", Small_8)
             |])
 
     module Channels9 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 9<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_9 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -252,18 +264,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels9", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels9", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_9", Small_9)
             |])
 
     module Channels10 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 10<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_10 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -278,18 +292,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels10", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels10", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_10", Small_10)
             |])
 
     module Channels11 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 11<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_11 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -304,18 +320,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels11", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels11", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_11", Small_11)
             |])
 
     module Channels12 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 12<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_12 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -330,18 +348,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels12", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels12", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_12", Small_12)
             |])
 
     module Channels14 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 14<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Medium_14 () : run =
-            makeMedium channelCount (RunNaming.create())
+            makeMedium channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -356,11 +376,13 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels14", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels14", description, channelCount, executionQueryCatalogName, [|
                 runExample("Medium_14", Medium_14)
             |])
 
     module Channels16 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 16<channelCount>
 
@@ -406,7 +428,7 @@ module Standard =
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Medium_16 () : run =
-            makeMedium channelCount (RunNaming.create())
+            makeMedium channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -423,19 +445,21 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels16", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels16", description, channelCount, executionQueryCatalogName, [|
                 runExample("Test", Test)
                 runExample("Medium_16", Medium_16)
             |])
 
     module Channels18 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 18<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Medium_18 () : run =
-            makeMedium channelCount (RunNaming.create())
+            makeMedium channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -450,18 +474,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels18", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels18", description, channelCount, executionQueryCatalogName, [|
                 runExample("Medium_18", Medium_18)
             |])
 
     module Channels20 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 20<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Medium_20 () : run =
-            makeMedium channelCount (RunNaming.create())
+            makeMedium channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -476,18 +502,20 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels20", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels20", description, channelCount, executionQueryCatalogName, [|
                 runExample("Medium_20", Medium_20)
             |])
 
     module Channels22 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 22<channelCount>
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Medium_22 () : run =
-            makeMedium channelCount (RunNaming.create())
+            makeMedium channelCount executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -502,6 +530,6 @@ module Standard =
         let description = "Evaluate sorting networks with standard test configurations."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels22", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Standard.Channels22", description, channelCount, executionQueryCatalogName, [|
                 runExample("Medium_22", Medium_22)
             |])

@@ -63,8 +63,31 @@ type executionBinding =
     | SimpleExecution of (runStorage -> runFunction)
     | SgdExecution of (runStorage -> sgdExecution -> evoPathFunction)
 
+/// Output address and query contract exposed by a producing run module.
+type runModuleSource = {
+    ProjectName: string<projectName>
+    DatabaseName: string<databaseName>
+    ExecutionQueryCatalogName: string
+}
+
+/// Hosts register module metadata; shared loaders do not infer workflow catalogs.
+module RunModuleCatalog =
+    let private syncRoot = obj ()
+    let mutable private modules: Map<string, runModuleSource> = Map.empty
+    let register name source =
+        if String.IsNullOrWhiteSpace name || String.IsNullOrWhiteSpace source.ExecutionQueryCatalogName then
+            invalidArg "source" "A module requires a name and an execution query catalog."
+        lock syncRoot (fun () ->
+            match modules.TryFind name with
+            | Some existing when existing <> source -> invalidOp (sprintf "Conflicting metadata for module '%s'." name)
+            | _ -> modules <- modules.Add(name, source))
+    let resolve name =
+        lock syncRoot (fun () -> modules.TryFind name)
+        |> Result.ofOption (sprintf "Unknown producing module '%s'. Register its database and execution query catalog before Setup." name)
+
 type workflowSourcesArgs = {
     OpenDatabase: sourceDatabaseOpener
+    EvolutionModules: setupParameters -> evolutionSetupSources
     Evolution: string<databaseName> -> string<databaseName> -> evolutionSetupSources
 }
 
@@ -72,4 +95,20 @@ type workflowSourcesArgs = {
 type workflowSources = private { args: workflowSourcesArgs } with
     member this.OpenDatabase = this.args.OpenDatabase
     member this.Evolution = this.args.Evolution
+    member this.EvolutionModules = this.args.EvolutionModules
+    member this.LoadModuleOutput moduleName (parameters: setupParameters) outputType = async {
+        match RunModuleCatalog.resolve moduleName with
+        | Error error -> return Error error
+        | Ok source ->
+            try
+                let database = this.OpenDatabase source.ProjectName source.DatabaseName source.ExecutionQueryCatalogName
+                let row = runParameters.create parameters.ParamMap
+                match database.makeQueryParamsFromRunParams row outputType with
+                | None -> return Error (sprintf "Module '%s' catalog '%s' cannot query %A with the supplied setup parameters." moduleName source.ExecutionQueryCatalogName outputType)
+                | Some query ->
+                    let! loaded = database.loadAsync geneSortDataMode.Results query
+                    return loaded |> Result.mapError (fun error ->
+                        sprintf "Source module %s, catalog %s, query %O: %s. Generate the matching producer output, then rerun Setup." moduleName source.ExecutionQueryCatalogName query error)
+            with error -> return Error (sprintf "Cannot load output from module '%s': %s" moduleName error.Message)
+    }
     static member create (args: workflowSourcesArgs) : workflowSources = { args = args }

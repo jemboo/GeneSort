@@ -14,7 +14,7 @@
                     ToolTip="Choose which columns to show. Changes are saved immediately." />
             <Button Content="Reset layout" Click="ResetLayout_Click" Margin="0,0,0,8"
                     ToolTip="Show all columns and restore the default column order, widths and sorting for Setup parameters." />
-            <TextBlock Text="Green: complete | Amber: partial | Brown: not run / not recorded" VerticalAlignment="Center" Margin="12,0,0,8" Foreground="{DynamicResource MutedBrush}" />
+            <TextBlock Text="Pending: gray | Running: blue | Completed: green | Failed: red" VerticalAlignment="Center" Margin="12,0,0,8" Foreground="{DynamicResource MutedBrush}" />
         </WrapPanel>
         <ListView x:Name="ParameterItems" Grid.Row="2" ItemsSource="{Binding Items}"
                   AutomationProperties.Name="Shared SetupParameters" SelectionMode="Extended"
@@ -24,11 +24,12 @@
                   VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
-                    <Setter Property="Background" Value="#382C25" />
+                    <Setter Property="Background" Value="#292E36" />
                     <Setter Property="ToolTip" Value="Setup completion is saved after success. Older files may have no completion record." />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SetupStatus}" Value="Complete"><Setter Property="Background" Value="#193D33" /></DataTrigger>
-                        <DataTrigger Binding="{Binding SetupStatus}" Value="Partial"><Setter Property="Background" Value="#494019" /></DataTrigger>
+                        <DataTrigger Binding="{Binding SetupStatus}" Value="Completed"><Setter Property="Background" Value="#193D33" /></DataTrigger>
+                        <DataTrigger Binding="{Binding SetupStatus}" Value="Running"><Setter Property="Background" Value="#193750" /></DataTrigger>
+                        <DataTrigger Binding="{Binding SetupStatus}" Value="Failed"><Setter Property="Background" Value="#49282C" /></DataTrigger>
                         <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource HoverBrush}" /></Trigger>
                         <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource SelectionBrush}" /></Trigger>
                     </Style.Triggers>

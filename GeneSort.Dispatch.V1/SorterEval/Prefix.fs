@@ -19,6 +19,7 @@ open GeneSort.Dispatch.V1
 module Prefix =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = "SortableTests.Prefix.Channels32"
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
     let executionFunctionName = ExecuteFunctionNames.sorterEval
@@ -33,6 +34,7 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
+                    (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                     (ParamKeys.excludeSelfCeKey, ["true"])
                     (ParamKeys.collectSortableTestsKey, ["false"])
                     (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -77,6 +79,7 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
+                    (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                     (ParamKeys.excludeSelfCeKey, ["true"])
                     (ParamKeys.collectSortableTestsKey, ["false"])
                     (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -135,7 +138,7 @@ module Prefix =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", description, channelCount, executionQueryCatalogName, [|
             runExample("Channels24", Channels24)
             runExample("Channels32", Channels32)
         |])

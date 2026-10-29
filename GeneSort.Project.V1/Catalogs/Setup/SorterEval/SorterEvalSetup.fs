@@ -11,6 +11,7 @@ open GeneSort.Model.Sorting.V1
 open GeneSort.SortingOps
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Catalogs.Setup
+open GeneSort.Project.V1.Catalogs.Evolution
 open GeneSort.Project.V1.Catalogs.SorterModelSet
 open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.Runtime
@@ -33,8 +34,8 @@ module SorterEvalSetup =
                     SorterModelSetCatalogNames.uniform, SorterModelSetMakers.makeUniformSorterModelSet storage allowOverwrite |> checkedSetup
                 ]
                 MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests storage allowOverwrite |> checkedSetup
-                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite |> checkedSetup
-                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getModuleTests sources) storage allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getModuleTests sources) storage allowOverwrite |> checkedSetup
             }
         SetupCatalog.get (Run.requireSetupFunctionName configured) context
 

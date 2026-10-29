@@ -18,10 +18,9 @@ definition. Code-only leaves retain their original run names when selected;
 new leaves start with an unused NewRun name. Tiles distinguish **Code only · not
 saved**, **Code + saved on disk**, and **Saved on disk**. A saved counterpart
 replaces the code leaf in place, and selection loads the saved values. Browsing
-does not save files or execute runs. Use the editor's existing save, parameter
-generation, Setup, and Processing controls after selecting a leaf.
+does not save files or execute runs. Use **Validate** and **Generate RunParameters** after selecting a leaf; generation saves the definition along with its parameters. Then use Setup and Processing.
 
-**Choose run…** reopens the wizard and refreshes disk state. **Return to editor**
+**Back** reopens the wizard and refreshes disk state. **Return to editor**
 keeps existing edits; selecting another leaf asks before discarding them.
 **Change folder** starts folder selection again. **Refresh runs** reloads the
 current folder without changing the hierarchy location. Unreadable definitions
@@ -33,22 +32,25 @@ database name changes. Older files are associated by project/database identity
 when unambiguous; otherwise they appear under **Saved runs**. Discovery reads
 canonical definition folders only, avoiding large parameter and result trees.
 
+Project names contain the full namespace and module hierarchy after `GeneSort.Dispatch.V1` (for example, `SortableTests.Prefix.Channels32`). Database names use the immediately containing module (`Channels32` in this example). Existing saved files are not relocated.
+
 The starting definition supplies parameter fields, defaults, catalog selections,
 evolution makers and schedules. SortableTests runs have one Processing
 parameter sweep and no Setup section or action. Evaluation and mutation runs
 prepare their input files before execution. Evolution runs create a starting
 population; continuation runs import one from their source.
 
-For fresh SGD runs, the Parameters tab exposes **SortableTests database** and
-**SorterEval database (SorterSetEvals)**. These name the input databases under
-`SortableTests` and `SorterEval` in the chosen projects folder. The run's Database
-name still specifies its output destination. The Catalogs tab shows the explicit
-`Setup.FunctionName`; Standard and Soss setup no longer dispatch through the
-execution function name. Source selections survive save/reopen and participate
-in Setup file identities, so changing a source cannot reuse another source's inputs.
-Old SGD definitions without these settings must be recreated; no migration is performed.
-Continuations retain the original library names and import prepared checkpoint inputs
-from their selected source run instead of loading those libraries again.
+For Merge and Prefix SorterEval runs, Setup includes **SortableTestsModule**, the producing module name (for example, `SortableTests.Prefix.Channels32`). Defaults are declared as `sortableTestsModule` module values. The module supplies its project, database, and execution query catalog; setup parameters supply the query inputs, including replica. The module name participates in Setup query identities but not processing query properties. Standard evaluation generates its test inputs locally. Each run module declares one execution query catalog. Formerly mixed SGD modules are split into Standard, Soss, StandardAppend, and SossAppend children as applicable. Their project and database identities follow the new hierarchy; existing saved output files are not relocated.
+
+For fresh SGD runs, Setup exposes **SortableTestsModule** and **SorterEvalModule**.
+Each names a producing run module whose metadata supplies the project, database,
+and execution query catalog. Source defaults are module-level values in the preset
+code. Both names are carried in setup parameters and participate in dependent
+setup identities, but are excluded from processing query properties. Evaluation
+inputs are selected from saved producer definitions so their prepared-input references
+remain intact. Unknown modules and ambiguous matching evaluations fail explicitly.
+Continuations retain the module selections and import their saved source state.
+Saved definitions using the old source-database fields must be recreated with module names.
 
 The domain `run` DU distinguishes `DirectRun`, `PreparedRun`, `EvolutionRun`, and
 `ContinuationRun`. `RunParameterRoles.fs` defines the explicit policies for each
@@ -407,7 +409,7 @@ This rename intentionally changes stored names without legacy aliases or migrati
 
 Open a code-defined or saved run and choose **Clone**. The definition is copied into an unsaved draft named `<source>_clone`; the name remains editable. The clone stays in the source module and project/database. Saving records that module association so the clone appears beside its source in the wizard.
 
-Only the run name and values of parameters declared in the source's Setup and Execution spans are editable. Phase membership remains fixed, and inherited/continuation-source restrictions still apply. Project/database identity, description, source databases, overwrite policy, schedules, functions, catalogs, and makers belong to the module. They remain read-only when opening module runs and clones. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
+Only the run name and values of parameters declared in the source's Setup and Execution spans are editable. Phase membership remains fixed, and inherited/continuation-source restrictions still apply. Project/database identity, description, source modules, overwrite policy, schedules, functions, catalogs, and makers belong to the module. They remain read-only when opening module runs and clones. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
 
 Cloning copies no generated rows, statuses, checkpoints, snapshots, or results. Saving a clone does not save or overwrite its source. An existing destination cannot be replaced from the editor; choose a different name for the clone.
 
@@ -439,3 +441,16 @@ are also fixed module policies. SimpleR's `AMax` and SimpleS's `ActivationProbab
 are explicit Setup run parameters, editable in clones. Their module defaults are 3
 and 0.5 respectively; existing sweeps are preserved. Missing activation settings
 are validation errors rather than requests for enhancer defaults.
+
+### Live phase status
+
+The parameter table displays `RunStatus` and `SetupStatus` instead of the legacy
+boolean completion fields. Pending rows have not completed, Running rows are
+active, and Completed rows have finished. Failures retain their error display;
+cancelled attempts return to Pending and can resume. Shared setup rows update
+live and show Completed only when every linked row has completed setup.
+
+An activity bar stays visible during Setup and Processing with an animated
+indicator and an enabled Cancel button. After cancellation is requested the
+button disables while active work reaches a safe stopping point. Saved completion
+flags remain compatible with existing files; Running is transient UI state.

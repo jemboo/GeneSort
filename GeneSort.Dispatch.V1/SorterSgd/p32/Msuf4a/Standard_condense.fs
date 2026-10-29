@@ -55,6 +55,6 @@ module Pool_32_condense =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", description, channelCount, executionQueryCatalogName, [|
             runExample("Test", Test)
         |])

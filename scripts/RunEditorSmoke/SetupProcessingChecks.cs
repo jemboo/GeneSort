@@ -25,21 +25,11 @@ internal static partial class Program
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterSgd.p32.Msuf4a.SimpleS.Soss"));
         model.SelectExample(model.Examples.Single(example => example.Name == "SossS"));
         model.ProjectsFolder = root;
+        model.Clone();
         SelectEditorTab(view, "Save intervals");
-        var originalSnapshotSchedule = model.SaveIntervals;
-        var originalCheckpointSchedule = model.CheckpointIntervals;
         var checkpoints = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Checkpoint schedule");
         var snapshots = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Snapshot schedule");
-        checkpoints.SelectedValue = GenIntervalNames.uniformInterval1;
-        snapshots.SelectedValue = GenIntervalNames.uniformInterval10;
-        Pump();
-        Check(model.CheckpointIntervals == GenIntervalNames.uniformInterval1 && model.SaveIntervals == GenIntervalNames.uniformInterval10,
-            "Checkpoint and snapshot controls did not bind independently.");
-        var scheduled = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
-        Check(scheduled.CheckpointIntervalsName?.Value == GenIntervalNames.uniformInterval1 && scheduled.GenSaveIntervalsName?.Value == GenIntervalNames.uniformInterval10,
-            "The configured run lost its independent schedules.");
-        model.SaveIntervals = originalSnapshotSchedule;
-        model.CheckpointIntervals = originalCheckpointSchedule;
+        Check(!checkpoints.IsEnabled && !snapshots.IsEnabled, "Module-owned schedules should remain read-only.");
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         var savedRows = RunParameterGeneration.generate(configured, 0, 2);
         var runs = new RunParameterListViewModel();
@@ -68,6 +58,14 @@ internal static partial class Program
         liveRow.ShowGeneration(null);
         Check(liveRow.Cells[generationColumn] == savedCell, "Live generation did not reset to saved state.");
         Check(!model.CanCancelPhase, "Cancel is enabled without an active phase.");
+        Check(!runs.Keys.Contains("RunFinished") && !runs.Keys.Contains("SetupCompleted")
+            && runs.Keys.Contains("RunStatus") && runs.Keys.Contains("SetupStatus"), "Legacy boolean status columns remain visible.");
+        var shared = setups.Items.Cast<SetupParameterItem>().First(item => item.Runs.Contains(liveRow));
+        liveRow.ShowSetupStatus(runRowStatus.Running);
+        Check(shared.SetupStatus == "Running" && shared.Cells[Array.IndexOf(setups.Keys, "SetupStatus")] == "Running"
+            && liveRow.Cells[Array.IndexOf(runs.Keys, "SetupStatus")] == "Running", "Setup status did not update both tables live.");
+        liveRow.ShowSetupStatus(runRowStatus.Cancelled);
+        Check(shared.SetupStatus == "Pending", "Cancelled setup was not reset to Pending.");
         setups.Select([setups.Items.Cast<SetupParameterItem>().First()]);
         var selected = setups.SelectedRuns.ToHashSet();
         setups.Sort(ParamKeys.replKey);
@@ -75,14 +73,14 @@ internal static partial class Program
         Check(selected.SetEquals(setups.SelectedRuns), "Sorting changed the selected linked runs.");
 
         // Exercise real Setup and Execution with a tiny generated evaluation library.
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard.Channels16"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard.Channels4"));
+        model.Clone();
         void Set(string key, string value)
         {
             var row = model.SetupParameters.Single(row => row.Key == key);
             while (row.Values.Count > 1) row.Values.RemoveAt(row.Values.Count - 1);
             row.Values[0].Text = value;
         }
-        Set(ParamKeys.channelCountKey, "4");
         Set(ParamKeys.sorterCountKey, "2");
         Set(ParamKeys.simpleSorterModelTypeKey, "Msce");
         var evalType = model.ExecutionParameters.Single(row => row.Key == ParamKeys.sorterEvalTypeKey);
@@ -94,7 +92,7 @@ internal static partial class Program
         var prepared = preparedTask.Result ?? throw new Exception(string.Join("; ", model.Issues));
         Wait(model.GenerateParametersAsync(prepared, false));
         Check(model.RunParameterList.Count == 2 && model.SetupParameterList.Count == 1, "Evaluation overrides did not share their setup.");
-        Check(model.SetupParameterList.Items.Cast<SetupParameterItem>().Single().SetupStatus == "Not run", "New setup was not marked Not run.");
+        Check(model.SetupParameterList.Items.Cast<SetupParameterItem>().Single().SetupStatus == "Pending", "New setup was not marked Not run.");
         var originalRows = model.RunParameterList.Items.Cast<RunParameterItem>().ToArray();
         var ids = originalRows.Select(row => row.Parameters.GetId()).ToArray();
         SelectEditorTab(view, "Setup parameters");
@@ -132,6 +130,9 @@ internal static partial class Program
         var cancelledSetup = model.RunSetupAsync();
         Layout(view);
         Check(Button(view, "Cancel").IsEnabled && model.IsPhaseRunning, "Cancel is disabled while the editor is busy.");
+        Check(Descendants<ProgressBar>(view).Any(bar => AutomationProperties.GetName(bar) == "Active phase activity" && bar.IsIndeterminate && bar.Visibility == Visibility.Visible
+                && bar.Parent is StackPanel { Parent: DockPanel { Parent: Border { Visibility: Visibility.Visible } } }),
+            "The active phase has no visible animated activity indicator.");
         Click(Button(view, "Cancel"));
         Check(!model.CanCancelPhase, "Cancel remained enabled after the request.");
         Wait(cancelledSetup); Layout(view);
@@ -140,21 +141,21 @@ internal static partial class Program
         Click(Button(view, "Run Setup")); WaitUntil(() => !model.IsBusy); Layout(view);
         Check(model.PhaseSummary == "Setup finished: 2 succeeded, 0 failed, 0 skipped." && model.SetupParameterList.SelectedCount == 0,
             "Setup failed to prepare both linked runs: " + model.ErrorMessages);
-        Check(model.SetupParameterList.Items.Cast<SetupParameterItem>().Single().SetupStatus == "Complete", "Setup completion was not displayed.");
+        Check(model.SetupParameterList.Items.Cast<SetupParameterItem>().Single().SetupStatus == "Completed", "Setup completion was not displayed.");
         Check(originalRows.SequenceEqual(model.RunParameterList.Items.Cast<RunParameterItem>())
             && ids.SequenceEqual(originalRows.Select(row => row.Parameters.GetId())), "Setup replaced live run items or changed their IDs.");
         SelectEditorTab(view, "Processing parameters");
         Check(!Descendants<Button>(view).Any(button => Equals(button.Content, "Run Setup")), "Setup is offered on the Run tab.");
         var runList = Descendants<ListView>(view).Single(control => AutomationProperties.GetName(control) == "Saved RunParameters");
-        Check(model.RunParameterList.Keys.Contains("Status"), "Processing status column is missing.");
-        Check(originalRows.All(row => row.Status == "Waiting"), "Setup changed Processing statuses.");
+        Check(model.RunParameterList.Keys.Contains("RunStatus"), "Processing status column is missing.");
+        Check(originalRows.All(row => row.Status == "Pending"), "Setup changed Processing statuses.");
         var statusRow = (RunParameterItem)runList.Items[0];
         var stripeColors = new HashSet<string>();
         foreach (var status in Enum.GetValues<runRowStatus>())
         {
             statusRow.ShowStatus(status); Layout(view);
             var container = (ListViewItem)runList.ItemContainerGenerator.ContainerFromItem(statusRow);
-            Check(statusRow.Cells[Array.IndexOf(model.RunParameterList.Keys, "Status")] == (status == runRowStatus.Cancelled ? "Waiting" : status.ToString()), "Status cell did not update.");
+            Check(statusRow.Cells[Array.IndexOf(model.RunParameterList.Keys, "RunStatus")] == (status is runRowStatus.Cancelled or runRowStatus.Waiting ? "Pending" : status.ToString()), "Status cell did not update.");
             stripeColors.Add(container.BorderBrush.ToString());
         }
         Check(stripeColors.Count == 4, "Processing states do not have distinct row colors.");
@@ -163,7 +164,7 @@ internal static partial class Program
         Check(model.CanRunExecution && !model.CanRunSetup, "Run selection changed Setup selection.");
         Click(Button(view, "Run Processing")); WaitUntil(() => !model.IsBusy); Layout(view);
         Check(model.PhaseSummary == "Processing finished: 1 succeeded, 0 failed, 0 skipped.", "Execution failed after shared Setup: " + model.ErrorMessages);
-        Check(statusRow.Status == "Completed" && originalRows.Count(row => row.Status == "Waiting") == 1,
+        Check(statusRow.Status == "Completed" && originalRows.Count(row => row.Status == "Pending") == 1,
             "Processing completion updated the wrong row status.");
         var savedTask = RunParameterFiles.loadAllAsync(root, model.Build().ResultValue); Wait(savedTask);
         Check(savedTask.Result.All(row => row.GetSetupCompleted()?.Value == true), "Setup completion was not persisted.");
@@ -190,9 +191,9 @@ internal static partial class Program
         var cancelledRetry = model.RunExecutionAsync();
         model.CancelPhase();
         Wait(cancelledRetry);
-        Check(retryRow.Status == "Waiting", "Cancelled retry retained a cancelled or failed status.");
+        Check(retryRow.Status == "Pending", "Cancelled retry retained a cancelled or failed status.");
         Wait(model.LoadRunParametersAsync());
-        Check(model.RunParameterList.Items.Cast<RunParameterItem>().Single(row => row.Parameters.GetId()!.Value == pendingId).Status == "Waiting",
+        Check(model.RunParameterList.Items.Cast<RunParameterItem>().Single(row => row.Parameters.GetId()!.Value == pendingId).Status == "Pending",
             "Cancelled retry preserved its old failure on disk.");
 
         SelectEditorTab(view, "Setup parameters");

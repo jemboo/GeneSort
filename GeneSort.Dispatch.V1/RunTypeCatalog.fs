@@ -58,7 +58,8 @@ module RunTypeCatalog =
             SorterSgd.p32.Msuf4a.SimpleR.Standard.runType
             SorterSgd.p32.Msuf4a.SimpleS.Soss.runType
             SorterSgd.p32.Msuf4a.SimpleS.Standard.runType
-            SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.runType
+            SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.Soss.runType
+            SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.SossAppend.runType
             SorterSgd.p32.Msuf4a.Soss.Pool_32.runType
             SorterSgd.p32.Msuf4a.Soss.Pool_512.runType
             SorterSgd.p32.Msuf4a.Standard_append.Pool_128.runType
@@ -67,12 +68,23 @@ module RunTypeCatalog =
             SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense.runType
             SorterSgd.p32.Msuf4a.Standard.Pool_32.runType
             SorterSgd.p32.Msuf4a.Standard.Pool_512.runType
-            SorterSgd.p32.Test.OnePool.Continuation.runType
-            SorterSgd.p32.Test.OnePool.Controlled.runType
-            SorterSgd.p32.Test.OnePool.MixedFamilyChain.runType
-            SorterSgd.p32.Test.OnePool.runType
-            SorterSgd.p32.Test.OnePool.SameFamilyChain.runType
-            SorterSgd.p32.Test.OnePool.SimpleR.runType
-            SorterSgd.p32.Test.OnePool.SimpleS.runType
+            SorterSgd.p32.Test.OnePool.Continuation.StandardAppend.runType
+            SorterSgd.p32.Test.OnePool.Continuation.SossAppend.runType
+            SorterSgd.p32.Test.OnePool.Controlled.Standard.runType
+            SorterSgd.p32.Test.OnePool.Controlled.Soss.runType
+            SorterSgd.p32.Test.OnePool.MixedFamilyChain.SossAppend.runType
+            SorterSgd.p32.Test.OnePool.MixedFamilyChain.StandardAppend.runType
+            SorterSgd.p32.Test.OnePool.Standard.runType
+            SorterSgd.p32.Test.OnePool.Soss.runType
+            SorterSgd.p32.Test.OnePool.SameFamilyChain.StandardAppend.runType
+            SorterSgd.p32.Test.OnePool.SameFamilyChain.SossAppend.runType
+            SorterSgd.p32.Test.OnePool.SimpleR.Standard.runType
+            SorterSgd.p32.Test.OnePool.SimpleR.Soss.runType
+            SorterSgd.p32.Test.OnePool.SimpleR.StandardAppend.runType
+            SorterSgd.p32.Test.OnePool.SimpleR.SossAppend.runType
+            SorterSgd.p32.Test.OnePool.SimpleS.Standard.runType
+            SorterSgd.p32.Test.OnePool.SimpleS.Soss.runType
+            SorterSgd.p32.Test.OnePool.SimpleS.StandardAppend.runType
+            SorterSgd.p32.Test.OnePool.SimpleS.SossAppend.runType
         |]
 

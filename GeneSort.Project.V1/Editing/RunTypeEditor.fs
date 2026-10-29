@@ -34,8 +34,8 @@ module RunTypeEditor =
     let fromRun (configured: run) =
         runDraft.create {
             ProjectName = %configured.ProjectName; DatabaseName = %configured.DatabaseName; RunName = %configured.RunName
-            SortableTestsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsDatabaseName) |> Option.defaultValue ""
-            SorterSetEvalsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SorterSetEvalsDatabaseName) |> Option.defaultValue ""
+            SortableTestsModule = configured.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsModule) |> Option.defaultValue ""
+            SorterEvalModule = configured.SgdSetup |> Option.map (fun setup -> string setup.SorterEvalModule) |> Option.defaultValue ""
             Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
             CheckpointIntervalsName = configured.CheckpointIntervalsName |> Option.orElse configured.GenSaveIntervalsName |> Option.defaultValue ""
             GenSaveIntervalsName = configured.GenSaveIntervalsName |> Option.defaultValue ""
@@ -289,8 +289,10 @@ module RunTypeEditor =
         issues.AddRange(ParameterValidation.poolSizes "Setup" setup)
         issues.AddRange(ParameterValidation.poolSizes "Execution" effective)
         if isEvolution template then
-            for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
-                issues.AddRange(RunIdentity.validate field value)
+            for key, value in [ParamKeys.sortableTestsModuleKey, draft.SortableTestsModule; ParamKeys.sorterEvalModuleKey, draft.SorterEvalModule] do
+                match ParameterValidation.validateValue key value with
+                | Ok _ -> ()
+                | Error error -> issues.Add(validationIssue.create ("Setup." + key) error)
             if not (String.IsNullOrWhiteSpace draft.CheckpointIntervalsName) && not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey draft.CheckpointIntervalsName) then
                 add "CheckpointIntervalsName" "Choose a registered generation interval."
             for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
@@ -304,8 +306,8 @@ module RunTypeEditor =
                     | None -> ()
             | _ -> ()
         if template.ParameterSource.IsSome then
-            if draft.SortableTestsDatabaseName <> string template.SgdSetup.Value.SortableTestsDatabaseName
-               || draft.SorterSetEvalsDatabaseName <> string template.SgdSetup.Value.SorterSetEvalsDatabaseName then
+            if draft.SortableTestsModule <> string template.SgdSetup.Value.SortableTestsModule
+               || draft.SorterEvalModule <> string template.SgdSetup.Value.SorterEvalModule then
                 add "Setup" "A continuation imports its prepared inputs from the selected source run; its original library databases must be preserved."
             // The source is a complete saved configuration, not just three editable path strings.
             for key in [ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey; ParamKeys.sourceGenerationIntervalKey] do
@@ -348,8 +350,8 @@ module RunTypeEditor =
                         ProjectName = UMX.tag draft.ProjectName; DatabaseName = UMX.tag draft.DatabaseName; RunName = UMX.tag draft.RunName
                         Description = draft.Description; AllowOverwrite = draft.AllowOverwrite; Execution = execution
                         Setup = { FunctionName = template.SgdSetup.Value.FunctionName
-                                  SortableTestsDatabaseName = UMX.tag draft.SortableTestsDatabaseName
-                                  SorterSetEvalsDatabaseName = UMX.tag draft.SorterSetEvalsDatabaseName
+                                  SortableTestsModule = UMX.tag draft.SortableTestsModule
+                                  SorterEvalModule = UMX.tag draft.SorterEvalModule
                                   QueryCatalogName = template.SetupQueryCatalogName; EnhancerFunctionName = template.SetupEnhancerFunctionName
                                   ParameterSpans = spans draft.SetupParameters }
                     } { MakerNames = template.MakerNames.Value; GenSaveIntervalsName = draft.GenSaveIntervalsName
@@ -377,8 +379,8 @@ module RunTypeEditor =
         if edited.DatabaseName <> original.DatabaseName then add "DatabaseName"
         if edited.Description <> original.Description then add "Description"
         if edited.AllowOverwrite <> original.AllowOverwrite then add "AllowOverwrite"
-        if edited.SortableTestsDatabaseName <> original.SortableTestsDatabaseName then add "SortableTestsDatabaseName"
-        if edited.SorterSetEvalsDatabaseName <> original.SorterSetEvalsDatabaseName then add "SorterSetEvalsDatabaseName"
+        if edited.SortableTestsModule <> original.SortableTestsModule then add "SortableTestsModule"
+        if edited.SorterEvalModule <> original.SorterEvalModule then add "SorterEvalModule"
         if edited.CheckpointIntervalsName <> original.CheckpointIntervalsName then add "CheckpointIntervalsName"
         if edited.GenSaveIntervalsName <> original.GenSaveIntervalsName then add "GenSaveIntervalsName"
         if edited.GenSaveSubIntervalsName <> original.GenSaveSubIntervalsName then add "GenSaveSubIntervalsName"

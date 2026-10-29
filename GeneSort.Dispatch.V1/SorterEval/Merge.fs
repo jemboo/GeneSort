@@ -26,9 +26,10 @@ module Merge =
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
 
 
-    let private makeSmall (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeSmall (channelCount: int<channelCount>) (sortableTestsModule: string) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpansSetup =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -71,9 +72,10 @@ module Merge =
             }
         )
 
-    let private makeTest (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeTest (channelCount: int<channelCount>) (sortableTestsModule: string) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpansSetup =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -118,9 +120,10 @@ module Merge =
             }
         )
 
-    let private makeMediumLd (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeMediumLd (channelCount: int<channelCount>) (sortableTestsModule: string) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpansSetup =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -163,9 +166,10 @@ module Merge =
             }
         )
 
-    let private makeMediumHd (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeMediumHd (channelCount: int<channelCount>) (sortableTestsModule: string) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpansSetup =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -205,9 +209,10 @@ module Merge =
             }
         )
 
-    let private makeLargeLd (channelCount: int<channelCount>) (names: runNames) : run =
+    let private makeLargeLd (channelCount: int<channelCount>) (sortableTestsModule: string) (executionQueryCatalogName: string) (names: runNames) : run =
         let parameterSpansSetup =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -250,12 +255,15 @@ module Merge =
 
     module Channels16 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 16<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels16"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_16 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -270,18 +278,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels16", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels16", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_16", Small_16)
             |])
 
     module Channels18 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 18<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels18"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_18 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -296,18 +307,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels18", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels18", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_18", Small_18)
             |])
 
     module Channels24 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 24<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels24"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_24 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -322,22 +336,25 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels24", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels24", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_24", Small_24)
             |])
 
     module Channels32 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 32<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels32"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Test () : run =
-            makeTest channelCount (RunNaming.create())
+            makeTest channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_32 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -354,19 +371,22 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels32", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels32", description, channelCount, executionQueryCatalogName, [|
                 runExample("Test", Test)
                 runExample("Small_32", Small_32)
             |])
 
     module Channels36 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 36<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels36"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_36 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -381,18 +401,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels36", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels36", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_36", Small_36)
             |])
 
     module Channels48 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 48<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels48"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_48 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -407,18 +430,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels48", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels48", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_48", Small_48)
             |])
 
     module Channels64 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 64<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels64"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let Small_64 () : run =
-            makeSmall channelCount (RunNaming.create())
+            makeSmall channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -433,22 +459,25 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels64", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels64", description, channelCount, executionQueryCatalogName, [|
                 runExample("Small_64", Small_64)
             |])
 
     module Channels96 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 96<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels96"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let MediumLd_96 () : run =
-            makeMediumLd channelCount (RunNaming.create())
+            makeMediumLd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let MediumHd () : run =
-            makeMediumHd channelCount (RunNaming.create())
+            makeMediumHd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -465,19 +494,22 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels96", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels96", description, channelCount, executionQueryCatalogName, [|
                 runExample("MediumLd_96", MediumLd_96)
                 runExample("MediumHd", MediumHd)
             |])
 
     module Channels128 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 128<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels128"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let MediumLd_128 () : run =
-            makeMediumLd channelCount (RunNaming.create())
+            makeMediumLd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -492,18 +524,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels128", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels128", description, channelCount, executionQueryCatalogName, [|
                 runExample("MediumLd_128", MediumLd_128)
             |])
 
     module Channels192 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 192<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels192"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let LargeLd_192 () : run =
-            makeLargeLd channelCount (RunNaming.create())
+            makeLargeLd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -518,18 +553,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels192", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels192", description, channelCount, executionQueryCatalogName, [|
                 runExample("LargeLd_192", LargeLd_192)
             |])
 
     module Channels256 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 256<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels256"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let LargeLd_256 () : run =
-            makeLargeLd channelCount (RunNaming.create())
+            makeLargeLd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -544,18 +582,21 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels256", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels256", description, channelCount, executionQueryCatalogName, [|
                 runExample("LargeLd_256", LargeLd_256)
             |])
 
     module Channels512 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 512<channelCount>
+        let sortableTestsModule = "SortableTests.Merge.Channels512"
 
 
         [<MethodImpl(MethodImplOptions.NoInlining)>]
         let LargeLd_512 () : run =
-            makeLargeLd channelCount (RunNaming.create())
+            makeLargeLd channelCount sortableTestsModule executionQueryCatalogName (RunNaming.create())
 
         [<RequireQualifiedAccess>]
         type configType =
@@ -570,6 +611,6 @@ module Merge =
         let description = "Evaluate sorting networks against merge test inputs."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels512", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SorterEval.Merge.Channels512", description, channelCount, executionQueryCatalogName, [|
                 runExample("LargeLd_512", LargeLd_512)
             |])

@@ -23,6 +23,9 @@ module Merge =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
 
+    let sortableTestsModule = sprintf "SortableTests.Merge.Channels%d" (int channelCount)
+    let sorterEvalModule = sprintf "SorterEval.Merge.Channels%d" (int channelCount)
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
@@ -35,6 +38,8 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -86,6 +91,8 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -137,6 +144,8 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -188,6 +197,8 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -258,7 +269,7 @@ module Merge =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", description, channelCount, executionQueryCatalogName, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

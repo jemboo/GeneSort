@@ -21,12 +21,16 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-        <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" Padding="16,10"
+        <Border Grid.Row="1" Background="#193750" BorderBrush="#62B7F3" BorderThickness="0,2,0,0" Padding="16,10"
                 Visibility="{Binding IsPhaseRunning, Converter={StaticResource VisibleIfTrue}}">
             <DockPanel>
-                <Button Content="Cancel" Click="CancelPhase_Click" IsEnabled="{Binding CanCancelPhase}" DockPanel.Dock="Left"
+                <Button Content="Cancel" FontWeight="Bold" MinWidth="100" Padding="12,8" AutomationProperties.Name="Cancel active phase" Click="CancelPhase_Click" IsEnabled="{Binding CanCancelPhase}" DockPanel.Dock="Left"
                         ToolTip="Stop queued rows and request active work to stop at its next safe point." />
-                <TextBlock Text="{Binding PhaseSummary}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <StackPanel>
+                    <TextBlock Text="{Binding PhaseActivity}" FontWeight="Bold" FontSize="16" AutomationProperties.Name="Active phase status" />
+                    <ProgressBar IsIndeterminate="True" Height="6" Margin="0,6,0,6" AutomationProperties.Name="Active phase activity" />
+                    <TextBlock Text="{Binding PhaseSummary}" TextWrapping="Wrap" />
+                </StackPanel>
             </DockPanel>
         </Border>
     <local:RunSelectionView x:Name="RunSelection" DataContext="{Binding Selection}"
@@ -43,11 +47,6 @@
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Content="Back" Click="ChooseRun_Click" ToolTip="Back to this run module. Your editor changes are kept." />
                 <Button Content="Clone" Click="Clone_Click" IsEnabled="{Binding CanClone}" ToolTip="Clone the opened definition in the same module. Parameter files and results are not copied." />
-                <Button Content="New" Click="New_Click" />
-                <Button Content="Open…" Click="Open_Click" />
-                <Button Content="Validate" Click="Validate_Click" />
-                <Button Content="Save" Click="Save_Click" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanSave}"
-                        ToolTip="{Binding SaveHint}" ToolTipService.ShowOnDisabled="True" />
             </StackPanel>
             <StackPanel>
                 <TextBlock Text="Run editor" FontSize="20" FontWeight="SemiBold" />
@@ -67,10 +66,6 @@
                             <Setter Property="Padding" Value="6,3" />
                         </Style>
                     </StackPanel.Resources>
-                <TextBlock Text="{Binding WorkflowName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
-                           ToolTip="{Binding WorkflowDescription}" Margin="0,0,0,6" />
-                <TextBlock Text="{Binding ModuleChannelCountLabel}" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Module channel count" />
-                <TextBlock Text="{Binding WorkflowDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,6" />
                 <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}">
                     <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
                         <DataTrigger Binding="{Binding SourceDescription}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
@@ -124,11 +119,11 @@
                     <TabItem Header="Parameters">
                         <StackPanel Margin="12" IsEnabled="{Binding CanEditDefinition}">
                             <StackPanel Visibility="{Binding HasSgdSourceSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
-                                <TextBlock Text="Setup source databases" FontWeight="SemiBold" />
-                                <TextBlock Text="SortableTests database" />
-                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SortableTestsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SortableTests source database" />
-                                <TextBlock Text="SorterEval database (SorterSetEvals)" Margin="0,6,0,0" />
-                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SorterSetEvalsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterSetEvals source database" />
+                                <TextBlock Text="Setup source modules" FontWeight="SemiBold" />
+                                <TextBlock Text="SortableTests module" />
+                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SortableTestsModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SortableTests source module" />
+                                <TextBlock Text="SorterEval module" Margin="0,6,0,0" />
+                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SorterEvalModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterEval source module" />
                             </StackPanel>
                             <TextBlock Text="{Binding DefinitionEditHelp}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8" Visibility="{Binding ModulePropertiesLocked, Converter={StaticResource VisibleIfTrue}}" />
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
@@ -189,8 +184,11 @@
                             </Border>
                             <TextBlock Text="Generating publishes the complete parameter set for this run. Replacing existing files requires confirmation."
                                        Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,10,0,12" />
-                            <Button Content="Generate RunParameters" Click="Generate_Click" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanGenerateParameters}"
-                                    HorizontalAlignment="Left" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Validate" Click="Validate_Click" />
+                                <Button Content="Generate RunParameters" Click="Generate_Click" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanGenerateParameters}"
+                                        HorizontalAlignment="Left" FontWeight="SemiBold" />
+                            </StackPanel>
                         </StackPanel>
                     </TabItem>
                     <TabItem x:Name="SetupParametersTab" Header="Setup parameters" Visibility="{Binding HasSetup, Converter={StaticResource VisibleIfTrue}}">

@@ -32,8 +32,9 @@ let ``Merge presets generate one correctly linked execution per setup combinatio
         configured.SetupParameterSpans
         |> List.fold (fun count (_, values) -> count * values.Length) 1
 
-    Assert.Equal("SorterEval", %configured.ProjectName)
-    Assert.Equal("Merge", %configured.DatabaseName)
+    let moduleName = match name with "Test" -> "Channels32" | "Small_18" -> "Channels18" | "LargeLd_192" -> "Channels192" | _ -> "Channels96"
+    Assert.Equal("SorterEval.Merge." + moduleName, %configured.ProjectName)
+    Assert.Equal(moduleName, %configured.DatabaseName)
     Assert.Equal(name, %configured.RunName)
     Assert.NotEmpty(setups)
     Assert.Equal(2 * expectedPerReplica, setups.Length)

@@ -22,6 +22,8 @@ module Standard =
 
     let channelCount = 16<GeneSort.Sorting.channelCount>
 
+    let sorterEvalModule = sprintf "SorterEval.Standard.Channels%d" (int channelCount)
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
@@ -34,6 +36,7 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
@@ -86,6 +89,7 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
@@ -152,7 +156,7 @@ module Standard =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", description, channelCount, executionQueryCatalogName, [|
             runExample("Msrs", Msrs)
             runExample("Msuf4", Msuf4)
         |])

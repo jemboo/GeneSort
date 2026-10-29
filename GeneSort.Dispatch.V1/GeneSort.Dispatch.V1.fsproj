@@ -28,14 +28,10 @@
     <Compile Include="SorterEval\Merge.fs" />
     <Compile Include="SorterEval\Prefix.fs" />
     <Compile Include="SorterEval\SorterEvalDbs.fs" />
-    <Compile Include="WorkflowSources.fs" />
     <Compile Include="SorterMutate\Standard.fs" />
     <Compile Include="SorterMutate\Merge.fs" />
     <Compile Include="SorterMutate\Prefix.fs" />
     <Compile Include="SorterMutate\SorterMutateDbs.fs" />
-    <Compile Include="RunHostSetupExecutor.fs" />
-    <Compile Include="ProjectOps.fs" />
-    <Compile Include="ReportOps.fs" />
     <Compile Include="SorterSgd\p32\Test.fs" />
     <Compile Include="SorterSgd\p32\Msuf4a\Standard.fs" />
     <Compile Include="SorterSgd\p32\Msuf4a\SimpleR.fs" />
@@ -57,6 +53,10 @@
     <Compile Include="SorterSgd\p24\Mssi3b\OrthoPara.fs" />
     <Compile Include="DispatchLib.fs" />
     <Compile Include="RunTypeCatalog.fs" />
+    <Compile Include="WorkflowSources.fs" />
+    <Compile Include="RunHostSetupExecutor.fs" />
+    <Compile Include="ProjectOps.fs" />
+    <Compile Include="ReportOps.fs" />
     <Compile Include="DispatchSortableTests.fs" />
     <Compile Include="DispatchSorterEval.fs" />
     <Compile Include="DispatchSorterMutate.fs" />

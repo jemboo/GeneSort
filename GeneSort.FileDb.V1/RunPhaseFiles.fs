@@ -153,11 +153,15 @@ module internal RunPhaseFiles =
                                              (message = "Operation cancelled" || message = "runEvolutionAsync execution was cancelled.") ->
                             do! recover ()
                         | _ ->
-                            do! persist (result |> Result.defaultWith invalidOp)
+                            let ready = result |> Result.defaultWith invalidOp
+                            do! persist ready
+                            let status =
+                                if phase.Name = "Execution" && (RunPhaseOutput.toParameters ready).GetRunFinished() <> Some true
+                                then runRowStatus.Waiting else runRowStatus.Completed
                             lock sync (fun () ->
                                 succeeded <- succeeded + 1
                                 completed <- completed + 1
-                                reportRow (Some index) None (Some runRowStatus.Completed) (sprintf "%s: %s complete." label phase.Name))
+                                reportRow (Some index) None (Some status) (sprintf "%s: %s attempt complete." label phase.Name))
                     with error ->
                         let message = label + ": " + error.GetBaseException().Message
                         lock sync (fun () ->

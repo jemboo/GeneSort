@@ -30,14 +30,14 @@ let private rejects fragment action =
 [<Fact>]
 let ``Controlled seeds pair model arrays and masks across replicas and workflows`` () =
     let configs = [|
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.StandardSimple()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.StandardR()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.CompareStandardS()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.SossSimple()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.SossR()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.CompareSossS()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.MatchedStandardS()
-        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.MatchedSossS()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Standard.StandardSimple()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Standard.StandardR()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Standard.CompareStandardS()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Soss.SossSimple()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Soss.SossR()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Soss.CompareSossS()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Standard.MatchedStandardS()
+        GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Soss.MatchedSossS()
     |]
     let make (rp: runParameters) =
         SeedSorterModelGeneration.makeControlledModelSet rp |> Result.defaultWith failwith |> fun models -> models.SorterModels

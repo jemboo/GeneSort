@@ -26,8 +26,7 @@ module SetupExecutorCatalog =
             | None ->
                 let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Standard setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
-                let setup = configured.SgdSetup.Value
-                let libraries = sources.Evolution setup.SortableTestsDatabaseName setup.SorterSetEvalsDatabaseName
+                let libraries = sources.EvolutionModules (setupParameters.create rp.ParamMap)
                 let makeTests = SortableTestsMakerCatalog.get names.SortableTests libraries
                 let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet libraries
                 let! start = EvoStartCreation.createStandardStart configured.ProjectName configured.DatabaseName makeTests makeSeed storage.RunDb rp cts.Token
@@ -50,8 +49,7 @@ module SetupExecutorCatalog =
             | None ->
                 let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Soss setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
-                let setup = configured.SgdSetup.Value
-                let libraries = sources.Evolution setup.SortableTestsDatabaseName setup.SorterSetEvalsDatabaseName
+                let libraries = sources.EvolutionModules (setupParameters.create rp.ParamMap)
                 let makeTests = SortableTestsMakerCatalog.get names.SortableTests libraries
                 let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet libraries
                 let! start = EvoStartCreation.createSossStart configured.ProjectName configured.DatabaseName makeTests makeSeed storage.RunDb rp cts.Token

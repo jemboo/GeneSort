@@ -5,6 +5,7 @@ open FSharp.UMX
 open GeneSort.Core
 
 
+[<Measure>] type runModuleName
 [<Measure>] type databaseName
 [<Measure>] type codeModKey
 [<Measure>] type projectName

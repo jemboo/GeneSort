@@ -36,6 +36,8 @@ let private sorterEvalMeasures =
 module VarModR_32 =
 
     let channelCount = 24<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -98,8 +100,8 @@ module VarModR_32 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -152,8 +154,8 @@ module VarModR_32 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -168,7 +170,7 @@ module VarModR_32 =
     let description = "Compare mutation-rate settings for 24-input Msuf63b evolution (VarModR_32)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", description, channelCount, executionQueryCatalogName, [|
             runExample("Test", Test)
             runExample("WideTest", WideTest)
         |])

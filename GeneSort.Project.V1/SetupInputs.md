@@ -45,8 +45,8 @@ that value. It contains no recipes, aliases, execution progress, or source looku
 SGD configurations use the standalone `sgdSetupConfig` record:
 
 - `FunctionName` selects `setup.sgd-standard` or `setup.sgd-soss` directly.
-- `SortableTestsDatabaseName` selects the input database under `SortableTests`.
-- `SorterSetEvalsDatabaseName` selects the seed evaluation database under `SorterEval`.
+- `SortableTestsModule` selects the input database under `SortableTests`.
+- `SorterEvalModule` selects the seed evaluation database under `SorterEval`.
 - `ParameterSpans`, `QueryCatalogName`, and `EnhancerFunctionName` describe the setup inputs.
 
 The run-level `DatabaseName` remains the destination for prepared inputs and Results.

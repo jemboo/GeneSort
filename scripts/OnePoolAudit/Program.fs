@@ -16,12 +16,17 @@ open GeneSort.FileDb.V1
 open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
+let isControlled (configured: run) =
+    [ GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Standard.runType.Name
+      GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.Soss.runType.Name ]
+    |> List.contains (string configured.ProjectName)
+
 let unwrap computation = computation |> Async.RunSynchronously |> Result.defaultWith failwith
 let require condition message = if not condition then failwith message
 let mutable controlledOnly = false
 let mutable msuf4Family: string option = None
 let replicaLimit (configured: run) =
-    (if %configured.DatabaseName = "Controlled" then GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.replicaCount else 1) |> UMX.tag
+    (if isControlled configured then GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Controlled.replicaCount else 1) |> UMX.tag
 let parameters (host: runHost) =
     host.RunDb.getRunParameters host.Run.RunName (Some (UMX.tag 0)) (Some (replicaLimit host.Run)) None None |> unwrap
 let query (host: runHost) rp kind = host.QueryParamsFromRunParams rp kind |> Option.get
@@ -84,7 +89,7 @@ let verifyPools soss (host: runHost) (expected: runParameters) (rp: runParameter
     let size, count = int (expected.GetSorterCountPerPool().Value), int (expected.GetSorterPoolCount().Value)
     let savedPoolSet = checkpoint host rp
     verifyModelActivationParameters (expected.GetAMax()) (expected.GetActivationProbability()) (models soss savedPoolSet)
-    if %host.Run.DatabaseName = "Controlled" && expected.GetAMax().IsSome then
+    if isControlled host.Run && expected.GetAMax().IsSome then
         let values = models soss savedPoolSet |> Seq.collect (GeneSort.Model.Sorting.V1.SorterModel.asSimpleSorterModelR >> fun model -> model.Activators) |> Seq.toArray
         let boundary = values |> Array.filter (fun value -> value = 0 || value = 1) |> Array.length
         let flipRate = expected.GetActivatorMutationRate().Value * 0.5 * float boundary / float values.Length
@@ -99,7 +104,7 @@ let verifyPools soss (host: runHost) (expected: runParameters) (rp: runParameter
     for row in rows do
         require (int row.["SorterCountPerPool"] = size && int row.["SorterPoolCount"] = count)
             (sprintf "%s: summary differs from configured pool sizes." %host.Run.RunName)
-    if %host.Run.DatabaseName = "Controlled" || msuf4Family.IsSome then
+    if isControlled host.Run || msuf4Family.IsSome then
         let intervals = match host with SgdRunHost sgd -> sgd.GenSaveIntervals | _ -> failwith "Expected an SGD host."
         let generations = GenIntervalConfig.getSampleAtIndex intervals (int (expected.GetGenerationIntervalLast().Value))
                           |> Option.defaultWith (fun () -> failwith "Invalid final generation interval.")
@@ -212,13 +217,13 @@ let currentRuns () =
         |> Array.collect (fun candidate -> candidate.GetMethods(BindingFlags.Public ||| BindingFlags.Static ||| BindingFlags.DeclaredOnly))
         |> Array.filter (fun method -> method.ReturnType = typeof<run> && method.GetParameters().Length = 0)
         |> Array.map (fun method -> method.Invoke(null, [||]) :?> run)
-        |> Array.filter (fun configured -> not controlledOnly || %configured.DatabaseName = "Controlled")
+        |> Array.filter (fun configured -> not controlledOnly || isControlled configured)
         |> Array.sortBy (fun configured -> %configured.RunName)
     require (runs.Length > 0) "No OnePool configurations found."
     runs
 
 let auditControlledSeeds () =
-    let runs = currentRuns () |> Array.filter (fun configured -> %configured.DatabaseName = "Controlled")
+    let runs = currentRuns () |> Array.filter (fun configured -> isControlled configured)
     for soss in [false; true] do
         let family = runs |> Array.filter (fun configured -> (configured.ExecuteFunctionName = ExecuteFunctionNames.soss) = soss)
         if family.Length > 0 then
@@ -262,8 +267,8 @@ let combineReports () =
     let combined = DataTableReport.create "OnePool Summary" headers
     for row in rows do
         combined.AppendDataRow(headers |> Array.map (fun header -> Map.tryFind header row |> Option.defaultValue ""))
-    // Keep the aggregate in the base OnePool folder as new nested runs are added.
-    let baseRun = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.TestStandard()
+    // Keep the aggregate alongside the Standard base run.
+    let baseRun = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Standard.TestStandard()
     let filename = if controlledOnly then "OnePool_Controlled_SummaryReport.txt" else "OnePool_SummaryReport.txt"
     let path =
         match msuf4Family with

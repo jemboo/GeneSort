@@ -49,6 +49,23 @@ module SortableTestsMakers =
                 return Error "Failed: One or more RunParameters for StandardTests were missing."
         }
 
+    /// The producer module supplies the database and catalog; setup supplies the query inputs.
+    let getModuleTests (sources: workflowSources) (rp: runParameters) : Async<Result<sortableTests * ce array, string>> =
+        asyncResult {
+            let! moduleName = rp.ParamMap.TryFind ParamKeys.sortableTestsModuleKey
+                              |> Result.ofOption "Setup requires SortableTestsModule."
+            let! moduleName = ParameterValidation.validateValue ParamKeys.sortableTestsModuleKey moduleName
+            let! comparators =
+                match rp.GetMergeLibId(), rp.GetPrefixLibId() with
+                | Some library, None -> SorterDataParse.getCeArrayFromMergeLib library |> Option.map Array.concat
+                | None, Some library -> SorterDataParse.getCeArrayFromPrefixLib library
+                | _ -> None
+                |> Result.ofOption "Setup requires exactly one valid merge or prefix library."
+            let! output = sources.LoadModuleOutput moduleName (setupParameters.create rp.ParamMap) (geneSortDataType.SortableTests "")
+            let! tests = OutputData.asSortableTests output
+            return tests, comparators
+        }
+
     let getMergeTests (sources: evolutionSetupSources) (rp: runParameters) : Async<Result<sortableTests * (ce array), string>> =
         async {
             let paramsOpt = option {

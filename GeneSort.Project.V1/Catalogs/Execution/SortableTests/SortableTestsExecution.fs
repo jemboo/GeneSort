@@ -44,7 +44,9 @@ module SortableTestsExecution =
                 do! storage.RunDb.saveAsync geneSortDataMode.Results query (outputData.SortableTests tests) allowOverwrite
                 log "Sortable tests saved as Results. Run complete."
                 return rp.WithRunFinished(Some true)
-            with e ->
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | e ->
                 return! Error (sprintf "Error generating sortable tests: %s" e.Message)
         } |> Async.map (logResult progress log)
 

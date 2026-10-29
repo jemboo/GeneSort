@@ -30,6 +30,18 @@ internal static partial class Program
             model.Clone();
             Layout(view);
             Check(model.ModuleChannelCount == count && model.CanEditDefinition, "Clone changed the module channel count.");
+            Check(!Descendants<Button>(view).Any(button => button.Content is "Save" or "New" or "Open…"),
+                "Removed editor actions remain visible.");
+            var configurationTabs = Descendants<TabControl>(view).Single();
+            configurationTabs.SelectedItem = configurationTabs.Items.Cast<TabItem>().Single(tab => Equals(tab.Header, "Generate parameters"));
+            Layout(view);
+            var validateButton = Descendants<Button>(view).Single(button => Equals(button.Content, "Validate"));
+            var generateButton = Descendants<Button>(view).Single(button => Equals(button.Content, "Generate RunParameters"));
+            Check(validateButton.Parent == generateButton.Parent
+                && validateButton.TransformToAncestor(view).Transform(new Point()).X < generateButton.TransformToAncestor(view).Transform(new Point()).X,
+                "Validate must appear immediately left of Generate RunParameters.");
+            configurationTabs.SelectedIndex = 0;
+            Layout(view);
             foreach (var row in model.SetupParameters.Where(row => row.Key == ParamKeys.aMaxKey || row.Key == ParamKeys.activationProbabilityKey))
                 Check(!row.IsReadOnly, $"Activation parameter {row.Key} is not editable in a clone.");
             if (name.StartsWith("SorterSgd", StringComparison.Ordinal))
@@ -43,7 +55,7 @@ internal static partial class Program
                 }
             Check(!Descendants<ComboBox>(view).Any(box => AutomationProperties.GetName(box) is "Prefix channel count" or "Merge channel count"),
                 "An editable channel-count picker remains.");
-            Check(Descendants<TextBlock>(view).Any(text => text.Text == model.ModuleChannelCountLabel), "Module channel count is not visible.");
+            Check(!Descendants<TextBlock>(view).Any(text => text.Text == model.ModuleChannelCountLabel), "Redundant module channel count remains visible.");
             foreach (var spec in model.Parameters)
                 foreach (var value in spec.Choices)
                 {

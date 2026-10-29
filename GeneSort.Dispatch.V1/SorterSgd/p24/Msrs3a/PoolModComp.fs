@@ -23,6 +23,8 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.Common
 module PoolSelSz128 =
 
     let channelCount = 24<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -81,8 +83,8 @@ module PoolSelSz128 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -98,13 +100,15 @@ module PoolSelSz128 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolSelSz128)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", description, channelCount, executionQueryCatalogName, [|
             runExample("TestSpec", TestSpec)
         |])
 
 module Sz_2048_Of_4096 =
 
     let channelCount = 24<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -160,8 +164,8 @@ module Sz_2048_Of_4096 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -177,13 +181,15 @@ module Sz_2048_Of_4096 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (Sz_2048_Of_4096)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", description, channelCount, executionQueryCatalogName, [|
             runExample("Sz_2048_Of_4096", Sz_2048_Of_4096)
         |])
 
 module PoolsSelSzTest_2_vs_256 =
 
     let channelCount = 24<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -239,8 +245,8 @@ module PoolsSelSzTest_2_vs_256 =
                 }
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -255,6 +261,6 @@ module PoolsSelSzTest_2_vs_256 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolsSelSzTest_2_vs_256)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, channelCount, executionQueryCatalogName, [|
             runExample("PoolSz_2n256", PoolSz_2n256)
         |])

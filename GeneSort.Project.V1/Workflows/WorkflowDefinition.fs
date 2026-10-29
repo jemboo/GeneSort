@@ -51,8 +51,8 @@ type workflowDefinition =
         }
     member this.SetupConfig testsDatabase evalsDatabase spans : sgdSetupConfig = {
         FunctionName = this.definition.SetupFunction.Name
-        SortableTestsDatabaseName = testsDatabase
-        SorterSetEvalsDatabaseName = evalsDatabase
+        SortableTestsModule = testsDatabase
+        SorterEvalModule = evalsDatabase
         QueryCatalogName = this.definition.SetupQuery.Name
         EnhancerFunctionName = this.definition.SetupEnhancer.Name
         ParameterSpans = spans

@@ -60,8 +60,8 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
         }
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard
-            SortableTestsDatabaseName = UMX.tag "Prefix"
-            SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+            SortableTestsModule = UMX.tag "SortableTests.Prefix.Channels32"
+            SorterEvalModule = UMX.tag "SorterEval.Prefix"
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
@@ -123,19 +123,19 @@ let ``setup spans and query catalogs survive serialization for simple and SGD ru
 [<Theory>]
 [<InlineData(false)>]
 [<InlineData(true)>]
-let ``SGD setup functions and source databases are explicit and serialized`` soss =
+let ``SGD setup functions and source modules are explicit and serialized`` soss =
     MessagePackSetup.configure ()
     let configured = if soss then WorkflowFixtures.sossSource [0; 1] else WorkflowFixtures.standardSource ()
-    let dto = { RunDto.fromDomain configured with SetupSortableTestsDatabaseName = "SelectedTests"; SetupSorterSetEvalsDatabaseName = "SelectedEvals" }
+    let dto = { RunDto.fromDomain configured with SetupSortableTestsModule = "Sources.SelectedTests"; SetupSorterEvalModule = "Sources.SelectedEvals" }
     Assert.Equal(Some dto.SetupFunctionName, configured.SetupFunctionName)
     let prepare configured = RunPreparation.prepare { Run = configured; FirstReplica = 0; ReplicaCount = 1 }
     let restored = MessagePackSerializer.Serialize dto |> MessagePackSerializer.Deserialize<runDto> |> RunDto.toDomain
     Assert.Equal(Some dto.SetupFunctionName, restored.SetupFunctionName)
-    Assert.Equal("SelectedTests", string restored.SgdSetup.Value.SortableTestsDatabaseName)
-    Assert.Equal("SelectedEvals", string restored.SgdSetup.Value.SorterSetEvalsDatabaseName)
+    Assert.Equal("Sources.SelectedTests", string restored.SgdSetup.Value.SortableTestsModule)
+    Assert.Equal("Sources.SelectedEvals", string restored.SgdSetup.Value.SorterEvalModule)
     Assert.Equal(dto, RunDto.fromDomain restored)
     Assert.True((prepare (RunDto.toDomain dto)).Entries = (prepare restored).Entries)
-    for incomplete in [{ dto with SetupFunctionName = null }; { dto with SetupSortableTestsDatabaseName = null }; { dto with SetupSorterSetEvalsDatabaseName = null }] do
+    for incomplete in [{ dto with SetupFunctionName = null }; { dto with SetupSortableTestsModule = null }; { dto with SetupSorterEvalModule = null }] do
         Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain incomplete |> ignore) |> ignore
 
 [<Fact>]
@@ -602,6 +602,7 @@ let ``Project report catalog uses supplied storage and run identity without a Di
     }
     let suppliedSources = workflowSources.create {
         OpenDatabase = fun _ _ _ -> failwith "Evaluation reporting must not open source databases."
+        EvolutionModules = fun _ -> sources
         Evolution = fun _ _ -> sources
     }
     let report = ReportCatalog.get ReportCatalog.sorterEvalFull suppliedSources configured storage

@@ -15,17 +15,17 @@ let private allPresets () =
     |> Array.filter (fun m -> m.ReturnType = typeof<run> && m.GetParameters().Length = 0)
 
 [<Fact>]
-let ``Project names follow the hierarchy above the database module`` () =
+let ``Project names include the full namespace and containing module hierarchy`` () =
     let presets =
-        [ "SorterSgd.p32.Msuf4a.Standard", SorterSgd.p32.Msuf4a.Standard.Pool_32.Test
+        [ "SorterSgd.p32.Msuf4a.Standard.Pool_32", SorterSgd.p32.Msuf4a.Standard.Pool_32.Test
           "SorterSgd.p32.Msuf4a.Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Test
-          "SorterSgd.p32.Msuf4a.Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
-          "SorterSgd.p32.Test.OnePool", SorterSgd.p32.Test.OnePool.Continuation.TestSossCondense
-          "SorterSgd.p32.Msrs4a.MutationRate", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
-          "SorterEval", SorterEval.Standard.Channels16.Test
-          "SorterMutate", SorterMutate.Prefix.Mssi
-          "SortableTests", SortableTests.Prefix.Channels32.FourStage_32
-          "SortableTests", SortableTests.Prefix.Channels24.ThreeStage_24 ]
+          "SorterSgd.p32.Msuf4a.Standard_append.Pool_128", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
+          "SorterSgd.p32.Test.OnePool.Continuation.SossAppend", SorterSgd.p32.Test.OnePool.Continuation.SossAppend.TestSossCondense
+          "SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
+          "SorterEval.Standard.Channels16", SorterEval.Standard.Channels16.Test
+          "SorterMutate.Prefix", SorterMutate.Prefix.Mssi
+          "SortableTests.Prefix.Channels32", SortableTests.Prefix.Channels32.FourStage_32
+          "SortableTests.Prefix.Channels24", SortableTests.Prefix.Channels24.ThreeStage_24 ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).ProjectName)
 
@@ -51,18 +51,17 @@ let ``Database names follow their modules and preset identities are unique`` () 
     Assert.NotEmpty(presets)
     for preset in presets do
         let configured = preset.Invoke(null, [||]) :?> run
-        let expected =
-            if preset.DeclaringType.Name = "Standard_append" && preset.Name = "Test" then "Test"
-            elif preset.DeclaringType.Name.StartsWith("Channels") then preset.DeclaringType.DeclaringType.Name
-            else preset.DeclaringType.Name
+        let expected = preset.DeclaringType.Name
+        let expectedProject = preset.DeclaringType.FullName.Replace('+', '.').Substring("GeneSort.Dispatch.V1.".Length)
+        Assert.Equal(expectedProject, %configured.ProjectName)
         Assert.Equal(expected, %configured.DatabaseName)
         Assert.True(identities.Add(%configured.ProjectName, %configured.DatabaseName, %configured.RunName),
                     sprintf "Duplicate identity for %s.%s" preset.DeclaringType.FullName preset.Name)
 
 [<Fact>]
-let ``Standard append database names follow the test function and pool modules`` () =
+let ``Standard append database names follow the containing modules`` () =
     let presets =
-        [ "Test", SorterSgd.p32.Msuf4a.Standard_append.Test
+        [ "Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Test
           "Pool_128", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
           "Pool_512", SorterSgd.p32.Msuf4a.Standard_append.Pool_512.V1 ]
     for expected, preset in presets do
@@ -84,3 +83,11 @@ let ``All dispatch presets use their defining name as RunName`` () =
         let expected = if preset.IsSpecialName && preset.Name.StartsWith("get_") then preset.Name.Substring(4) else preset.Name
         Assert.True((expected = %configured.RunName),
                     sprintf "%s.%s has RunName '%s'." preset.DeclaringType.FullName preset.Name %configured.RunName)
+
+[<Fact>]
+let ``Source databases with the same module name remain distinct across projects`` () =
+    Assert.Equal(2, SortableTests.SortableTestsDbs.databaseConfigs.Count)
+    Assert.Same(SortableTests.SortableTestsDbs.Merge.db,
+                SortableTests.SortableTestsDbs.getDatabaseByName SortableTests.SortableTestsDbs.Merge.projectName SortableTests.SortableTestsDbs.Merge.dbName)
+    Assert.Same(SortableTests.SortableTestsDbs.Prefix.db,
+                SortableTests.SortableTestsDbs.getDatabaseByName SortableTests.SortableTestsDbs.Prefix.projectName SortableTests.SortableTestsDbs.Prefix.dbName)

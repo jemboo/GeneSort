@@ -25,7 +25,9 @@ module SetupExecution =
                 do! checkCancellation cts.Token
                 log "Setup complete. Ready to run evaluation."
                 return rp
-            with e ->
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | e ->
                 let errorMsg = sprintf "Setup error in %s: %s" (RunParameters.getIdString rp) e.Message
                 log errorMsg
                 return! Error errorMsg

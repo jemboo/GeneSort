@@ -58,18 +58,26 @@ This keeps database implementations,
 filesystem paths, and host configuration out of Project, avoids a dependency cycle,
 and allows tests or other hosts to provide alternative storage.
 
-Dispatch and WPF use `WorkflowSourceFiles` to bind the configured source databases.
+Dispatch and WPF use `WorkflowSourceFiles` to resolve the configured source modules to their databases and execution query catalogs.
 `SgdRun.create` takes maker names in its named SGD configuration record.
 Its `sgdBaseConfig.Setup` is a standalone `sgdSetupConfig` with an explicit
-`FunctionName`, `SortableTestsDatabaseName`, `SorterSetEvalsDatabaseName`, parameter
+`FunctionName`, `SortableTestsModule`, `SorterEvalModule`, parameter
 spans, query catalog, and enhancer. `SetupExecutorCatalog` maps the setup function
 directly to its executor. `preparedSetupConfig` describes evaluation/mutation setup
 separately; neither setup record inherits from the other. SortableTests retains
 `directRunConfig`, with no Setup phase.
 `sgdRunHost` resolves all three maker functions when created, so unknown names fail
-before execution. Setup calls `workflowSources.Evolution` with its two input database
-names and supplies the resulting loaders to its makers; mutator makers
+before execution. Setup calls `workflowSources.EvolutionModules` with its generated setup parameters
+and supplies the resulting module-resolved loaders to its makers; mutator makers
 require only `evoPath`, reading its fixed settings directly.
+
+SorterMutate setup also passes its generated setup row to `EvolutionModules`.
+Merge and Prefix presets declare `SortableTestsModule` and `SorterEvalModule`;
+Standard declares `SorterEvalModule` and generates its tests locally. The defaults
+live in the dispatch modules. These settings identify the dependent setup artifacts
+and are excluded from processing query properties. Mutation reports use the same
+evaluation module as setup. Existing mutation definitions must supply these module
+parameters before loading source data.
 
 ## Storage and phase functions
 

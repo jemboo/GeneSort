@@ -7,9 +7,26 @@ using GeneSort.WPF.Settings;
 namespace GeneSort.WPF.ViewModels;
 
 /// One set of shared input files, with the saved execution rows that use it.
-public sealed class SetupParameterItem
+public sealed class SetupParameterItem : INotifyPropertyChanged, IDisposable
 {
-    public string SetupStatus { get; }
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public string SetupStatus => Runs.Any(row => row.SetupStatus == "Running") ? "Running"
+        : Runs.Any(row => row.SetupStatus == "Failed") ? "Failed"
+        : Runs.All(row => row.SetupStatus == "Completed") ? "Completed" : "Pending";
+    private string[] columnKeys = [];
+    internal void SetColumns(string[] keys)
+    {
+        columnKeys = keys;
+        Cells = keys.Select(key => key == "SetupStatus" ? SetupStatus : Values.GetValueOrDefault(key)).ToArray();
+        PropertyChanged?.Invoke(this, new(nameof(Cells)));
+    }
+    private void RunChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName != nameof(RunParameterItem.SetupStatus)) return;
+        PropertyChanged?.Invoke(this, new(nameof(SetupStatus)));
+        SetColumns(columnKeys);
+    }
+    public void Dispose() { foreach (var row in Runs) row.PropertyChanged -= RunChanged; }
     public int Number { get; }
     public RunParameterItem[] Runs { get; }
     public IReadOnlyDictionary<string, string> Values { get; }
@@ -19,8 +36,7 @@ public sealed class SetupParameterItem
     {
         Number = number;
         Runs = runs;
-        var completed = runs.Count(row => row.Parameters.GetSetupCompleted()?.Value == true);
-        SetupStatus = completed == runs.Length ? "Complete" : completed > 0 ? "Partial" : runs.All(row => row.Parameters.GetSetupCompleted()?.Value == false) ? "Not run" : "Not recorded";
+        foreach (var row in runs) row.PropertyChanged += RunChanged;
         var values = new Dictionary<string, string> { ["SetupStatus"] = SetupStatus };
         if (configured.ParameterSource is null)
         {
@@ -68,6 +84,7 @@ public sealed class SetupParameterListViewModel : INotifyPropertyChanged
 
     public void Clear(string message = "Generate parameters or refresh saved files to view shared setups.")
     {
+        foreach (SetupParameterItem item in Items.SourceCollection) item.Dispose();
         Items = new(new List<SetupParameterItem>());
         Keys = [];
         Summary = message;
@@ -78,12 +95,13 @@ public sealed class SetupParameterListViewModel : INotifyPropertyChanged
     public void SetRuns(run configured, IEnumerable<RunParameterItem> runs)
     {
         if (!configured.HasSetup) { Clear("This run executes directly and has no Setup phase."); return; }
+        foreach (SetupParameterItem item in Items.SourceCollection) item.Dispose();
         var items = runs.GroupBy(row => SharedInputKey(configured, row))
             .Select((group, index) => new SetupParameterItem(index + 1, configured, group.ToArray())).ToArray();
         string[] leading = ["SetupStatus", "LinkedRuns", ParamKeys.replKey];
         var keys = items.SelectMany(item => item.Values.Keys).Distinct().ToArray();
         Keys = leading.Where(keys.Contains).Concat(keys.Except(leading).Order(StringComparer.Ordinal)).ToArray();
-        foreach (var item in items) item.Cells = Keys.Select(key => item.Values.GetValueOrDefault(key)).ToArray();
+        foreach (var item in items) item.SetColumns(Keys);
         Items = new(items.ToList());
         Summary = $"{items.Length:N0} shared setups for {items.Sum(item => item.Runs.Length):N0} saved run rows. Setup prepares the inputs and updates every linked run.";
         Select([]);

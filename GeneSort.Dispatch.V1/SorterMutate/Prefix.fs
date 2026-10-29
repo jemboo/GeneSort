@@ -23,6 +23,9 @@ module Prefix =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
 
+    let sortableTestsModule = sprintf "SortableTests.Prefix.Channels%d" (int channelCount)
+    let sorterEvalModule = "SorterEval.Prefix"
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
@@ -35,6 +38,8 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -81,6 +86,8 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -127,6 +134,8 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -173,6 +182,8 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.sortableTestsModuleKey, [sortableTestsModule])
+                (ParamKeys.sorterEvalModuleKey, [sorterEvalModule])
                 (ParamKeys.excludeSelfCeKey, ["true"])
                 (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
@@ -238,7 +249,7 @@ module Prefix =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", description, channelCount, executionQueryCatalogName, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

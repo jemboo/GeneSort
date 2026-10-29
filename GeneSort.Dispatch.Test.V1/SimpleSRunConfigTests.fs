@@ -30,7 +30,7 @@ let private configuration soss sweep =
 [<InlineData(true, true)>]
 let ``Msuf4a SimpleS presets expand distinct executions with boolean models and mutators`` soss sweep =
     let configured = configuration soss sweep
-    Assert.Equal("SorterSgd.p32.Msuf4a.SimpleS", %configured.ProjectName)
+    Assert.Equal((if soss then "SorterSgd.p32.Msuf4a.SimpleS.Soss" else "SorterSgd.p32.Msuf4a.SimpleS.Standard"), %configured.ProjectName)
     Assert.Equal((if soss then "Soss" else "Standard"), %configured.DatabaseName)
     Assert.Equal((if sweep then "ActivatorRates" else "Test"), %configured.RunName)
     let host = runHost.Create configured 1

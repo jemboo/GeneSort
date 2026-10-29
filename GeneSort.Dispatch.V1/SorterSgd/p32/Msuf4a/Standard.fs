@@ -21,6 +21,8 @@ open GeneSort.Dispatch.V1
 module Pool_32 =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -75,8 +77,8 @@ module Pool_32 =
                 AllowOverwrite = false
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -128,8 +130,8 @@ module Pool_32 =
                 AllowOverwrite = false
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -152,7 +154,7 @@ module Pool_32 =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_32", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_32", description, channelCount, executionQueryCatalogName, [|
             runExample("Test", Test)
             runExample("V1", V1)
         |])
@@ -160,6 +162,8 @@ module Pool_32 =
 module Pool_512 =
 
     let channelCount = 32<GeneSort.Sorting.channelCount>
+    let sortableTestsModule = UMX.tag<runModuleName> (sprintf "SortableTests.Prefix.Channels%d" (int channelCount))
+    let sorterEvalModule = UMX.tag<runModuleName> "SorterEval.Prefix"
 
     let moduleParameters =
         [
@@ -214,8 +218,8 @@ module Pool_512 =
                 AllowOverwrite = false
                 Setup = {
                     FunctionName = setupFunctionName
-                    SortableTestsDatabaseName = UMX.tag "Prefix"
-                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
+                    SortableTestsModule = sortableTestsModule
+                    SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -237,6 +241,6 @@ module Pool_512 =
 
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_512", description, channelCount, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard.Pool_512", description, channelCount, executionQueryCatalogName, [|
             runExample("V2a", V2a)
         |])

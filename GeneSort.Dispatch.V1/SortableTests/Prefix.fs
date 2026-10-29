@@ -24,6 +24,8 @@ module Prefix =
 
     module Channels24 =
 
+        let executionQueryCatalogName = executionQueryCatalogName
+
         let channelCount = 24<channelCount>
 
 
@@ -136,13 +138,15 @@ module Prefix =
         let description = "Prefix filtered Bitv512 tests."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels24", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels24", description, channelCount, executionQueryCatalogName, [|
                 runExample("Channels24", Channels24)
                 runExample("TwoStage_24", TwoStage_24)
                 runExample("ThreeStage_24", ThreeStage_24)
             |])
 
     module Channels28 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 28<channelCount>
 
@@ -187,11 +191,13 @@ module Prefix =
         let description = "Prefix filtered Bitv512 tests."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels28", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels28", description, channelCount, executionQueryCatalogName, [|
                 runExample("FourStage_28", FourStage_28)
             |])
 
     module Channels32 =
+
+        let executionQueryCatalogName = executionQueryCatalogName
 
         let channelCount = 32<channelCount>
 
@@ -267,7 +273,7 @@ module Prefix =
         let description = "Prefix filtered Bitv512 tests."
 
         let runType =
-            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels32", description, channelCount, [|
+            GeneSort.Dispatch.V1.runType("SortableTests.Prefix.Channels32", description, channelCount, executionQueryCatalogName, [|
                 runExample("ThreeStage_32", ThreeStage_32)
                 runExample("FourStage_32", FourStage_32)
             |])

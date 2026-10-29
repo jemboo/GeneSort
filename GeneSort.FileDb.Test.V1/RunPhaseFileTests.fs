@@ -268,7 +268,8 @@ module RunPhaseFileTests =
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
                 EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
-                ParameterSpans = [ParamKeys.channelCountKey, ["4"]; ParamKeys.rngTypeKey, ["LCG"]
+                ParameterSpans = [ParamKeys.excludeSelfCeKey, ["true"]; ParamKeys.collectSortableTestsKey, ["false"];
+                                  ParamKeys.channelCountKey, ["4"]; ParamKeys.sortableDataFormatKey, ["BitVector512"]; ParamKeys.rngTypeKey, ["LCG"]
                                   ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]; ParamKeys.sorterCountKey, ["2"]]
             }
             Execution = {
@@ -328,9 +329,20 @@ module RunPhaseFileTests =
     })
 
     [<Fact>]
-    let ``SGD sources load from independently selected databases with arbitrary run names`` () = withFolder (fun folder -> task {
+    let ``SGD sources load from independently selected modules and catalogs with arbitrary run names`` () = withFolder (fun folder -> task {
+        GeneSort.Project.V1.Catalogs.ProjectCatalogs.registerAll ()
+        let registerContract name original =
+            let builder = QueryParamsCatalogRun.get original
+            QueryParamsCatalogRun.register name (fun project database parameters output ->
+                builder project database parameters output |> Option.map (fun query ->
+                    queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType
+                        (Array.append (Map.toArray query.Properties) [|"ProducerContract", name|])))
+        let testsCatalog = "tests.sgd-module-source"
+        let evalsCatalog = "evals.sgd-module-source"
+        registerContract testsCatalog QueryCatalogNamesRun.sortableTestPrefix
+        registerContract evalsCatalog QueryCatalogNamesRun.sorterEvalStandard
         let dto = smallLibrary() |> RunDto.fromDomain
-        let evaluation = RunDto.toDomain { dto with DataBaseName = "SeedBank"; RunName = "MyEvaluations" }
+        let evaluation = RunDto.toDomain { dto with ProjectName = "Evaluation.Producers"; DataBaseName = "SeedBank"; RunName = "MyEvaluations"; RunQueryCatalogName = evalsCatalog }
         let! rows = publish folder evaluation
         let! setup = RunSetupFiles.runAsync folder evaluation rows null
         Assert.Empty(setup.Errors)
@@ -340,11 +352,11 @@ module RunPhaseFileTests =
         let prefix = prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA
         let tests =
             DirectRun.create {
-                ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag "TestBank"; RunName = UMX.tag "MyTests"
+                ProjectName = UMX.tag "Test.Producers"; DatabaseName = UMX.tag "TestBank"; RunName = UMX.tag "MyTests"
                 Description = "Selected test source"; AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests
-                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                    QueryCatalogName = testsCatalog
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
                     ParameterSpans = [ParamKeys.prefixLibIdKey, [PrefixLibId.toString prefix]
                                       ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString sortableDataFormat.BitVector512]]
@@ -354,7 +366,12 @@ module RunPhaseFileTests =
         let! generated = RunExecutionFiles.runSavedAsync folder tests testRows null
         Assert.Empty(generated.Errors)
         let host = WorkflowSourceFiles.create folder
-        let sources = host.Evolution (UMX.tag "TestBank") (UMX.tag "SeedBank")
+        RunModuleCatalog.register "Sources.Tests" { ProjectName = tests.ProjectName; DatabaseName = tests.DatabaseName; ExecutionQueryCatalogName = testsCatalog }
+        RunModuleCatalog.register "Sources.Evaluations" { ProjectName = evaluation.ProjectName; DatabaseName = evaluation.DatabaseName; ExecutionQueryCatalogName = evalsCatalog }
+        let parameters = setupParameters.create (Map.ofList [
+            ParamKeys.sortableTestsModuleKey, "Sources.Tests"; ParamKeys.sorterEvalModuleKey, "Sources.Evaluations"
+            ParamKeys.replKey, "0"; ParamKeys.rngTypeKey, "LCG"; ParamKeys.sortableDataFormatKey, "BitVector512" ])
+        let sources = host.EvolutionModules parameters
         let! loadedTests = sources.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
         let! loadedEvals = sources.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.True(Result.isOk loadedTests)
@@ -380,13 +397,15 @@ module RunPhaseFileTests =
         match ambiguous with
         | Error message -> Assert.Contains("found 2", message)
         | Ok _ -> failwith "Do not choose an arbitrary evaluation from an ambiguous database."
-        let wrong = host.Evolution (UMX.tag "WrongTests") (UMX.tag "WrongEvals")
+        let wrong = host.EvolutionModules (setupParameters.create (parameters.ParamMap
+            |> Map.add ParamKeys.sortableTestsModuleKey "Sources.WrongTests"
+            |> Map.add ParamKeys.sorterEvalModuleKey "Sources.WrongEvals"))
         let! missingTests = wrong.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
         let! missingEvals = wrong.LoadStandardSorterEvals 4<channelCount> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         match missingTests, missingEvals with
         | Error testsError, Error evalsError ->
             Assert.Contains("WrongTests", testsError)
-            Assert.Contains("SortableTests.Prefix", testsError)
+            Assert.Contains("Unknown producing module", testsError)
             Assert.Contains("WrongEvals", evalsError)
         | _ -> failwith "Source loaders must not fall back to another database."
     })
@@ -408,13 +427,29 @@ module RunPhaseFileTests =
                 QueryCatalogNamesRun.sortableTestMerge, SetupCatalogNames.merge,
                 QueryCatalogNamesSetup.sorterEvalMerge, QueryCatalogNamesRun.sorterEvalMerge,
                 SetupEnhancerFunctionNames.sorterEval, RunParamBuilderNames.Enhancer.sorterEvalMerge
-        let inputs = [key, [library]; ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString format]]
+        GeneSort.Project.V1.Catalogs.ProjectCatalogs.registerAll ()
+        let producerCatalog = testCatalog + ".module-source-test"
+        let originalBuilder = QueryParamsCatalogRun.get testCatalog
+        QueryParamsCatalogRun.register producerCatalog (fun project database parameters outputType ->
+            originalBuilder project database parameters outputType
+            |> Option.map (fun query ->
+                queryParams.create query.DbName query.ProjectName query.Repl query.Generation query.OutputDataType
+                    (Array.append (Map.toArray query.Properties) [|"ProducerContract", producerCatalog|])))
+        let inputs = [key, [library]; ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString format];
+                      ParamKeys.channelCountKey, ["8"]; ParamKeys.excludeSelfCeKey, ["true"]; ParamKeys.collectSortableTestsKey, ["false"]]
+        let sourceProject = "SortableTests." + database + ".Channels8"
+        let sourceModule = sourceProject
+        RunModuleCatalog.register sourceModule {
+            ProjectName = UMX.tag sourceProject
+            DatabaseName = UMX.tag database
+            ExecutionQueryCatalogName = producerCatalog
+        }
         let tests =
             DirectRun.create {
-                ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
+                ProjectName = UMX.tag sourceProject; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
                 Description = "Tests saved under a user-selected name"; AllowOverwrite = false
                 Execution = {
-                    FunctionName = ExecuteFunctionNames.sortableTests; QueryCatalogName = testCatalog
+                    FunctionName = ExecuteFunctionNames.sortableTests; QueryCatalogName = producerCatalog
                     EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests; ParameterSpans = inputs
                 }
             } |> run.DirectRun
@@ -424,7 +459,7 @@ module RunPhaseFileTests =
                 Description = "Evaluation of the saved test library"; AllowOverwrite = false
                 Setup = {
                     FunctionName = setupCatalog; QueryCatalogName = querySetup; EnhancerFunctionName = setupEnhancer
-                    ParameterSpans = inputs @ [ParamKeys.rngTypeKey, ["LCG"]; ParamKeys.sorterCountKey, ["2"];
+                    ParameterSpans = inputs @ [ParamKeys.sortableTestsModuleKey, [sourceModule]; ParamKeys.rngTypeKey, ["LCG"]; ParamKeys.sorterCountKey, ["2"];
                                               ParamKeys.simpleSorterModelTypeKey, ["Msce"]]
                 }
                 Execution = {
@@ -442,7 +477,7 @@ module RunPhaseFileTests =
         let error = Assert.Single missing.Errors
         Assert.Contains(library, error)
         Assert.Contains(SortableDataFormat.toString format, error)
-        Assert.Contains("Expected result:", error)
+        Assert.Contains(sourceModule, error)
         Assert.Contains("then rerun Setup", error)
         Assert.DoesNotContain(messages, fun message -> message.Contains("Setup complete"))
         Assert.Empty(Directory.GetDirectories(folder, "SortableTestsWithPrefix", SearchOption.AllDirectories))
@@ -451,16 +486,18 @@ module RunPhaseFileTests =
         let! generated = RunExecutionFiles.runSavedAsync folder tests testRows null
         Assert.Empty(generated.Errors)
         Assert.Equal(1, generated.Succeeded)
-        let query = QueryParamsCatalogRun.get testCatalog tests.ProjectName tests.DatabaseName testRows[0] (geneSortDataType.SortableTests "") |> Option.get
-        let sourceRoot = Path.Combine(folder, "SortableTests", database, "Data") |> UMX.tag
+        let query = QueryParamsCatalogRun.get producerCatalog tests.ProjectName tests.DatabaseName testRows[0] (geneSortDataType.SortableTests "") |> Option.get
+        let sourceRoot = Path.Combine(folder, sourceProject, database, "Data") |> UMX.tag
         let sourceFile = OutputDataFile.getFullOutputDataFilePath sourceRoot geneSortDataMode.Results query |> UMX.untag
         Assert.True(File.Exists sourceFile)
         Assert.Contains(sourceFile, error)
         let sourceTime = File.GetLastWriteTimeUtc sourceFile
-        let sources = (WorkflowSourceFiles.create folder).Evolution (UMX.tag database) (UMX.tag database)
+        let sources = WorkflowSourceFiles.create folder
         let load replica format =
-            if database = "Prefix" then sources.LoadPrefixTests replica prefix format
-            else sources.LoadMergeTests replica merge format
+            let parameters = testRows[0].WithRepl(Some replica).WithSortableDataFormat(Some format)
+            sources.LoadModuleOutput sourceModule (setupParameters.create parameters.ParamMap) (geneSortDataType.SortableTests "")
+        let! unknown = sources.LoadModuleOutput "Unknown.Producer" (setupParameters.create testRows[0].ParamMap) (geneSortDataType.SortableTests "") |> Async.StartAsTask
+        Assert.True(Result.isError unknown)
         let! loaded = load 0<replNumber> format |> Async.StartAsTask
         get loaded |> ignore
         let! wrongReplica = load 1<replNumber> format |> Async.StartAsTask
@@ -759,4 +796,19 @@ module RunPhaseFileTests =
         Assert.Empty(result.Updates)
         let! saved = RunParameterFiles.loadAllAsync folder configured
         Assert.Equal<runParameters>(rows |> Array.sortBy (fun r -> r.GetId()), saved |> Array.sortBy (fun r -> r.GetId()))
+    })
+
+    [<Fact>]
+    let ``successful execution attempt stays pending until its saved completion flag is true`` () = withFolder (fun folder -> task {
+        let name = "execution-pending-" + Guid.NewGuid().ToString("N")
+        ExecuteFunctionCatalog.register name (SimpleExecution (fun _ row _ _ _ -> async.Return (Ok row)))
+        let dto = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
+        let configured = RunDto.toDomain { dto with ExecuteFunctionName = name }
+        let! rows = publish folder configured
+        let! result = RunExecutionFiles.runSavedAsync folder configured [|rows[0]|] null
+        Assert.Empty(result.Errors)
+        Assert.Equal(1, result.Succeeded)
+        Assert.Equal(runRowStatus.Waiting, Assert.Single(result.RowStatuses))
+        let _, output = Assert.Single(result.Updates)
+        Assert.NotEqual(Some true, (RunPhaseOutput.toParameters output).GetRunFinished())
     })

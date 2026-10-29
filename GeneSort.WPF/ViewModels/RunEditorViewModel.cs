@@ -22,7 +22,7 @@ namespace GeneSort.WPF.ViewModels;
 public sealed class RunEditorViewModel : INotifyPropertyChanged
 {
     private string projectName = "", databaseName = "", runName = "", description = "";
-    private string sortableTestsDatabaseName = "", sorterSetEvalsDatabaseName = "";
+    private string sortableTestsModule = "", sorterEvalModule = "";
     private string checkpointIntervals = "", saveIntervals = "", summaryIntervals = "", projectsFolder = "";
     private string status = "New definition. Choose a projects folder before saving.";
     private string firstReplica = "0", replicaCount = "1";
@@ -35,12 +35,14 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private CancellationTokenSource? summaryLoad;
     private CancellationTokenSource? phaseCancellation;
     public bool IsPhaseRunning => phaseCancellation is not null;
+    public string PhaseActivity => phaseCancellation?.IsCancellationRequested == true ? "Cancelling…" : isRunningPhase ? "Running…" : "Ready";
     public bool CanCancelPhase => phaseCancellation is { IsCancellationRequested: false };
     public void CancelPhase()
     {
         if (!CanCancelPhase) return;
         phaseCancellation!.Cancel();
         Changed(nameof(CanCancelPhase));
+        Changed(nameof(PhaseActivity));
         Status = "Cancelling... Waiting for active work and checkpoint saves to finish.";
         PhaseSummary = Status;
     }
@@ -150,8 +152,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     public string ProjectName { get => projectName; set => Edit(ref projectName, value); }
     public string DatabaseName { get => databaseName; set => Edit(ref databaseName, value); }
-    public string SortableTestsDatabaseName { get => sortableTestsDatabaseName; set => Edit(ref sortableTestsDatabaseName, value); }
-    public string SorterSetEvalsDatabaseName { get => sorterSetEvalsDatabaseName; set => Edit(ref sorterSetEvalsDatabaseName, value); }
+    public string SortableTestsModule { get => sortableTestsModule; set => Edit(ref sortableTestsModule, value); }
+    public string SorterEvalModule { get => sorterEvalModule; set => Edit(ref sorterEvalModule, value); }
     public string RunName { get => runName; set => Edit(ref runName, value); }
     public string Description { get => description; set => Edit(ref description, value); }
     public bool AllowOverwrite { get => allowOverwrite; set => Edit(ref allowOverwrite, value); }
@@ -434,7 +436,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public runDraft Snapshot() => runDraft.create(new runDraftArgs
     {
         ProjectName = ProjectName, DatabaseName = DatabaseName, RunName = RunName,
-        SortableTestsDatabaseName = SortableTestsDatabaseName, SorterSetEvalsDatabaseName = SorterSetEvalsDatabaseName,
+        SortableTestsModule = SortableTestsModule, SorterEvalModule = SorterEvalModule,
         Description = Description, AllowOverwrite = AllowOverwrite,
         CheckpointIntervalsName = CheckpointIntervals, GenSaveIntervalsName = SaveIntervals, GenSaveSubIntervalsName = SummaryIntervals,
         SetupParameters = SetupParameters.Select(row => row.Snapshot()).ToArray(),
@@ -452,7 +454,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             ExecutionSection.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, false) && spec.ExecutionAllowed).ToArray(), defaults);
             FirstReplica = "0"; ReplicaCount = "1";
             ProjectName = draft.ProjectName; DatabaseName = draft.DatabaseName; RunName = draft.RunName;
-            SortableTestsDatabaseName = draft.SortableTestsDatabaseName; SorterSetEvalsDatabaseName = draft.SorterSetEvalsDatabaseName;
+            SortableTestsModule = draft.SortableTestsModule; SorterEvalModule = draft.SorterEvalModule;
             Description = draft.Description; AllowOverwrite = draft.AllowOverwrite;
             CheckpointIntervals = draft.CheckpointIntervalsName; SaveIntervals = draft.GenSaveIntervalsName; SummaryIntervals = draft.GenSaveSubIntervalsName;
             SetupParameters.Clear(); ExecutionParameters.Clear();
@@ -725,6 +727,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         phaseCancellation = cancellation;
         Changed(nameof(IsPhaseRunning));
         Changed(nameof(CanCancelPhase));
+        Changed(nameof(PhaseActivity));
         Changed(nameof(IsProgressIndeterminate));
         PhaseCompleted = 0;
         PhaseTotal = selected.Length;
@@ -738,9 +741,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             if (update.RowIndex is { } rowIndex && update.Generation is { } generation
                 && rowIndex.Value >= 0 && rowIndex.Value < selected.Length)
                 selected[rowIndex.Value].ShowGeneration(generation.Value);
-            if (processing && update.RowIndex is { } statusIndex && update.Status is { } rowStatus
+            if (update.RowIndex is { } statusIndex && update.Status is { } rowStatus
                 && statusIndex.Value >= 0 && statusIndex.Value < selected.Length)
-                selected[statusIndex.Value].ShowStatus(rowStatus.Value, rowStatus.Value == runRowStatus.Failed ? update.Message : null);
+            {
+                if (processing) selected[statusIndex.Value].ShowStatus(rowStatus.Value, rowStatus.Value == runRowStatus.Failed ? update.Message : null);
+                else selected[statusIndex.Value].ShowSetupStatus(rowStatus.Value);
+            }
             PhaseCompleted = update.Completed;
             if (cancellation.IsCancellationRequested) return;
             PhaseSummary = $"{phase}: {update.Completed:N0} of {update.Total:N0} {rowLabel} processed.";
@@ -757,6 +763,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 var messages = result.RowErrors;
                 for (var index = 0; index < selected.Length; index++) selected[index].ShowStatus(statuses[index], messages[index]);
             }
+            else
+                for (var index = 0; index < selected.Length; index++) selected[index].ShowSetupStatus(result.RowStatuses[index]);
             RunParameterList.ApplyUpdates(selected, result.Updates);
             if (processing) await SaveProcessingFailuresAsync(configured);
             SetupParameterList.SetRuns(configured, RunParameterList.Items.SourceCollection.Cast<RunParameterItem>());
@@ -791,6 +799,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             phaseCancellation = null;
             Changed(nameof(IsPhaseRunning));
             Changed(nameof(CanCancelPhase));
+        Changed(nameof(PhaseActivity));
             isRunningPhase = false;
             IsBusy = false;
         }

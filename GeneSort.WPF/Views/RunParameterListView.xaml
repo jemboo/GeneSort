@@ -31,7 +31,7 @@
                     ToolTip="Choose which columns to show. Changes are saved immediately." />
             <Button Content="Reset layout" Click="ResetLayout_Click" Margin="0,0,0,8"
                     ToolTip="Show all columns and restore the default column order, widths and sorting for Run parameters." />
-            <TextBlock Text="Waiting: gray | Running: blue | Completed: green | Failed: red"
+            <TextBlock Text="Pending: gray | Running: blue | Completed: green | Failed: red"
                        Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="12,0,0,8" />
         </WrapPanel>
         <ListView x:Name="ParameterItems" Grid.Row="2" ItemsSource="{Binding Items}"

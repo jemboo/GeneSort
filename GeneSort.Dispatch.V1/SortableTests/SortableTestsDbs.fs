@@ -81,15 +81,15 @@ module SortableTestsDbs =
 
 
 
-    let databaseConfigs : Map<string<databaseName>, IGeneSortDb> = 
-        [ (Merge.dbName, Merge.db :> IGeneSortDb)
-          (Prefix.dbName, Prefix.db :> IGeneSortDb) ]
+    let databaseConfigs : Map<string<projectName> * string<databaseName>, IGeneSortDb> =
+        [ ((Merge.projectName, Merge.dbName), Merge.db :> IGeneSortDb)
+          ((Prefix.projectName, Prefix.dbName), Prefix.db :> IGeneSortDb) ]
         |> Map.ofList   
 
-    let getDatabaseByName (name: string<databaseName>) : IGeneSortDb =
-        match databaseConfigs.TryFind name with
+    let getDatabaseByName (project: string<projectName>) (name: string<databaseName>) : IGeneSortDb =
+        match databaseConfigs.TryFind (project, name) with
         | Some db -> db
-        | None -> failwithf "Database with name %s not found" (UMX.untag name)
+        | None -> failwithf "Database %s/%s not found" (UMX.untag project) (UMX.untag name)
 
 
 
