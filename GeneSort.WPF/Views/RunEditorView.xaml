@@ -21,15 +21,18 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-        <Border Grid.Row="1" Background="#193750" BorderBrush="#62B7F3" BorderThickness="0,2,0,0" Padding="16,10"
+        <Border Grid.Row="1" Background="#193750" BorderBrush="#62B7F3" BorderThickness="0,2,0,0" Padding="16,4"
                 Visibility="{Binding IsPhaseRunning, Converter={StaticResource VisibleIfTrue}}">
             <DockPanel>
-                <Button Content="Cancel" FontWeight="Bold" MinWidth="100" Padding="12,8" AutomationProperties.Name="Cancel active phase" Click="CancelPhase_Click" IsEnabled="{Binding CanCancelPhase}" DockPanel.Dock="Left"
+                <Button Content="Cancel" FontWeight="Bold" MinWidth="100" Padding="12,3" AutomationProperties.Name="Cancel active phase" Click="CancelPhase_Click" IsEnabled="{Binding CanCancelPhase}" DockPanel.Dock="Left"
                         ToolTip="Stop queued rows and request active work to stop at its next safe point." />
-                <StackPanel>
-                    <TextBlock Text="{Binding PhaseActivity}" FontWeight="Bold" FontSize="16" AutomationProperties.Name="Active phase status" />
-                    <ProgressBar IsIndeterminate="True" Height="6" Margin="0,6,0,6" AutomationProperties.Name="Active phase activity" />
-                    <TextBlock Text="{Binding PhaseSummary}" TextWrapping="Wrap" />
+                <StackPanel VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding PhaseActivity}" FontWeight="Bold" Margin="0,0,12,0" AutomationProperties.Name="Active phase status" />
+                        <TextBlock Grid.Column="1" Text="{Binding PhaseSummary}" TextTrimming="CharacterEllipsis" ToolTip="{Binding PhaseSummary}" />
+                    </Grid>
+                    <ProgressBar IsIndeterminate="True" Height="3" Margin="0,3,0,0" AutomationProperties.Name="Active phase activity" />
                 </StackPanel>
             </DockPanel>
         </Border>
