@@ -52,7 +52,9 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public catalogChoice[] Intervals { get; } = RunEditor.intervals();
     public parameterDescription[] Parameters => HasPrefixWidthSelection && SelectedPrefixSortingWidth is int width
         ? RunTypeEditor.parametersForPrefixWidth(editorTemplate, width) : RunTypeEditor.parameters(editorTemplate);
-    public bool HasPrefixWidthSelection => editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestPrefix;
+    public bool HasPrefixWidthSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestPrefix)
+        || (editorTemplate.IsPreparedRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterEvalPrefix);
+    private ParameterSectionViewModel PrefixSection => HasSetup ? SetupSection : ExecutionSection;
     public int[] PrefixSortingWidths => RunTypeEditor.prefixSortingWidths(editorTemplate);
     public bool CanSelectPrefixWidth => HasPrefixWidthSelection && !IsBusy && !HasPendingParameter;
     public int? SelectedPrefixSortingWidth
@@ -66,14 +68,17 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             loading = true;
             try
             {
-                var row = ExecutionParameters.FirstOrDefault(row => row.Key == ParamKeys.prefixLibIdKey);
+                var section = PrefixSection;
+                var row = section.Rows.FirstOrDefault(row => row.Key == ParamKeys.prefixLibIdKey);
                 if (row is not null)
                 {
                     var kept = row.Values.Select(value => value.Text).Where(text => PrefixWidth(text) == width).ToArray();
-                    ExecutionParameters[ExecutionParameters.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
+                    section.Rows[section.Rows.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
                         Parameters.Single(spec => spec.Key == row.Key));
                 }
-                ExecutionSection.Configure(Parameters.Where(spec => spec.ExecutionAllowed).ToArray(), Snapshot().ExecutionParameters);
+                section.Configure(Parameters.Where(spec => HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed).ToArray(),
+                    section.Rows.Select(row => row.Snapshot()).ToArray());
+                RefreshFixedValues();
             }
             finally { loading = false; }
             Changed(); Changed(nameof(Parameters));
@@ -262,10 +267,10 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         var built = RunTypeEditor.build(editorTemplate, Snapshot());
         if (HasPrefixWidthSelection && SelectedPrefixSortingWidth is int width
-            && ExecutionParameters.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
+            && PrefixSection.Rows.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
                 .Any(value => PrefixWidth(value.Text) != width))
         {
-            var issue = validationIssue.create("Execution." + ParamKeys.prefixLibIdKey, $"Choose prefixes with sorting width {width}.");
+            var issue = validationIssue.create((HasSetup ? "Setup." : "Execution.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with sorting width {width}.");
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
                 built.IsError ? [.. built.ErrorValue, issue] : [issue]);
         }
@@ -351,7 +356,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         try
         {
             SetupSection.CancelAdd(); ExecutionSection.CancelAdd();
-            var prefixWidths = draft.ExecutionParameters.Where(row => row.Key == ParamKeys.prefixLibIdKey)
+            var prefixWidths = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.prefixLibIdKey)
                 .SelectMany(row => row.Values).Select(PrefixWidth).Distinct().ToArray();
             selectedPrefixSortingWidth = prefixWidths.Length == 1 ? prefixWidths[0] : null;
             var defaults = draft.SetupParameters.Concat(draft.ExecutionParameters).ToArray();

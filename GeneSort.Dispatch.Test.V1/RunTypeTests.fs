@@ -8,6 +8,7 @@ open GeneSort.Project.V1.Editing
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
 open GeneSort.SortingLib.Sorter
+open GeneSort.Sorting
 open GeneSort.Core
 
 [<Fact>]
@@ -101,9 +102,11 @@ let ``Prefix choices include the declared IDs and library entries at the same wi
     let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = 24) |> Array.map PrefixLibId.toString
     Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
 
-[<Fact>]
-let ``SortableTests prefix choices can use any registered width without changing the example`` () =
-    let configured = SortableTests.Prefix.Width24s ()
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Prefix test and evaluation choices can use any registered width without changing the example`` evaluation =
+    let configured = if evaluation then SorterEval.Prefix.Width32 () else SortableTests.Prefix.Width24s ()
     let before = RunTypeEditor.fromRun configured
     let widths = RunTypeEditor.prefixSortingWidths configured
     Assert.Contains(8, widths)
@@ -114,7 +117,19 @@ let ``SortableTests prefix choices can use any registered width without changing
         let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = width) |> Array.map PrefixLibId.toString
         Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
         Assert.DoesNotContain(spec.Choices, fun value -> int (PrefixLibId.fromString value).SortingWidth <> width)
+        Assert.Equal(evaluation, spec.RequiredInSetup)
+        Assert.Equal(not evaluation, spec.ExecutionAllowed)
     Assert.Equal(before, RunTypeEditor.fromRun configured)
+
+[<Fact>]
+let ``Prefix evaluation width choices preserve saved Setup declarations outside the current library`` () =
+    let original = SorterEval.Prefix.Width32 ()
+    let savedPrefix = prefixLibId.create 12<sortingWidth> 3<stageLength> prefixLibVariant.PrefixC |> PrefixLibId.toString
+    let setup = original.SetupParameterSpans |> List.map (fun (key, values) -> if key = ParamKeys.prefixLibIdKey then key, [savedPrefix] else key, values)
+    let configured = Run.withParameterSpans setup original.RunParameterSpans original
+    Assert.Contains(12, RunTypeEditor.prefixSortingWidths configured)
+    let spec = RunTypeEditor.parametersForPrefixWidth configured 12 |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
+    Assert.Equal<string>([|savedPrefix|], spec.Choices)
 
 [<Fact>]
 let ``Sorter choices preserve saved IDs and offer other registered variants at that width`` () =

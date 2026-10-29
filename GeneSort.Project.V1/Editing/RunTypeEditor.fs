@@ -74,7 +74,7 @@ module RunTypeEditor =
     /// The width picker is editor state. PrefixLibId already records it in the saved run.
     let prefixSortingWidths (configured: run) =
         let declared =
-            configured.RunParameterSpans
+            configured.SetupParameterSpans @ configured.RunParameterSpans
             |> List.filter (fst >> (=) ParamKeys.prefixLibIdKey) |> List.collect snd
             |> List.choose (fun value -> try Some (int (PrefixLibId.fromString value).SortingWidth) with _ -> None)
         Array.append (PrefixLib.ids () |> Array.map (fun id -> int id.SortingWidth)) (List.toArray declared)
@@ -88,7 +88,7 @@ module RunTypeEditor =
                     PrefixLib.ids () |> Array.filter (fun id -> int id.SortingWidth = width)
                     |> Array.map PrefixLibId.toString |> Array.toList
                 let declared =
-                    configured.RunParameterSpans
+                    configured.SetupParameterSpans @ configured.RunParameterSpans
                     |> List.filter (fst >> (=) ParamKeys.prefixLibIdKey) |> List.collect snd
                     |> List.filter (fun value -> try int (PrefixLibId.fromString value).SortingWidth = width with _ -> false)
                 parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)

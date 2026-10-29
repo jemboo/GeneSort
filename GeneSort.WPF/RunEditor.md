@@ -52,10 +52,12 @@ a module identifier, so renamed definitions may match several compatible modules
    Code presets retain their existing automatic naming.
    `MergeLibId`, `PrefixLibId`, and `SorterLibId` use full-width dropdowns listing available library entries
    for the widths declared by the example (or opened definition), plus its existing
-   declared IDs. For `SortableTests.Prefix` and `SortableTests.PrefixTest`, choose
+   declared IDs. For `SortableTests.Prefix`, `SortableTests.PrefixTest`, and `SorterEval.Prefix`, choose
    **Sorting width** on the Parameters tab first. The PrefixLibId dropdowns then
    offer only that width. Changing width clears incompatible selections; choose
    a matching prefix before saving. Multiple selected prefixes remain unique.
+   In `SorterEval.Prefix`, this filters the Setup choices; Execution inherits them
+   read-only. Match the PrefixLibId and SortableDataFormat to the SortableTests run.
    Opening a saved run infers the width from its PrefixLibIds. The selector adds
    no extra sweep parameter and preserves the existing file IDs. Saved runs with
    mixed widths retain their values until you explicitly choose one width.

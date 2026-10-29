@@ -60,6 +60,7 @@ internal static partial class Program
         model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
         CheckLibrarySelection(model, view, ParamKeys.prefixLibIdKey, "Prefix library value");
         CheckPrefixWidthSelection(root, model, view);
+        CheckEvaluationPrefixWidthSelection(root, model, view);
 
         // SorterLibId is supported by saved definitions even though current Dispatch examples
         // do not declare it. Open such a definition through the actual editor boundary.
@@ -97,7 +98,7 @@ internal static partial class Program
         model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
         model.ProjectsFolder = root;
         Layout(view);
-        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "SortableTests sorting width");
+        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix sorting width");
         Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 24 && Equals(widthPicker.SelectedItem, 24)
             && widthPicker.Items.Contains(32), "The width picker is restricted to the example width or has the wrong default.");
         var prefix24 = model.ExecutionParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey).Values[0].Text;
@@ -157,6 +158,87 @@ internal static partial class Program
         Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 24, "PrefixTest does not support width selection.");
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge"));
         Check(!model.HasPrefixWidthSelection, "The prefix width picker leaked into another workflow.");
+    }
+
+    private static void CheckEvaluationPrefixWidthSelection(string root, RunEditorViewModel model, RunEditorView view)
+    {
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Prefix"));
+        model.SelectExample(model.Examples.Single(example => example.Name == "Width32"));
+        model.ProjectsFolder = root;
+        Layout(view);
+        var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix sorting width");
+        var section = Section(view, model.SetupSection);
+        Check(model.HasPrefixWidthSelection && model.SelectedPrefixSortingWidth == 32 && Equals(widthPicker.SelectedItem, 32)
+            && ((FrameworkElement)widthPicker.Parent).Visibility == Visibility.Visible, "Evaluation does not expose its Setup sorting width.");
+        var original = model.Validate()!;
+        var originalRows = RunParameterGeneration.generate(original, 0, 1);
+        var execution = model.Snapshot().ExecutionParameters;
+        var prefix32 = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey).Values[0].Text;
+        widthPicker.SetCurrentValue(Selector.SelectedItemProperty, 24);
+        Layout(view);
+        var row = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
+        Check(row.Values.Count == 1 && row.Values[0].Text == "" && !model.CanSave && model.Validate() is null,
+            "Evaluation retained a width-32 prefix or allowed saving after switching to width 24.");
+        Check(!model.ExecutionSection.InheritedRows.Single(row => row.Key == ParamKeys.prefixLibIdKey).DisplayValues.Contains(prefix32),
+            "Execution still displays the incompatible Setup prefix.");
+        var expected24 = RunTypeEditor.parametersForPrefixWidth(GeneSort.Dispatch.V1.SortableTests.Prefix.Width24s(), 24)
+            .Single(spec => spec.Key == ParamKeys.prefixLibIdKey).Choices;
+        Check(row.Values[0].Choices.SequenceEqual(expected24), "Evaluation and SortableTests offer different width-24 prefixes.");
+        var prefixPicker = Descendants<ComboBox>(section).Single(box => box.DataContext == row.Values[0]);
+        Check(prefixPicker.ActualWidth > 300, "Evaluation's PrefixLibId control is too narrow.");
+        prefixPicker.SetCurrentValue(Selector.SelectedItemProperty, expected24[0]);
+        Pump();
+        row.AddValue();
+        Check(row.Values.Count == 2 && row.Snapshot().Values.Distinct().Count() == 2
+            && row.Values.All(value => value.Choices.All(choice => choice == value.Text || row.Values.All(other => other.Text != choice))),
+            "Evaluation offers duplicate prefix selections.");
+        var inherited = model.ExecutionSection.InheritedRows.Single(row => row.Key == ParamKeys.prefixLibIdKey);
+        Check(inherited.IsReadOnly && inherited.Snapshot().Values.SequenceEqual(row.Snapshot().Values)
+            && model.ExecutionSection.AvailableParameters.All(spec => spec.Key != ParamKeys.prefixLibIdKey)
+            && execution.SequenceEqual(model.Snapshot().ExecutionParameters),
+            "The selected Setup prefixes were not inherited read-only or became extra Execution dimensions.");
+        var chosen = row.Snapshot().Values;
+        row.Values[0].Text = prefix32;
+        Check(model.Validate() is null && model.Issues.Any(issue => issue.StartsWith("Setup.PrefixLibId:")),
+            "A mismatched Setup prefix bypassed evaluation width validation.");
+        row.Values[0].Text = chosen[0];
+        var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
+        var expectedSetup = ListModule.OfSeq(original.SetupParameterSpans.Select(span => span.Item1 == ParamKeys.prefixLibIdKey
+            ? Tuple.Create(span.Item1, ListModule.OfArray(chosen)) : span));
+        var expected = Run.withParameterSpans(expectedSetup, original.RunParameterSpans, original);
+        var actualRows = RunParameterGeneration.generate(configured, 0, 1);
+        Check(actualRows.Length == originalRows.Length * chosen.Length && actualRows.SequenceEqual(RunParameterGeneration.generate(expected, 0, 1)),
+            "Evaluation width selection changed existing file identities or added sweep dimensions.");
+        Check(model.Snapshot().SetupParameters.All(parameter => parameter.Key != ParamKeys.sortingWidthKey),
+            "The evaluation picker added a redundant SortingWidth parameter.");
+        model.RunName = "EvaluationPrefixWidthSelection";
+        configured = model.Validate()!;
+        Wait(model.SaveAsync(configured, false));
+        model.SelectExample(model.Examples.Single(example => example.Name == "Width32"));
+        Wait(model.OpenAsync(RunDefinitionFiles.pathFor(root, configured)));
+        Layout(view);
+        Check(model.SelectedPrefixSortingWidth == 24 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,
+            "Reopening an evaluation run lost its Setup width or changed its saved configuration.");
+        Check(model.ExecutionSection.InheritedRows.Single(row => row.Key == ParamKeys.prefixLibIdKey).Snapshot().Values.SequenceEqual(chosen),
+            "Reopening lost the read-only Execution prefix values.");
+        // Changing back to the original values must restore the original generated identities.
+        model.SelectedPrefixSortingWidth = 32;
+        row = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
+        row.Values[0].Text = prefix32;
+        model.RunName = original.RunName;
+        Check(originalRows.SequenceEqual(RunParameterGeneration.generate(model.Validate()!, 0, 1)),
+            "Returning to width 32 changed the original Setup references or run parameters.");
+        // The Setup add panel must follow the selector too.
+        model.SetupParameters.Remove(row);
+        model.SelectedPrefixSortingWidth = 24;
+        model.SetupSection.BeginAdd();
+        model.SetupSection.SelectedParameter = model.SetupSection.AvailableParameters.Single(spec => spec.Key == ParamKeys.prefixLibIdKey);
+        var pending = model.SetupSection.PendingRow!;
+        Check(pending.Values[0].Choices.SequenceEqual(expected24) && !model.CanSelectPrefixWidth,
+            "The Setup add panel retained the old width or permits losing a pending edit.");
+        pending.Values[0].Text = chosen[0];
+        Check(model.SetupSection.Add() && model.Validate() is not null, "A matching Setup prefix could not be added back.");
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge"));
     }
 
     private static void CheckLibrarySelection(RunEditorViewModel model, RunEditorView view, string key, string controlName)

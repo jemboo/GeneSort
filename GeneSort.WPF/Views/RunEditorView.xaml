@@ -80,7 +80,7 @@
                                 <TextBlock Text="Sorting width" FontWeight="SemiBold" />
                                 <ComboBox ItemsSource="{Binding PrefixSortingWidths}" SelectedItem="{Binding SelectedPrefixSortingWidth}"
                                           IsEnabled="{Binding CanSelectPrefixWidth}" Width="140" HorizontalAlignment="Left"
-                                          AutomationProperties.Name="SortableTests sorting width" />
+                                          AutomationProperties.Name="Prefix sorting width" />
                                 <TextBlock Text="Choose a width, then select PrefixLibId values below. Changing width clears prefixes from other widths."
                                            TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
                             </StackPanel>
