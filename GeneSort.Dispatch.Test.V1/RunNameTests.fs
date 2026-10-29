@@ -24,8 +24,8 @@ let ``Project names follow the hierarchy above the database module`` () =
           "SorterSgd.p32.Msrs4a.MutationRate", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
           "SorterEval", SorterEval.Standard.Test
           "SorterMutate", SorterMutate.Prefix.Mssi
-          "SortableTests", SortableTests.Prefix.Channels32
-          "SortableTests", SortableTests.PrefixTest.Test ]
+          "SortableTests", SortableTests.Prefix.FourStage_32
+          "SortableTests", SortableTests.Prefix.ThreeStage_24 ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).ProjectName)
 
@@ -33,7 +33,7 @@ let ``Project names follow the hierarchy above the database module`` () =
 let ``Shared source readers use the projects and databases of their producing presets`` () =
     let readers =
         [ SortableTests.SortableTestsDbs.Merge.projectName, SortableTests.SortableTestsDbs.Merge.dbName, SortableTests.Merge.HiMD_32
-          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsDbs.Prefix.dbName, SortableTests.Prefix.Channels32
+          SortableTests.SortableTestsDbs.Prefix.projectName, SortableTests.SortableTestsDbs.Prefix.dbName, SortableTests.Prefix.FourStage_32
           SorterEval.SorterEvalDbs.Standard.projectName, SorterEval.SorterEvalDbs.Standard.dbName, SorterEval.Standard.Test
           SorterEval.SorterEvalDbs.Merge.projectName, SorterEval.SorterEvalDbs.Merge.dbName, SorterEval.Merge.Test
           SorterEval.SorterEvalDbs.Prefix.projectName, SorterEval.SorterEvalDbs.Prefix.dbName, SorterEval.Prefix.Channels32

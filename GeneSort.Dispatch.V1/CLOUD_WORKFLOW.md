@@ -104,7 +104,7 @@ the `evoMsuf32R` / `sossMsuf32R` execution enhancers default activator mutation
 rate to 0.1. Explicit spans override these defaults. Invalid activation settings
 are rejected during parameter preparation. These presets use the existing prefix
 seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Channels32`
-and `SortableTests.Prefix.Channels32` before setup. Automatic naming produces
+and `SortableTests.Prefix.FourStage_32` before setup. Automatic naming produces
 project `SorterSgd.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
 and run names matching the preset functions.
 Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleR`; it prepares
@@ -246,7 +246,7 @@ From the repository root, run the complete OnePool batch with:
 .\scripts\Run-OnePool.ps1
 ```
 
-The script builds its runner, prepares the `SortableTests.Prefix.Channels32`
+The script builds its runner, prepares the `SortableTests.Prefix.FourStage_32`
 and `SorterEval.Prefix.Channels32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
 and completes setup, execution, and the evolution summary report for each preset.
 Source presets finish before any dependent Append or Condense presets. It runs
@@ -309,8 +309,8 @@ The project is the module hierarchy above the database module, with the common
 has project `SorterSgd.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
 Modules directly under a workflow's namespace act as databases. For example,
 `SorterEval.Standard.Test()` has project `SorterEval`, database
-`Standard`, and run `Test`. The distinct sortable-test group is
-`SortableTests.PrefixTest.Test()` (database `PrefixTest`).
+`Standard`, and run `Test`. The sortable-test preset
+`SortableTests.Prefix.ThreeStage_24()` uses database `Prefix`.
 Top-level presets deeper in the hierarchy, such as `Standard_append.Test()`, use their entire module hierarchy
 as the project. Shared database readers obtain their project from a producing preset
 so module renames update both writing and reading locations.

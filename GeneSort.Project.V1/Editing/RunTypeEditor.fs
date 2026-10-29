@@ -267,3 +267,32 @@ module RunTypeEditor =
             match template.ParameterSource with
             | Some (source, selections) -> Run.withParameterSource source selections configured |> Ok
             | None -> Ok configured
+
+
+    /// Clone only the definition; generated rows and output files are separate artifacts.
+    let cloneDraft (configured: run) =
+        let args = (fromRun configured).ToArgs()
+        runDraft.create { args with RunName = args.RunName + "_clone" }
+
+    /// Module-owned settings and phase membership remain fixed while editing a leaf.
+    let buildModuleRun (template: run) (draft: runDraft) =
+        let original = (fromRun template).ToArgs()
+        let edited = draft.ToArgs()
+        let issues = ResizeArray<validationIssue>()
+        let add field = issues.Add(validationIssue.create field "This property is owned by the module and cannot be edited.")
+        if edited.ProjectName <> original.ProjectName then add "ProjectName"
+        if edited.DatabaseName <> original.DatabaseName then add "DatabaseName"
+        if edited.Description <> original.Description then add "Description"
+        if edited.AllowOverwrite <> original.AllowOverwrite then add "AllowOverwrite"
+        if edited.SortableTestsDatabaseName <> original.SortableTestsDatabaseName then add "SortableTestsDatabaseName"
+        if edited.SorterSetEvalsDatabaseName <> original.SorterSetEvalsDatabaseName then add "SorterSetEvalsDatabaseName"
+        if edited.CheckpointIntervalsName <> original.CheckpointIntervalsName then add "CheckpointIntervalsName"
+        if edited.GenSaveIntervalsName <> original.GenSaveIntervalsName then add "GenSaveIntervalsName"
+        if edited.GenSaveSubIntervalsName <> original.GenSaveSubIntervalsName then add "GenSaveSubIntervalsName"
+        for phase, rows, declared in ["Setup", draft.SetupParameters, template.SetupParameterSpans
+                                      "Execution", draft.ExecutionParameters, template.RunParameterSpans] do
+            let keys = declared |> List.map fst |> Set.ofList
+            for row in rows do
+                if not (Set.contains row.Key keys) then
+                    issues.Add(validationIssue.create (phase + "." + row.Key) "Only parameters declared in this phase of the source run may be edited.")
+        if issues.Count > 0 then Error (issues.ToArray()) else build template draft

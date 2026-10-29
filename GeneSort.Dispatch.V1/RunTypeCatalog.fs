@@ -6,7 +6,6 @@ module RunTypeCatalog =
         [|
             SortableTests.Merge.runType
             SortableTests.Prefix.runType
-            SortableTests.PrefixTest.runType
             SorterEval.Merge.runType
             SorterEval.Prefix.runType
             SorterEval.Standard.runType

@@ -94,7 +94,7 @@ renamed definitions without sidecars may match several compatible modules.
    Code presets retain their existing automatic naming.
    `MergeLibId`, `PrefixLibId`, and `SorterLibId` use full-width dropdowns listing available library entries
    for the widths declared by the example (or opened definition), plus its existing
-   declared IDs. For `SortableTests.Prefix`, `SortableTests.PrefixTest`, `SorterEval.Prefix`, and `SorterMutate.Prefix`, choose
+   declared IDs. For `SortableTests.Prefix`, `SorterEval.Prefix`, and `SorterMutate.Prefix`, choose
    **Channel count** on the Parameters tab first. The PrefixLibId dropdowns then
    offer only that width. Changing width clears incompatible selections; choose
    a matching prefix before saving. Multiple selected prefixes remain unique.
@@ -416,3 +416,12 @@ in parameter keys, library identities, DTOs, and the editor. Comparator endpoint
 are `LowChannel` and `HighChannel` (`int<channelIndex>`); `ChannelSpan` measures
 the distance between them. Comparator counts and stage counts remain separate.
 This rename intentionally changes stored names without legacy aliases or migration.
+
+
+### Cloning a run
+
+Open a code-defined or saved run and choose **Clone**. The definition is copied into an unsaved draft named `<source>_clone`; the name remains editable. The clone stays in the source module and project/database. Saving records that module association so the clone appears beside its source in the wizard.
+
+Only the run name and values of parameters declared in the source's Setup and Execution spans are editable. Phase membership remains fixed, and inherited/continuation-source restrictions still apply. Project/database identity, description, source databases, overwrite policy, schedules, functions, catalogs, and makers belong to the module. They remain read-only when opening module runs and clones. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
+
+Cloning copies no generated rows, statuses, checkpoints, snapshots, or results. Saving a clone does not save or overwrite its source. An existing destination still uses the normal explicit replacement confirmation.

@@ -116,17 +116,18 @@ internal static partial class Program
         Check(row.Values[0].Choices.Where(choice => choice.Length > 0).SequenceEqual(expected32),
             "Prefix choices did not follow the selected channel count.");
         var prefixPicker = Descendants<ComboBox>(view).Single(box => box.DataContext == row.Values[0]);
-        prefixPicker.SetCurrentValue(Selector.SelectedItemProperty, expected32[0]);
+        var fourStage32 = expected32.Single(value => PrefixLibId.fromString(value).StageLength == 4);
+        prefixPicker.SetCurrentValue(Selector.SelectedItemProperty, fourStage32);
         Pump();
-        Check(!row.HasErrors && !row.CanAddValue, $"A one-prefix width can add duplicates: text={row.Values[0].Text}; error={row.Error}; choices={string.Join(";", row.Definition!.Choices)}; selected={prefixPicker.SelectedItem}.");
+        Check(!row.HasErrors && row.CanAddValue, $"The second 32-channel prefix is unavailable: text={row.Values[0].Text}; error={row.Error}; choices={string.Join(";", row.Definition!.Choices)}; selected={prefixPicker.SelectedItem}.");
         row.Values[0].Text = prefix24;
         Check(model.Validate() is null, "A prefix from another width bypassed validation.");
-        row.Values[0].Text = expected32[0];
+        row.Values[0].Text = fourStage32;
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         Check(model.Snapshot().ExecutionParameters.All(parameter => parameter.Key != ParamKeys.channelCountKey),
             "The width picker created a redundant sweep parameter.");
         ProjectCatalogs.registerAll();
-        var expectedTemplate = model.Examples.Single(example => example.Name == "Channels32").Run;
+        var expectedTemplate = model.Examples.Single(example => example.Name == "FourStage_32").Run;
         var expected = RunTypeEditor.build(expectedTemplate, RunTypeEditor.newDraft(expectedTemplate)).ResultValue;
         var actualRows = RunParameterGeneration.generate(configured, 0, 1);
         var expectedRows = RunParameterGeneration.generate(expected, 0, 1);
@@ -157,8 +158,6 @@ internal static partial class Program
         Check(!model.CanSelectPrefixChannelCount, "Width changes can discard a pending parameter edit.");
         pending.Values[0].Text = prefix24;
         Check(model.ExecutionSection.Add(), "A matching prefix could not be added back.");
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.PrefixTest"));
-        Check(model.HasPrefixChannelCountSelection && model.SelectedPrefixChannelCount == 24, "PrefixTest does not support width selection.");
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge"));
         Check(!model.HasPrefixChannelCountSelection, "The prefix width picker leaked into another workflow.");
     }

@@ -75,6 +75,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public async Task ChooseRunAsync(RunSelectionTile tile)
     {
         if (IsBusy || tile.Definition is null) return;
+        modulePropertiesLocked = true;
         if (tile.SavedPath is not null && !tile.CreateNew)
         {
             await OpenAsync(tile.SavedPath);
@@ -105,6 +106,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         IsSelectingRun = false;
     }
 
+    private bool modulePropertiesLocked;
+    public bool ModulePropertiesLocked => modulePropertiesLocked;
+    public bool CanEditModuleProperties => !modulePropertiesLocked && !IsBusy;
+    public bool CanClone => !IsBusy && !HasPendingParameter && editorTemplate is not null && Build().IsOk;
+    private bool AllowedInPhase(string key, bool setup) => !modulePropertiesLocked ||
+        (setup ? editorTemplate.SetupParameterSpans : editorTemplate.RunParameterSpans).Any(span => span.Item1 == key);
     private run editorTemplate = null!;
     public runType[] RunTypes { get; } = RunTypeCatalog.all;
     public runType? SelectedRunType { get; private set; }
@@ -159,7 +166,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                         Parameters.Single(spec => spec.Key == row.Key));
                 }
                 UpdateMutatorChannelCount(width);
-                section.Configure(Parameters.Where(spec => HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed).ToArray(),
+                section.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, HasSetup) && (HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed)).ToArray(),
                     section.Rows.Select(row => row.Snapshot()).ToArray());
                 RefreshFixedValues();
             }
@@ -208,7 +215,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                             Parameters.Single(spec => spec.Key == row.Key));
                     }
                     UpdateMutatorChannelCount(width);
-                    section.Configure(Parameters.Where(spec => HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed).ToArray(),
+                    section.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, HasSetup) && (HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed)).ToArray(),
                         section.Rows.Select(row => row.Snapshot()).ToArray());
                     RefreshFixedValues();
                 }
@@ -326,6 +333,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     private void SaveStateChanged()
     {
+        Changed(nameof(CanClone)); Changed(nameof(ModulePropertiesLocked)); Changed(nameof(CanEditModuleProperties));
         Changed(nameof(CanSave)); Changed(nameof(SaveHint));
     }
 
@@ -404,8 +412,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         SelectedRunType = RunTypes.First(type => type.Name == "SorterSgd.p32.Msuf4a.Standard.Pool_32");
         SelectedExample = SelectedRunType.Examples[0];
         editorTemplate = SelectedExample.Run;
-        SetupSection = new("Setup parameters", Parameters.Where(spec => RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray());
-        ExecutionSection = new("Processing overrides", Parameters.Where(spec => spec.ExecutionAllowed).ToArray(),
+        SetupSection = new("Setup parameters", Parameters.Where(spec => AllowedInPhase(spec.Key, true) && RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray());
+        ExecutionSection = new("Processing overrides", Parameters.Where(spec => AllowedInPhase(spec.Key, false) && spec.ExecutionAllowed).ToArray(),
             key => SetupParameters.FirstOrDefault(row => row.Key == key)?.Snapshot().Values);
         SetupSection.PropertyChanged += SectionChanged;
         ExecutionSection.PropertyChanged += SectionChanged;
@@ -442,6 +450,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (!Examples.Contains(example)) throw new ArgumentException("Choose an example from this run type.", nameof(example));
         SelectedExample = example;
         sourceModule = SelectedRunType?.Name;
+        modulePropertiesLocked = false;
         editorTemplate = example.Run;
         Apply(RunTypeEditor.newDraft(editorTemplate));
         IsDirty = true;
@@ -450,7 +459,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     public Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]> Build()
     {
-        var built = RunTypeEditor.build(editorTemplate, Snapshot());
+        var built = modulePropertiesLocked ? RunTypeEditor.buildModuleRun(editorTemplate, Snapshot())
+            : RunTypeEditor.build(editorTemplate, Snapshot());
         if (HasPrefixChannelCountSelection && SelectedPrefixChannelCount is int width
             && PrefixSection.Rows.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
                 .Any(value => PrefixChannelCount(value.Text) != width))
@@ -571,8 +581,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             selectedMergeChannelCount = mergeChannelCounts.Length == 1 ? mergeChannelCounts[0]?.ToString(CultureInfo.InvariantCulture) ?? "" : "";
             mergeChannelCountEdited = false;
             var defaults = draft.SetupParameters.Concat(draft.ExecutionParameters).ToArray();
-            SetupSection.Configure(Parameters.Where(spec => RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray(), defaults);
-            ExecutionSection.Configure(Parameters.Where(spec => spec.ExecutionAllowed).ToArray(), defaults);
+            SetupSection.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, true) && RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray(), defaults);
+            ExecutionSection.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, false) && spec.ExecutionAllowed).ToArray(), defaults);
             FirstReplica = "0"; ReplicaCount = "1";
             ProjectName = draft.ProjectName; DatabaseName = draft.DatabaseName; RunName = draft.RunName;
             SortableTestsDatabaseName = draft.SortableTestsDatabaseName; SorterSetEvalsDatabaseName = draft.SorterSetEvalsDatabaseName;
@@ -600,8 +610,24 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         GenerationChanged();
     }
 
+    public void Clone()
+    {
+        if (!CanClone) return;
+        var source = Build().ResultValue;
+        var draft = RunTypeEditor.cloneDraft(source);
+        editorTemplate = RunTypeEditor.buildModuleRun(source, draft).ResultValue;
+        modulePropertiesLocked = true;
+        Apply(draft);
+        IsDirty = true;
+        hasChosenRun = true;
+        IsSelectingRun = false;
+        Validate();
+        Status = "Cloned definition. Edit the run name and declared parameter values, then save. Module settings are read-only.";
+    }
+
     public void New()
     {
+        modulePropertiesLocked = true;
         editorTemplate = SelectedExample?.Run ?? editorTemplate;
         Apply(RunTypeEditor.newDraft(editorTemplate));
         Status = "New definition. Select a projects folder and validate before saving.";
@@ -647,6 +673,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         SelectedRunType = match.Type;
         sourceModule = match.Type?.Name;
         SelectedExample = match.Example;
+        modulePropertiesLocked = true;
         editorTemplate = configured;
         var root = RunDefinitionFiles.tryProjectsFolder(path, configured);
         Apply(RunTypeEditor.fromRun(configured));
@@ -666,6 +693,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             throw new InvalidOperationException("Select an existing projects folder and validate the current definition before saving.");
         var path = await RunDefinitionFiles.saveAsync(ProjectsFolder, configured, overwrite);
         await RunSelectionViewModel.SaveModuleAsync(path, sourceModule ?? SelectedRunType?.Name);
+        editorTemplate = configured;
         IsDirty = false;
         Status = $"Saved {path}";
     }

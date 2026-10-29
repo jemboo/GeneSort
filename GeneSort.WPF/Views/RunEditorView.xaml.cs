@@ -42,6 +42,7 @@ public partial class RunEditorView : UserControl
     private void ReturnToEditor_Click(object sender, RoutedEventArgs e) => Model.CancelSelection();
 
     private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
+    private void Clone_Click(object sender, RoutedEventArgs e) => Model.Clone();
     private void Validate_Click(object sender, RoutedEventArgs e) => Model.Validate();
     private void CopyErrors_Click(object sender, RoutedEventArgs e)
     {

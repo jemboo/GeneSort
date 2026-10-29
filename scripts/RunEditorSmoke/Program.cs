@@ -63,6 +63,12 @@ internal static partial class Program
             }
             model.CancelSelection();
             Layout(view);
+            if (args.Contains("--clone"))
+            {
+                CheckCloning(root, model, view, errors);
+                Console.WriteLine("Code and saved clones, module ownership, editable names and spans, and artifact isolation passed.");
+                return 0;
+            }
             if (args.Contains("--setup-tabs"))
             {
                 CheckSetupProcessing(root, model, view, errors);

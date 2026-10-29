@@ -36,7 +36,7 @@ internal static partial class Program
         Wait(model.ChooseRunAsync(original));
         Check(!model.IsSelectingRun && model.RunName == codeRunName, "Code selection must retain the actual run name rather than NewRun.");
         Check(model.ProjectsFolder == root && model.IsDirty, "Code selection lost its folder or unsaved state.");
-        model.Description = "Saved values take precedence over code defaults";
+        Check(model.ModulePropertiesLocked, "Code module properties are editable.");
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         Wait(model.SaveAsync(configured, false));
         Wait(model.BeginSelectionAsync());
@@ -73,15 +73,14 @@ internal static partial class Program
         Render(view, Path.Combine(completionScreens, "completed.png"));
         Wait(model.ChooseRunAsync(saved));
         Check(!model.HasUnsavedChanges && model.RunName == codeRunName, "Saved leaf did not load cleanly.");
-        Check(model.Description == "Saved values take precedence over code defaults", "Code defaults replaced the saved counterpart.");
+        Check(model.Description == original.Definition!.Description, "Code defaults replaced the saved counterpart.");
         Wait(model.BeginSelectionAsync());
         wizard.Navigate(wizard.Tiles.Single(tile => tile.CreateNew));
         var template = wizard.Tiles.Single(tile => tile.Name == original.Name);
         Check(template.CreateNew && template.Definition is not null, "Create leaf did not expose templates.");
         Wait(model.ChooseRunAsync(template));
         model.RunName = "WizardCustom";
-        model.ProjectName = "MyCustomProject";
-        model.DatabaseName = "MyCustomDatabase";
+        Check(model.ProjectName == original.Definition!.ProjectName && model.DatabaseName == original.Definition.DatabaseName, "New leaf left its module database.");
         var custom = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         Wait(model.SaveAsync(custom, false));
         Check(File.Exists(RunDefinitionFiles.pathFor(root, custom) + ".module.json"), "Custom leaf did not retain its module.");
@@ -92,14 +91,14 @@ internal static partial class Program
         Check(!customTile.IsCodeDefined && customTile.SavedPath is not null && customTile.ModulePath == original.ModulePath, "Renamed custom leaf was not restored to its source module.");
         Wait(model.ChooseRunAsync(customTile));
         Check(model.SelectedRunType?.Name == original.ModulePath, "Custom leaf was associated with an unrelated compatible module.");
-        model.Description = "Keep this draft";
+        model.RunName = "KeepThisDraft";
         wizard.Home(); // The editor must return to its module, not this stale wizard location.
         Layout(view);
         Click(Descendants<Button>(view).Single(button => Equals(button.Content, "Back") && button.ToolTip is string tip && tip.StartsWith("Back to")));
         WaitUntil(() => model.IsSelectingRun && !wizard.IsLoading);
         Check(wizard.CurrentPath == original.ModulePath, "Back did not return to the containing module.");
         model.CancelSelection();
-        Check(model.Description == "Keep this draft" && model.HasUnsavedChanges, "Returning from the wizard discarded edits.");
+        Check(model.RunName == "KeepThisDraft" && model.HasUnsavedChanges, "Returning from the wizard discarded edits.");
         Wait(model.BeginSelectionAsync());
         // Corrupt definitions should not hide healthy runs or abort the wizard.
         var corruptFolder = Path.Combine(root, "Broken", "Database", "Data", "Project", "Run", "Broken");

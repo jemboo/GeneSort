@@ -163,7 +163,7 @@ let ``Prefix evaluation width choices preserve saved Setup declarations outside 
 
 [<Fact>]
 let ``Sorter choices preserve saved IDs and offer other registered variants at that width`` () =
-    let original = SortableTests.Prefix.Channels32 ()
+    let original = SortableTests.Prefix.FourStage_32 ()
     let savedIds = ["SorterLibId(channelCount=32, Variant=VariantA)"; "SorterLibId(channelCount=32, Variant=VariantC)"]
     let configured =
         SimpleRun.create {
@@ -195,3 +195,43 @@ let ``Prefix and sorter duplicates are compared by parsed identity`` () =
         Assert.Contains(ParameterValidation.validateSpans "Setup" [key, [value; equivalent]], fun issue -> issue.Message.Contains("duplicated"))
         Assert.True(ParameterValidation.validateValue key invalid |> Result.isError)
         Assert.True(ParameterValidation.validateValue key "not an ID" |> Result.isError)
+
+
+[<Fact>]
+let ``Clones preserve module settings and allow only source phase parameters`` () =
+    for kind in RunTypeCatalog.all do
+        for example in kind.Examples do
+            let source = example.Run
+            let draft = RunTypeEditor.cloneDraft source
+            Assert.Equal(string source.RunName + "_clone", draft.RunName)
+            let clone = RunTypeEditor.buildModuleRun source draft |> function Ok value -> value | Error errors -> failwithf "%s: %A" example.Name errors
+            Assert.True(source.ProjectName = clone.ProjectName, "Clone changed ProjectName.")
+            Assert.True(source.DatabaseName = clone.DatabaseName, "Clone changed DatabaseName.")
+            Assert.True(source.SetupParameterSpans = clone.SetupParameterSpans, "Clone changed SetupParameterSpans.")
+            Assert.True(source.RunParameterSpans = clone.RunParameterSpans, "Clone changed RunParameterSpans.")
+            Assert.Equal(source.MakerNames, clone.MakerNames)
+            Assert.Equal(source.ParameterSource, clone.ParameterSource)
+            let args = draft.ToArgs()
+            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with RunName = "RenamedClone" }) |> Result.isOk)
+            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with Description = args.Description + " changed" }) |> Result.isError)
+            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with DatabaseName = "OtherDatabase" }) |> Result.isError)
+            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with ExecutionParameters = Array.append args.ExecutionParameters [| parameterDraft.create "NotDeclaredBySource" [|"1"|] |] }) |> Result.isError)
+            for row in args.SetupParameters do
+                if not (args.ExecutionParameters |> Array.exists (fun other -> other.Key = row.Key)) then
+                    Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with ExecutionParameters = Array.append args.ExecutionParameters [|row|] }) |> Result.isError)
+
+
+[<Fact>]
+let ``Prefix presets resolve to valid networks with the declared stage count`` () =
+    for example in SortableTests.Prefix.runType.Examples do
+        for key, values in example.Run.RunParameterSpans do
+            if key = ParamKeys.prefixLibIdKey then
+                for value in values do
+                    let id = PrefixLibId.fromString value
+                    let network = PrefixLib.tryGet id |> Option.defaultWith (fun () -> failwithf "Missing prefix: %s" value)
+                    let stages = SorterDataParse.parseTo2dCeArray network
+                    Assert.Equal(int id.StageLength, stages.Length)
+                    for stage in stages do
+                        let channels = stage |> Array.collect (fun ce -> [|int ce.LowChannel; int ce.HighChannel|])
+                        Assert.Equal(channels.Length, (Array.distinct channels).Length)
+                        Assert.All(channels, fun channel -> Assert.InRange(channel, 0, int id.ChannelCount - 1))
