@@ -22,10 +22,19 @@ internal static partial class Program
         Check(wizard.Tiles.Select(tile => tile.Name).SequenceEqual(new[] { "SortableTests", "SorterEval", "SorterMutate", "SorterSgd" }), "Root module hierarchy is wrong.");
         var selectionView = Descendants<RunSelectionView>(view).Single();
         Check(selectionView.Visibility == Visibility.Visible && Descendants<WrapPanel>(selectionView).Any(), "Wizard is not rendered as wrap panels. " + errors);
+        wizard.Navigate(wizard.Tiles.Single(tile => tile.Name == "SorterEval"));
+        wizard.Navigate(wizard.Tiles.Single(tile => tile.Name == "Standard"));
+        var channelCounts = wizard.Tiles.Where(tile => tile.IsModule).Select(tile => int.Parse(tile.Name["Channels".Length..])).ToArray();
+        Check(channelCounts.SequenceEqual(channelCounts.Order()), "Channel modules are not sorted numerically.");
+        Check(Array.IndexOf(channelCounts, 8) < Array.IndexOf(channelCounts, 16), "Channels8 must precede Channels16.");
+        wizard.JumpTo(wizard.Breadcrumbs[0]);
+        Layout(view);
         var rootTile = Descendants<Button>(selectionView).Single(button => button.DataContext is RunSelectionTile { Name: "SortableTests" });
         Click(rootTile);
         Check(wizard.CurrentPath == "SortableTests", "Tile click did not navigate.");
         wizard.Navigate(wizard.Tiles.Single(tile => tile.Name == "Prefix"));
+        Check(wizard.Tiles.All(tile => tile.IsModule), "Mixed Prefix module still contains run leaves.");
+        wizard.Navigate(wizard.Tiles.Single(tile => tile.Name == "Channels24"));
         Check(wizard.ModuleDescription == model.RunTypes.Single(type => type.Name == wizard.CurrentPath).Description,
             "The module page lost its description.");
         Layout(view);
@@ -35,7 +44,7 @@ internal static partial class Program
         var codeRunName = original.Definition!.RunName;
         Wait(model.ChooseRunAsync(original));
         Check(!model.IsSelectingRun && model.RunName == codeRunName, "Code selection must retain the actual run name rather than NewRun.");
-        Check(model.ProjectsFolder == root && model.IsDirty, "Code selection lost its folder or unsaved state.");
+        Check(model.ProjectsFolder == root && !model.IsDirty && model.DefinitionReadOnly, "Code selection lost its folder or read-only state.");
         Check(model.ModulePropertiesLocked, "Code module properties are editable.");
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         Wait(model.SaveAsync(configured, false));
@@ -91,6 +100,7 @@ internal static partial class Program
         Check(!customTile.IsCodeDefined && customTile.SavedPath is not null && customTile.ModulePath == original.ModulePath, "Renamed custom leaf was not restored to its source module.");
         Wait(model.ChooseRunAsync(customTile));
         Check(model.SelectedRunType?.Name == original.ModulePath, "Custom leaf was associated with an unrelated compatible module.");
+        model.Clone();
         model.RunName = "KeepThisDraft";
         wizard.Home(); // The editor must return to its module, not this stale wizard location.
         Layout(view);
@@ -114,7 +124,7 @@ internal static partial class Program
         NavigateTo(wizard, original.ModulePath);
         Check(!wizard.Tiles.Any(tile => tile.Name == "WizardCustom") && wizard.Tiles.Where(tile => tile.Definition is not null).All(tile => tile.SavedPath is null), "Switching folders retained saved leaves from the old folder.");
         wizard.Back();
-        Check(wizard.CurrentPath == "SortableTests", "Back skipped a module layer.");
+        Check(wizard.CurrentPath == "SortableTests.Prefix", "Back skipped a module layer.");
         wizard.Home();
         NavigateTo(wizard, "SorterSgd.p32.Msuf4a.SimpleR.Soss");
         Check(wizard.Tiles.Any(tile => tile.Name == "Test") && wizard.Tiles.Any(tile => tile.Name == "ActivatorRates"), "Deep module lost its leaves.");

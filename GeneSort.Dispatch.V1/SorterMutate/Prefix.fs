@@ -21,6 +21,8 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
@@ -33,6 +35,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -76,6 +81,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -119,6 +127,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -162,6 +173,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -222,8 +236,9 @@ module Prefix =
 
     let description = "Compare mutations of sorting-network prefixes across model families."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", description, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Prefix", description, channelCount, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

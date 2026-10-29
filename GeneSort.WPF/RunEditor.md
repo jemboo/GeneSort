@@ -86,31 +86,16 @@ The MessagePack definition itself does not store a module identifier, so older
 renamed definitions without sidecars may match several compatible modules.
 
 1. Create a new definition or open an existing `Run_*.msgpack` file.
-2. Edit the project, database and run names, description, parameter spans and
-   save intervals. Parameter names are fixed once added. Edit values in their
-   numeric, choice or text controls, using **+ value** for a sweep. Each field
-   holds one value; commas and quotes in text labels are literal characters.
-   The catalog tab shows the entries supplied by the selected example.
-   Code presets retain their existing automatic naming.
-   `MergeLibId`, `PrefixLibId`, and `SorterLibId` use full-width dropdowns listing available library entries
-   for the widths declared by the example (or opened definition), plus its existing
-   declared IDs. For `SortableTests.Prefix`, `SorterEval.Prefix`, and `SorterMutate.Prefix`, choose
-   **Channel count** on the Parameters tab first. The PrefixLibId dropdowns then
-   offer only that width. Changing width clears incompatible selections; choose
-   a matching prefix before saving. Multiple selected prefixes remain unique.
-   In `SorterEval.Prefix` and `SorterMutate.Prefix`, this filters the Setup choices; Processing inherits them
-   read-only. Match the PrefixLibId and SortableDataFormat to the SortableTests run.
-   `SortableTests.Merge`, `SorterEval.Merge`, and `SorterMutate.Merge` also have **Channel count** selectors
-   that filter MergeLibId. Choose a suggested width or type another positive whole
-   number; available choices use component sorters in the library. Widths without
-   available entries are rejected. Evaluation and mutation inherit their selected Setup merges
-   read-only. Changing width clears incompatible selections, and all selections
-   remain unique. In the mutation workflows, changing width also updates the width
-   inside Setup's `MutatorParams`, preserving the other mutation settings. Processing
-   inherits those values read-only. Opening a saved definition does not change them.
-   Opening a saved run infers the width from its library IDs. The selectors add
-   no extra sweep parameter and preserve the existing file IDs. Saved runs with
-   mixed widths retain their values until you explicitly choose one width.
+2. Code-defined and saved runs are read-only. Choose **Clone** to edit the new
+   run's name and its declared Setup/Execution parameter values before saving.
+   Each module declares one fixed `channelCount`, displayed above the editor.
+   Mixed-channel workflows have `ChannelsN` child modules. Select the appropriate
+   module in the wizard rather than changing a run's channel count.
+   `ChannelCount`, when needed internally by parameter generation, remains a
+   read-only singleton. Prefix, merge and sorter library dropdowns use the module
+   count; model-type choices respect generator channel-count constraints.
+   Validation rejects mismatched IDs, mutator counts and channel-count sweeps.
+   Clones and saved definitions retain their source module's count.
    Long identities
    wrap at narrower window widths. Dropdowns exclude values selected elsewhere in
    the same parameter, and **+ value** chooses an unused option. Duplicate typed
@@ -424,4 +409,33 @@ Open a code-defined or saved run and choose **Clone**. The definition is copied 
 
 Only the run name and values of parameters declared in the source's Setup and Execution spans are editable. Phase membership remains fixed, and inherited/continuation-source restrictions still apply. Project/database identity, description, source databases, overwrite policy, schedules, functions, catalogs, and makers belong to the module. They remain read-only when opening module runs and clones. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
 
-Cloning copies no generated rows, statuses, checkpoints, snapshots, or results. Saving a clone does not save or overwrite its source. An existing destination still uses the normal explicit replacement confirmation.
+Cloning copies no generated rows, statuses, checkpoints, snapshots, or results. Saving a clone does not save or overwrite its source. An existing destination cannot be replaced from the editor; choose a different name for the clone.
+
+
+Code-defined and saved definitions are immutable in the editor, including their names and parameter spans. Clone to make an editable draft; saving or generating its first parameters makes it read-only. Replica range and parallel-thread controls remain available. Generating replicas adds missing files and preserves existing replicas (including progress and status), even outside the requested range. It refuses a different definition under an existing run name.
+
+
+### Channel module storage
+
+Channel-specific children of the SortableTests and SorterEval workflow modules
+share their parent's project/database library location. This keeps setup readers
+and channel-keyed library queries consistent. Presets split from a multi-channel
+sweep have unique names such as `Small_16`; each calls `RunNaming.create` itself.
+The `.module.json` label records the full channel-specific module for saved clones.
+When a label is missing, matching also checks channel count. Every run-bearing
+module exposes an explicit positive `channelCount` and registers it in `runType`.
+
+### Evolution module settings
+
+SGD modules declare model type, prefix stage/variant, evaluation measures, RNG type,
+and data format in `moduleParameters`. These values appear in Setup and remain
+read-only when cloning; validation rejects edits and removal. Continuations inherit
+them from their source. Existing evaluation/model/prefix comparison workflows retain
+their explicit sweeps. The Msuf6 initial-measure value `SameAsEvaluation` resolves to
+each Setup row's evaluation measure without adding another sweep dimension.
+
+`ExcludeSelfCe` and `CollectNewSortableTests` (`CollectSortableTests` in saved spans)
+are also fixed module policies. SimpleR's `AMax` and SimpleS's `ActivationProbability`
+are explicit Setup run parameters, editable in clones. Their module defaults are 3
+and 0.5 respectively; existing sweeps are preserved. Missing activation settings
+are validation errors rather than requests for enhancer defaults.

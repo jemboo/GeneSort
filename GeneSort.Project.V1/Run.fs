@@ -24,6 +24,8 @@ module private ParameterGeneration =
             else
                 fullSpans
                 |> Combinatorics.cartesianProductMaps
+                |> Seq.map ParameterValidation.resolveSelection
+                |> Seq.map ParameterValidation.resolveEvaluationMeasures
                 |> Seq.map parameterSet<'kind>.create
                 |> Seq.toArray
 

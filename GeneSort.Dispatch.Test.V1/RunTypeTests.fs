@@ -10,6 +10,8 @@ open GeneSort.Dispatch.V1
 open GeneSort.SortingLib.Sorter
 open GeneSort.Sorting
 open GeneSort.Core
+open GeneSort.Project.V1.ParamBundles
+open GeneSort.Model.Sorting.V1
 
 [<Fact>]
 let ``Every module and run definition has an explicit catalog entry`` () =
@@ -98,7 +100,7 @@ let ``Equivalent merge identities and numeric values cannot create duplicate swe
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Merge width filtering finds component networks for test and evaluation runs`` evaluation =
-    let configured = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.HiMD_32 ()
+    let configured = if evaluation then SorterEval.Merge.Channels32.Test () else SortableTests.Merge.Channels32.HiMD_32 ()
     let before = RunTypeEditor.fromRun configured
     Assert.Contains(24, RunTypeEditor.mergeChannelCounts configured)
     Assert.Contains(32, RunTypeEditor.mergeChannelCounts configured)
@@ -115,7 +117,7 @@ let ``Merge width filtering finds component networks for test and evaluation run
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Merge width suggestions and filtering preserve unavailable saved library identities`` evaluation =
-    let original = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.HiMD_32 ()
+    let original = if evaluation then SorterEval.Merge.Channels32.Test () else SortableTests.Merge.Channels32.HiMD_32 ()
     let saved = mergeLibId.create 768<channelCount> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString
     let replace spans = spans |> List.map (fun (key, values) -> if key = ParamKeys.mergeLibIdKey then key, [saved] else key, values)
     let configured = Run.withParameterSpans (replace original.SetupParameterSpans) (replace original.RunParameterSpans) original
@@ -126,7 +128,7 @@ let ``Merge width suggestions and filtering preserve unavailable saved library i
 
 [<Fact>]
 let ``Prefix choices include the declared IDs and library entries at the same widths`` () =
-    let configured = SortableTests.Prefix.Channels24 ()
+    let configured = SortableTests.Prefix.Channels24.Channels24 ()
     let spec = RunTypeEditor.parameters configured |> Array.find (fun spec -> spec.Key = ParamKeys.prefixLibIdKey)
     Assert.Equal(parameterValueKind.Choice, spec.ValueKind)
     let expected = PrefixLib.ids () |> Array.filter (fun id -> int id.ChannelCount = 24) |> Array.map PrefixLibId.toString
@@ -136,7 +138,7 @@ let ``Prefix choices include the declared IDs and library entries at the same wi
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``Prefix test and evaluation choices can use any registered width without changing the example`` evaluation =
-    let configured = if evaluation then SorterEval.Prefix.Channels32 () else SortableTests.Prefix.Channels24 ()
+    let configured = if evaluation then SorterEval.Prefix.Channels32 () else SortableTests.Prefix.Channels24.Channels24 ()
     let before = RunTypeEditor.fromRun configured
     let widths = RunTypeEditor.prefixChannelCounts configured
     Assert.Contains(8, widths)
@@ -163,7 +165,7 @@ let ``Prefix evaluation width choices preserve saved Setup declarations outside 
 
 [<Fact>]
 let ``Sorter choices preserve saved IDs and offer other registered variants at that width`` () =
-    let original = SortableTests.Prefix.FourStage_32 ()
+    let original = SortableTests.Prefix.Channels32.FourStage_32 ()
     let savedIds = ["SorterLibId(channelCount=32, Variant=VariantA)"; "SorterLibId(channelCount=32, Variant=VariantC)"]
     let configured =
         SimpleRun.create {
@@ -223,7 +225,7 @@ let ``Clones preserve module settings and allow only source phase parameters`` (
 
 [<Fact>]
 let ``Prefix presets resolve to valid networks with the declared stage count`` () =
-    for example in SortableTests.Prefix.runType.Examples do
+    for example in RunTypeCatalog.all |> Array.filter (fun kind -> kind.Name.StartsWith("SortableTests.Prefix.Channels")) |> Array.collect (fun kind -> kind.Examples) do
         for key, values in example.Run.RunParameterSpans do
             if key = ParamKeys.prefixLibIdKey then
                 for value in values do
@@ -235,3 +237,154 @@ let ``Prefix presets resolve to valid networks with the declared stage count`` (
                         let channels = stage |> Array.collect (fun ce -> [|int ce.LowChannel; int ce.HighChannel|])
                         Assert.Equal(channels.Length, (Array.distinct channels).Length)
                         Assert.All(channels, fun channel -> Assert.InRange(channel, 0, int id.ChannelCount - 1))
+
+
+[<Fact>]
+let ``Every module owns one channel count and all its presets agree`` () =
+    let mismatches =
+        RunTypeCatalog.all |> Array.collect (fun kind ->
+            kind.Examples |> Array.choose (fun example ->
+                let actual = RunTypeEditor.channelCounts example.Run
+                if actual = [|kind.ChannelCount|] then None
+                else Some (sprintf "%s.%s: %A" kind.Name example.Name actual)))
+    Assert.True(Array.isEmpty mismatches, String.Join("; ", mismatches))
+    for kind in RunTypeCatalog.all do
+        Assert.True(kind.ChannelCount > 0, kind.Name)
+        for example in kind.Examples do
+            let configured = example.Run
+            let declaredCount = RunParameterGeneration.effectiveSpans configured |> Map.tryFind ParamKeys.channelCountKey
+            Assert.True((declaredCount = Some [string kind.ChannelCount]), kind.Name + "." + example.Name + " must declare its module channel count.")
+            Assert.Equal<int>([|kind.ChannelCount|], RunTypeEditor.channelCounts configured)
+            let draft = RunTypeEditor.fromRun configured
+            Assert.Empty(RunTypeEditor.validateChannelCount kind.ChannelCount configured draft)
+            Assert.NotEmpty(RunTypeEditor.validateChannelCount (kind.ChannelCount + 1) configured draft)
+            for spec in RunTypeEditor.parametersForChannelCount configured kind.ChannelCount do
+                for value in spec.Choices do
+                    let count =
+                        if spec.Key = ParamKeys.prefixLibIdKey then Some (int (PrefixLibId.fromString value).ChannelCount)
+                        elif spec.Key = ParamKeys.mergeLibIdKey then Some (int (MergeLibId.fromString value).ChannelCount)
+                        elif spec.Key = ParamKeys.sorterLibIdKey then Some (int (SorterLibId.fromString value).ChannelCount)
+                        elif spec.Key = ParamKeys.channelCountKey then Some (int value)
+                        else None
+                    count |> Option.iter (fun actual -> Assert.Equal(kind.ChannelCount, actual))
+                    if spec.Key = ParamKeys.simpleSorterModelTypeKey then
+                        Assert.True(SimpleSorterModelType.supportsChannelCount kind.ChannelCount (SimpleSorterModelType.fromString value))
+
+[<Fact>]
+let ``Module validation rejects channel changes encoded in library and mutator parameters`` () =
+    let source = SortableTests.Prefix.Channels24.Channels24 ()
+    let args = (RunTypeEditor.cloneDraft source).ToArgs()
+    let changed = args.ExecutionParameters |> Array.map (fun row ->
+        if row.Key = ParamKeys.prefixLibIdKey then parameterDraft.create row.Key [|PrefixLibId.toString (prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA)|]
+        else row)
+    Assert.NotEmpty(RunTypeEditor.validateChannelCount 24 source (runDraft.create { args with ExecutionParameters = changed }))
+    let standard = SorterEval.Standard.Channels16.Test ()
+    let args = (RunTypeEditor.cloneDraft standard).ToArgs()
+    let changed = args.SetupParameters |> Array.map (fun row -> if row.Key = ParamKeys.channelCountKey then parameterDraft.create row.Key [|"16"; "24"|] else row)
+    Assert.NotEmpty(RunTypeEditor.validateChannelCount 16 standard (runDraft.create { args with SetupParameters = changed }))
+    let mutant = GeneSort.Dispatch.V1.SorterMutate.Standard.Msrs ()
+    let args = (RunTypeEditor.cloneDraft mutant).ToArgs()
+    let changed = args.SetupParameters |> Array.map (fun row ->
+        if row.Key = ParamKeys.mutatorParamsKey then
+            parameterDraft.create row.Key [|MutatorParams.msrsParamsRL 24<channelCount> rngType.Lcg mutatorVariant.V1 |> MutatorParams.toString|]
+        else row)
+    Assert.NotEmpty(RunTypeEditor.validateChannelCount 16 mutant (runDraft.create { args with SetupParameters = changed }))
+
+[<Fact>]
+let ``Seed enhancer preserves explicit module settings`` () =
+    let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupEnhancerContext = {
+        Run = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss.Pool_32.Gens100 ()
+        QueryParamsFromSetupParams = fun _ _ -> None
+    }
+    let parameters = setupParameters.create (Map.ofList [
+        ParamKeys.channelCountKey, "16"
+        ParamKeys.sorterCountPerPoolKey, "4"
+        ParamKeys.sorterCountPerPoolSetKey, "32"
+        ParamKeys.prefixLibIdKey, (prefixLibId.create 16<channelCount> 2<stageLength> prefixLibVariant.PrefixA |> PrefixLibId.toString)
+        ParamKeys.simpleSorterModelTypeKey, "Msrs"
+        ParamKeys.rngTypeKey, "LCG"
+        ParamKeys.sortableDataFormatKey, "BitVector512"
+        ParamKeys.sorterEvalMeasureKey, "explicit-evaluation-marker"
+        ParamKeys.sorterEvalMeasureInitialKey, "explicit-initial-marker"
+        ParamKeys.excludeSelfCeKey, "false"
+        ParamKeys.collectSortableTestsKey, "true"
+    ])
+    let enhanced = GeneSort.Project.V1.Catalogs.SetupParameters.SetupEnhancerCatalog.sossMsuf32 context parameters
+    Assert.Equal(16, int (enhanced.GetChannelCount().Value))
+    Assert.Equal(16, int (enhanced.GetPrefixLibId().Value.ChannelCount))
+    Assert.Equal(2, int (enhanced.GetPrefixLibId().Value.StageLength))
+    for key in [ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey; ParamKeys.prefixLibIdKey; ParamKeys.simpleSorterModelTypeKey; ParamKeys.rngTypeKey;
+                ParamKeys.sortableDataFormatKey; ParamKeys.sorterEvalMeasureKey; ParamKeys.sorterEvalMeasureInitialKey] do
+        Assert.Equal(parameters.ParamMap[key], enhanced.ParamMap[key])
+
+[<Fact>]
+let ``Evolution clones cannot change or remove module owned settings`` () =
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.TestStandard ()
+    let draft = RunTypeEditor.cloneDraft source
+    let args = draft.ToArgs()
+    for row in args.SetupParameters |> Array.filter (fun row -> RunTypeEditor.isModuleOwnedParameter source row.Key) do
+        let changed = args.SetupParameters |> Array.map (fun other -> if other.Key = row.Key then parameterDraft.create row.Key [|"changed"|] else other)
+        Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = changed }) |> Result.isError)
+        let removed = args.SetupParameters |> Array.filter (fun other -> other.Key <> row.Key)
+        Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = removed }) |> Result.isError)
+
+[<Fact>]
+let ``Activation settings are explicit editable clone parameters and affect setup identity`` () =
+    for source, key, defaultValue, changedValue in [
+        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleR.Standard.Test (), ParamKeys.aMaxKey, "3", "7"
+        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.Test (), ParamKeys.activationProbabilityKey, "0.5", "0.25"
+    ] do
+        let args = (RunTypeEditor.cloneDraft source).ToArgs()
+        let original = args.SetupParameters |> Array.find (fun row -> row.Key = key)
+        Assert.Equal<string>([|defaultValue|], original.Values)
+        Assert.False(RunTypeEditor.isModuleOwnedParameter source key)
+        let changed = args.SetupParameters |> Array.map (fun row -> if row.Key = key then parameterDraft.create key [|changedValue|] else row)
+        let clone = RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = changed }) |> Result.defaultWith (fun issues -> failwithf "%A" issues)
+        let before = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
+        let after = RunParameterGeneration.generate clone 0<replNumber> 1<replNumber>
+        Assert.Equal(before.Length, after.Length)
+        for row in after do
+            Assert.Equal(changedValue, row.ParamMap[key])
+            Assert.DoesNotContain(before, fun prior -> prior.GetSetupSorterPoolSetId() = row.GetSetupSorterPoolSetId())
+        let removed = args.SetupParameters |> Array.filter (fun row -> row.Key <> key)
+        Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = removed }) |> Result.isError)
+
+[<Fact>]
+let ``Initial measure follows each evaluation sweep choice without a Cartesian product`` () =
+    let configured = GeneSort.Dispatch.V1.SorterSgd.p24.Msuf63b.MutationRate.VarModR_32.Test ()
+    let setup = configured.SetupParameterSpans |> List.map (fun (key, values) ->
+        key, if key = ParamKeys.sorterEvalMeasureKey then values else List.take 1 values)
+    let execution = configured.RunParameterSpans |> List.map (fun (key, values) -> key, List.take 1 values)
+    let sample = Run.withParameterSpans setup execution configured
+    let rows = SimpleRun.makeSetupParameters 0<replNumber> 1<replNumber> id sample.BaseRun
+    Assert.Equal(4, rows.Length)
+    for row in rows do Assert.Equal(row.ParamMap[ParamKeys.sorterEvalMeasureKey], row.ParamMap[ParamKeys.sorterEvalMeasureInitialKey])
+
+[<Fact>]
+let ``Explicit evolution controls survive enhancement and separate execution identities`` () =
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Standard ()
+    let first spans = spans |> List.map (fun (key, values) -> key, List.take 1 values)
+    let replace key values spans = (key, values) :: (spans |> List.filter (fst >> (<>) key))
+    let setup = first source.SetupParameterSpans
+                |> replace ParamKeys.sorterCountPerPoolKey ["32"; "64"]
+                |> replace ParamKeys.sorterCountPerPoolSetKey ["128"]
+                |> replace ParamKeys.seedSorterPoolSelectionTypeKey ["GuidOrder:16"]
+    let execution = first source.RunParameterSpans
+                    |> replace ParamKeys.orthoRateKey ["1.25"]
+                    |> replace ParamKeys.modificationRateKey ["0.25"]
+                    |> replace ParamKeys.activatorMutationRateKey ["0.2"]
+                    |> replace ParamKeys.selectedSorterCountPerPoolKey ["All"]
+    let generate execution = Run.withParameterSpans setup execution source |> fun run -> RunParameterGeneration.generate run 0<replNumber> 1<replNumber>
+    let rows = generate execution
+    Assert.Equal(2, rows.Length)
+    for row in rows do
+        Assert.Equal(int (row.GetSorterCountPerPool().Value), int (row.GetSelectedSorterCountPerPool().Value))
+        Assert.Equal(128 / int (row.GetSorterCountPerPool().Value), int (row.GetSorterPoolCount().Value))
+        Assert.Equal(1.25, float (row.GetOrthoRate().Value))
+        Assert.Equal(0.25, float (row.GetModificationRate().Value))
+        Assert.Equal("0.2", row.ParamMap[ParamKeys.activatorMutationRateKey])
+        Assert.Equal("GuidOrder:16", row.ParamMap[ParamKeys.seedSorterPoolSelectionTypeKey])
+    let changed = generate (execution |> replace ParamKeys.orthoRateKey ["2.5"] |> replace ParamKeys.selectedSorterCountPerPoolKey ["8"])
+    for row in changed do
+        Assert.Equal(8, int (row.GetSelectedSorterCountPerPool().Value))
+        Assert.DoesNotContain(rows, fun original -> original.GetId() = row.GetId())

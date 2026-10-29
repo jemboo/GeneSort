@@ -22,6 +22,21 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.Common
 
 module PoolSelSz128 =
 
+    let channelCount = 24<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msrs"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
@@ -34,6 +49,14 @@ module PoolSelSz128 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
                 (ParamKeys.generationIntervalCountKey, [8] |> List.map string)
                 (ParamKeys.sorterCountPerPoolKey, ["32"] |> List.map string)
@@ -60,7 +83,7 @@ module PoolSelSz128 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -75,11 +98,26 @@ module PoolSelSz128 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolSelSz128)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolSelSz128", description, channelCount, [|
             runExample("TestSpec", TestSpec)
         |])
 
 module Sz_2048_Of_4096 =
+
+    let channelCount = 24<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msrs"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
@@ -93,6 +131,14 @@ module Sz_2048_Of_4096 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.sorterCountPerPoolSetKey, ["4096"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
                 (ParamKeys.generationIntervalCountKey, [12] |> List.map string)
                 (ParamKeys.sorterCountPerPoolKey, ["4096";])
@@ -116,7 +162,7 @@ module Sz_2048_Of_4096 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -131,11 +177,26 @@ module Sz_2048_Of_4096 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (Sz_2048_Of_4096)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.Sz_2048_Of_4096", description, channelCount, [|
             runExample("Sz_2048_Of_4096", Sz_2048_Of_4096)
         |])
 
 module PoolsSelSzTest_2_vs_256 =
+
+    let channelCount = 24<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msrs"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
@@ -149,6 +210,14 @@ module PoolsSelSzTest_2_vs_256 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
                 (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
                 (ParamKeys.sorterCountPerPoolKey, ["2"; "256";])
@@ -172,7 +241,7 @@ module PoolsSelSzTest_2_vs_256 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -186,6 +255,6 @@ module PoolsSelSzTest_2_vs_256 =
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolsSelSzTest_2_vs_256)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, channelCount, [|
             runExample("PoolSz_2n256", PoolSz_2n256)
         |])

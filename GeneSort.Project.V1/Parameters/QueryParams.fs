@@ -53,6 +53,7 @@ type queryParams =
         let structuralIdentityComponents = seq {
             yield box dbName
             yield box projName
+            // Replica is part of the hash itself, not just the storage folder.
             match repl with
             | Some r -> yield box true; yield box %r
             | None -> yield box false

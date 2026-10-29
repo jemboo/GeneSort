@@ -60,7 +60,7 @@ module CheckpointFileTests =
             Assert.Equal((query 900000).Id.ToString() + ".msgpack", Path.GetFileName expectedFile)
             let before = Directory.GetFiles(folder, "*", SearchOption.AllDirectories) |> Array.sort
             Assert.Equal(Ok (Some 900000), load())
-            Assert.Equal<string[]>(before, Directory.GetFiles(folder, "*", SearchOption.AllDirectories) |> Array.sort)
+            Assert.Equal<string>(before, Directory.GetFiles(folder, "*", SearchOption.AllDirectories) |> Array.sort)
             // The listing is refreshed for each resume; no persistent index or stale cache.
             File.Delete expectedFile
             Assert.Equal(Ok (Some 350000), load())

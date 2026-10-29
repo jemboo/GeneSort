@@ -21,12 +21,12 @@ module RunParameterRoles =
         ParamKeys.sortableDataFormatKey, parameterRole.InheritedReadOnly
         ParamKeys.rngTypeKey, parameterRole.InheritedReadOnly
         ParamKeys.excludeSelfCeKey, parameterRole.InheritedReadOnly
+        ParamKeys.collectSortableTestsKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterCountKey, parameterRole.InheritedReadOnly
         ParamKeys.aMaxKey, parameterRole.InheritedReadOnly
         ParamKeys.activationProbabilityKey, parameterRole.InheritedReadOnly
         ParamKeys.activatorMutationRateKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterEvalTypeKey, parameterRole.InheritedOverridable
-        ParamKeys.collectSortableTestsKey, parameterRole.InheritedOverridable
     ]
 
     let sorterMutate = Map.ofList [
@@ -38,6 +38,7 @@ module RunParameterRoles =
         ParamKeys.sortableDataFormatKey, parameterRole.InheritedReadOnly
         ParamKeys.rngTypeKey, parameterRole.InheritedReadOnly
         ParamKeys.excludeSelfCeKey, parameterRole.InheritedReadOnly
+        ParamKeys.collectSortableTestsKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterCountKey, parameterRole.InheritedReadOnly
         ParamKeys.aMaxKey, parameterRole.InheritedReadOnly
         ParamKeys.activationProbabilityKey, parameterRole.InheritedReadOnly
@@ -63,6 +64,7 @@ module RunParameterRoles =
         ParamKeys.sortableDataFormatKey, parameterRole.InheritedReadOnly
         ParamKeys.rngTypeKey, parameterRole.InheritedReadOnly
         ParamKeys.excludeSelfCeKey, parameterRole.InheritedReadOnly
+        ParamKeys.collectSortableTestsKey, parameterRole.InheritedReadOnly
         ParamKeys.aMaxKey, parameterRole.InheritedReadOnly
         ParamKeys.activationProbabilityKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterCountPerPoolKey, parameterRole.InheritedReadOnly

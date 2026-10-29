@@ -42,12 +42,41 @@ let Test () : run =
 
 let description = "Continue Standard 32-input Msuf4a evolution from saved pools."
 
+let channelCount = 32<GeneSort.Sorting.channelCount>
+
+let moduleParameters =
+    [
+        ParamKeys.excludeSelfCeKey, ["true"]
+        ParamKeys.collectSortableTestsKey, ["false"]
+        ParamKeys.rngTypeKey, ["LCG"]
+        ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+        ParamKeys.sortableDataFormatKey, ["BitVector512"]
+        ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+        ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+    ]
+
+
 let runType =
-    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", description, [|
+    GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append", description, channelCount, [|
         runExample("Test", Test)
     |])
 
 module Pool_128 =
+
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
 
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
 
@@ -79,12 +108,27 @@ module Pool_128 =
 
     let description = "Continue Standard 32-input Msuf4a evolution from saved pools (Pool_128)."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_128", description, channelCount, [|
             runExample("V1", V1)
         |])
 
 module Pool_512 =
+
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
 
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
 
@@ -114,7 +158,8 @@ module Pool_512 =
 
     let description = "Continue Standard 32-input Msuf4a evolution from saved pools (Pool_512)."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_append.Pool_512", description, channelCount, [|
             runExample("V1", V1)
         |])

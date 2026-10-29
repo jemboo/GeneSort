@@ -28,6 +28,14 @@ module SimpleSorterModelType =
         | "Msuf6" -> Msuf6
         | _ -> failwithf "Unknown SorterModelType: %s" s
 
+    /// Match the channel-count constraints of the uniform model generators.
+    let supportsChannelCount channelCount model =
+        match model with
+        | Msce -> channelCount >= 1
+        | Mssi | Msrs -> channelCount >= 2
+        | Msuf4 -> channelCount > 0 && (channelCount &&& (channelCount - 1)) = 0
+        | Msuf6 -> channelCount >= 6 && channelCount % 2 = 0
+
     let withMsuf4 () : simpleSorterModelType list =
         [ Msce; Mssi; Msrs; Msuf4 ]
 

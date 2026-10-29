@@ -21,6 +21,8 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
@@ -33,6 +35,9 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msce] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -81,6 +86,9 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Mssi] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -129,6 +137,9 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -177,6 +188,9 @@ module Merge =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.Int8Vector512] |> List.map SortableDataFormat.toString)
@@ -242,8 +256,9 @@ module Merge =
 
     let description = "Compare sorting-network mutations using merge test inputs."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", description, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Merge", description, channelCount, [|
             runExample("Msce", Msce)
             runExample("Mssi", Mssi)
             runExample("Msrs", Msrs)

@@ -128,6 +128,12 @@ module RunParameterGeneration =
                                    |> Map.fold (fun map key value ->
                                        if RunParameterRoles.isFixed (Run.parameterRole configured key) then Map.add key value map
                                        else map) parameters.ParamMap
+                                   |> fun map ->
+                                       if effectiveSpans configured |> Map.tryFind ParamKeys.selectedSorterCountPerPoolKey
+                                          |> Option.exists (function [value] -> System.String.Equals(value, "All", System.StringComparison.OrdinalIgnoreCase) | _ -> false) then
+                                           Map.add ParamKeys.selectedSorterCountPerPoolKey "All" map
+                                       else map
+                                   |> ParameterValidation.resolveSelection
                                    |> runParameters.create
                                |> SetupFileReferences.attach references
                                |> enhanceRun context
@@ -136,6 +142,7 @@ module RunParameterGeneration =
                                        // Execution spans override source values and enhancer defaults.
                                        // Apply before computing the final identity below.
                                        Map.fold (fun map key value -> Map.add key value map) enhanced.ParamMap parameters.ParamMap
+                                       |> ParameterValidation.resolveSelection
                                        |> runParameters.create
                                    else enhanced
                                |> SetupFileReferences.attach references

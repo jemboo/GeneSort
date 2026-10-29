@@ -20,7 +20,7 @@ module SorterEvalDbs =
 
     module Standard =
 
-        let private sourceRun = SorterEval.Standard.Test ()
+        let private sourceRun = SorterEval.Standard.Channels16.Test ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
@@ -36,7 +36,7 @@ module SorterEvalDbs =
 
     module Merge =
 
-        let private sourceRun = SorterEval.Merge.Test ()
+        let private sourceRun = SorterEval.Merge.Channels32.Test ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName

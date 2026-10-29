@@ -4,11 +4,41 @@ namespace GeneSort.Dispatch.V1
 module RunTypeCatalog =
     let all =
         [|
-            SortableTests.Merge.runType
-            SortableTests.Prefix.runType
-            SorterEval.Merge.runType
+            SortableTests.Merge.Channels16.runType
+            SortableTests.Merge.Channels24.runType
+            SortableTests.Merge.Channels32.runType
+            SortableTests.Merge.Channels48.runType
+            SortableTests.Merge.Channels64.runType
+            SortableTests.Prefix.Channels24.runType
+            SortableTests.Prefix.Channels28.runType
+            SortableTests.Prefix.Channels32.runType
+            SorterEval.Merge.Channels16.runType
+            SorterEval.Merge.Channels18.runType
+            SorterEval.Merge.Channels24.runType
+            SorterEval.Merge.Channels32.runType
+            SorterEval.Merge.Channels36.runType
+            SorterEval.Merge.Channels48.runType
+            SorterEval.Merge.Channels64.runType
+            SorterEval.Merge.Channels96.runType
+            SorterEval.Merge.Channels128.runType
+            SorterEval.Merge.Channels192.runType
+            SorterEval.Merge.Channels256.runType
+            SorterEval.Merge.Channels512.runType
             SorterEval.Prefix.runType
-            SorterEval.Standard.runType
+            SorterEval.Standard.Channels4.runType
+            SorterEval.Standard.Channels5.runType
+            SorterEval.Standard.Channels6.runType
+            SorterEval.Standard.Channels7.runType
+            SorterEval.Standard.Channels8.runType
+            SorterEval.Standard.Channels9.runType
+            SorterEval.Standard.Channels10.runType
+            SorterEval.Standard.Channels11.runType
+            SorterEval.Standard.Channels12.runType
+            SorterEval.Standard.Channels14.runType
+            SorterEval.Standard.Channels16.runType
+            SorterEval.Standard.Channels18.runType
+            SorterEval.Standard.Channels20.runType
+            SorterEval.Standard.Channels22.runType
             SorterMutate.Merge.runType
             SorterMutate.Prefix.runType
             SorterMutate.Standard.runType

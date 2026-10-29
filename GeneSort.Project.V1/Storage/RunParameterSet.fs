@@ -9,6 +9,7 @@ type runParameterWriteMode =
     | CreateNew = 0
     | Replace = 1
     | Resume = 2
+    | Append = 3
 
 type runParameterSetArgs = {
     Run: run

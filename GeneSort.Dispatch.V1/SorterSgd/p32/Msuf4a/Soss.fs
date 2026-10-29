@@ -20,6 +20,20 @@ open GeneSort.Dispatch.V1
 
 module Pool_32 =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
     let setupFunctionName = SetupCatalogNames.sgdSoss
@@ -32,12 +46,20 @@ module Pool_32 =
         let names = RunNaming.create()
         let parameterSpansSetup =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
                 (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
             ]
         let parameterSpansRun =
             [
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
                 (ParamKeys.partitionCountKey, [1; 4; 8;] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [100;] |> List.map string)
@@ -61,7 +83,7 @@ module Pool_32 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpansSetup
+                    ParameterSpans = moduleParameters @ parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -82,12 +104,27 @@ module Pool_32 =
 
     let description = "Soss evolutionary runs for the 32-input Msuf4a configuration (Pool_32)."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss.Pool_32", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss.Pool_32", description, channelCount, [|
             runExample("Gens100", Gens100)
         |])
 
 module Pool_512 =
+
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
@@ -101,12 +138,20 @@ module Pool_512 =
         let names = RunNaming.create()
         let parameterSpansSetup =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [512] |>  List.map string)
                 (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
                 (ParamKeys.mutationModKey, [0] |> List.map string)
             ]
         let parameterSpansRun =
             [
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
                 (ParamKeys.seedSossKey, [1234UL] |> List.map string)
                 (ParamKeys.partitionCountKey, [4] |> List.map string)
                 (ParamKeys.generationsPerSubsetKey, [100] |> List.map string)
@@ -130,7 +175,7 @@ module Pool_512 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpansSetup
+                    ParameterSpans = moduleParameters @ parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -149,7 +194,8 @@ module Pool_512 =
 
     let description = "Soss evolutionary runs for the 32-input Msuf4a configuration (Pool_512)."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss.Pool_512", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Soss.Pool_512", description, channelCount, [|
             runExample("V2a", V2a)
         |])

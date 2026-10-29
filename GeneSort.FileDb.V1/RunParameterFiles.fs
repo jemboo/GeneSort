@@ -83,3 +83,13 @@ module RunParameterFiles =
         | Ok () -> return ()
         | Error error -> return raise (InvalidOperationException error)
     }
+
+
+    /// Add missing replica files without replacing any saved progress or changing the definition.
+    let appendAsync (prepared: preparedRunFiles) (progress: IProgress<string>) = task {
+        let db = new GeneSortDbMp(prepared.Root, prepared.Run.RunQueryCatalogName) :> IGeneSortDb
+        let! result = RunPreparation.publishAsync db prepared.Prepared runParameterWriteMode.Append (Option.ofObj progress) |> Async.StartAsTask
+        match result with
+        | Ok () -> return ()
+        | Error error -> return raise (InvalidOperationException error)
+    }

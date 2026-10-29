@@ -16,7 +16,13 @@ type runNames =
 
 module RunNaming =
     let private fromMethod (method: MethodBase) : runNames =
-        let container = method.DeclaringType
+        // Channel-specific modules share the workflow's library database. Their
+        // run names are unique across these sibling modules.
+        let declared = method.DeclaringType
+        let container =
+            if not (isNull declared.DeclaringType) && declared.Name.StartsWith("Channels", System.StringComparison.Ordinal) then
+                declared.DeclaringType
+            else declared
         // Direct workflow modules are databases in that workflow's project.
         // Deeper configurations retain their enclosing module as the project.
         let isWorkflowDatabase =

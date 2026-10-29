@@ -75,7 +75,7 @@ internal static partial class Program
         Check(selected.SetEquals(setups.SelectedRuns), "Sorting changed the selected linked runs.");
 
         // Exercise real Setup and Execution with a tiny generated evaluation library.
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard.Channels16"));
         void Set(string key, string value)
         {
             var row = model.SetupParameters.Single(row => row.Key == key);
@@ -196,7 +196,7 @@ internal static partial class Program
             "Cancelled retry preserved its old failure on disk.");
 
         SelectEditorTab(view, "Setup parameters");
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix")); Layout(view);
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix.Channels24")); Layout(view);
         var tabs = Descendants<TabControl>(view).Single();
         Check(tabs.Items.Cast<TabItem>().Single(tab => Equals(tab.Header, "Setup parameters")).Visibility == Visibility.Collapsed
             && Equals(((TabItem)tabs.SelectedItem).Header, "Processing parameters"), "A direct run retained a selected Setup tab.");

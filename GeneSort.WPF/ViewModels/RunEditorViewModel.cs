@@ -45,9 +45,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         PhaseSummary = Status;
     }
     private readonly HashSet<ParameterRow> observedRows = [];
-    private int? selectedPrefixChannelCount;
-    private string selectedMergeChannelCount = "";
-    private bool mergeChannelCountEdited;
     private bool isSelectingRun = true;
     private bool hasChosenRun;
     private string? sourceModule;
@@ -75,6 +72,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public async Task ChooseRunAsync(RunSelectionTile tile)
     {
         if (IsBusy || tile.Definition is null) return;
+        definitionReadOnly = !tile.CreateNew;
         modulePropertiesLocked = true;
         if (tile.SavedPath is not null && !tile.CreateNew)
         {
@@ -96,7 +94,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 while (Build() is { IsOk: true } built && File.Exists(RunDefinitionFiles.pathFor(ProjectsFolder, built.ResultValue)))
                     RunName = "NewRun" + suffix++;
             }
-            IsDirty = true;
+            IsDirty = tile.CreateNew;
             Validate();
             Status = tile.CreateNew ? "New leaf. Edit its name and parameters, then save." :
                 "Code definition selected. Save and generate its parameters before running.";
@@ -106,12 +104,18 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         IsSelectingRun = false;
     }
 
+    private bool definitionReadOnly;
+    public bool DefinitionReadOnly => definitionReadOnly;
+    public bool CanEditDefinition => !definitionReadOnly && !IsBusy;
+    public string DefinitionEditHelp => definitionReadOnly
+        ? "This run definition is read-only. Add replicas, or Clone to edit a new run."
+        : "Edit the run name and declared parameter values. Module settings are read-only.";
     private bool modulePropertiesLocked;
     public bool ModulePropertiesLocked => modulePropertiesLocked;
-    public bool CanEditModuleProperties => !modulePropertiesLocked && !IsBusy;
+    public bool CanEditModuleProperties => !modulePropertiesLocked && CanEditDefinition;
     public bool CanClone => !IsBusy && !HasPendingParameter && editorTemplate is not null && Build().IsOk;
-    private bool AllowedInPhase(string key, bool setup) => !modulePropertiesLocked ||
-        (setup ? editorTemplate.SetupParameterSpans : editorTemplate.RunParameterSpans).Any(span => span.Item1 == key);
+    private bool AllowedInPhase(string key, bool setup) => !RunTypeEditor.isModuleOwnedParameter(editorTemplate, key) && (!modulePropertiesLocked ||
+        (setup ? editorTemplate.SetupParameterSpans : editorTemplate.RunParameterSpans).Any(span => span.Item1 == key));
     private run editorTemplate = null!;
     public runType[] RunTypes { get; } = RunTypeCatalog.all;
     public runType? SelectedRunType { get; private set; }
@@ -129,122 +133,10 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         $"Continuation source: {editorTemplate.ParameterSource.Value.Item1.ProjectName}/{editorTemplate.ParameterSource.Value.Item1.DatabaseName}/{editorTemplate.ParameterSource.Value.Item1.RunName}. Source selection is retained from the example.";
     public catalogChoice[] Catalogs => RunTypeEditor.catalogChoices(editorTemplate);
     public catalogChoice[] Intervals { get; } = RunEditor.intervals();
-    public parameterDescription[] Parameters
-    {
-        get
-        {
-            if (HasPrefixChannelCountSelection && SelectedPrefixChannelCount is int prefixChannelCount)
-                return RunTypeEditor.parametersForPrefixChannelCount(editorTemplate, prefixChannelCount);
-            if (HasMergeChannelCountSelection && ParsedMergeChannelCount is int mergeChannelCount)
-                return RunTypeEditor.parametersForMergeChannelCount(editorTemplate, mergeChannelCount);
-            return RunTypeEditor.parameters(editorTemplate);
-        }
-    }
-    public bool HasPrefixChannelCountSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestPrefix)
-        || (editorTemplate.IsPreparedRun && (editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterEvalPrefix
-            || editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterMutatePrefix));
-    private ParameterSectionViewModel PrefixSection => HasSetup ? SetupSection : ExecutionSection;
-    public int[] PrefixChannelCounts => RunTypeEditor.prefixChannelCounts(editorTemplate);
-    public bool CanSelectPrefixChannelCount => HasPrefixChannelCountSelection && !IsBusy && !HasPendingParameter;
-    public int? SelectedPrefixChannelCount
-    {
-        get => selectedPrefixChannelCount;
-        set
-        {
-            if (loading || !CanSelectPrefixChannelCount || value is not int width || selectedPrefixChannelCount == width
-                || !PrefixChannelCounts.Contains(width)) return;
-            selectedPrefixChannelCount = width;
-            loading = true;
-            try
-            {
-                var section = PrefixSection;
-                var row = section.Rows.FirstOrDefault(row => row.Key == ParamKeys.prefixLibIdKey);
-                if (row is not null)
-                {
-                    var kept = row.Values.Select(value => value.Text).Where(text => PrefixChannelCount(text) == width).ToArray();
-                    section.Rows[section.Rows.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
-                        Parameters.Single(spec => spec.Key == row.Key));
-                }
-                UpdateMutatorChannelCount(width);
-                section.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, HasSetup) && (HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed)).ToArray(),
-                    section.Rows.Select(row => row.Snapshot()).ToArray());
-                RefreshFixedValues();
-            }
-            finally { loading = false; }
-            Changed(); Changed(nameof(Parameters));
-            MarkEdited();
-        }
-    }
-    private static int? PrefixChannelCount(string value)
-    {
-        try { return PrefixLibId.fromString(value).ChannelCount; }
-        catch (Exception) { return null; }
-    }
-    public bool HasMergeChannelCountSelection => (editorTemplate.IsDirectRun && editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sortableTestMerge)
-        || (editorTemplate.IsPreparedRun && (editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterEvalMerge
-            || editorTemplate.RunQueryCatalogName == QueryCatalogNamesRun.sorterMutateMerge));
-    private ParameterSectionViewModel MergeSection => HasSetup ? SetupSection : ExecutionSection;
-    public string[] MergeChannelCounts => RunTypeEditor.mergeChannelCounts(editorTemplate).Select(width => width.ToString(CultureInfo.InvariantCulture)).ToArray();
-    public bool CanSelectMergeChannelCount => HasMergeChannelCountSelection && !IsBusy && !HasPendingParameter;
-    private int? ParsedMergeChannelCount => int.TryParse(selectedMergeChannelCount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var width)
-        && width > 0 ? width : null;
-    public string MergeChannelCountError => !HasMergeChannelCountSelection || (selectedMergeChannelCount.Length == 0 && !mergeChannelCountEdited) ? ""
-        : ParsedMergeChannelCount is not int ? "Enter a positive whole number for channel count."
-        : (Parameters.FirstOrDefault(spec => spec.Key == ParamKeys.mergeLibIdKey)?.Choices.Length ?? 0) == 0
-            ? "No merge library entries are available at this channel count." : "";
-    public string SelectedMergeChannelCount
-    {
-        get => selectedMergeChannelCount;
-        set
-        {
-            value ??= "";
-            if (loading || !CanSelectMergeChannelCount || selectedMergeChannelCount == value) return;
-            selectedMergeChannelCount = value;
-            mergeChannelCountEdited = true;
-            loading = true;
-            try
-            {
-                if (ParsedMergeChannelCount is int width)
-                {
-                    var section = MergeSection;
-                    var row = section.Rows.FirstOrDefault(row => row.Key == ParamKeys.mergeLibIdKey);
-                    if (row is not null)
-                    {
-                        var kept = row.Values.Select(value => value.Text).Where(text => MergeChannelCount(text) == width).ToArray();
-                        section.Rows[section.Rows.IndexOf(row)] = new ParameterRow(row.Key, kept.Length > 0 ? kept : [""],
-                            Parameters.Single(spec => spec.Key == row.Key));
-                    }
-                    UpdateMutatorChannelCount(width);
-                    section.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, HasSetup) && (HasSetup ? RunTypeEditor.canEditSetup(editorTemplate, spec.Key) : spec.ExecutionAllowed)).ToArray(),
-                        section.Rows.Select(row => row.Snapshot()).ToArray());
-                    RefreshFixedValues();
-                }
-            }
-            finally { loading = false; }
-            Changed(); Changed(nameof(Parameters)); Changed(nameof(MergeChannelCountError));
-            MarkEdited();
-        }
-    }
-    private static int? MergeChannelCount(string value)
-    {
-        try { return MergeLibId.fromString(value).ChannelCount; }
-        catch (Exception) { return null; }
-    }
-    private void UpdateMutatorChannelCount(int width)
-    {
-        if (editorTemplate.RunQueryCatalogName != QueryCatalogNamesRun.sorterMutatePrefix
-            && editorTemplate.RunQueryCatalogName != QueryCatalogNamesRun.sorterMutateMerge) return;
-        var row = SetupSection.Rows.FirstOrDefault(row => row.Key == ParamKeys.mutatorParamsKey);
-        if (row is null) return;
-        var values = row.Values.Select(value =>
-        {
-            var parsed = MutatorParams.fromString(value.Text);
-            if (parsed.IsError) return value.Text;
-            var resized = MutatorParams.withChannelCount(width, parsed.ResultValue);
-            return Equals(resized, parsed.ResultValue) ? value.Text : MutatorParams.toString(resized);
-        }).Distinct(StringComparer.Ordinal).ToArray();
-        SetupSection.Rows[SetupSection.Rows.IndexOf(row)] = new ParameterRow(row.Key, values, row.Definition);
-    }
+    public int ModuleChannelCount => SelectedRunType?.ChannelCount
+        ?? (RunTypeEditor.channelCounts(editorTemplate) is [var count] ? count : 0);
+    public string ModuleChannelCountLabel => ModuleChannelCount > 0 ? $"Channel count: {ModuleChannelCount} (module property)" : "Channel count: no matching module";
+    public parameterDescription[] Parameters => RunTypeEditor.parametersForChannelCount(editorTemplate, ModuleChannelCount);
     public ParameterSectionViewModel SetupSection { get; }
     public ParameterSectionViewModel ExecutionSection { get; }
     public ObservableCollection<ParameterRow> SetupParameters => SetupSection.Rows;
@@ -292,7 +184,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool HasPendingParameter => SetupSection.IsAdding || ExecutionSection.IsAdding;
     public bool HasUnsavedChanges => IsDirty || HasPendingParameter;
     public string DirtyLabel => HasPendingParameter ? "Finish adding the parameter, or cancel" : IsDirty ? "Unsaved changes" : "";
-    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); Changed(nameof(IsProgressIndeterminate)); Changed(nameof(CanSelectPrefixChannelCount)); Changed(nameof(CanSelectMergeChannelCount)); SaveStateChanged(); GenerationChanged(); } }
+    public bool IsBusy { get => isBusy; set { isBusy = value; Changed(); Changed(nameof(IsReady)); Changed(nameof(IsProgressIndeterminate)); SaveStateChanged(); GenerationChanged(); } }
     public bool IsReady => !IsBusy;
     public string Status { get => status; set { status = value; Changed(); } }
     public string FirstReplica { get => firstReplica; set => EditGeneration(ref firstReplica, value); }
@@ -301,8 +193,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool CanGenerateParameters => !IsBusy && GenerationDetails().Valid;
     private bool HasProjectsFolder => !string.IsNullOrWhiteSpace(ProjectsFolder)
         && Path.IsPathFullyQualified(ProjectsFolder) && Directory.Exists(ProjectsFolder);
-    public bool CanSave => !IsBusy && !HasPendingParameter && validatedRun is not null && HasProjectsFolder;
-    public string SaveHint => !HasProjectsFolder ? "Select an existing projects folder first."
+    public bool CanSave => CanEditDefinition && !HasPendingParameter && validatedRun is not null && HasProjectsFolder;
+    public string SaveHint => definitionReadOnly ? "This definition is read-only. Clone it to make changes." : !HasProjectsFolder ? "Select an existing projects folder first."
         : HasPendingParameter ? "Add or cancel the pending parameter first."
         : validatedRun is null ? "Validate the current definition before saving." : "Save the validated run definition.";
     public bool CanLoadRunParameters => !IsBusy && !HasPendingParameter && HasProjectsFolder && Build().IsOk;
@@ -333,6 +225,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     private void SaveStateChanged()
     {
+        Changed(nameof(DefinitionReadOnly)); Changed(nameof(CanEditDefinition)); Changed(nameof(DefinitionEditHelp));
+
         Changed(nameof(CanClone)); Changed(nameof(ModulePropertiesLocked)); Changed(nameof(CanEditModuleProperties));
         Changed(nameof(CanSave)); Changed(nameof(SaveHint));
     }
@@ -450,53 +344,33 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (!Examples.Contains(example)) throw new ArgumentException("Choose an example from this run type.", nameof(example));
         SelectedExample = example;
         sourceModule = SelectedRunType?.Name;
-        modulePropertiesLocked = false;
+        definitionReadOnly = true;
+        modulePropertiesLocked = true;
         editorTemplate = example.Run;
-        Apply(RunTypeEditor.newDraft(editorTemplate));
-        IsDirty = true;
-        Status = "Run type applied. Edit the values and names, then validate before saving.";
+        Apply(RunTypeEditor.fromRun(editorTemplate));
+        IsDirty = false;
+        Status = "Code definition selected. Add replicas, or Clone to edit a new run.";
     }
 
     public Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]> Build()
     {
+        if (definitionReadOnly && !Equals(Snapshot(), RunTypeEditor.fromRun(editorTemplate)))
+            return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
+                [validationIssue.create("Run", "This definition is read-only. Clone it to edit its name or parameters.")]);
         var built = modulePropertiesLocked ? RunTypeEditor.buildModuleRun(editorTemplate, Snapshot())
             : RunTypeEditor.build(editorTemplate, Snapshot());
-        if (HasPrefixChannelCountSelection && SelectedPrefixChannelCount is int width
-            && PrefixSection.Rows.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
-                .Any(value => PrefixChannelCount(value.Text) != width))
-        {
-            var issue = validationIssue.create((HasSetup ? "Setup." : "Processing.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with channel count {width}.");
+        var channelIssues = RunTypeEditor.validateChannelCount(ModuleChannelCount, editorTemplate, Snapshot());
+        if (channelIssues.Length > 0)
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
-                built.IsError ? [.. built.ErrorValue, issue] : [issue]);
-        }
-        if (HasMergeChannelCountSelection)
-        {
-            var error = MergeChannelCountError;
-            var field = "ChannelCount";
-            if (error.Length == 0 && ParsedMergeChannelCount is int mergeChannelCount
-                && MergeSection.Rows.Where(row => row.Key == ParamKeys.mergeLibIdKey).SelectMany(row => row.Values)
-                    .Any(value => MergeChannelCount(value.Text) != mergeChannelCount))
-            {
-                field = (HasSetup ? "Setup." : "Processing.") + ParamKeys.mergeLibIdKey;
-                error = $"Choose merges with channel count {mergeChannelCount}.";
-            }
-            if (error.Length > 0)
-            {
-                var issue = validationIssue.create(field, error);
-                return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
-                    built.IsError ? [.. built.ErrorValue, issue] : [issue]);
-            }
-        }
+                built.IsError ? [.. built.ErrorValue, .. channelIssues] : channelIssues);
         return built;
     }
 
     public void RefreshTypeSelection()
     {
         foreach (var name in new[] { nameof(SelectedRunType), nameof(Examples), nameof(SelectedExample), nameof(WorkflowName),
-            nameof(WorkflowDescription), nameof(Catalogs), nameof(Parameters), nameof(IsEvolution), nameof(SourceDescription),
-            nameof(HasSetup), nameof(HasSgdSourceSelection), nameof(PhaseHelp), nameof(HasPrefixChannelCountSelection), nameof(PrefixChannelCounts),
-            nameof(SelectedPrefixChannelCount), nameof(CanSelectPrefixChannelCount), nameof(HasMergeChannelCountSelection), nameof(MergeChannelCounts),
-            nameof(SelectedMergeChannelCount), nameof(CanSelectMergeChannelCount), nameof(MergeChannelCountError) }) Changed(name);
+            nameof(WorkflowDescription), nameof(ModuleChannelCount), nameof(ModuleChannelCountLabel), nameof(Catalogs), nameof(Parameters), nameof(IsEvolution), nameof(SourceDescription),
+            nameof(HasSetup), nameof(HasSgdSourceSelection), nameof(PhaseHelp) }) Changed(name);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -545,8 +419,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (e.PropertyName != nameof(ParameterSectionViewModel.IsAdding)) return;
         Changed(nameof(HasPendingParameter)); Changed(nameof(HasUnsavedChanges)); Changed(nameof(DirtyLabel));
-        Changed(nameof(CanSelectPrefixChannelCount));
-        Changed(nameof(CanSelectMergeChannelCount));
+
+
         SaveStateChanged();
         GenerationChanged();
         if (!loading)
@@ -573,13 +447,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         try
         {
             SetupSection.CancelAdd(); ExecutionSection.CancelAdd();
-            var prefixChannelCounts = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.prefixLibIdKey)
-                .SelectMany(row => row.Values).Select(PrefixChannelCount).Distinct().ToArray();
-            selectedPrefixChannelCount = prefixChannelCounts.Length == 1 ? prefixChannelCounts[0] : null;
-            var mergeChannelCounts = (HasSetup ? draft.SetupParameters : draft.ExecutionParameters).Where(row => row.Key == ParamKeys.mergeLibIdKey)
-                .SelectMany(row => row.Values).Select(MergeChannelCount).Distinct().ToArray();
-            selectedMergeChannelCount = mergeChannelCounts.Length == 1 ? mergeChannelCounts[0]?.ToString(CultureInfo.InvariantCulture) ?? "" : "";
-            mergeChannelCountEdited = false;
             var defaults = draft.SetupParameters.Concat(draft.ExecutionParameters).ToArray();
             SetupSection.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, true) && RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray(), defaults);
             ExecutionSection.Configure(Parameters.Where(spec => AllowedInPhase(spec.Key, false) && spec.ExecutionAllowed).ToArray(), defaults);
@@ -590,10 +457,10 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             CheckpointIntervals = draft.CheckpointIntervalsName; SaveIntervals = draft.GenSaveIntervalsName; SummaryIntervals = draft.GenSaveSubIntervalsName;
             SetupParameters.Clear(); ExecutionParameters.Clear();
             foreach (var row in draft.SetupParameters)
-                SetupParameters.Add(new(row.Key, row.Values, Parameters.FirstOrDefault(spec => spec.Key == row.Key)));
+                SetupParameters.Add(new(row.Key, row.Values, Parameters.FirstOrDefault(spec => spec.Key == row.Key), RunTypeEditor.isModuleOwnedParameter(editorTemplate, row.Key)));
             foreach (var row in draft.ExecutionParameters)
                 ExecutionParameters.Add(new(row.Key, row.Values, Parameters.FirstOrDefault(spec => spec.Key == row.Key),
-                    GeneSort.Project.V1.Parameters.RunParameterRoles.isFixed(Run.parameterRole(editorTemplate, row.Key))));
+                    RunTypeEditor.isModuleOwnedParameter(editorTemplate, row.Key) || GeneSort.Project.V1.Parameters.RunParameterRoles.isFixed(Run.parameterRole(editorTemplate, row.Key))));
             RefreshFixedValues();
             Issues.Clear(); IsDirty = false;
             validatedRun = null;
@@ -616,6 +483,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         var source = Build().ResultValue;
         var draft = RunTypeEditor.cloneDraft(source);
         editorTemplate = RunTypeEditor.buildModuleRun(source, draft).ResultValue;
+        definitionReadOnly = false;
         modulePropertiesLocked = true;
         Apply(draft);
         IsDirty = true;
@@ -627,6 +495,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 
     public void New()
     {
+        definitionReadOnly = false;
         modulePropertiesLocked = true;
         editorTemplate = SelectedExample?.Run ?? editorTemplate;
         Apply(RunTypeEditor.newDraft(editorTemplate));
@@ -665,7 +534,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         try { recordedModule = RunSelectionViewModel.ReadModule(path); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException) { /* The definition remains usable without its optional label. */ }
         var match = RunTypes.SelectMany(type => type.Examples.Select(example => (Type: type, Example: example)))
-            .Where(item => RunTypeEditor.matches(item.Example.Run, configured))
+            .Where(item => RunTypeEditor.matches(item.Example.Run, configured)
+                && RunTypeEditor.channelCounts(configured).SequenceEqual(new[] { item.Type.ChannelCount }))
             .OrderByDescending(item => item.Type.Name == recordedModule)
             .ThenByDescending(item => item.Example.Run.ProjectName == configured.ProjectName && item.Example.Run.DatabaseName == configured.DatabaseName)
             .ThenByDescending(item => item.Example.Run.RunName == configured.RunName)
@@ -673,6 +543,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         SelectedRunType = match.Type;
         sourceModule = match.Type?.Name;
         SelectedExample = match.Example;
+        definitionReadOnly = true;
         modulePropertiesLocked = true;
         editorTemplate = configured;
         var root = RunDefinitionFiles.tryProjectsFolder(path, configured);
@@ -691,11 +562,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (HasPendingParameter || validatedRun is null || !Equals(configured, validatedRun) || !HasProjectsFolder)
             throw new InvalidOperationException("Select an existing projects folder and validate the current definition before saving.");
-        var path = await RunDefinitionFiles.saveAsync(ProjectsFolder, configured, overwrite);
+        var path = await RunDefinitionFiles.saveAsync(ProjectsFolder, configured, false);
         await RunSelectionViewModel.SaveModuleAsync(path, sourceModule ?? SelectedRunType?.Name);
         editorTemplate = configured;
+        definitionReadOnly = true;
         IsDirty = false;
-        Status = $"Saved {path}";
+        SaveStateChanged();
+        Status = $"Saved {path}. The definition is now read-only; add replicas or Clone to make changes.";
     }
 
     public async Task<preparedRunFiles?> PrepareGenerationAsync()
@@ -711,15 +584,12 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (HasPendingParameter) throw new InvalidOperationException("Add or cancel the pending parameter before generating.");
         var progress = new Progress<string>(message => Status = message);
-        await RunParameterFiles.generateAsync(prepared, replace, progress);
-        if (replace)
-        {
-            try { await Settings.ProcessingFailureStore.SaveAsync(prepared.ParameterFolder, new Dictionary<Guid, string>()); }
-            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
-            { Issues.Add($"Parameters were regenerated, but old failed-run statuses could not be cleared: {error.Message}"); }
-        }
+        await RunParameterFiles.appendAsync(prepared, progress);
         await RunSelectionViewModel.SaveModuleAsync(RunDefinitionFiles.pathFor(ProjectsFolder, prepared.Run), sourceModule ?? SelectedRunType?.Name);
+        editorTemplate = prepared.Run;
+        definitionReadOnly = true;
         IsDirty = false;
+        SaveStateChanged();
         Status = $"Saved the run definition and {prepared.FileCount:N0} RunParameter files to {prepared.ParameterFolder}";
         await LoadRunParametersAsync(false);
         GenerationChanged();

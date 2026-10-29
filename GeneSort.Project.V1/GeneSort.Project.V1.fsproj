@@ -96,6 +96,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Catalogs\ENHANCER_PARAMETERS.md" />
+    <None Include="Catalogs\README.md" />
     <None Include="EvoPath.md" />
     <None Include="RunQueryBuilders.md" />
     <None Include="SetupInputs.md" />

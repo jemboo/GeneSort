@@ -20,6 +20,8 @@ open GeneSort.Dispatch.V1
 
 module Standard =
 
+    let channelCount = 16<GeneSort.Sorting.channelCount>
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
@@ -32,6 +34,8 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msrs] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -82,6 +86,8 @@ module Standard =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.excludeSelfCeKey, ["true"])
+                (ParamKeys.collectSortableTestsKey, ["false"])
                 (ParamKeys.simpleSorterModelTypeKey, [simpleSorterModelType.Msuf4] |> List.map SimpleSorterModelType.toString)
                 (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                 (ParamKeys.sortableDataFormatKey, [sortableDataFormat.BitVector512] |> List.map SortableDataFormat.toString)
@@ -144,8 +150,9 @@ module Standard =
 
     let description = "Compare standard sorting-network mutation configurations."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", description, [|
+        GeneSort.Dispatch.V1.runType("SorterMutate.Standard", description, channelCount, [|
             runExample("Msrs", Msrs)
             runExample("Msuf4", Msuf4)
         |])

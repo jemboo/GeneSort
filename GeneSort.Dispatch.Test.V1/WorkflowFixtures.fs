@@ -31,6 +31,9 @@ let private prefixId (width: int) =
 
 let sortableTestsRun prefix =
     let spans = [
+        ParamKeys.excludeSelfCeKey, ["true"]
+        ParamKeys.collectSortableTestsKey, ["false"]
+        ParamKeys.channelCountKey, [if prefix then "32" else "4"]
         ParamKeys.sortableDataFormatKey, ["BitVector512"]
         if prefix then ParamKeys.prefixLibIdKey, [prefixId 32]
         else ParamKeys.mergeLibIdKey, [mergeLibId.create 4<channelCount> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString]
@@ -56,6 +59,9 @@ let prefixEvaluation width =
         {
             FunctionName = SetupCatalogNames.prefix
             ParameterSpans = [
+                ParamKeys.excludeSelfCeKey, ["true"]
+                ParamKeys.collectSortableTestsKey, ["false"]
+                ParamKeys.channelCountKey, [string width]
                 ParamKeys.rngTypeKey, ["LCG"]
                 ParamKeys.prefixLibIdKey, [prefixId width]
                 ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
@@ -116,6 +122,22 @@ let standardSource () =
             SortableTestsDatabaseName = UMX.tag "Prefix"
             SorterSetEvalsDatabaseName = UMX.tag "Prefix"
             ParameterSpans = [
+                ParamKeys.orthoRateKey, ["4.001"]
+                ParamKeys.sorterChildCountKey, ["1"]
+                ParamKeys.selectedSorterCountPerPoolKey, ["All"]
+                ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"]
+                ParamKeys.sortedFractionKey, ["0.99"]
+                ParamKeys.distinctSorterHashesKey, ["true"]
+                ParamKeys.prioritizeNewMutantsKey, ["true"]
+                ParamKeys.rngTypeKey, ["LCG"]
+                ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+                ParamKeys.sortableDataFormatKey, ["BitVector512"]
+                ParamKeys.prefixLibIdKey, [prefixId 32]
+                ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+                ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+                ParamKeys.excludeSelfCeKey, ["true"]
+                ParamKeys.collectSortableTestsKey, ["false"]
+                ParamKeys.channelCountKey, ["32"]
                 ParamKeys.sorterCountPerPoolKey, ["32"]
                 ParamKeys.sorterCountPerPoolSetKey, ["128"]
                 ParamKeys.codeModKey, ["NoMods"]
@@ -155,6 +177,22 @@ let sossSource (modifiers: int list) =
             SortableTestsDatabaseName = UMX.tag "Prefix"
             SorterSetEvalsDatabaseName = UMX.tag "Prefix"
             ParameterSpans = [
+                ParamKeys.orthoRateKey, ["4.001"]
+                ParamKeys.sorterChildCountKey, ["1"]
+                ParamKeys.selectedSorterCountPerPoolKey, ["All"]
+                ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"]
+                ParamKeys.sortedFractionKey, ["0.99"]
+                ParamKeys.distinctSorterHashesKey, ["true"]
+                ParamKeys.prioritizeNewMutantsKey, ["true"]
+                ParamKeys.rngTypeKey, ["LCG"]
+                ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+                ParamKeys.sortableDataFormatKey, ["BitVector512"]
+                ParamKeys.prefixLibIdKey, [prefixId 32]
+                ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+                ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+                ParamKeys.excludeSelfCeKey, ["true"]
+                ParamKeys.collectSortableTestsKey, ["false"]
+                ParamKeys.channelCountKey, ["32"]
                 ParamKeys.sorterCountPerPoolKey, ["4"]
                 ParamKeys.sorterCountPerPoolSetKey, ["32"]
                 ParamKeys.mutationModKey, List.map string modifiers

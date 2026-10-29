@@ -47,6 +47,15 @@ type parameterRule =
 module ParameterValidation =
     let private rules =
         [
+            parameterRule.create ParamKeys.excludeSelfCeKey "Module policy: exclude self comparators." (Choice ["true"; "false"])
+            parameterRule.create ParamKeys.collectSortableTestsKey "Module policy: collect new sortable tests." (Choice ["true"; "false"])
+            parameterRule.create ParamKeys.orthoRateKey "Nonnegative orthogonal mutation weight." (Number (0.0, None))
+            parameterRule.create ParamKeys.sorterChildCountKey "Positive number of children per sorter." (Integer 1)
+            parameterRule.create ParamKeys.selectedSorterCountPerPoolKey "Positive selected count, or All to select the current pool capacity." Text
+            parameterRule.create ParamKeys.seedSorterPoolSelectionTypeKey "Seed selection strategy and positive count, for example GuidOrder:512." Text
+            parameterRule.create ParamKeys.sortedFractionKey "Finite sorted fraction, from 0 to 1." (Number (0.0, Some 1.0))
+            parameterRule.create ParamKeys.distinctSorterHashesKey "Require distinct sorter hashes." (Choice ["true"; "false"])
+            parameterRule.create ParamKeys.prioritizeNewMutantsKey "Prefer new mutants during selection." (Choice ["true"; "false"])
             parameterRule.create ParamKeys.mergeLibIdKey "Merge library identity with a positive channel count divisible by its dimension." Text
             parameterRule.create ParamKeys.prefixLibIdKey "Prefix library identity with a positive channel count and stage length." Text
             parameterRule.create ParamKeys.sorterLibIdKey "Sorter library identity with a positive channel count." Text
@@ -75,8 +84,24 @@ module ParameterValidation =
     let tryInteger value = match parseInteger value with true, number -> Some number | _ -> None
 
     /// Return a canonical value for duplicate detection; leave unregistered parameters to their own workflows.
-    let validateValue key value =
+    let validateValue key (value: string) =
         match Map.tryFind key rules with
+        | _ when List.contains key [ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey] ->
+            match Boolean.TryParse value with
+            | true, parsed -> Ok (if parsed then "true" else "false")
+            | _ -> Error "Choose true or false."
+        | _ when key = ParamKeys.selectedSorterCountPerPoolKey ->
+            if System.String.Equals(value, "All", StringComparison.OrdinalIgnoreCase) then Ok "All"
+            else match tryInteger value with
+                 | Some count when count > 0 -> Ok (string count)
+                 | _ -> Error "Enter a positive selected count or All."
+        | _ when key = ParamKeys.seedSorterPoolSelectionTypeKey ->
+            try
+                let selection = GeneSort.Eval.V1.SorterSelectionType.fromString value
+                let canonical = GeneSort.Eval.V1.SorterSelectionType.toString selection
+                if int (canonical.Split(':')[1]) <= 0 then Error "Seed selection count must be positive."
+                else Ok canonical
+            with _ -> Error "Use a seed selection strategy and positive count, such as GuidOrder:512."
         | _ when key = ParamKeys.prefixLibIdKey ->
             try
                 let id = PrefixLibId.fromString value
@@ -147,6 +172,22 @@ module ParameterValidation =
                 | Error message -> Some (validationIssue.create key message)) |> List.toArray
 
     let ofMap parameters = parameters |> Map.toList |> List.map (fun (key, value) -> key, [value])
+
+    /// Resolve an explicit All choice only once the paired pool capacity is available.
+    let resolveSelection parameters =
+        match Map.tryFind ParamKeys.selectedSorterCountPerPoolKey parameters, Map.tryFind ParamKeys.sorterCountPerPoolKey parameters with
+        | Some selected, Some capacity when System.String.Equals(selected, "All", StringComparison.OrdinalIgnoreCase) ->
+            Map.add ParamKeys.selectedSorterCountPerPoolKey capacity parameters
+        | _ -> parameters
+
+    /// Keep a declared initial/evolution measure pair correlated within each sweep row.
+    let resolveEvaluationMeasures parameters =
+        match Map.tryFind ParamKeys.sorterEvalMeasureInitialKey parameters with
+        | Some "SameAsEvaluation" ->
+            match Map.tryFind ParamKeys.sorterEvalMeasureKey parameters with
+            | Some value -> Map.add ParamKeys.sorterEvalMeasureInitialKey value parameters
+            | None -> invalidArg "parameters" "SameAsEvaluation requires SorterEvalMeasure."
+        | _ -> parameters
 
     /// Check every declared pool-size combination without expanding unrelated parameters.
     let poolSizes phase spans =

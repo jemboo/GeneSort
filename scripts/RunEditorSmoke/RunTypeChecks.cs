@@ -11,9 +11,9 @@ internal static partial class Program
 {
     private static void CheckRunTypes(string root, RunEditorViewModel model, RunEditorView view, StringBuilder bindingErrors)
     {
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix.Channels24"));
         Layout(view);
-        Check(model.SelectedRunType?.Name == "SortableTests.Prefix", "Picking a run type did not update the editor.");
+        Check(model.SelectedRunType?.Name == "SortableTests.Prefix.Channels24", "Picking a run type did not update the editor.");
         model.New();
         model.SelectExample(model.Examples.Last());
         Layout(view);
@@ -39,7 +39,7 @@ internal static partial class Program
                 count++;
             }
         }
-        foreach (var name in new[] { "SortableTests.Prefix", "SorterSgd.p32.Msuf4a.SimpleS.Soss", "SorterSgd.p32.Msuf4a.Standard_append" })
+        foreach (var name in new[] { "SortableTests.Prefix.Channels24", "SorterSgd.p32.Msuf4a.SimpleS.Soss", "SorterSgd.p32.Msuf4a.Standard_append" })
         {
             var kind = model.RunTypes.Single(type => type.Name == name);
             model.SelectRunType(kind);
@@ -81,7 +81,7 @@ internal static partial class Program
         rate.Values[0].Text = "1.5";
         Check(model.Validate() is null, "Invalid activation probability accepted.");
         model.SetupSection.BeginAdd();
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Merge.Channels32"));
         Check(!model.HasPendingParameter && model.RunParameterList.Count == 0 && model.Issues.Count == 0, "Type change retained stale editor state.");
         Layout(view);
         Check(bindingErrors.Length == 0, "WPF binding errors: " + bindingErrors);

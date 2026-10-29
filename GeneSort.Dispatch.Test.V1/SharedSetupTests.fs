@@ -36,7 +36,10 @@ let private configuration () =
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
             EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
             ParameterSpans = [
+                ParamKeys.excludeSelfCeKey, ["true"]
+                ParamKeys.collectSortableTestsKey, ["false"]
                 ParamKeys.channelCountKey, ["4"]
+                ParamKeys.sortableDataFormatKey, ["BitVector512"]
                 ParamKeys.rngTypeKey, ["LCG"]
                 ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]
                 ParamKeys.sorterCountKey, ["2"]
@@ -132,7 +135,7 @@ let ``different model counts produce separate files with the requested contents`
 
 [<Fact>]
 let ``Merge tests share across models and replicas while library and format differences stay separate`` () =
-    let host = runHost.Create (SorterEval.Merge.Test()) 1
+    let host = runHost.Create (SorterEval.Merge.Channels32.Test()) 1
     let parameters = host.MakeRunParameters 0<replNumber> 2<replNumber>
     let query (rp: runParameters) = QueryParamsCatalogSetup.get host.Run.SetupQueryCatalogName host.Run.ProjectName host.Run.DatabaseName (setupParameters.create rp.ParamMap) (geneSortDataType.SortableTestsWithPrefix "") |> Option.get
     let groups = parameters |> Array.groupBy (fun rp -> rp.GetMergeLibId(), rp.GetSortableDataFormat())

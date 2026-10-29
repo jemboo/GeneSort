@@ -63,10 +63,9 @@ module SetupEnhancerCatalog =
 
     let noOp : setupEnhancerFunction = fun _ parameters -> parameters
     let sortableTests : setupEnhancerFunction = noOp
-    let sorterEvalPrefix : setupEnhancerFunction =
-        withFileReferences [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
     let sorterEval : setupEnhancerFunction =
         withFileReferences [geneSortDataType.SorterModelSet ""; geneSortDataType.SortableTestsWithPrefix ""]
+    let sorterEvalPrefix : setupEnhancerFunction = sorterEval
     let sorterMutate : setupEnhancerFunction = sorterEval
     let sorterSgd : setupEnhancerFunction =
         withFileReferences [geneSortDataType.SorterPoolSet ""; geneSortDataType.SortableTestsWithPrefix ""]
@@ -77,18 +76,8 @@ module SetupEnhancerCatalog =
         |> ParameterValidation.ensureValid "parameters"
         let perPool = parameters.GetSorterCountPerPool().Value
         let total = parameters.GetSorterCountPerPoolSet().Value
-        let prefix = prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA
         parameters.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
                   .WithGenerationCurrent(Some 0<generationNumber>)
-                  .WithRngType(Some rngType.Lcg)
-                  .WithPrefixLibId(Some prefix)
-                  .WithChannelCount(Some prefix.ChannelCount)
-                  .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4)
-                  .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
-                  .WithExcludeSelfCe(Some (UMX.tag true))
-                  .WithSeedSorterPoolSelectionType(Some (sorterSelectionType.GuidOrder 512<sorterCount>))
-                  .WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
-                  .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
 
     /// Standard seed queries include the full parameter settings and their setup references.
     let standardMsuf32 : setupEnhancerFunction = fun context parameters ->
@@ -96,26 +85,24 @@ module SetupEnhancerCatalog =
         |> ParameterValidation.ensureValid "parameters"
         sossMsuf32 context parameters |> sorterSgd context
 
-    /// SimpleR defaults apply before queries are built, so AMax participates in seed identity.
+    /// Validate explicit SimpleR settings before queries are built.
     let private withSimpleR (enhancer: setupEnhancerFunction) : setupEnhancerFunction = fun context parameters ->
         if Map.containsKey ParamKeys.activationProbabilityKey parameters.ParamMap then
             invalidArg "parameters" "SimpleR setup uses AMax; ActivationProbability belongs to SimpleS."
-        let parameters =
-            if Map.containsKey ParamKeys.aMaxKey parameters.ParamMap then parameters
-            else parameters.WithAMax(Some 3)
+        ParameterValidation.requireKeys "Setup" [ParamKeys.aMaxKey] (ParameterValidation.ofMap parameters.ParamMap)
+        |> ParameterValidation.ensureValid "parameters"
         ParameterValidation.validateValues [ParamKeys.aMaxKey] parameters.ParamMap |> ParameterValidation.ensureValid "parameters"
         enhancer context parameters
 
     let standardMsuf32R = withSimpleR standardMsuf32
     let sossMsuf32R = withSimpleR sossMsuf32
 
-    /// Apply the boolean activation default before creating seed file references.
+    /// Validate explicit SimpleS settings before creating seed file references.
     let private withSimpleS (enhancer: setupEnhancerFunction) : setupEnhancerFunction = fun context parameters ->
         if Map.containsKey ParamKeys.aMaxKey parameters.ParamMap then
             invalidArg "parameters" "SimpleS setup uses ActivationProbability; AMax belongs to SimpleR."
-        let parameters =
-            if Map.containsKey ParamKeys.activationProbabilityKey parameters.ParamMap then parameters
-            else parameters.WithActivationProbability(Some 0.5)
+        ParameterValidation.requireKeys "Setup" [ParamKeys.activationProbabilityKey] (ParameterValidation.ofMap parameters.ParamMap)
+        |> ParameterValidation.ensureValid "parameters"
         ParameterValidation.validateValues [ParamKeys.activationProbabilityKey] parameters.ParamMap |> ParameterValidation.ensureValid "parameters"
         enhancer context parameters
 

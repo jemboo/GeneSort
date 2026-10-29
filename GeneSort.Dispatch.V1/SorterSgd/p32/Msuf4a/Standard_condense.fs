@@ -12,6 +12,20 @@ open GeneSort.Dispatch.V1
 
 module Pool_32_condense =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf4"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -39,7 +53,8 @@ module Pool_32_condense =
 
     let description = "Condense saved pools for 32-input Msuf4a Standard evolution (Pool_32_condense)."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.Standard_condense.Pool_32_condense", description, channelCount, [|
             runExample("Test", Test)
         |])

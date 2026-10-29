@@ -236,3 +236,26 @@ module RunParameterFileTests =
         Assert.Contains(Path.GetFileName path, error.Message)
         Assert.Equal<Map<string, string>>(before, snapshot root)
     })
+
+
+    [<Fact>]
+    let ``adding replicas preserves existing progress and rejects changed definitions`` () = withFolder (fun root -> task {
+        let original = configured [|"0"|]
+        let! first = publish root original 0 1 false
+        let file = Directory.GetFiles(first.ParameterFolder, "*.msgpack", SearchOption.AllDirectories) |> Array.exactlyOne
+        let dto = MessagePack.MessagePackSerializer.Deserialize<runParametersDto>(File.ReadAllBytes file)
+        let progressed = (RunParametersDto.toDomain dto).WithRunFinished(Some true)
+        File.WriteAllBytes(file, MessagePack.MessagePackSerializer.Serialize(RunParametersDto.fromDomain progressed))
+        let before = File.ReadAllBytes file
+        let! next = RunParameterFiles.prepareAsync root (request original 5 1)
+        do! RunParameterFiles.appendAsync next null
+        let! overlap = RunParameterFiles.prepareAsync root (request original 0 2)
+        do! RunParameterFiles.appendAsync overlap null
+        Assert.Equal<byte>(before, File.ReadAllBytes file)
+        let! rows = RunParameterFiles.loadAllAsync root original
+        Assert.Equal<int>([|0; 1; 5|], rows |> Array.map (fun row -> int (row.GetRepl().Value)) |> Array.sort)
+        let snapshotBefore = snapshot root
+        let! changed = RunParameterFiles.prepareAsync root (request (configured [|"1"|]) 6 1)
+        let! _ = Assert.ThrowsAsync<InvalidOperationException>(fun () -> RunParameterFiles.appendAsync changed null :> Task)
+        Assert.Equal<Map<string,string>>(snapshotBefore, snapshot root)
+    })

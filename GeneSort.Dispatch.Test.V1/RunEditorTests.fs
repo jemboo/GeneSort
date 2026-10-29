@@ -270,7 +270,7 @@ module RunEditorTests =
     let ``Soss seed setup does not require Standard mutation settings`` () =
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let context = { Run = configured; QueryParamsFromSetupParams = fun _ _ -> failwith "Seed validation must not query files." }
-        let parameters = setupParameters.create (Map.ofList [ParamKeys.sorterCountPerPoolKey, "32"; ParamKeys.sorterCountPerPoolSetKey, "64"])
+        let parameters = setupParameters.create (Map.ofList [ParamKeys.channelCountKey, string RunEditor.channelCount; ParamKeys.sorterCountPerPoolKey, "32"; ParamKeys.sorterCountPerPoolSetKey, "64"])
         let enhanced = SetupEnhancerCatalog.sossMsuf32 context parameters
         Assert.Equal(2, int (enhanced.GetSorterPoolCount().Value))
 

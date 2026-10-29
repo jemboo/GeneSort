@@ -89,20 +89,22 @@ type runDraft =
 /// The first editor profile deliberately exposes only the Standard Msuf32p4a workflow.
 /// Catalog selections form a compatible group; new workflows can supply their own group and schema.
 module RunEditor =
+    let channelCount = 32
     let private workflow = WorkflowDefinitions.standardMsuf32
     let workflowName = workflow.Name
     let workflowDescription = workflow.Description
     let catalogChoices () = workflow.CatalogChoices
 
     let private schema =
-        [| ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey; ParamKeys.codeModKey
+        [| ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey; ParamKeys.rngTypeKey; ParamKeys.simpleSorterModelTypeKey; ParamKeys.sortableDataFormatKey; ParamKeys.prefixLibIdKey; ParamKeys.sorterEvalMeasureInitialKey; ParamKeys.sorterEvalMeasureKey; ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey; ParamKeys.sortedFractionKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.channelCountKey; ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey; ParamKeys.codeModKey
            ParamKeys.adjustCeLengthFrequencyKey; ParamKeys.generationIntervalLastKey; ParamKeys.paraRateKey
            ParamKeys.selfSymRateKey; ParamKeys.mutationModKey; ParamKeys.seedModificationRateKey
            ParamKeys.modificationRateKey; ParamKeys.mutatorVariantKey |]
         |> Array.map (fun key ->
-            parameterDescription.create key
-                (List.contains key SgdParameterValidation.msufQueryKeys)
-                (not (List.contains key SgdParameterValidation.seedPoolKeys)))
+            if key = ParamKeys.channelCountKey then parameterDescription.forChoices key [string channelCount] true false
+            else parameterDescription.forKey key
+                    (List.contains key SgdParameterValidation.msufQueryKeys)
+                    (not (List.contains key SgdParameterValidation.seedPoolKeys)))
 
     let parameters () = Array.copy schema
     let intervals () =
@@ -121,6 +123,22 @@ module RunEditor =
             GenSaveIntervalsName = GenIntervalNames.uniformInterval10
             GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
             SetupParameters = [|
+                parameter ParamKeys.excludeSelfCeKey [|"true"|]
+                parameter ParamKeys.collectSortableTestsKey [|"false"|]
+                parameter ParamKeys.rngTypeKey [|"LCG"|]
+                parameter ParamKeys.simpleSorterModelTypeKey [|"Msuf4"|]
+                parameter ParamKeys.sortableDataFormatKey [|"BitVector512"|]
+                parameter ParamKeys.prefixLibIdKey [|GeneSort.SortingLib.Sorter.prefixLibId.create 32<GeneSort.Sorting.channelCount> 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString|]
+                parameter ParamKeys.sorterEvalMeasureInitialKey [|GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString|]
+                parameter ParamKeys.sorterEvalMeasureKey [|GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString|]
+                parameter ParamKeys.orthoRateKey [|"4.001"|]
+                parameter ParamKeys.sorterChildCountKey [|"1"|]
+                parameter ParamKeys.selectedSorterCountPerPoolKey [|"All"|]
+                parameter ParamKeys.seedSorterPoolSelectionTypeKey [|"GuidOrder:512"|]
+                parameter ParamKeys.sortedFractionKey [|"0.99"|]
+                parameter ParamKeys.distinctSorterHashesKey [|"true"|]
+                parameter ParamKeys.prioritizeNewMutantsKey [|"true"|]
+                parameter ParamKeys.channelCountKey [|string channelCount|]
                 parameter ParamKeys.sorterCountPerPoolKey [|"32"|]
                 parameter ParamKeys.sorterCountPerPoolSetKey [|"32"|]
                 parameter ParamKeys.codeModKey [|"NoMods"|]
@@ -141,6 +159,9 @@ module RunEditor =
     let validate (draft: runDraft) =
         let issues = ResizeArray<validationIssue>()
         let add field message = issues.Add(validationIssue.create field message)
+        if draft.SetupParameters |> Array.filter (fun row -> row.Key = ParamKeys.channelCountKey)
+           |> Array.collect (fun row -> row.Values) <> [|string channelCount|] then
+            add "ChannelCount" "This profile requires its fixed module channel count."
         issues.AddRange(SgdParameterValidation.standardMsuf (spans draft.SetupParameters) (spans draft.ExecutionParameters))
         for field, value in ["ProjectName", draft.ProjectName; "DatabaseName", draft.DatabaseName; "RunName", draft.RunName] do
             issues.AddRange(RunIdentity.validate field value)

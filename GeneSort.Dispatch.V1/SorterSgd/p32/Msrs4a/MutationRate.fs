@@ -20,6 +20,21 @@ open GeneSort.Dispatch.V1.SorterSgd.p32.Msrs4a.Common
 
 module MutationRate =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msrs"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixA |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
+
 
 
 
@@ -43,6 +58,14 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [12] |> List.map string)
@@ -50,7 +73,7 @@ module MutationRate =
                     (ParamKeys.paraRateKey, [4.001] |> List.map string)
                     (ParamKeys.selfSymRateKey, [4.001]  |> List.map string)
                     (ParamKeys.mutationModKey, [0] |> List.map string)
-                    (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
                     (ParamKeys.modificationRateKey, [0.25;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
@@ -71,7 +94,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -88,6 +111,14 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [12] |> List.map string)
@@ -95,7 +126,7 @@ module MutationRate =
                     (ParamKeys.paraRateKey, [3.001; 4.001; 5.001] |> List.map string)
                     (ParamKeys.selfSymRateKey, [3.001; 4.001; 5.001]  |> List.map string)
                     (ParamKeys.mutationModKey, [0] |> List.map string)
-                    (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
                     (ParamKeys.modificationRateKey, [0.015; 0.20; 0.25; 0.30; 0.40; 0.50;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
@@ -116,7 +147,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -134,6 +165,14 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [12] |> List.map string)
@@ -141,7 +180,7 @@ module MutationRate =
                     (ParamKeys.paraRateKey, [1.5; 2.5; 3.5] |> List.map string)
                     (ParamKeys.selfSymRateKey, [4.5; 5.5; 6.5]  |> List.map string)
                     (ParamKeys.mutationModKey, [0] |> List.map string)
-                    (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
                     (ParamKeys.modificationRateKey, [0.225; 0.25; 0.275;] |> List.map string)
                     (ParamKeys.mutatorVariantKey, [mutatorVariant.V1] |> List.map (MutatorVariant.toString))
                 ]
@@ -162,7 +201,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -177,8 +216,10 @@ module MutationRate =
 
         let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (VarModR_32)."
 
+
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", description, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", description, channelCount, [|
                 runExample("Test", Test)
                 runExample("EqualOPS", EqualOPS)
                 runExample("EqualOPS2", EqualOPS2)
@@ -200,6 +241,15 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [12] |> List.map string)
@@ -227,7 +277,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -244,6 +294,15 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
@@ -271,7 +330,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -289,6 +348,15 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [4] |> List.map string)
@@ -316,7 +384,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -333,8 +401,10 @@ module MutationRate =
 
         let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (VarModR_64)."
 
+
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", description, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.VarModR_64", description, channelCount, [|
                 runExample("Test", Test)
                 runExample("WideTest", WideTest)
                 runExample("NarrowTest", NarrowTest)
@@ -356,6 +426,16 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                    (ParamKeys.modificationRateKey, ["0.99"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [10] |> List.map string)
@@ -382,7 +462,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -398,8 +478,10 @@ module MutationRate =
 
         let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (MaxModR_32)."
 
+
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", description, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_32", description, channelCount, [|
                 runExample("Test2", Test2)
             |])
 
@@ -419,6 +501,16 @@ module MutationRate =
             let names = RunNaming.create()
             let parameterSpans =
                 [
+                    (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.orthoRateKey, ["4.001"])
+                    (ParamKeys.sorterChildCountKey, ["1"])
+                    (ParamKeys.distinctSorterHashesKey, ["true"])
+                    (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                    (ParamKeys.sortedFractionKey, ["0.99"])
+                    (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                    (ParamKeys.modificationRateKey, ["0.99"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                     (ParamKeys.generationCurrentKey, [0] |> List.map string)
                     (ParamKeys.generationIntervalCountKey, [10] |> List.map string)
@@ -445,7 +537,7 @@ module MutationRate =
                         FunctionName = setupFunctionName
                         SortableTestsDatabaseName = UMX.tag "Prefix"
                         SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                        ParameterSpans = parameterSpans
+                        ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
                     }
@@ -458,7 +550,9 @@ module MutationRate =
 
         let description = "Compare mutation-rate settings for 32-input Msrs4a evolution (MaxModR_64)."
 
+
+
         let runType =
-            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", description, [|
+            GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msrs4a.MutationRate.MaxModR_64", description, channelCount, [|
                 runExample("WideTest", WideTest)
             |])

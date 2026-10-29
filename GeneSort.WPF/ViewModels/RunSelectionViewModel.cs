@@ -100,7 +100,10 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
         {
             var prefix = currentPath.Length == 0 ? "" : currentPath + ".";
             var modules = leaves.Where(leaf => leaf.ModulePath.StartsWith(prefix, StringComparison.Ordinal) && leaf.ModulePath != currentPath)
-                .Select(leaf => leaf.ModulePath[prefix.Length..].Split('.')[0]).Distinct().Order(StringComparer.OrdinalIgnoreCase)
+                .Select(leaf => leaf.ModulePath[prefix.Length..].Split('.')[0]).Distinct()
+                .OrderBy(name => name.StartsWith("Channels", StringComparison.Ordinal)
+                    && int.TryParse(name.AsSpan("Channels".Length), out var count) ? count : int.MaxValue)
+                .ThenBy(name => name, StringComparer.OrdinalIgnoreCase)
                 .Select(name => new RunSelectionTile(name, ModuleIcon(prefix + name), DescribeModule(prefix + name), prefix + name));
             Tiles = [.. modules, .. here.OrderBy(leaf => leaf.Name, StringComparer.OrdinalIgnoreCase),
                 .. (here.Length == 0 ? Array.Empty<RunSelectionTile>() : [new RunSelectionTile("Create your own", "\uE710", "Start with a definition in this module", currentPath, CreateNew: true)])];
@@ -210,7 +213,8 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
                             catch (Exception error) { errors.Add($"{path}: could not read module label ({error.GetBaseException().Message})."); }
                             if (module is null || !types.Any(type => type.Name == module))
                             {
-                                var candidates = code.Where(leaf => leaf.Definition!.ProjectName == definition.ProjectName && leaf.Definition.DatabaseName == definition.DatabaseName)
+                                var candidates = code.Where(leaf => leaf.Definition!.ProjectName == definition.ProjectName && leaf.Definition.DatabaseName == definition.DatabaseName
+                                    && GeneSort.Project.V1.Editing.RunTypeEditor.channelCounts(leaf.Definition).SequenceEqual(GeneSort.Project.V1.Editing.RunTypeEditor.channelCounts(definition)))
                                     .Select(leaf => leaf.ModulePath).Distinct().ToArray();
                                 module = candidates.Length == 1 ? candidates[0] : $"Saved runs.{definition.ProjectName}.{definition.DatabaseName}";
                             }

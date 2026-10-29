@@ -69,6 +69,7 @@
                     </StackPanel.Resources>
                 <TextBlock Text="{Binding WorkflowName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
                            ToolTip="{Binding WorkflowDescription}" Margin="0,0,0,6" />
+                <TextBlock Text="{Binding ModuleChannelCountLabel}" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Module channel count" />
                 <TextBlock Text="{Binding WorkflowDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,6" />
                 <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}">
                     <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
@@ -84,7 +85,7 @@
                         <TextBlock Text="Database name" /><TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Database name" />
                     </StackPanel>
                     <StackPanel Grid.Column="2">
-                        <TextBlock Text="Run name" /><TextBox Text="{Binding RunName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Run name" />
+                        <TextBlock Text="Run name" /><TextBox IsReadOnly="{Binding DefinitionReadOnly}" Text="{Binding RunName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Run name" />
                     </StackPanel>
                 </Grid>
                 <Grid Margin="0,6,0,0">
@@ -121,7 +122,7 @@
                 </WrapPanel>
                 <TabControl AutomationProperties.Name="Run configuration, processing and results">
                     <TabItem Header="Parameters">
-                        <StackPanel Margin="12" IsEnabled="{Binding IsReady}">
+                        <StackPanel Margin="12" IsEnabled="{Binding CanEditDefinition}">
                             <StackPanel Visibility="{Binding HasSgdSourceSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
                                 <TextBlock Text="Setup source databases" FontWeight="SemiBold" />
                                 <TextBlock Text="SortableTests database" />
@@ -129,24 +130,7 @@
                                 <TextBlock Text="SorterEval database (SorterSetEvals)" Margin="0,6,0,0" />
                                 <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SorterSetEvalsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterSetEvals source database" />
                             </StackPanel>
-                            <StackPanel Visibility="{Binding HasPrefixChannelCountSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
-                                <TextBlock Text="Channel count" FontWeight="SemiBold" />
-                                <ComboBox ItemsSource="{Binding PrefixChannelCounts}" SelectedItem="{Binding SelectedPrefixChannelCount}"
-                                          IsEnabled="{Binding CanSelectPrefixChannelCount}" Width="140" HorizontalAlignment="Left"
-                                          AutomationProperties.Name="Prefix channel count" />
-                                <TextBlock Text="Choose a channel count, then select PrefixLibId values below. Changing channel count clears prefixes from other channel counts."
-                                           TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
-                            </StackPanel>
-                            <StackPanel Visibility="{Binding HasMergeChannelCountSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
-                                <TextBlock Text="Channel count" FontWeight="SemiBold" />
-                                <ComboBox ItemsSource="{Binding MergeChannelCounts}" Text="{Binding SelectedMergeChannelCount, UpdateSourceTrigger=PropertyChanged}"
-                                          IsEditable="True" IsEnabled="{Binding CanSelectMergeChannelCount}"
-                                          Width="140" HorizontalAlignment="Left" AutomationProperties.Name="Merge channel count" />
-                                <TextBlock Text="Choose or type a channel count, then select MergeLibId values below. Changing channel count clears merges from other channel counts."
-                                           TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
-                                <TextBlock Text="{Binding MergeChannelCountError}" TextWrapping="Wrap" Foreground="{DynamicResource ErrorBrush}" />
-                            </StackPanel>
-                            <TextBlock Text="Module settings are read-only. Edit the run name and the declared parameter values." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8" Visibility="{Binding ModulePropertiesLocked, Converter={StaticResource VisibleIfTrue}}" />
+                            <TextBlock Text="{Binding DefinitionEditHelp}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8" Visibility="{Binding ModulePropertiesLocked, Converter={StaticResource VisibleIfTrue}}" />
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
                             <local:ParameterSectionView DataContext="{Binding SetupSection}" Visibility="{Binding DataContext.HasSetup, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
                             <local:ParameterSectionView DataContext="{Binding ExecutionSection}" />

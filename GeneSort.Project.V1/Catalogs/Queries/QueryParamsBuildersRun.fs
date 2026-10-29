@@ -80,6 +80,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -140,6 +143,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -200,6 +206,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -260,6 +269,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -620,6 +632,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -680,6 +695,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -740,6 +758,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -809,6 +830,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -861,6 +885,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -913,6 +940,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -965,6 +995,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1277,6 +1310,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1329,6 +1365,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1381,6 +1420,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1450,6 +1492,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1502,6 +1547,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1554,6 +1602,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1606,6 +1657,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1918,6 +1972,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -1970,6 +2027,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -2022,6 +2082,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -2099,7 +2162,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the RunParameters address for SorterSgd.Msuf.Standard.
@@ -2157,7 +2223,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSet address for SorterSgd.Msuf.Standard.
@@ -2215,7 +2284,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetSummarySet address for SorterSgd.Msuf.Standard.
@@ -2273,7 +2345,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterSet address for SorterSgd.Msuf.Standard.
@@ -2621,7 +2696,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetHistory address for SorterSgd.Msuf.Standard.
@@ -2679,7 +2757,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the TextReport address for SorterSgd.Msuf.Standard.
@@ -2737,7 +2818,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Catalog adapter: selection only; each constructor owns its fields.
@@ -2820,7 +2904,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the RunParameters address for SorterSgd.Msuf.Soss.
@@ -2886,7 +2973,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSet address for SorterSgd.Msuf.Soss.
@@ -2952,7 +3042,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetSummarySet address for SorterSgd.Msuf.Soss.
@@ -3018,7 +3111,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterSet address for SorterSgd.Msuf.Soss.
@@ -3414,7 +3510,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetHistory address for SorterSgd.Msuf.Soss.
@@ -3480,7 +3579,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the TextReport address for SorterSgd.Msuf.Soss.
@@ -3546,7 +3648,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Catalog adapter: selection only; each constructor owns its fields.
@@ -3613,7 +3718,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the RunParameters address for SorterSgd.Msuf.StandardAppend.
@@ -3663,7 +3771,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSet address for SorterSgd.Msuf.StandardAppend.
@@ -3735,7 +3846,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetSummarySet address for SorterSgd.Msuf.StandardAppend.
@@ -3807,7 +3921,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterSet address for SorterSgd.Msuf.StandardAppend.
@@ -4239,7 +4356,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetHistory address for SorterSgd.Msuf.StandardAppend.
@@ -4311,7 +4431,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the TextReport address for SorterSgd.Msuf.StandardAppend.
@@ -4383,7 +4506,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Catalog adapter: selection only; each constructor owns its fields.
@@ -4458,7 +4584,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the RunParameters address for SorterSgd.Msuf.SossAppend.
@@ -4516,7 +4645,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSet address for SorterSgd.Msuf.SossAppend.
@@ -4596,7 +4728,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetSummarySet address for SorterSgd.Msuf.SossAppend.
@@ -4676,7 +4811,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterSet address for SorterSgd.Msuf.SossAppend.
@@ -5156,7 +5294,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the SorterPoolSetHistory address for SorterSgd.Msuf.SossAppend.
@@ -5236,7 +5377,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Constructs only the TextReport address for SorterSgd.Msuf.SossAppend.
@@ -5316,7 +5460,10 @@ module QueryParamsBuildersRun =
                                     yield ParamKeys.activatorMutationRateKey, value
                                 for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                     yield ParamKeys.controlledSeedAMaxKey, value
-                            |]
+                                for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
+                        |]
                     }
 
                 /// Catalog adapter: selection only; each constructor owns its fields.
@@ -5387,6 +5534,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5441,6 +5591,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5495,6 +5648,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5549,6 +5705,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5873,6 +6032,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5927,6 +6089,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -5981,6 +6146,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6054,6 +6222,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6110,6 +6281,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6166,6 +6340,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6222,6 +6399,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6558,6 +6738,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6614,6 +6797,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 
@@ -6670,6 +6856,9 @@ module QueryParamsBuildersRun =
                                 yield ParamKeys.activatorMutationRateKey, value
                             for value in rp.ParamMap.TryFind ParamKeys.controlledSeedAMaxKey |> Option.toList do
                                 yield ParamKeys.controlledSeedAMaxKey, value
+                            for key in [ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.sortedFractionKey] do
+                                for value in rp.ParamMap.TryFind key |> Option.toList do
+                                    yield key, value
                         |]
                 }
 

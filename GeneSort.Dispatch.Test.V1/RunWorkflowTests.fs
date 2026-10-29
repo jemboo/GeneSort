@@ -18,8 +18,8 @@ let private generate configured = RunParameterGeneration.generate configured 0<r
 
 [<Fact>]
 let ``workflows distinguish publication preparation fresh evolution and continuation`` () =
-    Assert.True((SortableTests.Merge.HiMD_32()).IsDirectRun)
-    Assert.True((SorterEval.Standard.Test()).IsPreparedRun)
+    Assert.True((SortableTests.Merge.Channels32.HiMD_32()).IsDirectRun)
+    Assert.True((SorterEval.Standard.Channels16.Test()).IsPreparedRun)
     Assert.True((SorterMutate.Standard.Msrs()).IsPreparedRun)
     Assert.True((SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()).IsEvolutionRun)
     Assert.True((SorterSgd.p32.Msuf4a.Standard_append.Test()).IsContinuationRun)
@@ -29,7 +29,7 @@ let ``workflows distinguish publication preparation fresh evolution and continua
 
 [<Fact>]
 let ``direct runs have one sweep and no Setup artifacts or action`` () =
-    for configured, expectedCount in [SortableTests.Merge.HiMD_32(), 2; SortableTests.Prefix.Channels24(), 4] do
+    for configured, expectedCount in [SortableTests.Merge.Channels32.HiMD_32(), 2; SortableTests.Prefix.Channels24.Channels24(), 4] do
         Assert.False(configured.HasSetup)
         Assert.Empty(configured.SetupParameterSpans)
         Assert.Equal(bigint expectedCount, RunPreparation.count { Run = configured; FirstReplica = 0; ReplicaCount = 1 })
@@ -42,7 +42,7 @@ let ``direct runs have one sweep and no Setup artifacts or action`` () =
 
 [<Fact>]
 let ``old direct definitions fold duplicate Setup spans into Execution without changing file queries`` () =
-    let original = SortableTests.Merge.HiMD_32()
+    let original = SortableTests.Merge.Channels32.HiMD_32()
     let dto = RunDto.fromDomain original
     let old = { dto with SetupParameterSpans = dto.RunParameterSpans } |> RunDto.toDomain
     Assert.Equal<run>(original, old)
@@ -108,7 +108,7 @@ let ``direct SortableTests file IDs survive a DTO round trip`` () =
             [geneSortDataType.Run configured.RunName; geneSortDataType.RunParameters configured.RunName; geneSortDataType.SortableTests ""]
             |> List.choose (fun output -> query rp output |> Option.map (fun q -> output, q.Id)))
         |> Set.ofList
-    for configured in [SortableTests.Merge.HiMD_32(); SortableTests.Prefix.Channels24()] do
+    for configured in [SortableTests.Merge.Channels32.HiMD_32(); SortableTests.Prefix.Channels24.Channels24()] do
         let original = identities configured
         Assert.NotEmpty(original)
         Assert.Equal<Set<_>>(original, configured |> RunDto.fromDomain |> RunDto.toDomain |> identities)

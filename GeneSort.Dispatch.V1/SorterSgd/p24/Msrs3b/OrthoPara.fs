@@ -22,6 +22,21 @@ open GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3b.Common
 
 module OrthoPara32 =
 
+    let channelCount = 24<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msrs"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 4<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixB |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+            ParamKeys.sorterEvalMeasureKey, [GeneSort.SortingOps.SorterEvalMeasure.stageBiasedFilterUnsorted |> GeneSort.SortingOps.SorterEvalMeasure.toCompactString]
+        ]
+
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
@@ -34,6 +49,15 @@ module OrthoPara32 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.sorterCountPerPoolSetKey, ["8192"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.modificationRateKey, ["0.99"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
                 (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
@@ -41,7 +65,7 @@ module OrthoPara32 =
                 (ParamKeys.paraRateKey, [0.075; 0.1; 0.125; 0.15] |> List.map string)
                 (ParamKeys.selfSymRateKey, [1.25; 1.75; 2.25; 2.75] |> List.map string)
                 (ParamKeys.mutationModKey, [0] |> List.map string)
-                (ParamKeys.selectedSorterCountPerPoolKey, [32;] |> List.map string)
+                (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
             ]
         run.EvolutionRun (
             SgdRun.create {
@@ -60,7 +84,7 @@ module OrthoPara32 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -74,6 +98,6 @@ module OrthoPara32 =
     let description = "Compare ortho and para mutation settings for 24-input Msrs3b evolution (OrthoPara32)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3b.OrthoPara.OrthoPara32", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3b.OrthoPara.OrthoPara32", description, channelCount, [|
             runExample("NoMods", NoMods)
         |])

@@ -74,8 +74,11 @@ public partial class RunEditorView : UserControl
         {
             var path = RunDefinitionFiles.pathFor(Model.ProjectsFolder, configured);
             var overwrite = File.Exists(path);
-            if (overwrite && MessageDialog.Show(Window.GetWindow(this), $"Replace this run definition?\n\n{path}",
-                    "Save run", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+            if (overwrite)
+            {
+                Model.Status = "A saved run already has this name. Choose another name for the new run.";
+                return;
+            }
             await Model.SaveAsync(configured, overwrite);
         });
     }
@@ -107,16 +110,7 @@ public partial class RunEditorView : UserControl
         {
             var prepared = await Model.PrepareGenerationAsync();
             if (prepared is null) return;
-            var replace = prepared.RequiresReplacement;
-            if (replace && MessageDialog.Show(Window.GetWindow(this),
-                    $"Save this definition and replace all {prepared.ExistingFileCount:N0} existing RunParameter files for '{prepared.Run.RunName}' with the {prepared.FileCount:N0} prepared files?\n\n" +
-                    $"Old parameter files, including replicas outside the new range, will be removed.\n\n{prepared.ParameterFolder}",
-                    "Generate RunParameters", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-            {
-                Model.Status = "Generation cancelled. Existing files were kept.";
-                return;
-            }
-            await Model.GenerateParametersAsync(prepared, replace);
+            await Model.GenerateParametersAsync(prepared, false);
         });
     }
     private async Task PerformAsync(Func<Task> action)

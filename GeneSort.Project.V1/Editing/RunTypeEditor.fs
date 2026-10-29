@@ -8,11 +8,26 @@ open GeneSort.Project.V1.Parameters
 open GeneSort.Project.V1.SorterSgd
 open GeneSort.Project.V1.Workflows
 open GeneSort.SortingLib.Sorter
+open GeneSort.Model.Sorting.V1
+open GeneSort.Project.V1.ParamBundles
 
 /// Edit a module's example without copying or reselecting its workflow configuration.
 /// The runType catalog belongs to Dispatch; this editor only needs the selected run.
 module RunTypeEditor =
     let isEvolution (configured: run) = configured.IsEvolution
+    /// Evolution families own these settings. Existing comparison workflows keep their sweeps.
+    let isModuleOwnedParameter (configured: run) key =
+        let spans = RunParameterGeneration.effectiveSpans configured
+        key = ParamKeys.channelCountKey
+        || List.contains key [ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey]
+        || (List.contains key [ParamKeys.rngTypeKey; ParamKeys.sortableDataFormatKey]
+            && (Map.tryFind key spans |> Option.exists (fun values -> values.Length = 1)))
+        || (configured.IsEvolution
+            && List.contains key [ParamKeys.rngTypeKey; ParamKeys.simpleSorterModelTypeKey;
+                                  ParamKeys.sortableDataFormatKey; ParamKeys.prefixLibIdKey;
+                                  ParamKeys.sorterEvalMeasureInitialKey; ParamKeys.sorterEvalMeasureKey]
+            && not (key = ParamKeys.sorterEvalMeasureKey
+                    && Map.tryFind ParamKeys.sorterEvalMeasureInitialKey spans = Some ["SameAsEvaluation"]))
     let private spans rows = rows |> Array.map (fun (row: parameterDraft) -> row.Key, Array.toList row.Values) |> Array.toList
     let private rows spans = spans |> List.map (fun (key, values) -> parameterDraft.create key (List.toArray values)) |> List.toArray
 
@@ -37,6 +52,58 @@ module RunTypeEditor =
         configured.HasSetup && not configured.IsContinuationRun
         && (Run.parameterRole configured key <> parameterRole.ExecutionOnly
             || configured.SetupParameterSpans |> List.exists (fst >> (=) key))
+
+    let private valueChannelCount key value =
+        try
+            if key = ParamKeys.channelCountKey then Some (Int32.Parse value)
+            elif key = ParamKeys.prefixLibIdKey then Some (int (PrefixLibId.fromString value).ChannelCount)
+            elif key = ParamKeys.mergeLibIdKey then Some (int (MergeLibId.fromString value).ChannelCount)
+            elif key = ParamKeys.sorterLibIdKey then Some (int (SorterLibId.fromString value).ChannelCount)
+            elif key = ParamKeys.mutatorParamsKey then
+                match MutatorParams.fromString value with
+                | Ok (mutatorParams.SimpleMutatorParams simple) -> Some (int simple.ChannelCount)
+                | _ -> None
+            else None
+        with _ -> None
+
+    /// Resolve module counts from saved spans, including continuation sources.
+    let rec channelCounts (configured: run) =
+        let declared =
+            configured.SetupParameterSpans @ configured.RunParameterSpans
+            |> List.collect (fun (key, values) -> values |> List.choose (valueChannelCount key))
+            |> List.distinct |> List.sort |> List.toArray
+        if declared.Length > 0 then declared
+        else
+            match configured.ParameterSource with
+            | Some (source, _) -> channelCounts source
+            | None -> [||]
+
+    let validateChannelCount channelCount (template: run) (draft: runDraft) =
+        let issues = ResizeArray<validationIssue>()
+        if channelCount <= 0 then
+            issues.Add(validationIssue.create "ChannelCount" "Choose a module with one fixed channel count.")
+        for phase, rows in ["Setup", draft.SetupParameters; "Execution", draft.ExecutionParameters] do
+            for row in rows do
+                for value in row.Values do
+                    if row.Key = ParamKeys.simpleSorterModelTypeKey then
+                        try
+                            if not (SimpleSorterModelType.supportsChannelCount channelCount (SimpleSorterModelType.fromString value)) then
+                                issues.Add(validationIssue.create (phase + "." + row.Key) (sprintf "%s does not support %d channels." value channelCount))
+                        with _ -> issues.Add(validationIssue.create (phase + "." + row.Key) "Choose a supported sorter model type.")
+                    if row.Key = ParamKeys.mutatorParamsKey then
+                        match MutatorParams.fromString value with
+                        | Error error -> issues.Add(validationIssue.create (phase + "." + row.Key) error)
+                        | _ -> ()
+                    match valueChannelCount row.Key value with
+                    | Some actual when actual <> channelCount ->
+                        issues.Add(validationIssue.create (phase + "." + row.Key) (sprintf "This module requires %d channels." channelCount))
+                    | _ -> ()
+                if row.Key = ParamKeys.channelCountKey && row.Values <> [|string channelCount|] then
+                    issues.Add(validationIssue.create (phase + "." + row.Key) "Channel count is fixed by the module; it cannot be a parameter sweep.")
+        for actual in channelCounts template do
+            if actual <> channelCount then
+                issues.Add(validationIssue.create "ChannelCount" "The source definition does not belong to this module's channel count.")
+        issues.ToArray()
 
     let parameters (configured: run) =
         let allSpans = configured.SetupParameterSpans @ configured.RunParameterSpans
@@ -73,6 +140,29 @@ module RunTypeEditor =
                 parameterDescription.forChoices key ((choices @ declared) |> List.distinct) required executionAllowed
             else parameterDescription.forKey key required executionAllowed)
         |> List.toArray
+
+    /// The module count, rather than the edited values, determines compatible choices.
+    let parametersForChannelCount (configured: run) (channelCount: int) =
+        let count = UMX.tag<GeneSort.Sorting.channelCount> channelCount
+        parameters configured |> Array.map (fun spec ->
+            let available =
+                if spec.Key = ParamKeys.prefixLibIdKey then
+                    Some (PrefixLib.ids () |> Array.filter (fun id -> id.ChannelCount = count) |> Array.map PrefixLibId.toString)
+                elif spec.Key = ParamKeys.mergeLibIdKey then
+                    Some (MergeLibId.availableForChannelCount count |> Array.map MergeLibId.toString)
+                elif spec.Key = ParamKeys.sorterLibIdKey then
+                    Some (SorterLib.ids () |> Array.filter (fun id -> id.ChannelCount = count) |> Array.map SorterLibId.toString)
+                elif spec.Key = ParamKeys.channelCountKey then Some [|string channelCount|]
+                else None
+            match available with
+            | None when spec.Key = ParamKeys.simpleSorterModelTypeKey ->
+                let choices = spec.Choices |> Array.filter (fun value ->
+                    try SimpleSorterModelType.supportsChannelCount channelCount (SimpleSorterModelType.fromString value) with _ -> false)
+                parameterDescription.forChoices spec.Key (Array.toList choices) spec.RequiredInSetup spec.ExecutionAllowed
+            | None -> spec
+            | Some values ->
+                let declared = spec.Choices |> Array.filter (fun value -> valueChannelCount spec.Key value = Some channelCount)
+                parameterDescription.forChoices spec.Key (Array.append values declared |> Array.distinct |> Array.toList) spec.RequiredInSetup spec.ExecutionAllowed)
 
     /// The width picker is editor state. PrefixLibId already records it in the saved run.
     let prefixChannelCounts (configured: run) =
@@ -279,6 +369,9 @@ module RunTypeEditor =
         let original = (fromRun template).ToArgs()
         let edited = draft.ToArgs()
         let issues = ResizeArray<validationIssue>()
+        match channelCounts template with
+        | [|count|] -> issues.AddRange(validateChannelCount count template draft)
+        | _ -> issues.Add(validationIssue.create "ChannelCount" "Choose a source run with one fixed channel count.")
         let add field = issues.Add(validationIssue.create field "This property is owned by the module and cannot be edited.")
         if edited.ProjectName <> original.ProjectName then add "ProjectName"
         if edited.DatabaseName <> original.DatabaseName then add "DatabaseName"
@@ -292,6 +385,13 @@ module RunTypeEditor =
         for phase, rows, declared in ["Setup", draft.SetupParameters, template.SetupParameterSpans
                                       "Execution", draft.ExecutionParameters, template.RunParameterSpans] do
             let keys = declared |> List.map fst |> Set.ofList
+            for key, values in declared do
+                if isModuleOwnedParameter template key then
+                    let actual = rows |> Array.filter (fun row -> row.Key = key) |> Array.collect (fun row -> row.Values) |> Array.toList
+                    if actual <> values then add (phase + "." + key)
+                elif List.contains key [ParamKeys.aMaxKey; ParamKeys.activationProbabilityKey]
+                     && not (rows |> Array.exists (fun row -> row.Key = key && row.Values.Length > 0)) then
+                    issues.Add(validationIssue.create (phase + "." + key) "This model requires an explicit activation setting.")
             for row in rows do
                 if not (Set.contains row.Key keys) then
                     issues.Add(validationIssue.create (phase + "." + row.Key) "Only parameters declared in this phase of the source run may be edited.")

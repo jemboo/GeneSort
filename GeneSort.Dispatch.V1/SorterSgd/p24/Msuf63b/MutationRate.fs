@@ -35,6 +35,20 @@ let private sorterEvalMeasures =
 
 module VarModR_32 =
 
+    let channelCount = 24<GeneSort.Sorting.channelCount>
+
+    let moduleParameters =
+        [
+            ParamKeys.excludeSelfCeKey, ["true"]
+            ParamKeys.collectSortableTestsKey, ["false"]
+            ParamKeys.rngTypeKey, ["LCG"]
+            ParamKeys.simpleSorterModelTypeKey, ["Msuf6"]
+            ParamKeys.sortableDataFormatKey, ["BitVector512"]
+            ParamKeys.prefixLibIdKey, [GeneSort.SortingLib.Sorter.prefixLibId.create channelCount 3<GeneSort.Sorting.stageLength> GeneSort.SortingLib.Sorter.prefixLibVariant.PrefixB |> GeneSort.SortingLib.Sorter.PrefixLibId.toString]
+            ParamKeys.sorterEvalMeasureInitialKey, ["SameAsEvaluation"]
+        ]
+
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
@@ -48,6 +62,14 @@ module VarModR_32 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
@@ -70,7 +92,7 @@ module VarModR_32 =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = executionFunctionName
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpans |> List.filter (fun (key, _) -> key <> ParamKeys.sorterEvalMeasureKey)
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
@@ -78,7 +100,7 @@ module VarModR_32 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -94,6 +116,14 @@ module VarModR_32 =
         let names = RunNaming.create()
         let parameterSpans =
             [
+                (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
+                (ParamKeys.orthoRateKey, ["4.001"])
+                (ParamKeys.sorterChildCountKey, ["1"])
+                (ParamKeys.distinctSorterHashesKey, ["true"])
+                (ParamKeys.prioritizeNewMutantsKey, ["true"])
+                (ParamKeys.sortedFractionKey, ["0.99"])
+                (ParamKeys.selectedSorterCountPerPoolKey, ["All"])
+                (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
@@ -116,7 +146,7 @@ module VarModR_32 =
                 AllowOverwrite = false
                 Execution = {
                     FunctionName = executionFunctionName
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = parameterSpans |> List.filter (fun (key, _) -> key <> ParamKeys.sorterEvalMeasureKey)
                     QueryCatalogName = executionQueryCatalogName
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
@@ -124,7 +154,7 @@ module VarModR_32 =
                     FunctionName = setupFunctionName
                     SortableTestsDatabaseName = UMX.tag "Prefix"
                     SorterSetEvalsDatabaseName = UMX.tag "Prefix"
-                    ParameterSpans = parameterSpans
+                    ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
                 }
@@ -138,7 +168,7 @@ module VarModR_32 =
     let description = "Compare mutation-rate settings for 24-input Msuf63b evolution (VarModR_32)."
 
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", description, [|
+        GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msuf63b.MutationRate.VarModR_32", description, channelCount, [|
             runExample("Test", Test)
             runExample("WideTest", WideTest)
         |])

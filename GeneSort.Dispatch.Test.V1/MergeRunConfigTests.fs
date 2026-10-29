@@ -8,20 +8,21 @@ open GeneSort.Project.V1
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
 
-let private configuration = function
-    | "Test" -> SorterEval.Merge.Test()
-    | "Small" -> SorterEval.Merge.Small()
-    | "MediumLd" -> SorterEval.Merge.MediumLd()
-    | "MediumHd" -> SorterEval.Merge.MediumHd()
-    | "LargeLd" -> SorterEval.Merge.LargeLd()
-    | name -> failwithf "Unknown Merge preset: %s" name
+let private configurations name =
+    RunTypeCatalog.all
+    |> Array.filter (fun kind -> kind.Name.StartsWith("SorterEval.Merge.Channels"))
+    |> Array.collect (fun kind -> kind.Examples)
+    |> Array.filter (fun example -> example.Name = name || example.Name.StartsWith(name + "_"))
+    |> Array.map (fun example -> example.Run)
+
+let private configuration name = configurations name |> Array.exactlyOne
 
 [<Theory>]
 [<InlineData("Test")>]
-[<InlineData("Small")>]
-[<InlineData("MediumLd")>]
+[<InlineData("Small_18")>]
+[<InlineData("MediumLd_96")>]
 [<InlineData("MediumHd")>]
-[<InlineData("LargeLd")>]
+[<InlineData("LargeLd_192")>]
 let ``Merge presets generate one correctly linked execution per setup combination and replica`` name =
     let configured = configuration name
     let host = runHost.Create configured 1
@@ -68,8 +69,8 @@ let ``Merge presets generate one correctly linked execution per setup combinatio
 [<Fact>]
 let ``Merge sweeps retain divisible width dimension combinations and omit invalid pairs`` () =
     let pairs name =
-        let configured = configuration name
-        (runHost.Create configured 1).MakeSetupParameters 0<replNumber> 1<replNumber>
+        configurations name
+        |> Array.collect (fun configured -> (runHost.Create configured 1).MakeSetupParameters 0<replNumber> 1<replNumber>)
         |> Array.map (fun sp ->
             let library = sp.GetMergeLibId().Value
             Assert.Equal(sorterLibVariant.VariantA, library.SorterLibVariant)

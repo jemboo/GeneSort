@@ -18,6 +18,8 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
+    let channelCount = 32<GeneSort.Sorting.channelCount>
+
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
     let executionFunctionName = ExecuteFunctionNames.sorterEval
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
@@ -31,6 +33,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
+                    (ParamKeys.excludeSelfCeKey, ["true"])
+                    (ParamKeys.collectSortableTestsKey, ["false"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                     (ParamKeys.prefixLibIdKey,
                      [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
@@ -72,6 +77,9 @@ module Prefix =
         let names = RunNaming.create()
         let parameterSpansSetup =
                 [
+                    (ParamKeys.excludeSelfCeKey, ["true"])
+                    (ParamKeys.collectSortableTestsKey, ["false"])
+                    (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.rngTypeKey, [rngType.Lcg] |> List.map RngType.toString)
                     (ParamKeys.prefixLibIdKey,
                      [prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA]
@@ -125,8 +133,9 @@ module Prefix =
 
     let description = "Evaluate sorting-network prefixes at different widths."
 
+
     let runType =
-        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", description, [|
+        GeneSort.Dispatch.V1.runType("SorterEval.Prefix", description, channelCount, [|
             runExample("Channels24", Channels24)
             runExample("Channels32", Channels32)
         |])

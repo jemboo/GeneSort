@@ -72,63 +72,23 @@ module RunParamEnhancerBuilders =
             |> Map.fold (fun map key value -> if Map.containsKey key map then map else Map.add key value map) rp.ParamMap
             |> runParameters.create
 
-    let sortableTests (context: runParamEnhancerContext) (rp: runParameters) =
+    let private initializeRun (context: runParamEnhancerContext) (rp: runParameters) =
         let qp = queryParamsForRun context rp
         rp.WithDatabaseName(Some context.Run.DatabaseName)
             .WithRunName(Some context.Run.RunName)
             .WithRunFinished(Some false)
             .WithId(Some qp.Id)
 
-    let sorterEvalStandard (context: runParamEnhancerContext) (rp: runParameters) =
-        let rp = inheritSetup context rp
-        let qp = queryParamsForRun context rp
-        rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithRunName(Some context.Run.RunName)
-            .WithRunFinished(Some false)
-            .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-            .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-            .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
-            .WithId(Some qp.Id)
+    let sortableTests = initializeRun
 
-    let sorterMutateStandard (context: runParamEnhancerContext) (rp: runParameters) =
-        let rp = inheritSetup context rp
-        let qp = queryParamsForRun context rp
-        rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithRunName(Some context.Run.RunName)
-            .WithRunFinished(Some false)
-            .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-            .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-            .WithId(Some qp.Id)
+    /// Execution spans win over paired setup values; file references are handled separately.
+    let private fromSetup context parameters =
+        inheritSetup context parameters |> initializeRun context
 
-    let sorterMutateStandardFormat (context: runParamEnhancerContext) (rp: runParameters) =
-        let rp = inheritSetup context rp
-        let qp = queryParamsForRun context rp
-        rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithRunName(Some context.Run.RunName)
-            .WithRunFinished(Some false)
-            .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-            .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
-            .WithId(Some qp.Id)
-
-    let sorterEvalMerge (context: runParamEnhancerContext) (rp: runParameters) =
-        // Each execution consumes its paired setup; only execution spans add new combinations.
-        let rp =
-            match context.SetupParameters with
-            | None -> rp
-            | Some setup ->
-                (SetupFileReferences.withoutReferences setup).ParamMap
-                |> Map.fold (fun map key value ->
-                    if Map.containsKey key map then map else Map.add key value map) rp.ParamMap
-                |> runParameters.create
-        let qp = queryParamsForRun context rp
-        let mergeLibId = rp.GetMergeLibId().Value
-        rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithRunName(Some context.Run.RunName)
-            .WithRunFinished(Some false)
-            .WithChannelCount(Some mergeLibId.ChannelCount)
-            .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-            .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-            .WithId(Some qp.Id)
+    let sorterEvalStandard = fromSetup
+    let sorterMutateStandard = fromSetup
+    let sorterMutateStandardFormat = fromSetup
+    let sorterEvalMerge = fromSetup
 
     let sorterEvalPrefix (context: runParamEnhancerContext) (rp: runParameters) =
         let rp =
@@ -149,107 +109,28 @@ module RunParamEnhancerBuilders =
                         | Some value -> Map.add key value map
                         | None -> map) map
                 |> runParameters.create
-        let qp = queryParamsForRun context rp
-        let prefixLibId = rp.GetPrefixLibId().Value
-        rp.WithDatabaseName(Some context.Run.DatabaseName)
-            .WithChannelCount(Some prefixLibId.ChannelCount)
-            .WithRunName(Some context.Run.RunName)
-            .WithRunFinished(Some false)
-            .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-            .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-            .WithId(Some qp.Id)
+        initializeRun context rp
 
     module Sgd =
 
-        let private applyPrefixDefaults
-                (channelCount: int<channelCount>)
-                (stageLength: int<stageLength>)
-                (prefixVariant: prefixLibVariant)
-                (modelType: simpleSorterModelType)
-                (includeSorterEvalMeasure: bool)
-                (rp: runParameters) =
-            let selectionType = sorterSelectionType.GuidOrder (512<sorterCount>)
-            let prefixLibId = prefixLibId.create channelCount stageLength prefixVariant
-            let result =
-                rp.WithRngType(Some rngType.Lcg)
-                    .WithCollectNewSortableTests(Some (false |> UMX.tag<collectNewSortableTests>))
-                    .WithExcludeSelfCe(Some (true |> UMX.tag<excludeSelfCe>))
-                    .WithSorterChildCount(Some 1<sorterChildCount>)
-                    .WithSimpleSorterModelType(Some modelType)
-                    .WithSortableDataFormat(Some sortableDataFormat.BitVector512)
-                    .WithDistinctSorterHashes(Some true)
-                    .WithPrioritizeNewMutants(Some true)
-                    .WithSortedFraction(Some 0.99<sortedFraction>)
-                    .WithSeedSorterPoolSelectionType(Some selectionType)
-                    .WithPrefixLibId(Some prefixLibId)
-                    .WithChannelCount(Some prefixLibId.ChannelCount)
-            if includeSorterEvalMeasure then
-                result.WithSorterEvalMeasureInitial(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
-                    .WithSorterEvalMeasure(Some SorterEvalMeasure.stageBiasedFilterUnsorted)
-            else result
-
-        let private withOrthoRate (rate: float<orthoRate>) (applyDefaults: runParameters -> runParameters) (rp: runParameters) =
-            applyDefaults rp |> fun value -> value.WithOrthoRate(Some rate)
-
-        let private makeFinishRunParams
-                (withLocalParams: runParameters -> runParameters)
-                (poolCount: runParameters -> int<sorterPoolCount>)
-                (selectSorterCountPerPool: bool)
-                (setGenerationCurrent: bool)
-                (modificationRate: float<modificationRate> option) : runParamEnhancerBuilder =
-            fun host rp ->
-                let scpp = rp.GetSorterCountPerPool().Value
-                let rp2 = withLocalParams rp
-                let rp3 = rp2.WithSorterPoolCount(Some (poolCount rp))
-                let rp3 =
-                    if setGenerationCurrent then rp3.WithGenerationCurrent(Some 0<generationNumber>)
-                    else rp3
-                let rp3 =
-                    match modificationRate with
-                    | Some rate -> rp3.WithModificationRate(Some rate)
-                    | None -> rp3
-                let qp = host.QueryParamsFromRunParams rp3 (geneSortDataType.Run host.Run.RunName)
-
-                let result =
-                    rp3.WithRunFinished(Some false)
-                        .WithId(Some qp.Value.Id)
-                        .WithRunName(Some host.Run.RunName)
-                if selectSorterCountPerPool then result.WithSelectedSorterCountPerPool(Some scpp) else result
-
-        let fromGlobalSorterCount
-                (withLocalParams: runParameters -> runParameters)
-                (globalSorterCount: int<sorterCount>)
-                (selectSorterCountPerPool: bool)
-                (modificationRate: float<modificationRate> option) : runParamEnhancerBuilder =
-            makeFinishRunParams
-                withLocalParams
-                (fun rp -> (%globalSorterCount / %rp.GetSorterCountPerPool().Value) |> UMX.tag<sorterPoolCount>)
-                selectSorterCountPerPool
-                false
-                modificationRate
-
-        let fromSorterPoolSet
-                (withLocalParams: runParameters -> runParameters)
-                (setGenerationCurrent: bool)
-                (selectSorterCountPerPool: bool)
-                (modificationRate: float<modificationRate> option) : runParamEnhancerBuilder =
-            makeFinishRunParams
-                withLocalParams
-                (fun rp -> (%rp.GetSorterCountPerPoolSet().Value / %rp.GetSorterCountPerPool().Value) |> UMX.tag<sorterPoolCount>)
-                selectSorterCountPerPool
-                setGenerationCurrent
-                modificationRate
+        let private fromSorterPoolSet setGenerationCurrent : runParamEnhancerBuilder =
+            fun host parameters ->
+                let rp = (inheritSetup host parameters).ParamMap |> ParameterValidation.resolveSelection |> runParameters.create
+                ParameterValidation.validateValues SgdParameterValidation.seedPoolKeys rp.ParamMap
+                |> ParameterValidation.ensureValid "parameters"
+                ParameterValidation.poolSizes "Execution" (ParameterValidation.ofMap rp.ParamMap)
+                |> ParameterValidation.ensureValid "parameters"
+                let perPool = rp.GetSorterCountPerPool().Value
+                let total = rp.GetSorterCountPerPoolSet().Value
+                let enhanced = rp.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
+                let enhanced = if setGenerationCurrent then enhanced.WithGenerationCurrent(Some 0<generationNumber>) else enhanced
+                let qp = host.QueryParamsFromRunParams enhanced (geneSortDataType.Run host.Run.RunName)
+                enhanced.WithRunFinished(Some false).WithId(Some qp.Value.Id).WithRunName(Some host.Run.RunName)
 
         let msuf32MutationRate : runParamEnhancerBuilder = fun context parameters ->
             parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.msufExecution
             |> ParameterValidation.ensureValid "parameters"
-            fromSorterPoolSet
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msuf4 true))
-                true
-                true
-                None
-                context
-                parameters
+            fromSorterPoolSet true context parameters
 
         let private combineSetup (context: runParamEnhancerContext) (parameters: runParameters) =
             match context.SetupParameters with
@@ -262,78 +143,33 @@ module RunParamEnhancerBuilders =
         let msuf32FromSetup : runParamEnhancerBuilder =
             fun context parameters -> msuf32MutationRate context (combineSetup context parameters)
 
-        /// Supply the SimpleR mutation default before execution IDs are calculated.
+        /// Validate explicit SimpleR mutation settings before execution IDs are calculated.
         let msuf32RFromSetup : runParamEnhancerBuilder = fun context parameters ->
             let combined = combineSetup context parameters
             if Map.containsKey ParamKeys.activationProbabilityKey combined.ParamMap then
                 invalidArg "parameters" "SimpleR execution uses AMax; ActivationProbability belongs to SimpleS."
             ParameterValidation.validateValues [ParamKeys.aMaxKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
-            let combined =
-                if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
-                else combined.WithActivatorMutationRate(Some 0.1)
             ParameterValidation.validateValues [ParamKeys.activatorMutationRateKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
             msuf32MutationRate context combined
 
-        /// Supply the SimpleS flip-rate default before execution IDs are calculated.
+        /// Validate explicit SimpleS flip-rate settings before execution IDs are calculated.
         let msuf32SFromSetup : runParamEnhancerBuilder = fun context parameters ->
             let combined = combineSetup context parameters
             if Map.containsKey ParamKeys.aMaxKey combined.ParamMap then
                 invalidArg "parameters" "SimpleS execution uses ActivationProbability; AMax belongs to SimpleR."
             ParameterValidation.validateValues [ParamKeys.activationProbabilityKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
-            let combined =
-                if Map.containsKey ParamKeys.activatorMutationRateKey combined.ParamMap then combined
-                else combined.WithActivatorMutationRate(Some 0.1)
             ParameterValidation.validateValues [ParamKeys.activatorMutationRateKey] combined.ParamMap |> ParameterValidation.ensureValid "parameters"
             msuf32MutationRate context combined
 
-        let msrs32MutationRate =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
-                512<sorterCount>
-                true
-                None
-
-        let msrs32MutationRateMax =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
-                512<sorterCount>
-                true
-                (Some 0.99<modificationRate>)
-
-        let msuf624p3bMutationRate =
-            let defaults rp =
-                let result = applyPrefixDefaults 24<channelCount> 3<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msuf6 false rp
-                let sorterEvalMeasure = result.GetSorterEvalMeasure().Value
-                result.WithSorterEvalMeasureInitial(Some sorterEvalMeasure).WithOrthoRate(Some 4.001<orthoRate>)
-            fromSorterPoolSet defaults false true None
-
-        let msrs24p3aOrthoPara =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
-                8192<sorterCount>
-                true
-                (Some 0.99<modificationRate>)
-
-        let msrs24p3aPoolModComp =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixA simpleSorterModelType.Msrs true))
-                512<sorterCount>
-                false
-                None
-
-        let msrs24p3bOrthoPara =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Msrs true))
-                8192<sorterCount>
-                true
-                (Some 0.99<modificationRate>)
-
-        let mssi24p3bOrthoPara =
-            fromGlobalSorterCount
-                (withOrthoRate 4.001<orthoRate> (applyPrefixDefaults 24<channelCount> 4<stageLength> prefixLibVariant.PrefixB simpleSorterModelType.Mssi true))
-                1024<sorterCount>
-                true
-                None
+        /// These families retain the supplied generation and share pool validation/calculation.
+        let private continueFromSorterPoolSet = fromSorterPoolSet false
+        let msrs32MutationRate = continueFromSorterPoolSet
+        let msrs32MutationRateMax = continueFromSorterPoolSet
+        let msuf624p3bMutationRate = continueFromSorterPoolSet
+        let msrs24p3aOrthoPara = continueFromSorterPoolSet
+        let msrs24p3aPoolModComp = continueFromSorterPoolSet
+        let msrs24p3bOrthoPara = continueFromSorterPoolSet
+        let mssi24p3bOrthoPara = continueFromSorterPoolSet
 
 module RunParamBuilderNames =
     module Enhancer =

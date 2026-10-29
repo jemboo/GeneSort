@@ -440,11 +440,13 @@ public partial class MessagePackBrowserView : UserControl
                 CurrentViewer = viewer;
                 if (nodePathToRestore is { Length: > 0 })
                 {
-                    Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+                    await Dispatcher.InvokeAsync(() =>
                     {
                         if (version == folderLoadVersion && ReferenceEquals(CurrentViewer, viewer))
                             viewer.SelectNodePath(nodePathToRestore);
-                    }));
+                    }, DispatcherPriority.Loaded);
+                    if (version != folderLoadVersion)
+                        return;
                 }
                 FileSummary = $"{file.FullPath}  •  {result.Size:N0} bytes  •  {result.NodeCount:N0} values";
                 SelectionSize = $"{result.Size:N0} bytes";

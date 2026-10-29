@@ -9,9 +9,11 @@ type runExample(name: string, create: unit -> run) =
     member _.Name = name
     member _.Run = configured.Value
 
-/// One module containing run definitions. Mixed modules expose their examples explicitly.
-type runType(name: string, description: string, examples: runExample[]) =
+/// One module containing run definitions with a fixed, positive channel count.
+type runType(name: string, description: string, channelCount: int<GeneSort.Sorting.channelCount>, examples: runExample[]) =
+    do if int channelCount <= 0 then invalidArg (nameof channelCount) "A run module requires a positive channel count."
     do if System.String.IsNullOrWhiteSpace description then invalidArg (nameof description) "A run module requires a description."
     member _.Name = name
+    member _.ChannelCount = int channelCount
     member _.Description = description
     member _.Examples = Array.copy examples

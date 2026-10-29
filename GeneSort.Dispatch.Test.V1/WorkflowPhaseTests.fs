@@ -1823,7 +1823,7 @@ let ``Saved runs without explicit source fields remain readable`` () =
                    |> MessagePack.MessagePackSerializer.Deserialize<GeneSort.Project.Mp.V1.runDto>
                    |> GeneSort.Project.Mp.V1.RunDto.toDomain
     Assert.True(restored.ParameterSource.IsNone)
-    Assert.Equal<runParameters array>(RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>,
+    Assert.Equal<runParameters>(RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>,
                                       RunParameterGeneration.generate restored 0<replNumber> 1<replNumber>)
 
 [<Theory>]
@@ -3008,5 +3008,5 @@ let ``Standard interim checkpoint resumes a complete snapshot report segment`` (
         match (memory :> IGeneSortDb).loadAsync geneSortDataMode.Results query |> Async.RunSynchronously |> Result.defaultWith failwith with
         | outputData.SorterPoolSetSummarySet (spSummarySet.Standard summaries) ->
             // Standard samples the input pool before each step; preserve that established convention.
-            Assert.Equal<int[]>([|generation - 5 .. generation - 1|], summaries.SorterPoolSetSummaries |> Array.map (fun s -> int s.GenerationNumber) |> Array.sort)
+            Assert.Equal<int>([|generation - 5 .. generation - 1|], summaries.SorterPoolSetSummaries |> Array.map (fun s -> int s.GenerationNumber) |> Array.sort)
         | _ -> failwith "Expected Standard summaries"

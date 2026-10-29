@@ -113,7 +113,8 @@ module internal RunFileStorage =
             | runParameterWriteMode.CreateNew ->
                 if existing.Length > 0 || (File.Exists definition && not (sameDefinition definition configured)) then
                     invalidOp "Run files already exist. Choose Replace to regenerate this run, or use a new run name."
-            | runParameterWriteMode.Resume ->
+            | runParameterWriteMode.Resume
+            | runParameterWriteMode.Append ->
                 if File.Exists definition && not (sameDefinition definition configured) then
                     invalidOp "The saved run definition differs. Resume requires the original configuration; use Replace to regenerate it."
             | runParameterWriteMode.Replace -> ()
@@ -137,10 +138,16 @@ module internal RunFileStorage =
             Directory.CreateDirectory stagedParameters |> ignore
             try
                 do! File.WriteAllBytesAsync(stagedDefinition, MessagePackSerializer.Serialize(RunDto.fromDomain configured))
+                if mode = runParameterWriteMode.Append then
+                    for path in existing do
+                        let staged = within root (Path.Combine(stagedParameters, Path.GetRelativePath(parameters, path)))
+                        Directory.CreateDirectory(Path.GetDirectoryName staged) |> ignore
+                        File.Copy(path, staged)
                 for index, (target, value) in Array.indexed entries do
                     let staged = within root (Path.Combine(stagedParameters, Path.GetRelativePath(parameters, target)))
                     Directory.CreateDirectory(Path.GetDirectoryName staged) |> ignore
-                    if mode = runParameterWriteMode.Resume && File.Exists target then File.Copy(target, staged)
+                    if mode = runParameterWriteMode.Append && File.Exists staged then ()
+                    elif mode = runParameterWriteMode.Resume && File.Exists target then File.Copy(target, staged)
                     else do! File.WriteAllBytesAsync(staged, MessagePackSerializer.Serialize(RunParametersDto.fromDomain value))
                     if index = 0 || index + 1 = entries.Length || (index + 1) % 100 = 0 then
                         report (sprintf "Prepared %d of %d RunParameter files." (index + 1) entries.Length)

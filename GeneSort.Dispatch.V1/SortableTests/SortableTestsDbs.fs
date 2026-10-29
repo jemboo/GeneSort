@@ -16,7 +16,7 @@ module SortableTestsDbs =
 
     module Merge =
 
-        let private sourceRun = SortableTests.Merge.HiMD_32 ()
+        let private sourceRun = SortableTests.Merge.Channels32.HiMD_32 ()
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
@@ -49,7 +49,7 @@ module SortableTestsDbs =
 
     module Prefix =
 
-        let private sourceRun = SortableTests.Prefix.FourStage_32 ()
+        let private sourceRun = SortableTests.Prefix.Channels32.FourStage_32 ()
         let projectName = sourceRun.ProjectName
     
         let dbName = sourceRun.DatabaseName
