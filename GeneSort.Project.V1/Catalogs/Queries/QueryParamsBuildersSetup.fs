@@ -52,6 +52,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -97,6 +101,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -137,6 +145,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -161,6 +171,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -209,6 +223,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -251,6 +269,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -275,6 +295,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -323,6 +347,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -822,6 +850,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -867,6 +899,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -907,6 +943,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -931,6 +969,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -979,6 +1021,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1021,6 +1067,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -1045,6 +1093,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1093,6 +1145,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1512,6 +1568,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1557,6 +1617,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1597,6 +1661,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -1621,6 +1687,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1669,6 +1739,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1711,6 +1785,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -1735,6 +1811,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -1783,6 +1863,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2204,6 +2288,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2249,6 +2337,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2289,6 +2381,8 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                     yield ParamKeys.mergeLibIdKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -2313,6 +2407,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2361,6 +2459,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2403,6 +2505,8 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                     yield ParamKeys.prefixLibIdKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -2427,6 +2531,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2475,6 +2583,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2954,6 +3066,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-standard-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -2999,6 +3115,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-standard-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3039,6 +3159,8 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                     yield ParamKeys.mergeLibIdKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -3063,6 +3185,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3111,6 +3237,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-merge-tests-without-prefix-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3153,6 +3283,8 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                             [|
                                 yield "SetupRecipe", "prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                     yield ParamKeys.prefixLibIdKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -3177,6 +3309,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3225,6 +3361,10 @@ module QueryParamsBuildersSetup =
                         return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                             [|
                                 yield "SetupRecipe", "soss-seed-pool-prefix-tests-v1"
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                                for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                    yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                     yield ParamKeys.sortingWidthKey, value
                                 for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3784,6 +3924,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3829,6 +3973,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3869,6 +4017,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -3893,6 +4043,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3941,6 +4095,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -3983,6 +4141,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -4007,6 +4167,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4055,6 +4219,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4494,6 +4662,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4539,6 +4711,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-standard-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4579,6 +4755,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -4603,6 +4781,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4651,6 +4833,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-merge-tests-without-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4693,6 +4879,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -4717,6 +4905,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -4765,6 +4957,10 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                         [|
                             yield "SetupRecipe", "standard-seed-pool-prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                                 yield ParamKeys.sortingWidthKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -5827,6 +6023,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -5880,6 +6078,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -6286,6 +6486,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -6339,6 +6541,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -6767,6 +6971,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -6820,6 +7026,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -7263,6 +7471,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -7332,6 +7542,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -7847,6 +8059,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -7916,6 +8130,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -8431,6 +8647,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "merge-tests-with-prefix-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                                 yield ParamKeys.mergeLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -8500,6 +8718,8 @@ module QueryParamsBuildersSetup =
                     return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                         [|
                             yield "SetupRecipe", "prefix-tests-v1"
+                            for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                                yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                                 yield ParamKeys.prefixLibIdKey, value
                             for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -8973,6 +9193,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (None) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-standard-tests-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -9018,6 +9242,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-standard-tests-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -9058,6 +9286,8 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                     [|
                         yield "SetupRecipe", "merge-tests-without-prefix-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.mergeLibIdKey |> Option.toList do
                             yield ParamKeys.mergeLibIdKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -9082,6 +9312,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-merge-tests-without-prefix-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -9130,6 +9364,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-merge-tests-without-prefix-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -9172,6 +9410,8 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (None) None (geneSortDataType.SortableTestsWithPrefix outputName)
                     [|
                         yield "SetupRecipe", "prefix-tests-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.prefixLibIdKey |> Option.toList do
                             yield ParamKeys.prefixLibIdKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortableDataFormatKey |> Option.toList do
@@ -9196,6 +9436,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-prefix-tests-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do
@@ -9244,6 +9488,10 @@ module QueryParamsBuildersSetup =
                 return queryParams.create database project (rp.GetRepl()) None (geneSortDataType.SorterPoolSet outputName)
                     [|
                         yield "SetupRecipe", "soss-seed-pool-prefix-tests-v1"
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSortableTestsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSortableTestsDatabaseNameKey, value
+                        for value in parameters.ParamMap.TryFind ParamKeys.setupSorterSetEvalsDatabaseNameKey |> Option.toList do
+                            yield ParamKeys.setupSorterSetEvalsDatabaseNameKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.sortingWidthKey |> Option.toList do
                             yield ParamKeys.sortingWidthKey, value
                         for value in parameters.ParamMap.TryFind ParamKeys.rngTypeKey |> Option.toList do

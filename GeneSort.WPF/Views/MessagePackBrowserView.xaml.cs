@@ -63,7 +63,7 @@ public partial class MessagePackBrowserView : UserControl
     {
         var dialog = new VistaFolderBrowserDialog
         {
-            Description = "Choose the root folder to browse for GeneSort output files",
+            Description = "Choose the root folder to browse for Sortopia output files",
             UseDescriptionForTitle = true,
             SelectedPath = Directory.Exists(ViewModel.FolderPath) ? ViewModel.FolderPath : string.Empty
         };
@@ -75,8 +75,8 @@ public partial class MessagePackBrowserView : UserControl
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Open a GeneSort output file",
-            Filter = "GeneSort output files (*.msgpack;*.txt)|*.msgpack;*.txt|MessagePack files (*.msgpack)|*.msgpack|Text reports (*.txt)|*.txt|All files (*.*)|*.*",
+            Title = "Open a Sortopia output file",
+            Filter = "Sortopia output files (*.msgpack;*.txt)|*.msgpack;*.txt|MessagePack files (*.msgpack)|*.msgpack|Text reports (*.txt)|*.txt|All files (*.*)|*.*",
             CheckFileExists = true
         };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true)

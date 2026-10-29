@@ -39,7 +39,7 @@ module RunEditorTests =
     let ``catalog selections resolve to registered implementations`` () =
         ProjectCatalogs.registerAll ()
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
-        Assert.True(configured.SetupFunctionName.IsNone)
+        Assert.Equal(Some GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard, configured.SetupFunctionName)
         SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName |> ignore
         QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName |> ignore
         QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName |> ignore
@@ -186,12 +186,13 @@ module RunEditorTests =
         let workflow = WorkflowDefinitions.standardMsuf32
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let dto = RunDto.fromDomain configured
-        let selected = [| dto.SetupQueryCatalogName; dto.SetupEnhancerFunctionName
+        let selected = [| dto.SetupFunctionName; dto.SetupQueryCatalogName; dto.SetupEnhancerFunctionName
                           dto.ExecuteFunctionName; dto.RunQueryCatalogName; dto.RunEnhancerFunctionName
                           dto.SortableTestsMakerName; dto.SeedPoolSetMakerName; dto.MutatorMakerName |]
         Assert.Equal<string>(selected, RunEditor.catalogChoices() |> Array.map (fun choice -> choice.Name))
         Assert.True(workflow.Matches configured)
         let mismatches = [
+            { dto with SetupFunctionName = "another-setup" }
             { dto with SetupQueryCatalogName = "another-query" }
             { dto with SetupEnhancerFunctionName = "another-enhancer" }
             { dto with ExecuteFunctionName = "another-executor" }

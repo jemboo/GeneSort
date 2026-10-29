@@ -368,13 +368,13 @@ module SorterMutateSetup =
         let context =
             setupContext.create {
                 MakeSorterModelSets = Map.ofList [
-                    SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet (makeMutantStandardSorterModels sources.Evolution) storage allowOverwrite cts
-                    SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet (makeMutantMergeSorterModels sources.Evolution) storage allowOverwrite cts
-                    SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet (makeMutantPrefixSorterModels sources.Evolution) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantStandard, storeMutantSorterModelSet (makeMutantStandardSorterModels (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard"))) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantMerge, storeMutantSorterModelSet (makeMutantMergeSorterModels (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite cts
+                    SorterModelSetCatalogNames.mutantPrefix, storeMutantSorterModelSet (makeMutantPrefixSorterModels (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite cts
                 ]
                 MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests storage allowOverwrite |> checkedSetup
-                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests sources.Evolution) storage allowOverwrite |> checkedSetup
-                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests sources.Evolution) storage allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite |> checkedSetup
             }
         SetupCatalog.get (Run.requireSetupFunctionName configured) context
 

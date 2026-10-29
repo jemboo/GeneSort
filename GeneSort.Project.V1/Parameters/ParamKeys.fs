@@ -17,6 +17,11 @@ open GeneSort.Project.V1.ParamBundles
 /// Shared immutable parameters; the kind keeps setup and run values distinct.
 module ParamKeys =
 
+    [<Literal>]
+    let setupSortableTestsDatabaseNameKey = "SetupSortableTestsDatabaseName"
+    [<Literal>]
+    let setupSorterSetEvalsDatabaseNameKey = "SetupSorterSetEvalsDatabaseName"
+
     let addOrRemove key valueOpt map =
         match valueOpt with
         | Some v -> Map.add key v map

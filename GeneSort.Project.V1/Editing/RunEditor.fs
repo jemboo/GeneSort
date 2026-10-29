@@ -54,6 +54,8 @@ type parameterDraft =
 type runDraftArgs = {
     ProjectName: string
     DatabaseName: string
+    SortableTestsDatabaseName: string
+    SorterSetEvalsDatabaseName: string
     RunName: string
     Description: string
     AllowOverwrite: bool
@@ -67,6 +69,8 @@ type runDraft =
     private { settings: runDraftArgs }
     member this.ProjectName = this.settings.ProjectName
     member this.DatabaseName = this.settings.DatabaseName
+    member this.SortableTestsDatabaseName = this.settings.SortableTestsDatabaseName
+    member this.SorterSetEvalsDatabaseName = this.settings.SorterSetEvalsDatabaseName
     member this.RunName = this.settings.RunName
     member this.Description = this.settings.Description
     member this.AllowOverwrite = this.settings.AllowOverwrite
@@ -109,6 +113,7 @@ module RunEditor =
         let parameter key values = parameterDraft.create key values
         runDraft.create {
             ProjectName = "SorterSgd.p32.Msuf4a.Standard"; DatabaseName = "Test"; RunName = "NewRun"
+            SortableTestsDatabaseName = "Prefix"; SorterSetEvalsDatabaseName = "Prefix"
             Description = "Standard Msuf32p4a run"; AllowOverwrite = false
             GenSaveIntervalsName = GenIntervalNames.uniformInterval10
             GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
@@ -135,6 +140,8 @@ module RunEditor =
         let add field message = issues.Add(validationIssue.create field message)
         issues.AddRange(SgdParameterValidation.standardMsuf (spans draft.SetupParameters) (spans draft.ExecutionParameters))
         for field, value in ["ProjectName", draft.ProjectName; "DatabaseName", draft.DatabaseName; "RunName", draft.RunName] do
+            issues.AddRange(RunIdentity.validate field value)
+        for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
             issues.AddRange(RunIdentity.validate field value)
         for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
             if String.IsNullOrWhiteSpace name || not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey name) then
@@ -169,7 +176,7 @@ module RunEditor =
             SgdRun.create {
                 DatabaseName = UMX.tag draft.DatabaseName; ProjectName = UMX.tag draft.ProjectName; RunName = UMX.tag draft.RunName
                 Description = draft.Description; AllowOverwrite = draft.AllowOverwrite
-                Setup = workflow.SetupConfig (spans draft.SetupParameters)
+                Setup = workflow.SetupConfig (UMX.tag draft.SortableTestsDatabaseName) (UMX.tag draft.SorterSetEvalsDatabaseName) (spans draft.SetupParameters)
                 Execution = workflow.ExecutionConfig (spans draft.ExecutionParameters)
             } {
                 MakerNames = workflow.MakerNames
@@ -185,6 +192,8 @@ module RunEditor =
             let rows spans = spans |> List.map (fun (key, values) -> parameterDraft.create key (List.toArray values)) |> List.toArray
             runDraft.create {
                 ProjectName = %configured.ProjectName; DatabaseName = %configured.DatabaseName; RunName = %configured.RunName
+                SortableTestsDatabaseName = string configured.SgdSetup.Value.SortableTestsDatabaseName
+                SorterSetEvalsDatabaseName = string configured.SgdSetup.Value.SorterSetEvalsDatabaseName
                 Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
                 GenSaveIntervalsName = configured.GenSaveIntervalsName.Value; GenSaveSubIntervalsName = configured.GenSaveSubIntervalsName.Value
                 SetupParameters = rows configured.SetupParameterSpans; ExecutionParameters = rows configured.RunParameterSpans

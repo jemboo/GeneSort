@@ -94,6 +94,36 @@ let ``Equivalent merge identities and numeric values cannot create duplicate swe
                     "MergeLibId(sortingWidth=32, mergeDimension=16, Variant=Unknown)"] do
         Assert.True(ParameterValidation.validateValue ParamKeys.mergeLibIdKey invalid |> Result.isError)
 
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Merge width filtering finds component networks for test and evaluation runs`` evaluation =
+    let configured = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.Test ()
+    let before = RunTypeEditor.fromRun configured
+    Assert.Contains(24, RunTypeEditor.mergeSortingWidths configured)
+    Assert.Contains(32, RunTypeEditor.mergeSortingWidths configured)
+    for width in [24; 32; 64; 96; 37] do
+        let spec = RunTypeEditor.parametersForMergeWidth configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey)
+        let expected = MergeLibId.availableForWidth (FSharp.UMX.UMX.tag width) |> Array.map MergeLibId.toString
+        Assert.Equal<string>(expected |> Array.sort, spec.Choices |> Array.sort)
+        Assert.Equal(evaluation, spec.RequiredInSetup)
+        Assert.Equal(not evaluation, spec.ExecutionAllowed)
+        Assert.DoesNotContain(spec.Choices, fun value -> int (MergeLibId.fromString value).SortingWidth <> width)
+    Assert.Equal(before, RunTypeEditor.fromRun configured)
+
+[<Theory>]
+[<InlineData(false)>]
+[<InlineData(true)>]
+let ``Merge width suggestions and filtering preserve unavailable saved library identities`` evaluation =
+    let original = if evaluation then SorterEval.Merge.Test () else SortableTests.Merge.Test ()
+    let saved = mergeLibId.create 768<sortingWidth> 2<mergeDimension> sorterLibVariant.VariantA |> MergeLibId.toString
+    let replace spans = spans |> List.map (fun (key, values) -> if key = ParamKeys.mergeLibIdKey then key, [saved] else key, values)
+    let configured = Run.withParameterSpans (replace original.SetupParameterSpans) (replace original.RunParameterSpans) original
+    Assert.Contains(768, RunTypeEditor.mergeSortingWidths configured)
+    let choices width = RunTypeEditor.parametersForMergeWidth configured width |> Array.find (fun spec -> spec.Key = ParamKeys.mergeLibIdKey) |> fun spec -> spec.Choices
+    Assert.Contains(saved, choices 768)
+    Assert.DoesNotContain(saved, choices 24)
+
 [<Fact>]
 let ``Prefix choices include the declared IDs and library entries at the same widths`` () =
     let configured = SortableTests.Prefix.Width24s ()

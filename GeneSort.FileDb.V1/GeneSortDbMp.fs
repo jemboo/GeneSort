@@ -52,6 +52,21 @@ type GeneSortDbMp(
 
     member _.RootFolder = rootFolder
 
+    interface IOutputDataListing with
+        member _.getOutputIds dataMode query = async {
+            let folder = OutputDataFile.getPathToOutputDataFolder rootFolder dataMode query.ReplAsString query.OutputDataType
+            let pattern = match query.OutputDataType with geneSortDataType.TextReport _ -> "*.txt" | _ -> "*.msgpack"
+            if not (Directory.Exists %folder) then return Set.empty
+            else
+                return
+                    Directory.EnumerateFiles(%folder, pattern)
+                    |> Seq.choose (fun path ->
+                        match Guid.TryParse(Path.GetFileNameWithoutExtension path) with
+                        | true, id -> Some (UMX.tag<queryParamsId> id)
+                        | _ -> None)
+                    |> Set.ofSeq
+        }
+
     interface IRunParameterStore with
         member _.saveRunParameterSetAsync prepared mode progress =
             mailbox.PostAndAsyncReply(fun reply -> SaveParameterSet(prepared, mode, progress, reply))

@@ -49,3 +49,8 @@ type IGeneSortDb =
 
 /// Opens a source database without prescribing a filesystem or database implementation.
 type sourceDatabaseOpener = string<projectName> -> string<databaseName> -> string -> IGeneSortDb
+
+/// Optional bulk lookup for outputs in the same mode, output type and replica as a query.
+/// Checkpoint discovery can match IDs in memory instead of probing every candidate file.
+type IOutputDataListing =
+    abstract member getOutputIds : geneSortDataMode -> queryParams -> Async<Set<Guid<queryParamsId>>>

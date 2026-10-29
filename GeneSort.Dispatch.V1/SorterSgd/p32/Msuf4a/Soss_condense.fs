@@ -25,6 +25,7 @@ module Pool_X =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
+    let setupFunctionName = SetupCatalogNames.sgdSoss
     let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
     let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
@@ -70,6 +71,9 @@ module Pool_X =
                 Description = "SossBase for Msuf32p4a"
                 AllowOverwrite = false
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName

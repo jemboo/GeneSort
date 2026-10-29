@@ -9,6 +9,17 @@ parameter sweep and no Setup section or action. Evaluation and mutation runs
 prepare their input files before execution. Evolution runs create a starting
 population; continuation runs import one from their source.
 
+For fresh SGD runs, the Parameters tab exposes **SortableTests database** and
+**SorterEval database (SorterSetEvals)**. These name the input databases under
+`SortableTests` and `SorterEval` in the chosen projects folder. The run's Database
+name still specifies its output destination. The Catalogs tab shows the explicit
+`Setup.FunctionName`; Standard and Soss setup no longer dispatch through the
+execution function name. Source selections survive save/reopen and participate
+in Setup file identities, so changing a source cannot reuse another source's inputs.
+Old SGD definitions without these settings must be recreated; no migration is performed.
+Continuations retain the original library names and import prepared checkpoint inputs
+from their selected source run instead of loading those libraries again.
+
 The domain `run` DU distinguishes `DirectRun`, `PreparedRun`, `EvolutionRun`, and
 `ContinuationRun`. `RunParameterRoles.fs` defines the explicit policies for each
 workflow: `SetupOnly`, `InheritedReadOnly`, `InheritedOverridable`, and
@@ -22,7 +33,7 @@ dimensions are fixed. ActivatorMutationRate remains editable: rates 0.0 and 0.01
 share the same recorded Setup files for each MutationMod and retain distinct
 execution/result IDs.
 
-The MessagePack DTO shape and query constructors are unchanged. On import,
+SortableTests and prepared-run identities retain their current behavior. On import,
 legacy SortableTests Setup spans are folded into the one Execution sweep, and
 exactly repeated fixed spans in prepared runs are inherited instead of expanded
 again. Existing files are neither rewritten nor renamed. The historical
@@ -52,14 +63,22 @@ a module identifier, so renamed definitions may match several compatible modules
    Code presets retain their existing automatic naming.
    `MergeLibId`, `PrefixLibId`, and `SorterLibId` use full-width dropdowns listing available library entries
    for the widths declared by the example (or opened definition), plus its existing
-   declared IDs. For `SortableTests.Prefix`, `SortableTests.PrefixTest`, and `SorterEval.Prefix`, choose
+   declared IDs. For `SortableTests.Prefix`, `SortableTests.PrefixTest`, `SorterEval.Prefix`, and `SorterMutate.Prefix`, choose
    **Sorting width** on the Parameters tab first. The PrefixLibId dropdowns then
    offer only that width. Changing width clears incompatible selections; choose
    a matching prefix before saving. Multiple selected prefixes remain unique.
-   In `SorterEval.Prefix`, this filters the Setup choices; Execution inherits them
+   In `SorterEval.Prefix` and `SorterMutate.Prefix`, this filters the Setup choices; Execution inherits them
    read-only. Match the PrefixLibId and SortableDataFormat to the SortableTests run.
-   Opening a saved run infers the width from its PrefixLibIds. The selector adds
-   no extra sweep parameter and preserves the existing file IDs. Saved runs with
+   `SortableTests.Merge`, `SorterEval.Merge`, and `SorterMutate.Merge` also have **Sorting width** selectors
+   that filter MergeLibId. Choose a suggested width or type another positive whole
+   number; available choices use component sorters in the library. Widths without
+   available entries are rejected. Evaluation and mutation inherit their selected Setup merges
+   read-only. Changing width clears incompatible selections, and all selections
+   remain unique. In the mutation workflows, changing width also updates the width
+   inside Setup's `MutatorParams`, preserving the other mutation settings. Execution
+   inherits those values read-only. Opening a saved definition does not change them.
+   Opening a saved run infers the width from its library IDs. The selectors add
+   no extra sweep parameter and preserve the existing file IDs. Saved runs with
    mixed widths retain their values until you explicitly choose one width.
    Long identities
    wrap at narrower window widths. Dropdowns exclude values selected elsewhere in
@@ -99,6 +118,23 @@ publication fails. Dispatch uses the same Project preparation service and FileDb
 publisher. OnePool uses its explicit resume mode to retain saved checkpoint state
 and fill missing files; changed definitions or unexpected files require replacement.
 
+Evolution resumes from the highest saved checkpoint through `GenerationIntervalLast`,
+the zero-based index in the save schedule. An explicit schedule `MaxCount` still
+limits finite schedules; there is no default 200-entry search cutoff. FileDb lists
+checkpoint IDs in the output/replica folder once, matches the scheduled queries in
+memory, and deserializes only the latest matching file. Missing earlier checkpoints
+and stale saved progress are supported. Existing file names and formats are unchanged.
+
+Processing has separate **Setup parameters** and **Run parameters** tabs.
+The Setup tab has one row per shared set of recorded input files, with the input
+parameters, file IDs and a `LinkedRuns` count. Execution-only sweep values do not
+split these groups: Soss.SossS rates 0.0 and 0.01 share a Setup row when they use
+the same inputs. Select Setup rows and click **Run Setup** to prepare their inputs
+and update all linked saved run rows. Shared artifacts are reused by the existing
+setup executors. Progress counts linked run rows. Continuation requests whose
+input IDs are not yet known stay separate until Setup records their imported files.
+SortableTests hides this tab because it has no Setup phase.
+
 The **Run parameters** tab displays the saved parameter files for the current run,
 including every saved replica regardless of the generation range controls. Opening
 a definition or generating parameters loads this view automatically; **Refresh saved
@@ -116,7 +152,7 @@ refreshes, including empty results and failed reads. Temporarily absent columns 
 their layout and sorting when they return; new columns are appended. Sorting does
 not modify saved files.
 
-Both tables save their column order, widths and sorting when you close the application,
+The Setup, Run parameters and Summary Reports tables save their column order, widths and sorting when you close the application,
 and restore them the next time you open it. Each table has its own settings, shared
 across runs for your Windows user, in `%LOCALAPPDATA%\GeneSort\table-layouts.json`.
 Settings include the `#` column and columns that are temporarily absent. Missing or
@@ -136,9 +172,11 @@ remembered layouts for absent columns too, and saves immediately. It works with 
 empty table, whose default sort is applied when rows load. The other table keeps
 its layout. A message below the table confirms the save or reports a save failure.
 
-Select rows with Ctrl+click or Shift+click and choose **Run Execution**, **Run Setup**
-for prepared workflows, or **Generate Summary Reports** for evolution. These require a saved definition and at least
-one selected row. Each action processes those rows one at a time on a background
+Select rows with Ctrl+click or Shift+click. Use **Run Setup** on the Setup tab;
+use **Run Execution** or **Generate Summary Reports** on the Run parameters tab.
+The tabs have independent selections, so selecting shared inputs does not select
+executions. These actions require a saved definition and at least one selected row.
+Each action processes the affected saved run rows one at a time on a background
 thread. A progress bar shows the number processed,
 and the status shows the current activity. The final counts distinguish successes,
 failures and rows skipped because execution has already finished; individual failures
@@ -202,8 +240,10 @@ format and replica. Their run name may be anything, including `NewRun`; no sourc
 definition is required to load these results. Missing tests report the requested
 values and exact result path. Generate and execute a matching SortableTests run,
 then rerun the evaluation's Setup to create `SortableTestsWithPrefix` before Execution.
-Evolution workflows also use evaluation libraries such as `SorterEval/Prefix/Width32`;
-those saved definitions still supply library sizes and other query settings.
+Evolution workflows use the selected evaluation database; its saved run definitions
+supply library sizes and other query settings. The loader accepts any run name and
+requires one distinct matching evaluation. If several match, use a database containing
+the intended evaluation rather than relying on an arbitrary selection.
 This binding lives in
 `GeneSort.FileDb.V1/WorkflowSourceFiles.fs`, alongside the selected-row setup adapter
 `RunSetupFiles.fs`. `RunExecutionFiles.fs` binds the shared Project execution catalog

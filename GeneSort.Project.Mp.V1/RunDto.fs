@@ -33,6 +33,8 @@ type runDto =
         SeedPoolSetMakerName: string
         MutatorMakerName: string
         SetupFunctionName: string
+        SetupSortableTestsDatabaseName: string
+        SetupSorterSetEvalsDatabaseName: string
         ExecuteFunctionName: string
         ParameterSource: runDto option
         SourceParameterSpans: parameterSpanDto []
@@ -57,6 +59,8 @@ module RunDto =
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values })
                 |> List.toArray
             SetupFunctionName = project.SetupFunctionName |> Option.toObj
+            SetupSortableTestsDatabaseName = project.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsDatabaseName) |> Option.toObj
+            SetupSorterSetEvalsDatabaseName = project.SgdSetup |> Option.map (fun setup -> string setup.SorterSetEvalsDatabaseName) |> Option.toObj
             ExecuteFunctionName = project.ExecuteFunctionName
             ParameterSource = project.ParameterSource |> Option.map (fst >> fromDomain)
             SourceParameterSpans =
@@ -106,6 +110,9 @@ module RunDto =
                 EnhancerFunctionName = runEnhancerFunctionName
             }
             Setup = {
+                FunctionName = dto.SetupFunctionName
+                SortableTestsDatabaseName = UMX.tag dto.SetupSortableTestsDatabaseName
+                SorterSetEvalsDatabaseName = UMX.tag dto.SetupSorterSetEvalsDatabaseName
                 ParameterSpans = setupParameterSpans
                 QueryCatalogName = dto.SetupQueryCatalogName
                 EnhancerFunctionName = dto.SetupEnhancerFunctionName
@@ -113,9 +120,7 @@ module RunDto =
         }
         let configured =
           match Option.ofObj dto.GenSaveIntervalsName, Option.ofObj dto.GenSaveSubIntervalsName with
-          | None, None when isParameterSource &&
-                           (System.String.IsNullOrWhiteSpace dto.SetupFunctionName ||
-                            dto.ExecuteFunctionName = ExecuteFunctionNames.standard || dto.ExecuteFunctionName = ExecuteFunctionNames.soss) ->
+          | None, None when isParameterSource && not (System.String.IsNullOrWhiteSpace dto.SetupSortableTestsDatabaseName) ->
             Run.ofSimple (SimpleRun.createEvolutionSource config)
           | None, None ->
             Run.ofSimple (SimpleRun.create {
@@ -158,7 +163,5 @@ module RunDto =
                 |> Array.map (fun span -> span.Key, Array.toList span.Values) |> Array.toList
             configured |> Run.withParameterSource (restore true source) spans
 
-    /// The wire shape is unchanged. Legacy simple definitions become DirectRun
-    /// or PreparedRun; evolutionary definitions become fresh or continuation runs.
-    /// Old redundant spans are normalized by their constructors, never on disk.
+    /// Restore explicit setup choices and source databases; no legacy SGD inference.
     let toDomain dto = restore false dto

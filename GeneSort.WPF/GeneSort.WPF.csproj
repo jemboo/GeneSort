@@ -6,7 +6,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <Product>Sortopia</Product>
+    <Title>Sortopia</Title>
+    <ApplicationIcon>Assets\sortopia.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\sortopia-fisherman.png" />
+    <Resource Include="Assets\sortopia.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="RunEditorSmoke" />

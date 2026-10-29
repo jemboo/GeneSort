@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="OutputUnionTests.fs" />
+    <Compile Include="CheckpointFileTests.fs" />
     <Compile Include="RunDefinitionFileTests.fs" />
     <Compile Include="RunParameterFileTests.fs" />
     <Compile Include="RunPhaseFileTests.fs" />

@@ -2,6 +2,10 @@ namespace GeneSort.Project.V1.Catalogs.Setup
 
 module SetupCatalogNames =
     [<Literal>]
+    let sgdStandard = "setup.sgd-standard"
+    [<Literal>]
+    let sgdSoss = "setup.sgd-soss"
+    [<Literal>]
     let standard = "setup.standard"
     [<Literal>]
     let merge = "setup.merge"

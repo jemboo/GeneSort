@@ -230,6 +230,12 @@ type mutatorParams =
 
 module MutatorParams =
 
+    let withSortingWidth width = function
+        | SimpleMutatorParams smp ->
+            simpleMutatorParams.create width smp.RngType smp.MutatorVariant smp.Case
+            |> SimpleMutatorParams
+        | ComplexMutatorParams value -> ComplexMutatorParams value
+
     let SimplePrefix = "smp:"
 
     let ComplexPrefix = "cmp:"

@@ -101,11 +101,10 @@ let ``Soss activator rates still share Setup references and have separate execut
         Assert.NotEqual(group[0].GetId(), group[1].GetId())
 
 [<Fact>]
-let ``representative file IDs match the pre refactor fingerprints`` () =
-    let expected = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "WorkflowFileIds.txt")) |> Set.ofArray
+let ``direct SortableTests file IDs remain unchanged`` () =
+    let expected = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "WorkflowFileIds.txt")) |> Array.filter (fun line -> line.StartsWith("SortableTests.")) |> Set.ofArray
     let actual =
-        [SortableTests.Merge.Test(), "SortableTests.Merge.Test"
-         SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS(), "SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS"]
+        [SortableTests.Merge.Test(), "SortableTests.Merge.Test"]
         |> List.collect (fun (configured, name) ->
             generate configured |> Array.toList |> List.collect (fun rp ->
                 let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
@@ -114,7 +113,6 @@ let ``representative file IDs match the pre refactor fingerprints`` () =
                 |> List.choose (fun output -> query rp output |> Option.map (fun q -> sprintf "%s|%A|%O" name output q.Id))))
         |> Set.ofList
     Assert.Empty(Set.difference actual expected)
-    // Only redundant direct-run bookkeeping rows disappear. Result IDs and all
-    // Soss identities must remain exactly the same.
-    let retained (line: string) = line.StartsWith("SorterSgd.") || line.Contains("|SortableTests ")
+    // Only redundant direct-run bookkeeping rows disappear.
+    let retained (line: string) = line.Contains("|SortableTests ")
     Assert.Equal<Set<string>>(Set.filter retained expected, Set.filter retained actual)

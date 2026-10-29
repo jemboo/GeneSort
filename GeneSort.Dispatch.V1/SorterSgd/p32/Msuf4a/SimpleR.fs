@@ -1,6 +1,7 @@
 module GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleR
 
 open System.Runtime.CompilerServices
+open FSharp.UMX
 open GeneSort.Core
 open GeneSort.Model.Sorting.V1
 open GeneSort.Project.V1
@@ -16,6 +17,7 @@ module Standard =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32R
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32R
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
@@ -49,6 +51,9 @@ module Standard =
                 Description = "SimpleR Msuf4, width 32, four-stage PrefixA; one pool of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -97,6 +102,9 @@ module Standard =
                 Description = "SimpleR Msuf4, width 32, four-stage PrefixA; one pool of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -125,6 +133,7 @@ module Soss =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32R
     let executionFunctionName = ExecuteFunctionNames.soss
+    let setupFunctionName = SetupCatalogNames.sgdSoss
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32R
     let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
@@ -161,6 +170,9 @@ module Soss =
                 Description = "SimpleR Msuf4, width 32, four-stage PrefixA; one pool of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -212,6 +224,9 @@ module Soss =
                 Description = "SimpleR Msuf4, width 32, four-stage PrefixA; one pool of 32 sorters"
                 AllowOverwrite = false
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName

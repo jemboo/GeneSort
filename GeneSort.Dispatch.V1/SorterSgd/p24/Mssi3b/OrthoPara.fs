@@ -24,6 +24,7 @@ module OrthoPara64 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
@@ -56,6 +57,9 @@ module OrthoPara64 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -96,6 +100,9 @@ module OrthoPara64 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -136,6 +143,9 @@ module OrthoPara64 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -160,6 +170,7 @@ module OrthoPara128 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
@@ -192,6 +203,9 @@ module OrthoPara128 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName

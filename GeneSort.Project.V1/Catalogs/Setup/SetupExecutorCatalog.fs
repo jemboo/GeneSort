@@ -10,7 +10,7 @@ open GeneSort.Project.V1.Catalogs.Setup.SorterEval
 open GeneSort.Project.V1.Catalogs.Setup.SorterMutate
 open GeneSort.Project.V1.Catalogs.Setup.SorterSgd
 
-/// Selects setup from the run's execution family; individual factories honor its setup catalog and makers.
+/// Each setup function name selects its executor directly.
 module SetupExecutorCatalog =
     let private standard (sources: workflowSources) (configured: run) (storage: runStorage) : runPhaseFunction =
         fun rp _ cts progress -> asyncResult {
@@ -26,8 +26,10 @@ module SetupExecutorCatalog =
             | None ->
                 let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Standard setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
-                let makeTests = SortableTestsMakerCatalog.get names.SortableTests sources.Evolution
-                let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet sources.Evolution
+                let setup = configured.SgdSetup.Value
+                let libraries = sources.Evolution setup.SortableTestsDatabaseName setup.SorterSetEvalsDatabaseName
+                let makeTests = SortableTestsMakerCatalog.get names.SortableTests libraries
+                let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet libraries
                 let! start = EvoStartCreation.createStandardStart configured.ProjectName configured.DatabaseName makeTests makeSeed storage.RunDb rp cts.Token
                 let initialized = EvoStart.initializeExecution start rp
                 let path, initialProgress = EvoPath.fromStart configured start initialized
@@ -48,8 +50,10 @@ module SetupExecutorCatalog =
             | None ->
                 let! sgd = match configured with EvolutionRun sgd | ContinuationRun sgd -> Ok sgd | _ -> Error "Soss setup requires an SgdRun."
                 let names = SgdRun.makerNames sgd
-                let makeTests = SortableTestsMakerCatalog.get names.SortableTests sources.Evolution
-                let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet sources.Evolution
+                let setup = configured.SgdSetup.Value
+                let libraries = sources.Evolution setup.SortableTestsDatabaseName setup.SorterSetEvalsDatabaseName
+                let makeTests = SortableTestsMakerCatalog.get names.SortableTests libraries
+                let makeSeed = SeedSorterPoolSetMakerCatalog.get names.SeedPoolSet libraries
                 let! start = EvoStartCreation.createSossStart configured.ProjectName configured.DatabaseName makeTests makeSeed storage.RunDb rp cts.Token
                 let initialized = EvoStart.initializeExecution start rp
                 let path, initialProgress = EvoPath.fromStart configured start initialized
@@ -62,15 +66,19 @@ module SetupExecutorCatalog =
 
     let private syncRoot = obj ()
     let mutable private builders: Map<string, workflowSources -> run -> runStorage -> runPhaseFunction> = Map.ofList [
-        ExecuteFunctionNames.sorterEval, simple SorterEvalSetup.bind
-        ExecuteFunctionNames.sorterMutate, simple SorterMutateSetup.bind
-        ExecuteFunctionNames.standard, standard
-        ExecuteFunctionNames.soss, soss
+        SetupCatalogNames.standard, simple SorterEvalSetup.bind
+        SetupCatalogNames.merge, simple SorterEvalSetup.bind
+        SetupCatalogNames.prefix, simple SorterEvalSetup.bind
+        SetupCatalogNames.mutantStandard, simple SorterMutateSetup.bind
+        SetupCatalogNames.mutantMerge, simple SorterMutateSetup.bind
+        SetupCatalogNames.mutantPrefix, simple SorterMutateSetup.bind
+        SetupCatalogNames.sgdStandard, standard
+        SetupCatalogNames.sgdSoss, soss
     ]
 
     let register name builder =
         if String.IsNullOrWhiteSpace name then
-            invalidArg (nameof name) "Setup executor registration requires an execute function name."
+            invalidArg (nameof name) "Setup executor registration requires a setup function name."
         lock syncRoot (fun () ->
             if Map.containsKey name builders then
                 invalidOp (sprintf "A setup executor for '%s' is already registered." name)
@@ -78,10 +86,10 @@ module SetupExecutorCatalog =
 
     let prepare sources (configured: run) storage =
         if not configured.HasSetup then invalidArg "configured" "A direct run has no Setup phase. Run Execution instead."
-        let name = configured.ExecuteFunctionName
+        let name = Run.requireSetupFunctionName configured
         let builder = lock syncRoot (fun () ->
             Map.tryFind name builders
-            |> Option.defaultWith (fun () -> invalidOp (sprintf "No setup executor is registered for execute function '%s'." name)))
+            |> Option.defaultWith (fun () -> invalidOp (sprintf "No setup executor is registered for setup function '%s'." name)))
         builder sources configured storage
 
     /// Parameter-only adapter for callers that deliberately persist and reopen between phases.

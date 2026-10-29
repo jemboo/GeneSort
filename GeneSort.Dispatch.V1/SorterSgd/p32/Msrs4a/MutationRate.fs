@@ -31,6 +31,7 @@ module MutationRate =
 
         let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
         let executionFunctionName = ExecuteFunctionNames.standard
+        let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
         let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
@@ -67,6 +68,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -109,6 +113,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -152,6 +159,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -176,6 +186,7 @@ module MutationRate =
 
         let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
         let executionFunctionName = ExecuteFunctionNames.standard
+        let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
         let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
@@ -211,6 +222,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -252,6 +266,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -294,6 +311,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -320,6 +340,7 @@ module MutationRate =
 
         let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
         let executionFunctionName = ExecuteFunctionNames.standard
+        let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
         let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
@@ -354,6 +375,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName
@@ -377,6 +401,7 @@ module MutationRate =
 
         let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
         let executionFunctionName = ExecuteFunctionNames.standard
+        let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
         let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
@@ -411,6 +436,9 @@ module MutationRate =
                         EnhancerFunctionName = executionEnhancerFunctionName
                     }
                     Setup = {
+                        FunctionName = setupFunctionName
+                        SortableTestsDatabaseName = UMX.tag "Prefix"
+                        SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
                         EnhancerFunctionName = setupEnhancerFunctionName

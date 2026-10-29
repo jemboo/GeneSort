@@ -36,7 +36,7 @@ let private createHostWithSaveResult saveResult finished execute =
                 EnhancerFunctionName = "sortable-test"
             }
             Setup = {
-                FunctionName = SetupCatalogNames.standard
+                FunctionName = name
                 ParameterSpans = []
                 QueryCatalogName = name
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
@@ -186,7 +186,7 @@ let ``setup executor catalog rejects blank and duplicate names`` () =
     let builder _ _ _ : runPhaseFunction = fun rp _ _ _ -> async { return Ok (Parameters rp) }
     Assert.Throws<ArgumentException>(fun () -> SetupExecutorCatalog.register " " builder) |> ignore
     Assert.Throws<InvalidOperationException>(fun () ->
-        SetupExecutorCatalog.register GeneSort.Project.V1.Catalogs.Evolution.ExecuteFunctionNames.sorterEval builder) |> ignore
+        SetupExecutorCatalog.register SetupCatalogNames.standard builder) |> ignore
 
 [<Fact>]
 let ``report catalog exposes all report families independently of run execution`` () =
@@ -220,7 +220,7 @@ let ``Dispatch executes paths directly and requires reopening changed files`` ch
         return Ok (state.WithFinished(Some true))
     }))
     let dto = WorkflowFixtures.standardSource () |> GeneSort.Project.Mp.V1.RunDto.fromDomain
-    let configured = { dto with ExecuteFunctionName = name } |> GeneSort.Project.Mp.V1.RunDto.toDomain
+    let configured = { dto with ExecuteFunctionName = name; SetupFunctionName = name } |> GeneSort.Project.Mp.V1.RunDto.toDomain
     let host = runHost.Create configured 1
     let mutable saved = host.MakeRunParameters (UMX.tag 0) (UMX.tag 1)
     let db = { new IGeneSortDb with

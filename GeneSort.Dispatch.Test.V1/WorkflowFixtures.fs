@@ -112,6 +112,9 @@ let standardSource () =
         Description = "Single-execution Standard test fixture"
         AllowOverwrite = false
         Setup = {
+            FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard
+            SortableTestsDatabaseName = UMX.tag "Prefix"
+            SorterSetEvalsDatabaseName = UMX.tag "Prefix"
             ParameterSpans = [
                 ParamKeys.sorterCountPerPoolKey, ["32"]
                 ParamKeys.sorterCountPerPoolSetKey, ["128"]
@@ -148,6 +151,9 @@ let sossSource (modifiers: int list) =
         Description = "Fixed Soss test fixture"
         AllowOverwrite = false
         Setup = {
+            FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdSoss
+            SortableTestsDatabaseName = UMX.tag "Prefix"
+            SorterSetEvalsDatabaseName = UMX.tag "Prefix"
             ParameterSpans = [
                 ParamKeys.sorterCountPerPoolKey, ["4"]
                 ParamKeys.sorterCountPerPoolSetKey, ["32"]

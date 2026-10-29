@@ -76,6 +76,13 @@
                 <TabControl>
                     <TabItem Header="Parameters">
                         <StackPanel Margin="12">
+                            <StackPanel Visibility="{Binding HasSgdSourceSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
+                                <TextBlock Text="Setup source databases" FontWeight="SemiBold" />
+                                <TextBlock Text="SortableTests database" />
+                                <TextBox Text="{Binding SortableTestsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SortableTests source database" />
+                                <TextBlock Text="SorterEval database (SorterSetEvals)" Margin="0,6,0,0" />
+                                <TextBox Text="{Binding SorterSetEvalsDatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterSetEvals source database" />
+                            </StackPanel>
                             <StackPanel Visibility="{Binding HasPrefixWidthSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
                                 <TextBlock Text="Sorting width" FontWeight="SemiBold" />
                                 <ComboBox ItemsSource="{Binding PrefixSortingWidths}" SelectedItem="{Binding SelectedPrefixSortingWidth}"
@@ -83,6 +90,15 @@
                                           AutomationProperties.Name="Prefix sorting width" />
                                 <TextBlock Text="Choose a width, then select PrefixLibId values below. Changing width clears prefixes from other widths."
                                            TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel Visibility="{Binding HasMergeWidthSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
+                                <TextBlock Text="Sorting width" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding MergeSortingWidths}" Text="{Binding SelectedMergeSortingWidth, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEditable="True" IsEnabled="{Binding CanSelectMergeWidth}"
+                                          Width="140" HorizontalAlignment="Left" AutomationProperties.Name="Merge sorting width" />
+                                <TextBlock Text="Choose or type a width, then select MergeLibId values below. Changing width clears merges from other widths."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding MergeWidthError}" TextWrapping="Wrap" Foreground="{DynamicResource ErrorBrush}" />
                             </StackPanel>
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
                             <local:ParameterSectionView DataContext="{Binding SetupSection}" Visibility="{Binding DataContext.HasSetup, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
@@ -143,12 +159,24 @@
                                     HorizontalAlignment="Left" FontWeight="SemiBold" />
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Run parameters">
+                    <TabItem x:Name="SetupParametersTab" Header="Setup parameters" Visibility="{Binding HasSetup, Converter={StaticResource VisibleIfTrue}}">
+                        <StackPanel Margin="12">
+                            <TextBlock Text="Each row represents shared Setup inputs. Selecting it prepares the inputs and updates all linked run rows."
+                                       TextWrapping="Wrap" Margin="0,0,0,10" />
+                            <WrapPanel Margin="0,0,0,10">
+                                <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
+                                <Button Content="Run Setup" Click="RunSetup_Click" IsEnabled="{Binding CanRunSetup}" FontWeight="SemiBold"
+                                        ToolTip="Prepare the selected shared inputs for every linked run. Save definition changes first." ToolTipService.ShowOnDisabled="True" />
+                            </WrapPanel>
+                            <TextBlock Text="{Binding SetupParameterList.SelectionSummary}" TextWrapping="Wrap" Margin="0,0,0,6" />
+                            <TextBox Text="{Binding PhaseSummary, Mode=OneWay}" Style="{StaticResource SelectableMessage}" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Setup phase progress" />
+                            <local:SetupParameterListView DataContext="{Binding SetupParameterList}" Height="360" />
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem x:Name="RunParametersTab" Header="Run parameters">
                         <StackPanel Margin="12">
                             <WrapPanel Margin="0,0,0,10">
                                 <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
-                                <Button Content="Run Setup" Visibility="{Binding HasSetup, Converter={StaticResource VisibleIfTrue}}" Click="RunSetup_Click" IsEnabled="{Binding CanRunSetup}" FontWeight="SemiBold"
-                                        ToolTip="Run Setup for the selected saved rows. Save any definition changes first." ToolTipService.ShowOnDisabled="True" />
                                 <Button Content="Run Execution" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
                                         ToolTip="Execute the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
                                 <Button Content="Generate Summary Reports" Click="GenerateSummaryReports_Click" IsEnabled="{Binding CanGenerateSummaryReports}" FontWeight="SemiBold"

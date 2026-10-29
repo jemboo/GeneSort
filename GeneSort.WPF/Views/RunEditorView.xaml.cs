@@ -1,4 +1,5 @@
 using System.IO;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -10,7 +11,22 @@ namespace GeneSort.WPF.Views;
 public partial class RunEditorView : UserControl
 {
     private RunEditorViewModel Model => (RunEditorViewModel)DataContext;
-    public RunEditorView() => InitializeComponent();
+    public RunEditorView()
+    {
+        InitializeComponent();
+        DataContextChanged += (_, e) =>
+        {
+            if (e.OldValue is INotifyPropertyChanged oldModel)
+                PropertyChangedEventManager.RemoveHandler(oldModel, SetupAvailabilityChanged, nameof(RunEditorViewModel.HasSetup));
+            if (e.NewValue is INotifyPropertyChanged newModel)
+                PropertyChangedEventManager.AddHandler(newModel, SetupAvailabilityChanged, nameof(RunEditorViewModel.HasSetup));
+        };
+    }
+    private void SetupAvailabilityChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!Model.HasSetup && SetupParametersTab.IsSelected)
+            RunParametersTab.IsSelected = true;
+    }
     private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageDialog.Show(Window.GetWindow(this),
         "Discard the unsaved run definition changes?", "Run editor", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
@@ -45,7 +61,7 @@ public partial class RunEditorView : UserControl
     }
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFolderDialog { Title = "Choose the folder containing your GeneSort projects" };
+        var dialog = new OpenFolderDialog { Title = "Choose the folder containing your Sortopia projects" };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true) Model.ProjectsFolder = dialog.FolderName;
     }
     private async void Open_Click(object sender, RoutedEventArgs e)

@@ -44,8 +44,8 @@ type executionConfig = {
     EnhancerFunctionName: string
 }
 
-/// Settings for the setup phase.
-type setupConfig = {
+/// Setup settings for evaluation and mutation runs.
+type preparedSetupConfig = {
     FunctionName: string
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
@@ -60,7 +60,7 @@ type simpleRunConfig = {
     Description: string
     AllowOverwrite: bool
     Execution: executionConfig
-    Setup: setupConfig
+    Setup: preparedSetupConfig
 }
 
 /// A publication run has one parameter sweep and no preparation phase.
@@ -73,14 +73,17 @@ type directRunConfig = {
     Execution: executionConfig
 }
 
-/// Evolution setup is selected by the execution family and optional source.
+/// Evolution setup and its source libraries, independent of the output database.
 type sgdSetupConfig = {
+    FunctionName: string
+    SortableTestsDatabaseName: string<databaseName>
+    SorterSetEvalsDatabaseName: string<databaseName>
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
     EnhancerFunctionName: string
 }
 
-/// SGD definitions have no independently selectable setup function.
+/// The run database stores prepared inputs and execution results.
 type sgdBaseConfig = {
     DatabaseName: string<databaseName>
     ProjectName: string<projectName>
@@ -110,6 +113,8 @@ type simpleRun =
           setupParameterSpans: (string * string list) list
           setupQueryCatalogName: string
           setupFunctionName: string option
+          sortableTestsDatabaseName: string<databaseName> option
+          sorterSetEvalsDatabaseName: string<databaseName> option
           runEnhancerFunctionName: string
           setupEnhancerFunctionName: string
           allowOverwrite: bool
@@ -122,7 +127,15 @@ module SimpleRun =
         ParameterGeneration.make minReplica maxReplica run.runParameterSpans refiner
 
     let makeSetupParameters minReplica maxReplica refiner (run: simpleRun) : setupParameters[] =
-        ParameterGeneration.make minReplica maxReplica run.setupParameterSpans refiner
+        let withSourceDatabases (parameters: setupParameters) =
+            match run.sortableTestsDatabaseName, run.sorterSetEvalsDatabaseName with
+            | Some tests, Some evals ->
+                parameters.ParamMap
+                |> Map.add ParamKeys.setupSortableTestsDatabaseNameKey (string tests)
+                |> Map.add ParamKeys.setupSorterSetEvalsDatabaseNameKey (string evals)
+                |> setupParameters.create
+            | _ -> parameters
+        ParameterGeneration.make minReplica maxReplica run.setupParameterSpans (Seq.map withSourceDatabases >> refiner)
 
     let create (config: simpleRunConfig) : simpleRun =
         let executeFunctionName = config.Execution.FunctionName
@@ -159,6 +172,8 @@ module SimpleRun =
           setupParameterSpans = setupParameterSpans
           setupQueryCatalogName = setupQueryCatalogName
           setupFunctionName = Some setupFunctionName
+          sortableTestsDatabaseName = None
+          sorterSetEvalsDatabaseName = None
           runEnhancerFunctionName = runEnhancerFunctionName
           setupEnhancerFunctionName = setupEnhancerFunctionName
           allowOverwrite = allowOverwrite
@@ -169,6 +184,7 @@ module SimpleRun =
     /// The shared parameter-generation data for an SGD run or continuation source.
     let createEvolutionSource (config: sgdBaseConfig) : simpleRun =
         for argument, value in ["ExecuteFunctionName", config.Execution.FunctionName
+                                "SetupFunctionName", config.Setup.FunctionName
                                 "RunQueryCatalogName", config.Execution.QueryCatalogName
                                 "RunEnhancerFunctionName", config.Execution.EnhancerFunctionName
                                 "SetupQueryCatalogName", config.Setup.QueryCatalogName
@@ -176,6 +192,9 @@ module SimpleRun =
             if String.IsNullOrWhiteSpace value then invalidArg argument "Function names cannot be empty."
         if String.IsNullOrWhiteSpace %config.DatabaseName then
             invalidArg "DatabaseName" "Database name cannot be empty."
+        for field, name in ["SortableTestsDatabaseName", config.Setup.SortableTestsDatabaseName
+                            "SorterSetEvalsDatabaseName", config.Setup.SorterSetEvalsDatabaseName] do
+            if String.IsNullOrWhiteSpace %name then invalidArg field "A setup source database name cannot be empty."
         {
             dataBaseName = config.DatabaseName
             projName = config.ProjectName
@@ -188,7 +207,9 @@ module SimpleRun =
             runQueryCatalogName = config.Execution.QueryCatalogName
             setupParameterSpans = config.Setup.ParameterSpans
             setupQueryCatalogName = config.Setup.QueryCatalogName
-            setupFunctionName = None
+            setupFunctionName = Some config.Setup.FunctionName
+            sortableTestsDatabaseName = Some config.Setup.SortableTestsDatabaseName
+            sorterSetEvalsDatabaseName = Some config.Setup.SorterSetEvalsDatabaseName
             runEnhancerFunctionName = config.Execution.EnhancerFunctionName
             setupEnhancerFunctionName = config.Setup.EnhancerFunctionName
             allowOverwrite = config.AllowOverwrite
@@ -205,6 +226,15 @@ module SimpleRun =
     let setupParameterSpans (run: simpleRun) = run.setupParameterSpans
     let setupQueryCatalogName (run: simpleRun) = run.setupQueryCatalogName
     let setupFunctionName (run: simpleRun) = run.setupFunctionName
+    let sgdSetup (run: simpleRun) : sgdSetupConfig option =
+        run.sortableTestsDatabaseName |> Option.map (fun tests -> {
+            FunctionName = run.setupFunctionName.Value
+            SortableTestsDatabaseName = tests
+            SorterSetEvalsDatabaseName = run.sorterSetEvalsDatabaseName.Value
+            ParameterSpans = run.setupParameterSpans
+            QueryCatalogName = run.setupQueryCatalogName
+            EnhancerFunctionName = run.setupEnhancerFunctionName
+        })
     let runEnhancerFunctionName (run: simpleRun) = run.runEnhancerFunctionName
     let setupEnhancerFunctionName (run: simpleRun) = run.setupEnhancerFunctionName
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
@@ -297,6 +327,7 @@ type run =
     member this.SetupParameterSpans = SimpleRun.setupParameterSpans this.BaseRun
     member this.SetupQueryCatalogName = SimpleRun.setupQueryCatalogName this.BaseRun
     member this.SetupFunctionName with get() = SimpleRun.setupFunctionName this.BaseRun
+    member this.SgdSetup = SimpleRun.sgdSetup this.BaseRun
     member this.RunEnhancerFunctionName = SimpleRun.runEnhancerFunctionName this.BaseRun
     member this.SetupEnhancerFunctionName = SimpleRun.setupEnhancerFunctionName this.BaseRun
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
@@ -330,7 +361,7 @@ module Run =
 
     let requireSetupFunctionName (configured: run) =
         configured.SetupFunctionName
-        |> Option.defaultWith (fun () -> invalidArg "configured" "Evolution setup is selected by its execution family and source, not a setup function name.")
+        |> Option.defaultWith (fun () -> invalidArg "configured" "This run does not specify a setup function name.")
 
     let withParameterSource (source: run) spans = function
         | PreparedRun value -> PreparedRun (SimpleRun.withParameterSource source.BaseRun spans value)

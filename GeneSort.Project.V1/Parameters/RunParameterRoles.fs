@@ -53,6 +53,8 @@ module RunParameterRoles =
     ]
 
     let evolution = Map.ofList [
+        ParamKeys.setupSortableTestsDatabaseNameKey, parameterRole.SetupOnly
+        ParamKeys.setupSorterSetEvalsDatabaseNameKey, parameterRole.SetupOnly
         ParamKeys.sortingWidthKey, parameterRole.InheritedReadOnly
         ParamKeys.prefixLibIdKey, parameterRole.InheritedReadOnly
         ParamKeys.mergeLibIdKey, parameterRole.InheritedReadOnly

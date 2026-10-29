@@ -54,7 +54,7 @@ module RunPhaseFileTests =
             setup rp overwrite cts progress |> Async.map (Result.map Parameters))
         // There deliberately is no ExecuteFunction registration: setup must never resolve or call it.
         let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
-        { configured with ExecuteFunctionName = name } |> RunDto.toDomain
+        { configured with ExecuteFunctionName = name; SetupFunctionName = name } |> RunDto.toDomain
 
     let private phaseRunner = function
         | "Setup" -> RunSetupFiles.runAsync
@@ -85,7 +85,7 @@ module RunPhaseFileTests =
             return Ok (state.WithFinished(Some true))
         }))
         let dto = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors) |> RunDto.fromDomain
-        let configured = { dto with ExecuteFunctionName = name } |> RunDto.toDomain
+        let configured = { dto with ExecuteFunctionName = name; SetupFunctionName = name } |> RunDto.toDomain
         let! rows = publish folder configured
         let files = Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.sort
         let! setup = RunSetupFiles.runAsync folder configured [|rows[0]|] null
@@ -306,17 +306,80 @@ module RunPhaseFileTests =
         let setupFiles = Directory.GetFiles(folder, "*.msgpack", SearchOption.AllDirectories) |> Array.filter (fun path -> path.Contains(string Path.DirectorySeparatorChar + "Setup" + string Path.DirectorySeparatorChar)) |> Array.sort
         Assert.Equal<string>(files, setupFiles)
         let sources = WorkflowSourceFiles.create folder
-        let! loaded = sources.Evolution.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! loaded = (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.Equal(2, (get loaded).SorterEvals.Length)
-        let! absent = (WorkflowSourceFiles.create (Path.Combine(folder, "other"))).Evolution.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        let! absent = ((WorkflowSourceFiles.create (Path.Combine(folder, "other"))).Evolution (UMX.tag "Standard") (UMX.tag "Standard")).LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
         Assert.True(Result.isError absent)
         match absent with
         | Error message ->
-            Assert.Contains("Missing source library SorterEval/Standard/Test", message)
-            Assert.Contains("Expected definition:", message)
+            Assert.Contains("Missing source library SorterEval/Standard", message)
+            Assert.Contains("Expected definitions under:", message)
             Assert.Contains("Prepare and execute this library", message)
             Assert.Contains(Path.Combine(folder, "other"), message)
         | Ok _ -> failwith "Expected a missing source library error."
+    })
+
+    [<Fact>]
+    let ``SGD sources load from independently selected databases with arbitrary run names`` () = withFolder (fun folder -> task {
+        let dto = smallLibrary() |> RunDto.fromDomain
+        let evaluation = RunDto.toDomain { dto with DataBaseName = "SeedBank"; RunName = "MyEvaluations" }
+        let! rows = publish folder evaluation
+        let! setup = RunSetupFiles.runAsync folder evaluation rows null
+        Assert.Empty(setup.Errors)
+        let! executed = RunExecutionFiles.runSavedAsync folder evaluation rows null
+        Assert.Empty(executed.Errors)
+        let prefix = prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
+        let tests =
+            DirectRun.create {
+                ProjectName = UMX.tag "SortableTests"; DatabaseName = UMX.tag "TestBank"; RunName = UMX.tag "MyTests"
+                Description = "Selected test source"; AllowOverwrite = false
+                Execution = {
+                    FunctionName = ExecuteFunctionNames.sortableTests
+                    QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
+                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    ParameterSpans = [ParamKeys.prefixLibIdKey, [PrefixLibId.toString prefix]
+                                      ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString sortableDataFormat.BitVector512]]
+                }
+            } |> run.DirectRun
+        let! testRows = publish folder tests
+        let! generated = RunExecutionFiles.runSavedAsync folder tests testRows null
+        Assert.Empty(generated.Errors)
+        let host = WorkflowSourceFiles.create folder
+        let sources = host.Evolution (UMX.tag "TestBank") (UMX.tag "SeedBank")
+        let! loadedTests = sources.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
+        let! loadedEvals = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        Assert.True(Result.isOk loadedTests)
+        Assert.Equal(2, (get loadedEvals).SorterEvals.Length)
+        Assert.False(Directory.Exists(Path.Combine(folder, "SortableTests", "Prefix")))
+        Assert.False(Directory.Exists(Path.Combine(folder, "SorterEval", "Standard")))
+        // A definition from another evaluation family is not a matching seed source.
+        let differentFamily = RunDto.toDomain {
+            RunDto.fromDomain evaluation with RunName = "DifferentFamily"; RunQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
+        }
+        let! _ = RunDefinitionFiles.saveAsync folder differentFamily false
+        let! stillStandard = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        Assert.True(Result.isOk stillStandard)
+        // A database with two different matching evaluations needs a narrower source choice.
+        let alternative = RunDto.toDomain {
+            RunDto.fromDomain evaluation with
+                RunName = "OtherInputs"
+                SetupParameterSpans = (RunDto.fromDomain evaluation).SetupParameterSpans |> Array.map (fun span ->
+                    if span.Key = ParamKeys.sorterCountKey then { span with Values = [|"3"|] } else span)
+        }
+        let! _ = RunDefinitionFiles.saveAsync folder alternative false
+        let! ambiguous = sources.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        match ambiguous with
+        | Error message -> Assert.Contains("found 2", message)
+        | Ok _ -> failwith "Do not choose an arbitrary evaluation from an ambiguous database."
+        let wrong = host.Evolution (UMX.tag "WrongTests") (UMX.tag "WrongEvals")
+        let! missingTests = wrong.LoadPrefixTests 0<replNumber> prefix sortableDataFormat.BitVector512 |> Async.StartAsTask
+        let! missingEvals = wrong.LoadStandardSorterEvals 4<sortingWidth> simpleSorterModelType.Msce sorterEvalType.V2 |> Async.StartAsTask
+        match missingTests, missingEvals with
+        | Error testsError, Error evalsError ->
+            Assert.Contains("WrongTests", testsError)
+            Assert.Contains("SortableTests.Prefix", testsError)
+            Assert.Contains("WrongEvals", evalsError)
+        | _ -> failwith "Source loaders must not fall back to another database."
     })
 
     [<Theory>]
@@ -385,7 +448,7 @@ module RunPhaseFileTests =
         Assert.True(File.Exists sourceFile)
         Assert.Contains(sourceFile, error)
         let sourceTime = File.GetLastWriteTimeUtc sourceFile
-        let sources = (WorkflowSourceFiles.create folder).Evolution
+        let sources = (WorkflowSourceFiles.create folder).Evolution (UMX.tag database) (UMX.tag database)
         let load replica format =
             if database = "Prefix" then sources.LoadPrefixTests replica prefix format
             else sources.LoadMergeTests replica merge format

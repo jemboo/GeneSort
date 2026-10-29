@@ -1164,6 +1164,9 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
             Description = baseline.Description
             AllowOverwrite = false
             Setup = {
+                FunctionName = baseline.SgdSetup.Value.FunctionName
+                SortableTestsDatabaseName = baseline.SgdSetup.Value.SortableTestsDatabaseName
+                SorterSetEvalsDatabaseName = baseline.SgdSetup.Value.SorterSetEvalsDatabaseName
                 ParameterSpans = baseline.SetupParameterSpans |> List.map (fun (key, values) ->
                     if key = ParamKeys.mutationModKey then key, ["0"; "1"; "2"] else key, values)
                 QueryCatalogName = baseline.SetupQueryCatalogName
@@ -2624,7 +2627,7 @@ let ``Mixed family Setup converts members and execution needs only destination d
             Assert.Equal(sourceRun.RunQueryCatalogName, catalog)
             sourceOpens <- sourceOpens + 1
             sourceDb
-        Evolution = {
+        Evolution = fun _ _ -> {
             LoadMergeTests = fun _ _ _ -> failwith "Continuation must copy its saved tests."
             LoadPrefixTests = fun _ _ _ -> failwith "Continuation must copy its saved tests."
             LoadStandardSorterEvals = fun _ _ _ -> failwith "Continuation must copy its saved pool."

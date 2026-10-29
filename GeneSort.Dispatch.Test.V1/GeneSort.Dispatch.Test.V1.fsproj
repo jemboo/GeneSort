@@ -15,6 +15,7 @@
     <Compile Include="SimpleSRunConfigTests.fs" />
     <Compile Include="SetupCatalogTests.fs" />
     <Compile Include="SgdCheckpointTests.fs" />
+    <Compile Include="SgdSetupConfigTests.fs" />
     <Compile Include="PoolPruningTests.fs" />
     <Compile Include="WorkflowPhaseTests.fs" />
     <Compile Include="ExecutionPathTests.fs" />

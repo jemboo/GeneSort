@@ -37,6 +37,7 @@ module VarModR_32 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf624p3bMutationRate
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
@@ -74,6 +75,9 @@ module VarModR_32 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -117,6 +121,9 @@ module VarModR_32 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName

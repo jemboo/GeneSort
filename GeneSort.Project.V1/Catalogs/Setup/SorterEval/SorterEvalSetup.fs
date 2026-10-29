@@ -33,8 +33,8 @@ module SorterEvalSetup =
                     SorterModelSetCatalogNames.uniform, SorterModelSetMakers.makeUniformSorterModelSet storage allowOverwrite |> checkedSetup
                 ]
                 MakeStandardTestsWithPrefix = SortableTestsMakers.storeTests SortableTestsMakers.makeStandardTests storage allowOverwrite |> checkedSetup
-                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests sources.Evolution) storage allowOverwrite |> checkedSetup
-                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests sources.Evolution) storage allowOverwrite |> checkedSetup
+                MakeMergeTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getMergeTests (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))) storage allowOverwrite |> checkedSetup
+                MakePrefixTestsWithPrefix = SortableTestsMakers.storeTests (SortableTestsMakers.getPrefixTests (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))) storage allowOverwrite |> checkedSetup
             }
         SetupCatalog.get (Run.requireSetupFunctionName configured) context
 

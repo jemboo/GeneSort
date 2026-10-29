@@ -19,6 +19,8 @@ module RunTypeEditor =
     let fromRun (configured: run) =
         runDraft.create {
             ProjectName = %configured.ProjectName; DatabaseName = %configured.DatabaseName; RunName = %configured.RunName
+            SortableTestsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsDatabaseName) |> Option.defaultValue ""
+            SorterSetEvalsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SorterSetEvalsDatabaseName) |> Option.defaultValue ""
             Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
             GenSaveIntervalsName = configured.GenSaveIntervalsName |> Option.defaultValue ""
             GenSaveSubIntervalsName = configured.GenSaveSubIntervalsName |> Option.defaultValue ""
@@ -91,6 +93,27 @@ module RunTypeEditor =
                     configured.SetupParameterSpans @ configured.RunParameterSpans
                     |> List.filter (fst >> (=) ParamKeys.prefixLibIdKey) |> List.collect snd
                     |> List.filter (fun value -> try int (PrefixLibId.fromString value).SortingWidth = width with _ -> false)
+                parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)
+
+    /// Merge widths can be larger than their component sorter widths. These are
+    /// suggestions; the editor also accepts a typed width supported by availableForWidth.
+    let mergeSortingWidths (configured: run) =
+        let declared =
+            configured.SetupParameterSpans @ configured.RunParameterSpans
+            |> List.filter (fst >> (=) ParamKeys.mergeLibIdKey) |> List.collect snd
+            |> List.choose (fun value -> try Some (int (MergeLibId.fromString value).SortingWidth) with _ -> None)
+        Array.append (SorterLib.ids () |> Array.map (fun id -> int id.SortingWidth)) (List.toArray declared)
+        |> Array.distinct |> Array.sort
+
+    let parametersForMergeWidth (configured: run) (width: int) =
+        parameters configured |> Array.map (fun spec ->
+            if spec.Key <> ParamKeys.mergeLibIdKey then spec
+            else
+                let available = MergeLibId.availableForWidth (UMX.tag width) |> Array.map MergeLibId.toString |> Array.toList
+                let declared =
+                    configured.SetupParameterSpans @ configured.RunParameterSpans
+                    |> List.filter (fst >> (=) ParamKeys.mergeLibIdKey) |> List.collect snd
+                    |> List.filter (fun value -> try int (MergeLibId.fromString value).SortingWidth = width with _ -> false)
                 parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)
 
     /// Display only: these rows never become execution sweep dimensions. Resolve
@@ -175,6 +198,8 @@ module RunTypeEditor =
         issues.AddRange(ParameterValidation.poolSizes "Setup" setup)
         issues.AddRange(ParameterValidation.poolSizes "Execution" effective)
         if isEvolution template then
+            for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
+                issues.AddRange(RunIdentity.validate field value)
             for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
                 if String.IsNullOrWhiteSpace name || not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey name) then
                     add field "Choose a registered generation interval."
@@ -186,6 +211,9 @@ module RunTypeEditor =
                     | None -> ()
             | _ -> ()
         if template.ParameterSource.IsSome then
+            if draft.SortableTestsDatabaseName <> string template.SgdSetup.Value.SortableTestsDatabaseName
+               || draft.SorterSetEvalsDatabaseName <> string template.SgdSetup.Value.SorterSetEvalsDatabaseName then
+                add "Setup" "A continuation imports its prepared inputs from the selected source run; its original library databases must be preserved."
             // The source is a complete saved configuration, not just three editable path strings.
             for key in [ParamKeys.sourceProjectNameKey; ParamKeys.sourceDbNameKey; ParamKeys.sourceRunNameKey; ParamKeys.sourceGenerationIntervalKey] do
                 if List.tryFind (fst >> (=) key) execution <> List.tryFind (fst >> (=) key) template.RunParameterSpans then
@@ -226,7 +254,10 @@ module RunTypeEditor =
                     SgdRun.create {
                         ProjectName = UMX.tag draft.ProjectName; DatabaseName = UMX.tag draft.DatabaseName; RunName = UMX.tag draft.RunName
                         Description = draft.Description; AllowOverwrite = draft.AllowOverwrite; Execution = execution
-                        Setup = { QueryCatalogName = template.SetupQueryCatalogName; EnhancerFunctionName = template.SetupEnhancerFunctionName
+                        Setup = { FunctionName = template.SgdSetup.Value.FunctionName
+                                  SortableTestsDatabaseName = UMX.tag draft.SortableTestsDatabaseName
+                                  SorterSetEvalsDatabaseName = UMX.tag draft.SorterSetEvalsDatabaseName
+                                  QueryCatalogName = template.SetupQueryCatalogName; EnhancerFunctionName = template.SetupEnhancerFunctionName
                                   ParameterSpans = spans draft.SetupParameters }
                     } { MakerNames = template.MakerNames.Value; GenSaveIntervalsName = draft.GenSaveIntervalsName
                         GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName } |> Run.ofSgd

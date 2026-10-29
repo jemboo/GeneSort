@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="0,0,0,14">
-            <TextBlock Text="Choose a folder to find GeneSort output files, then select a file to inspect its contents." Margin="0,5,0,12" Foreground="{DynamicResource MutedBrush}" />
+            <TextBlock Text="Choose a folder to find Sortopia output files, then select a file to inspect its contents." Margin="0,5,0,12" Foreground="{DynamicResource MutedBrush}" />
             <DockPanel>
                 <Button Content="Browse folder…" Click="BrowseFolder_Click" Padding="14,7" Margin="0,0,8,0" />
                 <Button Content="Open file…" Click="OpenFile_Click" Padding="14,7" Margin="0,0,12,0" />

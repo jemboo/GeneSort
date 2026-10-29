@@ -83,7 +83,7 @@ type evoContinuationConfig =
 module internal EvoContinuation =
     /// Select source executions independently, then branch each into the execution spans.
     /// Unspecified execution settings are inherited from each selected source.
-    let create expectedExecutionFunction (config: evoContinuationConfig) : run =
+    let create expectedExecutionFunction setupFunctionName (config: evoContinuationConfig) : run =
         let source = config.Source.SourceRun
         let sourceSgd = config.Source.SourceSgdRun
         if source.ExecuteFunctionName <> expectedExecutionFunction && expectedExecutionFunction = ExecuteFunctionNames.soss then
@@ -135,6 +135,9 @@ module internal EvoContinuation =
             Description = sprintf "Continue %s/%s/%s from interval %d" %source.ProjectName %source.DatabaseName %source.RunName config.Source.GenerationInterval
             AllowOverwrite = false
             Setup = {
+                FunctionName = setupFunctionName
+                SortableTestsDatabaseName = source.SgdSetup.Value.SortableTestsDatabaseName
+                SorterSetEvalsDatabaseName = source.SgdSetup.Value.SorterSetEvalsDatabaseName
                 ParameterSpans = []
                 QueryCatalogName = QueryCatalogNamesSetup.importedStart
                 EnhancerFunctionName = SetupEnhancerFunctionNames.noOp

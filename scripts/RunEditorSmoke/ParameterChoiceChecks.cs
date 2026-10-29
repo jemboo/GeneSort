@@ -60,7 +60,10 @@ internal static partial class Program
         model.SelectExample(model.Examples.Single(example => example.Name == "Width24s"));
         CheckLibrarySelection(model, view, ParamKeys.prefixLibIdKey, "Prefix library value");
         CheckPrefixWidthSelection(root, model, view);
-        CheckEvaluationPrefixWidthSelection(root, model, view);
+        CheckPreparedPrefixWidthSelection(root, model, view, "SorterEval.Prefix", "Width32");
+        foreach (var example in new[] { "Msce", "Mssi", "Msrs", "Msuf4" })
+            CheckPreparedPrefixWidthSelection(root, model, view, "SorterMutate.Prefix", example);
+        CheckMergeWidthSelection(root, model, view);
 
         // SorterLibId is supported by saved definitions even though current Dispatch examples
         // do not declare it. Open such a definition through the actual editor boundary.
@@ -71,7 +74,7 @@ internal static partial class Program
         var configured = Run.ofSimple(SimpleRun.create(new simpleRunConfig(
             source.DatabaseName, source.ProjectName, "SorterLibraryEditor", source.Description, false,
             new executionConfig(source.ExecuteFunctionName, source.RunParameterSpans, source.RunQueryCatalogName, source.RunEnhancerFunctionName),
-            new setupConfig(source.SetupFunctionName.Value, ListModule.OfSeq(source.SetupParameterSpans.Append(sorterSpan)),
+            new preparedSetupConfig(source.SetupFunctionName.Value, ListModule.OfSeq(source.SetupParameterSpans.Append(sorterSpan)),
                 source.SetupQueryCatalogName, source.SetupEnhancerFunctionName))));
         var save = RunDefinitionFiles.saveAsync(root, configured, false);
         Wait(save);
@@ -160,10 +163,10 @@ internal static partial class Program
         Check(!model.HasPrefixWidthSelection, "The prefix width picker leaked into another workflow.");
     }
 
-    private static void CheckEvaluationPrefixWidthSelection(string root, RunEditorViewModel model, RunEditorView view)
+    private static void CheckPreparedPrefixWidthSelection(string root, RunEditorViewModel model, RunEditorView view, string typeName, string exampleName)
     {
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Prefix"));
-        model.SelectExample(model.Examples.Single(example => example.Name == "Width32"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == typeName));
+        model.SelectExample(model.Examples.Single(example => example.Name == exampleName));
         model.ProjectsFolder = root;
         Layout(view);
         var widthPicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Prefix sorting width");
@@ -176,6 +179,7 @@ internal static partial class Program
         var prefix32 = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey).Values[0].Text;
         widthPicker.SetCurrentValue(Selector.SelectedItemProperty, 24);
         Layout(view);
+        CheckMutatorWidth(model, original, 24);
         var row = model.SetupParameters.Single(row => row.Key == ParamKeys.prefixLibIdKey);
         Check(row.Values.Count == 1 && row.Values[0].Text == "" && !model.CanSave && model.Validate() is null,
             "Evaluation retained a width-32 prefix or allowed saving after switching to width 24.");
@@ -204,17 +208,17 @@ internal static partial class Program
         row.Values[0].Text = chosen[0];
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         var expectedSetup = ListModule.OfSeq(original.SetupParameterSpans.Select(span => span.Item1 == ParamKeys.prefixLibIdKey
-            ? Tuple.Create(span.Item1, ListModule.OfArray(chosen)) : span));
+            ? Tuple.Create(span.Item1, ListModule.OfArray(chosen)) : MutatorSpanAtWidth(span, 24)));
         var expected = Run.withParameterSpans(expectedSetup, original.RunParameterSpans, original);
         var actualRows = RunParameterGeneration.generate(configured, 0, 1);
         Check(actualRows.Length == originalRows.Length * chosen.Length && actualRows.SequenceEqual(RunParameterGeneration.generate(expected, 0, 1)),
             "Evaluation width selection changed existing file identities or added sweep dimensions.");
         Check(model.Snapshot().SetupParameters.All(parameter => parameter.Key != ParamKeys.sortingWidthKey),
             "The evaluation picker added a redundant SortingWidth parameter.");
-        model.RunName = "EvaluationPrefixWidthSelection";
+        model.RunName = typeName + exampleName + "WidthSelection";
         configured = model.Validate()!;
         Wait(model.SaveAsync(configured, false));
-        model.SelectExample(model.Examples.Single(example => example.Name == "Width32"));
+        model.SelectExample(model.Examples.Single(example => example.Name == exampleName));
         Wait(model.OpenAsync(RunDefinitionFiles.pathFor(root, configured)));
         Layout(view);
         Check(model.SelectedPrefixSortingWidth == 24 && Equals(configured, model.Validate()) && !model.HasUnsavedChanges,

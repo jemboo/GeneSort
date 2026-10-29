@@ -1,5 +1,6 @@
 namespace GeneSort.Project.V1.Catalogs.Reports
 
+open FSharp.UMX
 open GeneSort.Project.V1
 open GeneSort.Project.V1.Runtime
 
@@ -31,9 +32,9 @@ module ReportCatalog =
         sorterEvalFull, (fun _ -> SorterEval.Reporting.makeFullReport)
         sorterEvalStageStats, (fun _ -> SorterEval.Reporting.makeStageStatsReport)
         sorterEvalCeBins, (fun _ -> SorterEval.Reporting.makeCeBinSummaryStats)
-        sorterMutateStandard, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makeStandardMutantDetails sources.Evolution))
-        sorterMutateMerge, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makeMergeMutantDetails sources.Evolution))
-        sorterMutatePrefix, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makePrefixMutantDetails sources.Evolution))
+        sorterMutateStandard, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makeStandardMutantDetails (sources.Evolution (UMX.tag "Standard") (UMX.tag "Standard"))))
+        sorterMutateMerge, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makeMergeMutantDetails (sources.Evolution (UMX.tag "Merge") (UMX.tag "Merge"))))
+        sorterMutatePrefix, (fun sources -> SorterMutate.Reporting.makeMutantReport (SorterMutate.Reporting.makePrefixMutantDetails (sources.Evolution (UMX.tag "Prefix") (UMX.tag "Prefix"))))
         evolutionSummary, (fun _ -> SorterSgd.Reporting.summaryReportExecutor)
         evolutionSnapshot, (fun _ -> SorterSgd.Reporting.snapshotReportExecutor)
         evolutionHistory, (fun _ -> SorterSgd.Reporting.poolHistoryReportExecutor)

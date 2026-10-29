@@ -24,9 +24,11 @@ open GeneSort.Project.V1.Catalogs.Evolution
 [<InlineData(true, 1)>]
 [<InlineData(false, 2)>]
 [<InlineData(true, 2)>]
+[<InlineData(false, 500)>]
+[<InlineData(true, 500)>]
 let ``checkpoint search supports Setup-only seeds and legacy generation zero Results`` soss highest =
     let parameters = runParameters.create Map.empty
-    let config = { Name = "test"; Min = 0; MaxCount = Some (if highest = 1 then 2 else 4); Scale = 1.0; Method = Constant 1 }
+    let config = { Name = "test"; Min = 0; MaxCount = Some (if highest = 1 then 2 else max 4 (highest + 2)); Scale = 1.0; Method = Constant 1 }
     let exists generation =
         if highest = 0 then generation = 0
         else generation > 0 && generation <= highest
@@ -59,6 +61,64 @@ let ``checkpoint search supports Setup-only seeds and legacy generation zero Res
             Utils.loadHighestGenSorterPoolSet config db parameters
             |> Async.RunSynchronously |> Result.map (Option.map (fun pool -> int pool.GenerationNumber))
     Assert.Equal(Ok (if highest < 0 then None else Some highest), actual)
+
+[<Theory>]
+[<InlineData(false, 1.0, 4000, -1, 950)>]
+[<InlineData(true, 1.0, 4000, -1, 950)>]
+[<InlineData(false, 1000.0, 4000, -1, 950000)>]
+[<InlineData(true, 1000.0, 4000, -1, 950000)>]
+[<InlineData(false, 1.0, 450, -1, 450)>]
+[<InlineData(true, 1.0, 450, -1, 450)>]
+[<InlineData(false, 1.0, 4000, 500, 450)>]
+[<InlineData(true, 1.0, 4000, 500, 450)>]
+[<InlineData(false, 1.0, 400, -1, -1)>]
+let ``checkpoint listing finds sparse results beyond 200 within the run horizon`` soss scale (last: int) maxCount expected =
+    let parameters =
+        (runParameters.create Map.empty)
+            .WithGenerationFirst(Some (UMX.tag (int (200.0 * scale))))
+            .WithGenerationCurrent(Some (UMX.tag (int (200.0 * scale)))) // Progress has not been saved since Setup.
+            .WithGenerationIntervalLast(Some (UMX.tag last))
+    let config = { Name = "long"; Min = 0; MaxCount = (if maxCount < 0 then None else Some maxCount); Scale = scale; Method = Constant 1 }
+    let query generation output = queryParams.create (UMX.tag "db") (UMX.tag "project") (Some 0<replNumber>) generation output [||]
+    let outputType = geneSortDataType.SorterPoolSet ""
+    let ids =
+        [ 200; 450; 950; 5000 ] // Includes the imported seed and a checkpoint beyond the run's endpoint.
+        |> List.map (fun gen -> (query (Some (UMX.tag (int (float gen * scale)))) outputType).Id)
+        |> Set.ofList
+    let mutable listings = 0
+    let loaded = ResizeArray<int>()
+    let db =
+        { new IGeneSortDb with
+            member _.databaseName = UMX.tag "db"
+            member _.makeQueryParamsFromRunParams rp dataType = Some (query (rp.GetGenerationCurrent()) dataType)
+            member _.doesOutPutDataExist _ _ = failwith "A listing must avoid per-generation file probes"
+            member _.loadIfFoundAsync mode qp = async {
+                Assert.Equal(geneSortDataMode.Results, mode)
+                loaded.Add(int qp.Generation.Value)
+                let standard = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) qp.Generation.Value (Dim1 1) None
+                let pool = if soss then SorterPoolSet_Soss.fromStandard standard |> sorterPoolSet.Soss else sorterPoolSet.Standard standard
+                return Some (outputData.SorterPoolSet pool)
+            }
+            member _.saveAsync _ _ _ _ = failwith "Search must not save"
+            member _.loadAsync _ _ = failwith "Unexpected load"
+            member _.getRunParameters _ _ _ _ _ = failwith "Unexpected parameter load"
+          interface IOutputDataListing with
+            member _.getOutputIds mode qp = async {
+                Assert.Equal(geneSortDataMode.Results, mode)
+                Assert.Equal(outputType, qp.OutputDataType)
+                listings <- listings + 1
+                return ids
+            } }
+    let actual =
+        if soss then
+            Utils.loadHighestGenSorterPoolSetSoss config db parameters
+            |> Async.RunSynchronously |> Result.map (Option.map (fun pool -> int pool.GenerationNumber))
+        else
+            Utils.loadHighestGenSorterPoolSet config db parameters
+            |> Async.RunSynchronously |> Result.map (Option.map (fun pool -> int pool.GenerationNumber))
+    Assert.Equal(Ok (if expected < 0 then None else Some expected), actual)
+    Assert.Equal(1, listings)
+    Assert.Equal<int list>((if expected < 0 then [] else [expected]), List.ofSeq loaded)
 
 [<Theory>]
 [<InlineData("success")>]

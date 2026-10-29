@@ -23,6 +23,7 @@ internal sealed class TableLayoutStore
     private readonly string path;
     private readonly Dictionary<string, TableLayoutSettings> tables;
     public TableLayoutSettings RunParameters => Get("RunParameters");
+    public TableLayoutSettings SetupParameters => Get("SetupParameters");
     public TableLayoutSettings SummaryReports => Get("SummaryReports");
 
     public TableLayoutStore(string path)

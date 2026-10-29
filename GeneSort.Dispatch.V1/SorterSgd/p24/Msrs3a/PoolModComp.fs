@@ -24,6 +24,7 @@ module PoolSelSz128 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
@@ -56,6 +57,9 @@ module PoolSelSz128 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -77,6 +81,7 @@ module Sz_2048_Of_4096 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
@@ -106,6 +111,9 @@ module Sz_2048_Of_4096 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName
@@ -127,6 +135,7 @@ module PoolsSelSzTest_2_vs_256 =
 
     let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
+    let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
@@ -156,6 +165,9 @@ module PoolsSelSzTest_2_vs_256 =
                     EnhancerFunctionName = executionEnhancerFunctionName
                 }
                 Setup = {
+                    FunctionName = setupFunctionName
+                    SortableTestsDatabaseName = UMX.tag "Prefix"
+                    SorterSetEvalsDatabaseName = UMX.tag "Prefix"
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
                     EnhancerFunctionName = setupEnhancerFunctionName

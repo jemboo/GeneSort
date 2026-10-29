@@ -178,9 +178,8 @@ module Utils =
 
 
 
-    /// Optimized search to locate and load ONLY the slice with the highest generation number.
-    /// Uses fast file-existence probes to skip expensive MessagePack deserialization.
-    /// Loads and extracts a specific output data slice at the highest saved generation.
+    /// Search the run's complete save schedule, loading only the highest saved slice.
+    /// File databases list existing IDs once; other stores use existence probes.
     let loadOutputDataWithHighestGenerationNumber<'T>
             (extractFn: outputData -> Result<'T, string>)
             (dataType: geneSortDataType)
@@ -188,48 +187,69 @@ module Utils =
             (generationalDb: IGeneSortDb)
             (rp: runParameters) : Async<Result<'T option, string>> =
         async {
-            let targetCount = defaultArg saveConfig.MaxCount 200
-            let intervals =
-                IntSampleMethod.generate saveConfig.Method saveConfig.Min targetCount
-                |> Seq.map (fun gen -> int (ceil (float gen * saveConfig.Scale)))
-                |> Seq.toArray
-                |> Array.map (fun gen -> %gen : int<generationNumber>)
-                // An imported initial pool lives only in Setup. Results start after it.
-                |> Array.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
+            // GenerationIntervalLast is a zero-based schedule index, not a generation number.
+            // MaxCount limits finite schedules; unbounded schedules use the run's endpoint.
+            let targetCount =
+                match rp.GetGenerationIntervalLast(), saveConfig.MaxCount with
+                | Some last, _ when int last < 0 || int last = System.Int32.MaxValue ->
+                    Error "Invalid last generation interval for checkpoint search."
+                | _, Some count when count < 0 -> Error "Invalid save interval MaxCount."
+                | Some last, Some count -> Ok (min (int last + 1) count)
+                | Some last, None -> Ok (int last + 1)
+                | None, Some count -> Ok count
+                | None, None -> Error "Checkpoint search requires GenerationIntervalLast or a finite save interval MaxCount."
 
-            let getQueryParams index =
-                let currentGen = intervals.[index]
-                let wrp = rp.WithGenerationCurrent(Some currentGen)
-                generationalDb.makeQueryParamsFromRunParams wrp dataType
+            match targetCount with
+            | Error error -> return Error error
+            | Ok count ->
+                let intervals =
+                    IntSampleMethod.generate saveConfig.Method saveConfig.Min count
+                    |> Seq.map (fun gen -> UMX.tag<generationNumber> (int (ceil (float gen * saveConfig.Scale))))
+                    // An imported initial pool lives only in Setup. Results start after it.
+                    |> Seq.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
+                    |> Seq.toArray
 
-            // Saved generations need not be contiguous: earlier checkpoints may
-            // have been removed or only a retained checkpoint may be available.
-            // Probe newest first, deserializing only the first existing result.
-            let rec findHighestExistingIndex index =
-                async {
+                let getQueryParams index =
+                    generationalDb.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some intervals.[index])) dataType
+
+                let! existingIds = async {
+                    match generationalDb with
+                    | :? IOutputDataListing as listing ->
+                        match intervals |> Array.tryPick (fun gen ->
+                            generationalDb.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some gen)) dataType) with
+                        | None -> return Some Set.empty
+                        | Some query ->
+                            let! ids = listing.getOutputIds geneSortDataMode.Results query
+                            return Some ids
+                    | _ -> return None
+                }
+
+                // Sparse retained checkpoints and stale saved progress are supported.
+                // Do not stop at a gap or assume that GenerationCurrent is up to date.
+                let rec findHighest index = async {
                     if index < 0 then return None
                     else
                         match getQueryParams index with
-                        | None -> return! findHighestExistingIndex (index - 1)
-                        | Some qp ->
-                            let! exists = generationalDb.doesOutPutDataExist geneSortDataMode.Results qp
-                            if exists then return Some index
-                            else return! findHighestExistingIndex (index - 1)
+                        | None -> return! findHighest (index - 1)
+                        | Some query ->
+                            let! exists =
+                                match existingIds with
+                                | Some ids -> async.Return (Set.contains query.Id ids)
+                                | None -> generationalDb.doesOutPutDataExist geneSortDataMode.Results query
+                            if exists then return Some query
+                            else return! findHighest (index - 1)
                 }
 
-            if intervals.Length = 0 then return Ok None
-            else
-                let! highestIndexOpt = findHighestExistingIndex (intervals.Length - 1)
-                match highestIndexOpt with
+                let! highest =
+                    if existingIds |> Option.exists Set.isEmpty then async.Return None
+                    else findHighest (intervals.Length - 1)
+                match highest with
                 | None -> return Ok None
-                | Some idx ->
-                    match getQueryParams idx with
-                    | None -> return Error "Failed to create query parameters for the highest saved generation."
-                    | Some qp ->
-                        let! rawDataOpt = generationalDb.loadIfFoundAsync geneSortDataMode.Results qp
-                        match rawDataOpt with
-                        | None -> return Ok None
-                        | Some rawData -> return extractFn rawData |> Result.map Some
+                | Some query ->
+                    let! rawDataOpt = generationalDb.loadIfFoundAsync geneSortDataMode.Results query
+                    match rawDataOpt with
+                    | None -> return Ok None
+                    | Some rawData -> return extractFn rawData |> Result.map Some
         }
 
     /// Ergonomic 1-liner wrapper for SorterRunResult.

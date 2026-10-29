@@ -49,6 +49,12 @@ internal static partial class Program
                 Background = (Brush)application.FindResource("SurfaceBrush")
             };
             Layout(view);
+            if (args.Contains("--setup-tabs"))
+            {
+                CheckSetupProcessing(root, model, view, errors);
+                Console.WriteLine("Shared Setup selection, linked run updates, separate processing tabs, and direct-run visibility passed.");
+                return 0;
+            }
             if (args.Contains("--parameters"))
             {
                 CheckParameterChoices(root, model, view, errors);
@@ -284,7 +290,7 @@ internal static partial class Program
                     model.ExecutionSection.CancelAdd();
                     Layout(view);
                 }
-                if (index == 4)
+                if (((TabItem)tabs.Items[index]).Header.Equals("Run parameters"))
                 {
                     var list = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
                     Check(list.Items.Count == 4, "The RunParameters items control does not show the saved set.");
@@ -326,18 +332,24 @@ internal static partial class Program
                     Wait(model.OpenAsync(savedDefinition));
                     Layout(view);
                     Check(model.RunParameterList.Count == 4 && model.CanSave, "Opening a definition did not load and validate its saved parameters.");
-                    var runSetup = Button(view, "Run Setup");
                     var runExecution = Button(view, "Run Execution");
                     var summaryReports = Button(view, "Generate Summary Reports");
-                    Check(!runSetup.IsEnabled && !runExecution.IsEnabled && !summaryReports.IsEnabled, "A run action is enabled without a selection.");
+                    Check(!model.CanRunSetup && !runExecution.IsEnabled && !summaryReports.IsEnabled, "A run action is enabled without a selection.");
                     list.SelectedItems.Add(list.Items[1]);
                     list.SelectedItems.Add(list.Items[3]);
                     Pump();
                     var selected = model.RunParameterList.SelectedParameters.ToHashSet();
-                    Check(runSetup.IsEnabled && runExecution.IsEnabled && summaryReports.IsEnabled && model.RunParameterList.SelectedCount == 2,
-                        "Selected rows did not enable the phase and report actions.");
+                    Check(!model.CanRunSetup && runExecution.IsEnabled && summaryReports.IsEnabled && model.RunParameterList.SelectedCount == 2,
+                        "Run selection did not independently enable execution and reporting.");
                     model.RunParameterList.Sort(ParamKeys.mutationModKey); Pump();
                     Check(selected.SetEquals(model.RunParameterList.SelectedParameters), "Sorting changed the selected parameter identities.");
+                    SelectEditorTab(view, "Setup parameters");
+                    var runSetup = Button(view, "Run Setup");
+                    var setupList = Descendants<ListView>(view).Single(control => AutomationProperties.GetName(control) == "Shared SetupParameters");
+                    foreach (var item in setupList.Items.Cast<SetupParameterItem>().Where(item => item.Runs.Any(row => selected.Contains(row.Parameters))))
+                        setupList.SelectedItems.Add(item);
+                    Pump();
+                    Check(runSetup.IsEnabled && model.SetupParameterList.SelectedCount == 2, "Shared setups did not enable Setup.");
                     var sawBusy = false;
                     var sawProgress = false;
                     model.PropertyChanged += (_, change) =>
@@ -349,6 +361,7 @@ internal static partial class Program
                     };
                     Click(runSetup);
                     WaitUntil(() => !model.IsBusy);
+                    SelectEditorTab(view, "Run parameters");
                     Layout(view);
                     Check(sawBusy && sawProgress && model.PhaseTotal == 2 && model.PhaseCompleted == 2,
                         "Setup did not disable other operations or report progress for the selected rows.");
@@ -414,7 +427,7 @@ internal static partial class Program
                     Check(!Directory.Exists(Path.Combine(root, model.ProjectName, model.DatabaseName, "Data", "Setup")),
                         "Reporting unexpectedly prepared setup files.");
                 }
-                if (index == 5)
+                if (((TabItem)tabs.Items[index]).Header.Equals("Summary Reports"))
                 {
                     CheckSummaryViewer(root, view, model, tabs);
                 }
@@ -447,7 +460,7 @@ internal static partial class Program
             var parameterBytes = File.ReadAllBytes(parameterPath);
             if (model.RunParameterList.SortKey != ParamKeys.mutationModKey) model.RunParameterList.Sort(ParamKeys.mutationModKey);
             if (!model.RunParameterList.Descending) model.RunParameterList.Sort(ParamKeys.mutationModKey);
-            tabs.SelectedIndex = 4; Layout(view);
+            SelectEditorTab(view, "Run parameters"); Layout(view);
             var parameterColumns = ((GridView)Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters").View).Columns;
             var layoutBeforeFailure = parameterColumns.Select(column => ((column.Header as GridViewColumnHeader)?.Tag, column.Width)).ToArray();
             File.WriteAllText(parameterPath, "invalid");
@@ -495,14 +508,14 @@ internal static partial class Program
         var path1 = WriteReport(1, $"Score\tRunName\tMutationMod\tSeed\tExtra[0]\tLabel\n2\t{configured.RunName}\t1\t18446744073709551614\tyes\tbeta\nInfinity\t{configured.RunName}\t1\t2\t\tgamma\n");
         var before0 = File.ReadAllBytes(path0);
         var before1 = File.ReadAllBytes(path1);
-        tabs.SelectedIndex = 4; Layout(view);
+        SelectEditorTab(view, "Run parameters"); Layout(view);
         var parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         parameterList.SelectedItems.Add(parameters[0]);
         parameterList.SelectedItems.Add(parameters[1]);
         parameterList.SelectedItems.Add(parameters[2]); // Deliberately missing.
         Pump();
         WaitUntil(() => !model.SummaryReportList.IsLoading);
-        tabs.SelectedIndex = 5; Layout(view);
+        SelectEditorTab(view, "Summary Reports"); Layout(view);
         var reports = model.SummaryReportList;
         var reportList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved Summary Reports");
         Check(reports.Count == 4 && reports.Errors.Length == 1 && reports.Errors[0].Contains("No saved Summary Report"),
@@ -535,7 +548,7 @@ internal static partial class Program
         Check(reports.SortKey == "Extra[0]" && reports.Count == 4, "Refreshing reports lost the sort or report rows.");
         Check(before0.SequenceEqual(File.ReadAllBytes(path0)) && before1.SequenceEqual(File.ReadAllBytes(path1)), "Viewing or sorting reports changed the saved files.");
 
-        tabs.SelectedIndex = 4; Layout(view);
+        SelectEditorTab(view, "Run parameters"); Layout(view);
         parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         // Rapid selection changes exercise cancellation and prevent an older load from winning the race.
         parameterList.SelectedItems.Clear();
@@ -550,7 +563,7 @@ internal static partial class Program
         // The same ItemsControl must virtualize large summary tables.
         WriteReport(0, "RunName\tScore\n" + string.Join("\n", Enumerable.Range(0, 2000).Select(value => $"{configured.RunName}\t{value}")));
         parameterList.SelectedItems.Add(parameters[0]); Pump(); WaitUntil(() => !reports.IsLoading);
-        tabs.SelectedIndex = 5; Layout(view);
+        SelectEditorTab(view, "Summary Reports"); Layout(view);
         reportList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved Summary Reports");
         Check(reports.Count == 2000 && Descendants<ListViewItem>(reportList).Count() is > 0 and < 100, "The Summary Reports view does not virtualize its rows.");
         var largeExport = Path.Combine(root, "all-summary-rows.tsv");
@@ -560,10 +573,10 @@ internal static partial class Program
         Check(savingAll.Result && File.ReadAllLines(largeExport).Length == 2001, "Combined export omitted rows outside the visible viewport.");
         // Leave a small, readable combined table for the rendered preview.
         File.WriteAllBytes(path0, before0);
-        tabs.SelectedIndex = 4; Layout(view);
+        SelectEditorTab(view, "Run parameters"); Layout(view);
         parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         parameterList.SelectedItems.Add(parameters[1]); Pump(); WaitUntil(() => !reports.IsLoading);
-        tabs.SelectedIndex = 5; Layout(view);
+        SelectEditorTab(view, "Summary Reports"); Layout(view);
         reports.Sort("Score");
         Layout(view);
         reportList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved Summary Reports");
@@ -760,12 +773,12 @@ internal static partial class Program
         GridViewColumn Column(string? key) => Columns().Single(column => Key(column) == key);
         void Select(params int[] indices)
         {
-            tabs.SelectedIndex = 4; Layout(view);
+            SelectEditorTab(view, "Run parameters"); Layout(view);
             var list = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
             list.SelectedItems.Clear();
             foreach (var index in indices) list.SelectedItems.Add(parameters[index]);
             Pump(); WaitUntil(() => !reports.IsLoading);
-            tabs.SelectedIndex = 5; Layout(view);
+            SelectEditorTab(view, "Summary Reports"); Layout(view);
         }
         void CheckLayout(IEnumerable<(string? Key, double Width)> expected)
         {

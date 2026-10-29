@@ -17,7 +17,7 @@ continue to produce separate Results IDs for different activator mutation rates.
 `RunParameterGeneration` records these Setup IDs in the existing `Setup*Id`
 parameter fields. The prepared parameter set's `SetupFiles` lists the unique input files;
 `evoPath.SetupInputs` binds each input output-type to its concrete file. Neither
-contains requested-to-stored aliases. No new files or MessagePack fields are used.
+contains requested-to-stored aliases.
 
 ## Existing data and imports
 
@@ -39,11 +39,21 @@ until their checkpoint has been validated during Setup.
 `evoStart` contains `Tests`, `Pool`, and `FirstGeneration`. `evoPath.Start` exposes
 that value. It contains no recipes, aliases, execution progress, or source lookup.
 
-SGD configurations use `sgdSetupConfig`: parameter spans, a query catalog, and a
-parameter enhancer. There is no `Setup.FunctionName`. The execution family selects
-Standard or Soss start creation; a continuation source selects importing instead.
-Simple evaluation/mutation workflows retain their explicit setup function choice.
-Older saved SGD labels are ignored on read and written as null in the existing DTO field.
+SGD configurations use the standalone `sgdSetupConfig` record:
+
+- `FunctionName` selects `setup.sgd-standard` or `setup.sgd-soss` directly.
+- `SortableTestsDatabaseName` selects the input database under `SortableTests`.
+- `SorterSetEvalsDatabaseName` selects the seed evaluation database under `SorterEval`.
+- `ParameterSpans`, `QueryCatalogName`, and `EnhancerFunctionName` describe the setup inputs.
+
+The run-level `DatabaseName` remains the destination for prepared inputs and Results.
+`preparedSetupConfig` is a separate record for evaluation/mutation setup;
+`directRunConfig` describes SortableTests runs without a Setup phase.
+The setup function and source database names are serialized explicitly. Old SGD
+definitions without these fields are unsupported; recreate their definitions and parameters.
+Source database names are recorded before setup enhancement. Test-file constructors
+include the tests database, and seed-pool constructors include both databases, preventing
+reuse of inputs created from a different source. Activator-rate sweeps still share inputs.
 
 Fresh runs call `EvoStartCreation.createStandardStart` or `createSossStart`.
 The caller supplies the run's project and database. `EvoStartCreation.files`
@@ -91,4 +101,4 @@ Setup file IDs. They retain their explicit Results query catalog.
 
 Old append setup labels, `SourcePoolFileId`/`SourceTestsFileId` aliases, and the old
 off-by-one checkpoint generation convention are unsupported. Rerun those sources
-and regenerate continuation parameters. Existing fresh-run IDs and files are unchanged.
+and regenerate continuation parameters. Fresh SGD file identities now include their source databases.

@@ -58,14 +58,17 @@ This keeps database implementations,
 filesystem paths, and host configuration out of Project, avoids a dependency cycle,
 and allows tests or other hosts to provide alternative storage.
 
-Dispatch binds its existing library databases in `WorkflowSources.fs`.
+Dispatch and WPF use `WorkflowSourceFiles` to bind the configured source databases.
 `SgdRun.create` takes maker names in its named SGD configuration record.
-Its `sgdBaseConfig.Setup` has only parameter spans, query catalog, and enhancer.
-There is no SGD setup-function choice: execution family and source select how the
-start is prepared. The editor displays only those effective choices. Simple-run
-setup catalogs remain explicit because they select evaluation/mutation inputs.
+Its `sgdBaseConfig.Setup` is a standalone `sgdSetupConfig` with an explicit
+`FunctionName`, `SortableTestsDatabaseName`, `SorterSetEvalsDatabaseName`, parameter
+spans, query catalog, and enhancer. `SetupExecutorCatalog` maps the setup function
+directly to its executor. `preparedSetupConfig` describes evaluation/mutation setup
+separately; neither setup record inherits from the other. SortableTests retains
+`directRunConfig`, with no Setup phase.
 `sgdRunHost` resolves all three maker functions when created, so unknown names fail
-before execution. Setup supplies `workflowSources.Evolution`; mutator makers
+before execution. Setup calls `workflowSources.Evolution` with its two input database
+names and supplies the resulting loaders to its makers; mutator makers
 require only `evoPath`, reading its fixed settings directly.
 
 ## Storage and phase functions

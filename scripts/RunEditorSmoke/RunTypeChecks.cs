@@ -48,6 +48,17 @@ internal static partial class Program
             var kind = model.RunTypes.Single(type => type.Name == name);
             model.SelectRunType(kind);
             model.RunName = "EditorRoundTrip";
+            if (model.HasSgdSourceSelection)
+            {
+                Layout(view);
+                var testsDatabase = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "SortableTests source database");
+                var evalsDatabase = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "SorterSetEvals source database");
+                testsDatabase.SetCurrentValue(TextBox.TextProperty, "MyTests");
+                evalsDatabase.SetCurrentValue(TextBox.TextProperty, "MySeedEvals");
+                Pump();
+                Check(model.SortableTestsDatabaseName == "MyTests" && model.SorterSetEvalsDatabaseName == "MySeedEvals", "Source database fields are not bound.");
+                Check(model.Catalogs.Any(choice => choice.Role == "Setup.FunctionName"), "SGD setup function is not displayed.");
+            }
             var original = model.Validate()!;
             var save = model.SaveAsync(original, false);
             while (!save.IsCompleted) Pump();

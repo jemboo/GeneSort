@@ -65,7 +65,7 @@ type executionBinding =
 
 type workflowSourcesArgs = {
     OpenDatabase: sourceDatabaseOpener
-    Evolution: evolutionSetupSources
+    Evolution: string<databaseName> -> string<databaseName> -> evolutionSetupSources
 }
 
 /// Source access supplied by the application for setup and source-dependent reports.
