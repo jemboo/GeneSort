@@ -14,6 +14,14 @@ public partial class RunEditorView : UserControl
     public RunEditorView()
     {
         InitializeComponent();
+        RunSelection.RunChosen += async tile =>
+        {
+            if (!DiscardChanges()) return;
+            RunSelection.IsEnabled = false;
+            try { await Model.ChooseRunAsync(tile); }
+            catch (Exception error) { MessageDialog.Show(Window.GetWindow(this), error.GetBaseException().Message, "Open run", MessageBoxButton.OK, MessageBoxImage.Error); }
+            finally { RunSelection.IsEnabled = true; }
+        };
         DataContextChanged += (_, e) =>
         {
             if (e.OldValue is INotifyPropertyChanged oldModel)
@@ -30,23 +38,8 @@ public partial class RunEditorView : UserControl
     private bool DiscardChanges() => !Model.HasUnsavedChanges || MessageDialog.Show(Window.GetWindow(this),
         "Discard the unsaved run definition changes?", "Run editor", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
-    private bool changingType;
-    private void RunType_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (changingType || sender is not ComboBox combo || combo.SelectedItem is not GeneSort.Dispatch.V1.runType type
-            || ReferenceEquals(type, Model.SelectedRunType)) return;
-        changingType = true;
-        try { if (DiscardChanges()) Model.SelectRunType(type); else Model.RefreshTypeSelection(); }
-        finally { changingType = false; }
-    }
-    private void Example_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (changingType || sender is not ComboBox combo || combo.SelectedItem is not GeneSort.Dispatch.V1.runExample example
-            || ReferenceEquals(example, Model.SelectedExample)) return;
-        changingType = true;
-        try { if (DiscardChanges()) Model.SelectExample(example); else Model.RefreshTypeSelection(); }
-        finally { changingType = false; }
-    }
+    private async void ChooseRun_Click(object sender, RoutedEventArgs e) => await Model.BeginSelectionAsync();
+    private void ReturnToEditor_Click(object sender, RoutedEventArgs e) => Model.CancelSelection();
 
     private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
     private void Validate_Click(object sender, RoutedEventArgs e) => Model.Validate();
@@ -89,6 +82,8 @@ public partial class RunEditorView : UserControl
     {
         await PerformAsync(() => Model.LoadRunParametersAsync());
     }
+    private void CancelPhase_Click(object sender, RoutedEventArgs e) => Model.CancelPhase();
+
     private async void RunSetup_Click(object sender, RoutedEventArgs e)
     {
         if (Model.CanRunSetup) await Model.RunSetupAsync();

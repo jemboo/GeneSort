@@ -52,5 +52,7 @@ module ExecuteFunctionCatalog =
                         GenSaveSubIntervals = path.GenSaveSubIntervals
                     }
                     return! bind storage dependencies path progress overwrite cts sink
-            with error -> return Error error.Message
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return Error "Operation cancelled"
+            | error -> return Error error.Message
         }

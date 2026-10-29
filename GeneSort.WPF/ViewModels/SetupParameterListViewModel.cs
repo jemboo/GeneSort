@@ -9,6 +9,7 @@ namespace GeneSort.WPF.ViewModels;
 /// One set of shared input files, with the saved execution rows that use it.
 public sealed class SetupParameterItem
 {
+    public string SetupStatus { get; }
     public int Number { get; }
     public RunParameterItem[] Runs { get; }
     public IReadOnlyDictionary<string, string> Values { get; }
@@ -18,7 +19,9 @@ public sealed class SetupParameterItem
     {
         Number = number;
         Runs = runs;
-        var values = new Dictionary<string, string>();
+        var completed = runs.Count(row => row.Parameters.GetSetupCompleted()?.Value == true);
+        SetupStatus = completed == runs.Length ? "Complete" : completed > 0 ? "Partial" : runs.All(row => row.Parameters.GetSetupCompleted()?.Value == false) ? "Not run" : "Not recorded";
+        var values = new Dictionary<string, string> { ["SetupStatus"] = SetupStatus };
         if (configured.ParameterSource is null)
         {
             // Show the inputs used by the explicit Setup constructors, not execution overrides.
@@ -77,7 +80,7 @@ public sealed class SetupParameterListViewModel : INotifyPropertyChanged
         if (!configured.HasSetup) { Clear("This run executes directly and has no Setup phase."); return; }
         var items = runs.GroupBy(row => SharedInputKey(configured, row))
             .Select((group, index) => new SetupParameterItem(index + 1, configured, group.ToArray())).ToArray();
-        string[] leading = ["LinkedRuns", ParamKeys.replKey];
+        string[] leading = ["SetupStatus", "LinkedRuns", ParamKeys.replKey];
         var keys = items.SelectMany(item => item.Values.Keys).Distinct().ToArray();
         Keys = leading.Where(keys.Contains).Concat(keys.Except(leading).Order(StringComparer.Ordinal)).ToArray();
         foreach (var item in items) item.Cells = Keys.Select(key => item.Values.GetValueOrDefault(key)).ToArray();

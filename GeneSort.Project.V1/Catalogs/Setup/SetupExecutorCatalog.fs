@@ -90,7 +90,9 @@ module SetupExecutorCatalog =
         let builder = lock syncRoot (fun () ->
             Map.tryFind name builders
             |> Option.defaultWith (fun () -> invalidOp (sprintf "No setup executor is registered for setup function '%s'." name)))
-        builder sources configured storage
+        let execute = builder sources configured storage
+        fun (rp: runParameters) overwrite cts progress ->
+            execute (rp.WithSetupCompleted(Some true)) overwrite cts progress
 
     /// Parameter-only adapter for callers that deliberately persist and reopen between phases.
     let get sources configured storage : runFunction =

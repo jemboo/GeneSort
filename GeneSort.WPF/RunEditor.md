@@ -1,10 +1,40 @@
 # Run editor
 
-Open the **Run Editor** tab in GeneSort.WPF. Choose a **Run type** (a Dispatch
-module), then an **Example run** from that module. The example supplies the
-parameter fields, defaults, catalog selections, evolution makers and schedules.
-Edit the values and names to create your own run. Changing the type or example
-asks before discarding unsaved edits. SortableTests runs have one Execution
+Architectural constraint: preserve [future single-machine deployment](../GeneSort.Dispatch.V1/CLOUD_WORKFLOW.md#single-machine-deployment-architectural-requirements).
+This guides local development; cloud features are explicitly deferred.
+
+Open the **Run Editor** tab in Sortopia. The selection wizard first asks for the
+folder containing your projects. The last valid Projects folder is remembered
+per user and prefilled in the wizard and
+editor on startup. When that folder still exists, the wizard opens directly to
+the top-level modules. **Change folder** remains available. An unavailable folder remains visible so you can reconnect
+it or choose another folder; restoring it does not create unsaved run edits.
+Each successive page shows the next module
+layer as a wrapping set of icon tiles, with module names underneath. **Back**
+returns one layer and **All modules** returns to the root.
+
+At a module's leaves, select a run or **Create your own** and choose a starting
+definition. Code-only leaves retain their original run names when selected;
+new leaves start with an unused NewRun name. Tiles distinguish **Code only · not
+saved**, **Code + saved on disk**, and **Saved on disk**. A saved counterpart
+replaces the code leaf in place, and selection loads the saved values. Browsing
+does not save files or execute runs. Use the editor's existing save, parameter
+generation, Setup, and Processing controls after selecting a leaf.
+
+**Choose run…** reopens the wizard and refreshes disk state. **Return to editor**
+keeps existing edits; selecting another leaf asks before discarding them.
+**Change folder** starts folder selection again. **Refresh runs** reloads the
+current folder without changing the hierarchy location. Unreadable definitions
+are reported while healthy runs remain available.
+
+New saves include a small `Run_*.msgpack.module.json` sidecar recording the
+originating module, so a custom run stays in that module even if its project or
+database name changes. Older files are associated by project/database identity
+when unambiguous; otherwise they appear under **Saved runs**. Discovery reads
+canonical definition folders only, avoiding large parameter and result trees.
+
+The starting definition supplies parameter fields, defaults, catalog selections,
+evolution makers and schedules. SortableTests runs have one Processing
 parameter sweep and no Setup section or action. Evaluation and mutation runs
 prepare their input files before execution. Evolution runs create a starting
 population; continuation runs import one from their source.
@@ -23,7 +53,7 @@ from their selected source run instead of loading those libraries again.
 The domain `run` DU distinguishes `DirectRun`, `PreparedRun`, `EvolutionRun`, and
 `ContinuationRun`. `RunParameterRoles.fs` defines the explicit policies for each
 workflow: `SetupOnly`, `InheritedReadOnly`, `InheritedOverridable`, and
-`ExecutionOnly`. Execution displays fixed Setup values as read-only, including
+`ExecutionOnly`. Processing displays fixed Setup values as read-only, including
 resolved enhancer defaults. These display rows are not additional sweep dimensions.
 The domain also rejects overrides of fixed values, so the same rule applies
 outside WPF. Continuations explicitly permit mutation branching and pool resizing.
@@ -34,7 +64,7 @@ share the same recorded Setup files for each MutationMod and retain distinct
 execution/result IDs.
 
 SortableTests and prepared-run identities retain their current behavior. On import,
-legacy SortableTests Setup spans are folded into the one Execution sweep, and
+legacy SortableTests Setup spans are folded into the one Processing sweep, and
 exactly repeated fixed spans in prepared runs are inherited instead of expanded
 again. Existing files are neither rewritten nor renamed. The historical
 SetupParametersId remains in direct-run bookkeeping queries solely to preserve
@@ -51,8 +81,9 @@ The editor validates source identity fields but does not provide a source picker
 
 Opening a saved definition preserves its parameter values and continuation source,
 normalizing redundant spans as described above. The editor chooses a compatible catalog entry for display,
-preferring the original project/database. The existing saved format does not store
-a module identifier, so renamed definitions may match several compatible modules.
+preferring the recorded module sidecar, then the original project/database.
+The MessagePack definition itself does not store a module identifier, so older
+renamed definitions without sidecars may match several compatible modules.
 
 1. Create a new definition or open an existing `Run_*.msgpack` file.
 2. Edit the project, database and run names, description, parameter spans and
@@ -67,7 +98,7 @@ a module identifier, so renamed definitions may match several compatible modules
    **Sorting width** on the Parameters tab first. The PrefixLibId dropdowns then
    offer only that width. Changing width clears incompatible selections; choose
    a matching prefix before saving. Multiple selected prefixes remain unique.
-   In `SorterEval.Prefix` and `SorterMutate.Prefix`, this filters the Setup choices; Execution inherits them
+   In `SorterEval.Prefix` and `SorterMutate.Prefix`, this filters the Setup choices; Processing inherits them
    read-only. Match the PrefixLibId and SortableDataFormat to the SortableTests run.
    `SortableTests.Merge`, `SorterEval.Merge`, and `SorterMutate.Merge` also have **Sorting width** selectors
    that filter MergeLibId. Choose a suggested width or type another positive whole
@@ -75,7 +106,7 @@ a module identifier, so renamed definitions may match several compatible modules
    available entries are rejected. Evaluation and mutation inherit their selected Setup merges
    read-only. Changing width clears incompatible selections, and all selections
    remain unique. In the mutation workflows, changing width also updates the width
-   inside Setup's `MutatorParams`, preserving the other mutation settings. Execution
+   inside Setup's `MutatorParams`, preserving the other mutation settings. Processing
    inherits those values read-only. Opening a saved definition does not change them.
    Opening a saved run infers the width from its library IDs. The selectors add
    no extra sweep parameter and preserve the existing file IDs. Saved runs with
@@ -101,8 +132,8 @@ To generate parameter files, open **Generate parameters**, choose **First replic
 and **Replica count**, and review the file count and destination. For example,
 first replica 2 and count 3 generate replicas 2, 3 and 4. Click **Generate RunParameters**
 to save the current definition together with the generated set. Run Setup for
-workflows that require prepared inputs, then Execution. SortableTests goes directly
-to Execution. Replica controls describe this generation operation;
+workflows that require prepared inputs, then Processing. SortableTests goes directly
+to Processing. Replica controls describe this generation operation;
 they are not stored as run parameters.
 
 Generation previews do not write files. Existing parameter files or a different
@@ -125,9 +156,9 @@ checkpoint IDs in the output/replica folder once, matches the scheduled queries 
 memory, and deserializes only the latest matching file. Missing earlier checkpoints
 and stale saved progress are supported. Existing file names and formats are unchanged.
 
-Processing has separate **Setup parameters** and **Run parameters** tabs.
+Processing has separate **Setup parameters** and **Processing parameters** tabs.
 The Setup tab has one row per shared set of recorded input files, with the input
-parameters, file IDs and a `LinkedRuns` count. Execution-only sweep values do not
+parameters, file IDs and a `LinkedRuns` count. Processing-only sweep values do not
 split these groups: Soss.SossS rates 0.0 and 0.01 share a Setup row when they use
 the same inputs. Select Setup rows and click **Run Setup** to prepare their inputs
 and update all linked saved run rows. Shared artifacts are reused by the existing
@@ -135,7 +166,7 @@ setup executors. Progress counts linked run rows. Continuation requests whose
 input IDs are not yet known stay separate until Setup records their imported files.
 SortableTests hides this tab because it has no Setup phase.
 
-The **Run parameters** tab displays the saved parameter files for the current run,
+The **Processing parameters** tab displays the saved parameter files for the current run,
 including every saved replica regardless of the generation range controls. Opening
 a definition or generating parameters loads this view automatically; **Refresh saved
 files** reloads saved values, including execution progress. Unsaved definition edits
@@ -152,7 +183,7 @@ refreshes, including empty results and failed reads. Temporarily absent columns 
 their layout and sorting when they return; new columns are appended. Sorting does
 not modify saved files.
 
-The Setup, Run parameters and Summary Reports tables save their column order, widths and sorting when you close the application,
+The Setup, Processing parameters and Summary Reports tables save their column order, widths and sorting when you close the application,
 and restore them the next time you open it. Each table has its own settings, shared
 across runs for your Windows user, in `%LOCALAPPDATA%\GeneSort\table-layouts.json`.
 Settings include the `#` column and columns that are temporarily absent. Missing or
@@ -173,7 +204,7 @@ empty table, whose default sort is applied when rows load. The other table keeps
 its layout. A message below the table confirms the save or reports a save failure.
 
 Select rows with Ctrl+click or Shift+click. Use **Run Setup** on the Setup tab;
-use **Run Execution** or **Generate Summary Reports** on the Run parameters tab.
+use **Run Processing** or **Generate Summary Reports** on the Processing parameters tab.
 The tabs have independent selections, so selecting shared inputs does not select
 executions. These actions require a saved definition and at least one selected row.
 Each action processes the affected saved run rows one at a time on a background
@@ -184,10 +215,10 @@ appear below the editor. Failed rows do not stop the remaining selection. The sa
 parameter list refreshes afterward and clears the selection.
 
 Setup reuses existing shared inputs and records its results in the selected parameter
-files. It does not start execution. Execution reads the prepared inputs, resumes saved
+files. It does not start execution. Processing reads the prepared inputs, resumes saved
 checkpoints through the workflow executor, and saves the resulting generation and
 completion state. Missing prepared inputs are reported as failures; use **Run Setup**
-to prepare them before retrying Execution. Other rows in the selection still run.
+to prepare them before retrying Processing. Other rows in the selection still run.
 
 **Generate Summary Reports** uses the existing report catalog to summarize saved
 generation slices, including finished runs. It writes one tab-separated SummaryReport
@@ -197,7 +228,7 @@ usual `RunName` column. Missing or empty results are reported per row. Reports h
 execution state unchanged. Reporting does not require the original setup libraries.
 
 The **Summary Reports** tab automatically loads reports for the rows selected in
-**Run parameters**. It combines their saved rows into one virtualized, read-only
+**Processing parameters**. It combines their saved rows into one virtualized, read-only
 table. Each selection uses its latest saved report within the configured generation
 range, even if its execution checkpoint has since advanced. Older cumulative reports
 are not added again. **Refresh reports** reloads the current selection from disk.
@@ -239,7 +270,7 @@ are loaded from `SortableTests/<database>/Data/Results` using the library ID, da
 format and replica. Their run name may be anything, including `NewRun`; no source
 definition is required to load these results. Missing tests report the requested
 values and exact result path. Generate and execute a matching SortableTests run,
-then rerun the evaluation's Setup to create `SortableTestsWithPrefix` before Execution.
+then rerun the evaluation's Setup to create `SortableTestsWithPrefix` before Processing.
 Evolution workflows use the selected evaluation database; its saved run definitions
 supply library sizes and other query settings. The loader accepts any run name and
 requires one distinct matching evaluation. If several match, use a database containing
@@ -249,7 +280,7 @@ This binding lives in
 `RunSetupFiles.fs`. `RunExecutionFiles.fs` binds the shared Project execution catalog
 without accessing source libraries. `RunSummaryFiles.fs` binds the Summary Report
 catalog entry. All three use `RunPhaseFiles.fs` for selection checks, progress and
-locking; only Setup and Execution persist returned parameters.
+locking; only Setup and Processing persist returned parameters.
 
 **Add parameter** and **Add override** open an embedded panel. Choose an available
 parameter, enter its values, then **Add** or **Cancel**. Parameters already present
@@ -306,3 +337,58 @@ malformed files and cancellation. The WPF smoke checks cover the report viewer's
 column alignment, sorting, selection changes, refresh and virtualization. Export
 checks cover reordered columns, both sort directions, all virtualized rows,
 snapshot consistency, overwrite refusal and temporary-file cleanup.
+
+Setup rows include a saved completion status: green Complete, amber Partial,
+and brown Not run. Older parameter files without a completion record show Not
+recorded. A grouped setup is complete when all linked rows have completed Setup.
+The Parallel threads field defaults to 1 and limits concurrent selected rows in
+Setup and Processing; shared setup artifacts remain protected against duplicate
+creation. Positive whole numbers are required, and the control is disabled while
+work is running.
+
+During SGD Processing, GenerationCurrent updates from coarse generation messages
+for each selected row. These are display-only updates; saved parameters continue
+to describe resumable state. The Cancel footer remains available while the editor
+is busy. Cancellation stops queued rows and lets active work reach a cooperative
+stop point (between SGD generations, after any checkpoint writes). Cancelled SGD
+rows are restored to their highest saved pool checkpoint, or their initial Setup
+generation when no Results checkpoint exists. That generation is saved to the
+parameter file with RunFinished=false, so the same selection can resume. Completed
+rows remain completed, and cancellations are counted separately from failures.
+
+Processing parameters show a Status column: Waiting (gray), Running (blue),
+Completed (green), and Failed (red). A colored left stripe
+remains visible on selected rows. Status updates target the original selected row
+regardless of table order or parallel completion order. Setup and summary report
+operations do not change Processing status. Saved finished runs open as Completed;
+failed runs restore their Failed status from a .processing-failures.json sidecar beside the
+parameter folder. This history does not modify parameter values. Other unfinished
+runs open as Waiting. Cancelled rows return to Waiting; a retry replaces the
+previous failure status. Replacing generated parameters clears the old failure history.
+
+During execution, parameter tables and the outer editor remain scrollable. Tabs,
+row selection, sorting, and column layout controls stay available for inspection;
+the active job uses its captured selection. Run navigation, metadata, parameter
+editing, parallel-thread settings, and actions that start or reload work remain
+locked until the operation finishes.
+
+Generated Setup and Processing values are read-only text cells. To change input
+values, edit the run configuration and regenerate parameters. Runtime progress
+and status updates do not provide an editing path for generated inputs.
+
+Click the underlined Failed status in Processing parameters to view that row's
+error in a scrollable, selectable dialog, with run name, replica, and ID. The
+failure history stores each message by run-parameter ID, so it survives reopening
+and remains associated with the correct row after sorting or parallel execution.
+Older failure files that stored only IDs remain readable and explicitly indicate
+that no error message was recorded.
+
+### Checkpoints and snapshots
+
+The Save intervals tab has separate Checkpoint, Snapshot, and Summary sampling
+schedules. Checkpoints provide recovery; only the latest valid recovery group per
+processing row is retained. Snapshots preserve evolutionary history permanently.
+When schedules coincide, one snapshot serves both purposes. GenerationIntervalLast
+still indexes the Snapshot schedule; the endpoint is always a snapshot. Old run
+files retain their existing save schedule as snapshots. Cloud deployment remains
+deferred. See [checkpoint retention](../GeneSort.Project.V1/EvoPath.md).

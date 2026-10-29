@@ -133,6 +133,13 @@ module RunPhaseFileTests =
         Assert.Equal(1, result.Succeeded)
         Assert.Equal(1, result.Failed)
         Assert.Equal(1, result.Skipped)
+        Assert.Contains("Missing source input", result.RowErrors[0]);
+        Assert.Equal("", result.RowErrors[1]);
+        Assert.Equal("", result.RowErrors[2]);
+        Assert.Equal<runRowStatus>([|runRowStatus.Failed; runRowStatus.Completed; runRowStatus.Completed|], result.RowStatuses)
+        Assert.Contains(progress, fun p -> p.RowIndex = Some 0 && p.Status = Some runRowStatus.Running)
+        Assert.Contains(progress, fun p -> p.RowIndex = Some 0 && p.Status = Some runRowStatus.Failed)
+        Assert.Contains(progress, fun p -> p.RowIndex = Some 2 && p.Status = Some runRowStatus.Completed)
         let index, _ = Assert.Single(result.Updates)
         Assert.Equal(2, index)
         Assert.Contains("Missing source input", result.Errors[0])
@@ -284,6 +291,7 @@ module RunPhaseFileTests =
         Assert.Equal(2, files.Length)
         Assert.Empty(Directory.GetDirectories(folder, "Results", SearchOption.AllDirectories))
         let before = files |> Array.map File.GetLastWriteTimeUtc
+        let selected = result.Updates |> Array.exactlyOne |> snd |> RunPhaseOutput.toParameters
         let! again = RunSetupFiles.runAsync folder configured [|selected|] null
         Assert.Equal(1, again.Succeeded)
         Assert.Equal<DateTime>(before, files |> Array.map File.GetLastWriteTimeUtc)
@@ -326,6 +334,7 @@ module RunPhaseFileTests =
         let! rows = publish folder evaluation
         let! setup = RunSetupFiles.runAsync folder evaluation rows null
         Assert.Empty(setup.Errors)
+        let! rows = RunParameterFiles.loadAllAsync folder evaluation
         let! executed = RunExecutionFiles.runSavedAsync folder evaluation rows null
         Assert.Empty(executed.Errors)
         let prefix = prefixLibId.create 8<sortingWidth> 3<stageLength> prefixLibVariant.PrefixA
@@ -461,6 +470,7 @@ module RunPhaseFileTests =
 
         let! setup = RunSetupFiles.runAsync folder evaluation rows null
         Assert.Empty(setup.Errors)
+        let! rows = RunParameterFiles.loadAllAsync folder evaluation
         Assert.Equal(1, setup.Succeeded)
         let setupFiles = Directory.GetFiles(Path.Combine(folder, "SorterEval", database, "Data", "Setup"), "*.msgpack", SearchOption.AllDirectories) |> Array.sort
         Assert.Equal(2, setupFiles.Length)
@@ -635,4 +645,118 @@ module RunPhaseFileTests =
             Assert.Equal<byte>(bytes, File.ReadAllBytes path)
             Assert.Equal(modified, File.GetLastWriteTimeUtc path)) parameterFiles before
         Assert.Empty(Directory.GetDirectories(folder, "Setup", SearchOption.AllDirectories))
+    })
+
+    [<Fact>]
+    let ``parallel setup bounds concurrency and persists completion`` () = withFolder (fun folder -> task {
+        let sync = obj ()
+        let mutable active, peak = 0, 0
+        let started = TaskCompletionSource<unit>(TaskCreationOptions.RunContinuationsAsynchronously)
+        let configured = custom (fun row _ _ _ -> async {
+            lock sync (fun () ->
+                active <- active + 1
+                peak <- max peak active
+                if active = 2 then started.TrySetResult(()) |> ignore)
+            try
+                do! started.Task.WaitAsync(TimeSpan.FromSeconds 10.) |> Async.AwaitTask
+                do! Async.Sleep 20
+                return Ok row
+            finally lock sync (fun () -> active <- active - 1)
+        })
+        let! rows = publish folder configured
+        let progress = ResizeArray<runPhaseProgress>()
+        let sink = { new IProgress<runPhaseProgress> with member _.Report update = progress.Add update }
+        let! result = RunSetupFiles.runParallelAsync 2 folder configured rows sink
+        Assert.Equal(2, peak)
+        Assert.Equal(rows.Length, result.Succeeded)
+        Assert.Empty(result.Errors)
+        Assert.Equal(rows.Length, result.Updates.Length)
+        Assert.Equal<int>(progress |> Seq.map (fun p -> p.Completed) |> Seq.sort, progress |> Seq.map (fun p -> p.Completed))
+        for index, output in result.Updates do
+            Assert.Equal(rows[index].GetId(), (RunPhaseOutput.toParameters output).GetId())
+        let! saved = RunParameterFiles.loadAllAsync folder configured
+        Assert.All(saved, fun row -> Assert.Equal(Some true, row.GetSetupCompleted()))
+    })
+
+    [<Theory>]
+    [<InlineData(false, false)>]
+    [<InlineData(false, true)>]
+    [<InlineData(true, false)>]
+    [<InlineData(true, true)>]
+    let ``cancelled evolution restores its saved generation and can resume`` soss checkpoint = withFolder (fun folder -> task {
+        let configured = custom (fun row _ _ _ -> async { return Ok row })
+        use cancellation = new CancellationTokenSource()
+        let mutable calls = 0
+        let mutable resumed = false
+        let mutable savedGeneration = 0<generationNumber>
+        ExecuteFunctionCatalog.register configured.ExecuteFunctionName (SgdExecution (fun storage _ path state _ _ sink -> asyncResult {
+            calls <- calls + 1
+            if resumed then
+                Assert.Equal(Some savedGeneration, state.CurrentGeneration)
+                return state.WithFinished(Some true)
+            else
+                savedGeneration <- path.Start.FirstGeneration
+                if checkpoint then
+                    let generation = [0 .. 10] |> List.choose (GenIntervalConfig.getSampleAtIndex path.GenSaveIntervals)
+                                     |> List.find (fun gen -> gen > int path.Start.FirstGeneration) |> UMX.tag<generationNumber>
+                    let pool = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) generation (Dim1 1) None
+                    let data = if soss then GeneSort.Eval.V1.Sgd.Soss.SorterPoolSet_Soss.fromStandard pool |> sorterPoolSet.Soss else sorterPoolSet.Standard pool
+                    let query = EvolutionFiles.queryAtGeneration storage.RunDb path state generation (geneSortDataType.SorterPoolSet "") |> Option.get
+                    do! storage.RunDb.saveAsync geneSortDataMode.Results query (outputData.SorterPoolSet data) (UMX.tag true)
+                    savedGeneration <- generation
+                sink |> Option.iter (fun progress -> progress.Report(sprintf "Starting evolution step. Generation %d of 999999" (int savedGeneration + 1)))
+                do! checkCancellation cancellation.Token
+                return state.WithFinished(Some true)
+        }))
+        let! rows = publish folder configured
+        let paths = rows |> Array.take 3 |> Array.map (EvoPath.fromParameters configured)
+        let progress = ResizeArray<runPhaseProgress>()
+        let sink = { new IProgress<runPhaseProgress> with
+                        member _.Report update =
+                            progress.Add update
+                            if update.Generation.IsSome then cancellation.Cancel() }
+        let! result = RunExecutionFiles.runPathsCancellableAsync cancellation.Token 1 folder configured paths sink
+        Assert.Equal(1, calls)
+        Assert.Equal(3, result.Cancelled)
+        Assert.All(result.RowStatuses, fun status -> Assert.Equal(runRowStatus.Cancelled, status))
+        Assert.Equal(0, result.Failed)
+        Assert.Equal(0, result.Succeeded)
+        let index, update = Assert.Single(result.Updates)
+        Assert.Equal(0, index)
+        let restoredPath, restoredState = Assert.Single(result.EvolutionPaths)
+        Assert.Same(fst paths[0], restoredPath)
+        Assert.Equal(Some savedGeneration, restoredState.CurrentGeneration)
+        Assert.Equal(Some false, restoredState.Finished)
+        Assert.Contains(progress, fun p -> p.RowIndex = Some 0 && p.Generation = Some (int savedGeneration + 1))
+        let! saved = RunParameterFiles.loadAllAsync folder configured
+        let restored = saved |> Array.find (fun row -> row.GetId() = Some (fst paths[0]).Id)
+        Assert.Equal(Some savedGeneration, restored.GetGenerationCurrent())
+        for row in rows |> Array.skip 1 do
+            Assert.Equal(row, saved |> Array.find (fun candidate -> candidate.GetId() = row.GetId()))
+        resumed <- true
+        let! finished = RunExecutionFiles.runPathsAsync folder configured [|restoredPath, restoredState|] null
+        Assert.Equal(1, finished.Succeeded)
+        Assert.Empty(finished.Errors)
+    })
+
+    [<Fact>]
+    let ``parallel cancellation stops queued rows and accounts for active rows`` () = withFolder (fun folder -> task {
+        use cancellation = new CancellationTokenSource()
+        let mutable calls = 0
+        let bothStarted = TaskCompletionSource<unit>(TaskCreationOptions.RunContinuationsAsynchronously)
+        let configured = custom (fun row _ _ _ -> async {
+            if Interlocked.Increment(&calls) = 2 then bothStarted.TrySetResult(()) |> ignore
+            do! bothStarted.Task.WaitAsync(TimeSpan.FromSeconds 10.) |> Async.AwaitTask
+            cancellation.Cancel()
+            return Error "Operation cancelled"
+        })
+        let! rows = publish folder configured
+        let! result = RunSetupFiles.runCancellableAsync cancellation.Token 2 folder configured rows null
+        Assert.Equal(2, calls)
+        Assert.Equal(rows.Length, result.Cancelled)
+        Assert.All(result.RowStatuses, fun status -> Assert.Equal(runRowStatus.Cancelled, status))
+        Assert.Empty(result.Errors)
+        Assert.Empty(result.Updates)
+        let! saved = RunParameterFiles.loadAllAsync folder configured
+        Assert.Equal<runParameters>(rows |> Array.sortBy (fun r -> r.GetId()), saved |> Array.sortBy (fun r -> r.GetId()))
     })

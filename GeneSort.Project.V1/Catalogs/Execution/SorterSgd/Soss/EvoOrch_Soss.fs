@@ -79,9 +79,15 @@ module EvoOrch_Soss =
                     | Some intervals -> GenIntervalConfig.getSampleSetMaxBound intervals targetGenInt
                     | None -> Set.empty
 
-                let targetGenerationsForSaveResults = 
+                let targetGenerationsForSnapshots =
                     GenIntervalConfig.getSampleSetMaxBound saveIntervals targetGenInt
                     |> Set.add targetGenInt
+
+                let targetGenerationsForSaveResults =
+                    path.CheckpointIntervals
+                    |> Option.map (fun config -> GenIntervalConfig.getSampleSetMaxBound config targetGenInt)
+                    |> Option.defaultValue Set.empty
+                    |> Set.union targetGenerationsForSnapshots
 
                 let targetGenerationsForSummaryReport = 
                     GenIntervalConfig.getSampleSetMaxBound subIntervals targetGenInt
@@ -137,6 +143,7 @@ module EvoOrch_Soss =
                             // Triggers
                             let shouldSummaryReport = Set.contains %currentGen targetGenerationsForSummaryReport
                             let shouldSaveResults = Set.contains %currentGen targetGenerationsForSaveResults
+                            let isSnapshot = Set.contains %currentGen targetGenerationsForSnapshots
 
                             let shouldExpandPools = 
                                 match optSorterPoolExpansionRate, optPoolMeasure with
@@ -216,7 +223,6 @@ module EvoOrch_Soss =
                                         let! qpSorterPoolSet = 
                                             EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolSet "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolSet."
-                                        do! genDb.saveAsync geneSortDataMode.Results qpSorterPoolSet (nextSorterPoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet) allowOverwrite
 
 
                                         // Save SorterPoolSetSummaries
@@ -226,7 +232,6 @@ module EvoOrch_Soss =
                                         let spsstID = qpSummaries.Id |> UMX.cast<queryParamsId, sorterPoolSetSummarySetId>
                                         let currentSummaries = updatedSorterPoolSetSummary |> List.toArray
                                         let sorterPoolSetSummarySet = spSummarySet_Soss.create spsstID currentGen currentSummaries
-                                        do! genDb.saveAsync geneSortDataMode.Results qpSummaries (sorterPoolSetSummarySet |> spSummarySet.Soss |> outputData.SorterPoolSetSummarySet) allowOverwrite
 
 
                                         // Save SorterPoolBinsSetSeries
@@ -236,7 +241,11 @@ module EvoOrch_Soss =
                                         let! qpBinsSeries = 
                                             EvolutionFiles.queryAtGeneration genDb path state currentGen (geneSortDataType.SorterPoolBinsSetSeries "")
                                             |> Result.ofOption "Failed to create QueryParams for SorterPoolEvalBinsSetCollection."
-                                        do! genDb.saveAsync geneSortDataMode.Results qpBinsSeries (evalBinsCollection |> sorterPoolBinsSetSeries.Soss |> outputData.SorterPoolBinsSetSeries) allowOverwrite
+                                        do! EvolutionFiles.saveRetainedCheckpoint genDb path isSnapshot [|
+                                            qpSorterPoolSet, (nextSorterPoolSet |> sorterPoolSet.Soss |> outputData.SorterPoolSet)
+                                            qpSummaries, (sorterPoolSetSummarySet |> spSummarySet.Soss |> outputData.SorterPoolSetSummarySet)
+                                            qpBinsSeries, (evalBinsCollection |> sorterPoolBinsSetSeries.Soss |> outputData.SorterPoolBinsSetSeries)
+                                            |] allowOverwrite
 
 
                                         // Prune dead lineages and generate SorterPoolSetHistory
@@ -248,7 +257,7 @@ module EvoOrch_Soss =
                                         //do! genDb.saveAsync geneSortDataMode.Results qpHistory (poolSetHistory |> spsh.Soss |> outputData.SorterPoolSetHistory) allowOverwrite
 
                                        // return ([], [], prunedRunningMap)
-                                        return ([], [], MhMap_Soss.empty)
+                                        return (if isSnapshot then ([], [], MhMap_Soss.empty) else (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, MhMap_Soss.empty))
                                     else
                                         //return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, updatedRunningHistoryMap)
                                         return (updatedSorterPoolSetSummary, updatedEvalBinsSetAcc, MhMap_Soss.empty)
@@ -258,6 +267,19 @@ module EvoOrch_Soss =
                            // return! loop (remainingSteps - 1) nextSorterPoolSet historyAccNext evalBinsSetAccNext []
                     }
 
-                // Execute loop with empty initial states
-                return! loop (%totalGen - %genStart) initialPoolSet [] [] MhMap_Soss.empty
+                // An interim recovery checkpoint carries the report segment since the last snapshot.
+                let! initialHistory, initialBins = asyncResult {
+                    if path.CheckpointIntervals.IsSome && genStart > path.Start.FirstGeneration && not (Set.contains %genStart targetGenerationsForSnapshots) then
+                        let! summaryQuery = EvolutionFiles.queryAtGeneration genDb path state genStart (geneSortDataType.SorterPoolSetSummarySet "") |> Result.ofOption "Missing checkpoint summary query."
+                        let! binsQuery = EvolutionFiles.queryAtGeneration genDb path state genStart (geneSortDataType.SorterPoolBinsSetSeries "") |> Result.ofOption "Missing checkpoint bins query."
+                        let! summaryData = genDb.loadAsync geneSortDataMode.Results summaryQuery
+                        let! binsData = genDb.loadAsync geneSortDataMode.Results binsQuery
+                        match summaryData, binsData with
+                        | outputData.SorterPoolSetSummarySet (spSummarySet.Soss summaries), outputData.SorterPoolBinsSetSeries (sorterPoolBinsSetSeries.Soss bins) ->
+                            return (summaries.SorterPoolSetSummaries |> Array.toList), (bins.SorterPoolEvalBinsSets.Values |> Seq.sortByDescending (fun b -> b.GenerationNumber) |> Seq.toList)
+                        | _ -> return! Error "Checkpoint report payloads do not match the workflow."
+                    else return [], []
+                }
+                // Continue the segment without dropping samples saved before cancellation.
+                return! loop (%totalGen - %genStart) initialPoolSet initialHistory initialBins MhMap_Soss.empty
         }

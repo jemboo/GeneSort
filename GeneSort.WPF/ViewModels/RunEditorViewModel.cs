@@ -23,7 +23,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
 {
     private string projectName = "", databaseName = "", runName = "", description = "";
     private string sortableTestsDatabaseName = "", sorterSetEvalsDatabaseName = "";
-    private string saveIntervals = "", summaryIntervals = "", projectsFolder = "";
+    private string checkpointIntervals = "", saveIntervals = "", summaryIntervals = "", projectsFolder = "";
     private string status = "New definition. Choose a projects folder before saving.";
     private string firstReplica = "0", replicaCount = "1";
     private bool allowOverwrite, isDirty, isBusy, loading;
@@ -33,10 +33,73 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private int phaseCompleted, phaseTotal = 1;
     private string phaseSummary = "";
     private CancellationTokenSource? summaryLoad;
+    private CancellationTokenSource? phaseCancellation;
+    public bool IsPhaseRunning => phaseCancellation is not null;
+    public bool CanCancelPhase => phaseCancellation is { IsCancellationRequested: false };
+    public void CancelPhase()
+    {
+        if (!CanCancelPhase) return;
+        phaseCancellation!.Cancel();
+        Changed(nameof(CanCancelPhase));
+        Status = "Cancelling... Waiting for active work and checkpoint saves to finish.";
+        PhaseSummary = Status;
+    }
     private readonly HashSet<ParameterRow> observedRows = [];
     private int? selectedPrefixSortingWidth;
     private string selectedMergeSortingWidth = "";
     private bool mergeWidthEdited;
+    private bool isSelectingRun = true;
+    private bool hasChosenRun;
+    private string? sourceModule;
+    private readonly Settings.WorkspaceSettingsStore? workspaceSettings;
+    public RunSelectionViewModel Selection { get; } = new(RunTypeCatalog.all);
+    public bool IsSelectingRun { get => isSelectingRun; private set { isSelectingRun = value; Changed(); Changed(nameof(IsEditingRun)); Changed(nameof(CanReturnToEditor)); } }
+    public bool IsEditingRun => !IsSelectingRun;
+    public bool CanReturnToEditor => hasChosenRun && IsSelectingRun && !Selection.IsLoading;
+
+    public async Task BeginSelectionAsync()
+    {
+        if (IsBusy) return;
+        Selection.Folder = ProjectsFolder;
+        IsSelectingRun = true;
+        if (Selection.CanContinue) await Selection.LoadAsync(false);
+        else Selection.ChangeFolder();
+    }
+
+    public void CancelSelection() => IsSelectingRun = false;
+
+    public async Task ChooseRunAsync(RunSelectionTile tile)
+    {
+        if (IsBusy || tile.Definition is null) return;
+        if (tile.SavedPath is not null && !tile.CreateNew)
+        {
+            await OpenAsync(tile.SavedPath);
+            SelectedRunType = RunTypes.FirstOrDefault(type => type.Name == tile.ModulePath);
+            SelectedExample = SelectedRunType?.Examples.FirstOrDefault(example => example.Run.RunName == tile.Definition.RunName);
+            RefreshTypeSelection();
+        }
+        else
+        {
+            SelectedRunType = RunTypes.FirstOrDefault(type => type.Name == tile.ModulePath);
+            SelectedExample = SelectedRunType?.Examples.FirstOrDefault(example => example.Name == tile.Name);
+            editorTemplate = tile.Definition;
+            Apply(tile.CreateNew ? RunTypeEditor.newDraft(editorTemplate) : RunTypeEditor.fromRun(editorTemplate));
+            ProjectsFolder = Selection.Folder;
+            if (tile.CreateNew)
+            {
+                var suffix = 1;
+                while (Build() is { IsOk: true } built && File.Exists(RunDefinitionFiles.pathFor(ProjectsFolder, built.ResultValue)))
+                    RunName = "NewRun" + suffix++;
+            }
+            IsDirty = true;
+            Validate();
+            Status = tile.CreateNew ? "New leaf. Edit its name and parameters, then save." :
+                "Code definition selected. Save and generate its parameters before running.";
+        }
+        sourceModule = RunTypes.Any(type => type.Name == tile.ModulePath) ? tile.ModulePath : null;
+        hasChosenRun = true;
+        IsSelectingRun = false;
+    }
 
     private run editorTemplate = null!;
     public runType[] RunTypes { get; } = RunTypeCatalog.all;
@@ -49,8 +112,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool HasSgdSourceSelection => editorTemplate.IsEvolutionRun;
     public bool HasSetup => editorTemplate.HasSetup;
     public string PhaseHelp => HasSetup
-        ? "Save the definition and generate its parameter files. Run Setup, then Execution."
-        : "Save the definition and generate its parameter files, then run Execution.";
+        ? "Save the definition and generate its parameter files. Run Setup, then Processing."
+        : "Save the definition and generate its parameter files, then run Processing.";
     public string SourceDescription => editorTemplate.ParameterSource is null ? "" :
         $"Continuation source: {editorTemplate.ParameterSource.Value.Item1.ProjectName}/{editorTemplate.ParameterSource.Value.Item1.DatabaseName}/{editorTemplate.ParameterSource.Value.Item1.RunName}. Source selection is retained from the example.";
     public catalogChoice[] Catalogs => RunTypeEditor.catalogChoices(editorTemplate);
@@ -189,6 +252,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public string RunName { get => runName; set => Edit(ref runName, value); }
     public string Description { get => description; set => Edit(ref description, value); }
     public bool AllowOverwrite { get => allowOverwrite; set => Edit(ref allowOverwrite, value); }
+    public string CheckpointIntervals { get => checkpointIntervals; set => Edit(ref checkpointIntervals, value); }
     public string SaveIntervals { get => saveIntervals; set => Edit(ref saveIntervals, value); }
     public string SummaryIntervals { get => summaryIntervals; set => Edit(ref summaryIntervals, value); }
     public string ProjectsFolder
@@ -210,6 +274,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             }
             Changed(nameof(Destination));
             SaveStateChanged(); GenerationChanged();
+            RememberProjectsFolder(value);
         }
     }
     public bool IsDirty { get => isDirty; private set { isDirty = value; Changed(); Changed(nameof(DirtyLabel)); Changed(nameof(HasUnsavedChanges)); PhaseActionsChanged(); } }
@@ -230,7 +295,15 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         : HasPendingParameter ? "Add or cancel the pending parameter first."
         : validatedRun is null ? "Validate the current definition before saving." : "Save the validated run definition.";
     public bool CanLoadRunParameters => !IsBusy && !HasPendingParameter && HasProjectsFolder && Build().IsOk;
-    private bool CanProcessSavedRows => !IsBusy && !HasUnsavedChanges && loadedRun is not null && HasProjectsFolder;
+    private string parallelThreads = "1";
+    public string ParallelThreads
+    {
+        get => parallelThreads;
+        set { parallelThreads = value; Changed(nameof(ParallelThreads)); Changed(nameof(ParallelThreadsError)); PhaseActionsChanged(); }
+    }
+    public string ParallelThreadsError => int.TryParse(ParallelThreads, out var count) && count > 0 ? "" : "Enter a positive whole number.";
+    private int ParallelThreadCount => int.Parse(ParallelThreads, CultureInfo.InvariantCulture);
+    private bool CanProcessSavedRows => ParallelThreadsError.Length == 0 && !IsBusy && !HasUnsavedChanges && loadedRun is not null && HasProjectsFolder;
     private bool CanRunSelectedRows => CanProcessSavedRows && RunParameterList.SelectedCount > 0;
     public bool CanRunSetup => HasSetup && CanProcessSavedRows && SetupParameterList.SelectedCount > 0;
     public bool CanRunExecution => CanRunSelectedRows;
@@ -306,13 +379,29 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         }
     }
 
-    public RunEditorViewModel()
+    private void RememberProjectsFolder(string folder)
     {
+        if (workspaceSettings?.RememberFolder(folder) is string error) Status = error;
+    }
+
+    public RunEditorViewModel() : this(App.WorkspaceSettings) { }
+
+    internal RunEditorViewModel(Settings.WorkspaceSettingsStore? settings)
+    {
+        workspaceSettings = settings;
+        // Restore backing state directly: choosing a folder is not a draft edit at startup.
+        projectsFolder = settings?.ProjectsFolder ?? "";
+        Selection.Folder = projectsFolder;
+        Selection.FolderSelected += RememberProjectsFolder;
+        Selection.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(RunSelectionViewModel.IsLoading)) Changed(nameof(CanReturnToEditor));
+        };
         SelectedRunType = RunTypes.First(type => type.Name == "SorterSgd.p32.Msuf4a.Standard.Pool_32");
         SelectedExample = SelectedRunType.Examples[0];
         editorTemplate = SelectedExample.Run;
         SetupSection = new("Setup parameters", Parameters.Where(spec => RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray());
-        ExecutionSection = new("Execution overrides", Parameters.Where(spec => spec.ExecutionAllowed).ToArray(),
+        ExecutionSection = new("Processing overrides", Parameters.Where(spec => spec.ExecutionAllowed).ToArray(),
             key => SetupParameters.FirstOrDefault(row => row.Key == key)?.Snapshot().Values);
         SetupSection.PropertyChanged += SectionChanged;
         ExecutionSection.PropertyChanged += SectionChanged;
@@ -339,6 +428,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (IsBusy || ReferenceEquals(type, SelectedRunType)) return;
         if (!RunTypes.Contains(type)) throw new ArgumentException("Choose a registered run type.", nameof(type));
         SelectedRunType = type;
+        sourceModule = type.Name;
         SelectExample(type.Examples[0]);
     }
 
@@ -347,6 +437,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (IsBusy) return;
         if (!Examples.Contains(example)) throw new ArgumentException("Choose an example from this run type.", nameof(example));
         SelectedExample = example;
+        sourceModule = SelectedRunType?.Name;
         editorTemplate = example.Run;
         Apply(RunTypeEditor.newDraft(editorTemplate));
         IsDirty = true;
@@ -360,7 +451,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             && PrefixSection.Rows.Where(row => row.Key == ParamKeys.prefixLibIdKey).SelectMany(row => row.Values)
                 .Any(value => PrefixWidth(value.Text) != width))
         {
-            var issue = validationIssue.create((HasSetup ? "Setup." : "Execution.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with sorting width {width}.");
+            var issue = validationIssue.create((HasSetup ? "Setup." : "Processing.") + ParamKeys.prefixLibIdKey, $"Choose prefixes with sorting width {width}.");
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
                 built.IsError ? [.. built.ErrorValue, issue] : [issue]);
         }
@@ -372,7 +463,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 && MergeSection.Rows.Where(row => row.Key == ParamKeys.mergeLibIdKey).SelectMany(row => row.Values)
                     .Any(value => MergeWidth(value.Text) != mergeWidth))
             {
-                field = (HasSetup ? "Setup." : "Execution.") + ParamKeys.mergeLibIdKey;
+                field = (HasSetup ? "Setup." : "Processing.") + ParamKeys.mergeLibIdKey;
                 error = $"Choose merges with sorting width {mergeWidth}.";
             }
             if (error.Length > 0)
@@ -457,7 +548,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         ProjectName = ProjectName, DatabaseName = DatabaseName, RunName = RunName,
         SortableTestsDatabaseName = SortableTestsDatabaseName, SorterSetEvalsDatabaseName = SorterSetEvalsDatabaseName,
         Description = Description, AllowOverwrite = AllowOverwrite,
-        GenSaveIntervalsName = SaveIntervals, GenSaveSubIntervalsName = SummaryIntervals,
+        CheckpointIntervalsName = CheckpointIntervals, GenSaveIntervalsName = SaveIntervals, GenSaveSubIntervalsName = SummaryIntervals,
         SetupParameters = SetupParameters.Select(row => row.Snapshot()).ToArray(),
         ExecutionParameters = ExecutionParameters.Select(row => row.Snapshot()).ToArray()
     });
@@ -482,7 +573,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             ProjectName = draft.ProjectName; DatabaseName = draft.DatabaseName; RunName = draft.RunName;
             SortableTestsDatabaseName = draft.SortableTestsDatabaseName; SorterSetEvalsDatabaseName = draft.SorterSetEvalsDatabaseName;
             Description = draft.Description; AllowOverwrite = draft.AllowOverwrite;
-            SaveIntervals = draft.GenSaveIntervalsName; SummaryIntervals = draft.GenSaveSubIntervalsName;
+            CheckpointIntervals = draft.CheckpointIntervalsName; SaveIntervals = draft.GenSaveIntervalsName; SummaryIntervals = draft.GenSaveSubIntervalsName;
             SetupParameters.Clear(); ExecutionParameters.Clear();
             foreach (var row in draft.SetupParameters)
                 SetupParameters.Add(new(row.Key, row.Values, Parameters.FirstOrDefault(spec => spec.Key == row.Key)));
@@ -540,12 +631,17 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public async Task OpenAsync(string path)
     {
         var configured = await RunDefinitionFiles.loadAsync(path);
+        string? recordedModule = null;
+        try { recordedModule = RunSelectionViewModel.ReadModule(path); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException) { /* The definition remains usable without its optional label. */ }
         var match = RunTypes.SelectMany(type => type.Examples.Select(example => (Type: type, Example: example)))
             .Where(item => RunTypeEditor.matches(item.Example.Run, configured))
-            .OrderByDescending(item => item.Example.Run.ProjectName == configured.ProjectName && item.Example.Run.DatabaseName == configured.DatabaseName)
+            .OrderByDescending(item => item.Type.Name == recordedModule)
+            .ThenByDescending(item => item.Example.Run.ProjectName == configured.ProjectName && item.Example.Run.DatabaseName == configured.DatabaseName)
             .ThenByDescending(item => item.Example.Run.RunName == configured.RunName)
             .FirstOrDefault();
         SelectedRunType = match.Type;
+        sourceModule = match.Type?.Name;
         SelectedExample = match.Example;
         editorTemplate = configured;
         var root = RunDefinitionFiles.tryProjectsFolder(path, configured);
@@ -565,6 +661,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (HasPendingParameter || validatedRun is null || !Equals(configured, validatedRun) || !HasProjectsFolder)
             throw new InvalidOperationException("Select an existing projects folder and validate the current definition before saving.");
         var path = await RunDefinitionFiles.saveAsync(ProjectsFolder, configured, overwrite);
+        await RunSelectionViewModel.SaveModuleAsync(path, sourceModule ?? SelectedRunType?.Name);
         IsDirty = false;
         Status = $"Saved {path}";
     }
@@ -583,6 +680,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         if (HasPendingParameter) throw new InvalidOperationException("Add or cancel the pending parameter before generating.");
         var progress = new Progress<string>(message => Status = message);
         await RunParameterFiles.generateAsync(prepared, replace, progress);
+        if (replace)
+        {
+            try { await Settings.ProcessingFailureStore.SaveAsync(prepared.ParameterFolder, new Dictionary<Guid, string>()); }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            { Issues.Add($"Parameters were regenerated, but old failed-run statuses could not be cleared: {error.Message}"); }
+        }
+        await RunSelectionViewModel.SaveModuleAsync(RunDefinitionFiles.pathFor(ProjectsFolder, prepared.Run), sourceModule ?? SelectedRunType?.Name);
         IsDirty = false;
         Status = $"Saved the run definition and {prepared.FileCount:N0} RunParameter files to {prepared.ParameterFolder}";
         await LoadRunParametersAsync(false);
@@ -602,6 +706,15 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             if (!configured.IsOk) throw new InvalidOperationException("Correct the run definition before loading its saved parameters.");
             var rows = await RunParameterFiles.loadAllAsync(ProjectsFolder, configured.ResultValue);
             RunParameterList.SetParameters(rows, configured.ResultValue);
+            try
+            {
+                var failures = await Settings.ProcessingFailureStore.LoadAsync(RunParameterFiles.folderFor(ProjectsFolder, configured.ResultValue));
+                foreach (var row in RunParameterList.Items.SourceCollection.Cast<RunParameterItem>())
+                    if (row.Status != "Completed" && row.Parameters.GetId() is { } id && failures.TryGetValue(id.Value, out var message))
+                        row.ShowStatus(runRowStatus.Failed, message);
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+            { Issues.Add($"Could not restore failed-run statuses: {error.Message}"); }
             SetupParameterList.SetRuns(configured.ResultValue, RunParameterList.Items.SourceCollection.Cast<RunParameterItem>());
             loadedRun = configured.ResultValue;
             PhaseActionsChanged();
@@ -629,15 +742,15 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (!HasSetup) throw new InvalidOperationException("This run executes directly and has no Setup phase.");
         if (!CanRunSetup) throw new InvalidOperationException("Save the current definition and select shared setups before running Setup.");
-        return RunSelectedAsync("Setup", (folder, configured, rows, progress) =>
-            RunSetupFiles.runAsync(folder, configured, rows.Select(row => row.Parameters).ToArray(), progress), SetupParameterList.SelectedRuns);
+        return RunSelectedAsync("Setup", (folder, configured, rows, progress, token) =>
+            RunSetupFiles.runCancellableAsync(token, ParallelThreadCount, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress), SetupParameterList.SelectedRuns);
     }
-    public Task RunExecutionAsync() => RunSelectedAsync("Execution", (folder, configured, rows, progress) =>
+    public Task RunExecutionAsync() => RunSelectedAsync("Processing", (folder, configured, rows, progress, token) =>
         configured.IsEvolution
-            ? RunExecutionFiles.runPathsAsync(folder, configured, rows.Select(row => row.Evolution).ToArray(), progress)
-            : RunExecutionFiles.runSavedAsync(folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
-    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", (folder, configured, rows, progress) =>
-        RunSummaryFiles.runAsync(folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
+            ? RunExecutionFiles.runPathsCancellableAsync(token, ParallelThreadCount, folder, configured, rows.Select(row => row.Evolution).ToArray(), progress)
+            : RunExecutionFiles.runSavedCancellableAsync(token, ParallelThreadCount, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
+    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", (folder, configured, rows, progress, token) =>
+        RunSummaryFiles.runCancellableAsync(token, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
 
     private void ClearSummaryReports()
     {
@@ -676,8 +789,21 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         }
     }
 
+    private async Task SaveProcessingFailuresAsync(run configured)
+    {
+        try
+        {
+            var failures = RunParameterList.Items.SourceCollection.Cast<RunParameterItem>()
+                .Where(row => row.Status == "Failed" && row.Parameters.GetId() is not null)
+                .ToDictionary(row => row.Parameters.GetId()!.Value, row => row.FailureMessage);
+            await Settings.ProcessingFailureStore.SaveAsync(RunParameterFiles.folderFor(ProjectsFolder, configured), failures);
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        { Issues.Add($"Could not save failed-run statuses: {error.Message}"); }
+    }
+
     private async Task RunSelectedAsync(string phase,
-        Func<string, run, RunParameterItem[], IProgress<runPhaseProgress>, Task<runPhaseResult>> runPhase,
+        Func<string, run, RunParameterItem[], IProgress<runPhaseProgress>, CancellationToken, Task<runPhaseResult>> runPhase,
         RunParameterItem[]? setupRuns = null)
     {
         // Own the busy state so all callers, including keyboard/programmatic actions, get the same guard.
@@ -685,10 +811,18 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             throw new InvalidOperationException($"Save the current definition and select saved parameter rows before running {phase}.");
         var configured = loadedRun!;
         var selected = setupRuns ?? RunParameterList.SelectedItems;
+        var processing = phase == "Processing";
+        if (processing)
+            foreach (var row in selected)
+                row.ShowStatus(row.Parameters.GetRunFinished()?.Value == true ? runRowStatus.Completed : runRowStatus.Waiting);
         var rowLabel = setupRuns is null ? "selected rows" : "linked run rows";
         ClearSummaryReports();
         IsBusy = true;
         isRunningPhase = true;
+        using var cancellation = new CancellationTokenSource();
+        phaseCancellation = cancellation;
+        Changed(nameof(IsPhaseRunning));
+        Changed(nameof(CanCancelPhase));
         Changed(nameof(IsProgressIndeterminate));
         PhaseCompleted = 0;
         PhaseTotal = selected.Length;
@@ -699,18 +833,35 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         var progress = new Progress<runPhaseProgress>(update =>
         {
             if (!acceptingProgress) return;
+            if (update.RowIndex is { } rowIndex && update.Generation is { } generation
+                && rowIndex.Value >= 0 && rowIndex.Value < selected.Length)
+                selected[rowIndex.Value].ShowGeneration(generation.Value);
+            if (processing && update.RowIndex is { } statusIndex && update.Status is { } rowStatus
+                && statusIndex.Value >= 0 && statusIndex.Value < selected.Length)
+                selected[statusIndex.Value].ShowStatus(rowStatus.Value, rowStatus.Value == runRowStatus.Failed ? update.Message : null);
             PhaseCompleted = update.Completed;
+            if (cancellation.IsCancellationRequested) return;
             PhaseSummary = $"{phase}: {update.Completed:N0} of {update.Total:N0} {rowLabel} processed.";
             Status = update.Message;
         });
         try
         {
-            var result = await runPhase(ProjectsFolder, configured, selected, progress);
-            RunParameterList.ApplyUpdates(selected, result.Updates);
-            SetupParameterList.SetRuns(configured, RunParameterList.Items.SourceCollection.Cast<RunParameterItem>());
+            var result = await runPhase(ProjectsFolder, configured, selected, progress, cancellation.Token);
             acceptingProgress = false;
+            foreach (var row in selected) row.ShowGeneration(null);
+            if (processing)
+            {
+                var statuses = result.RowStatuses;
+                var messages = result.RowErrors;
+                for (var index = 0; index < selected.Length; index++) selected[index].ShowStatus(statuses[index], messages[index]);
+            }
+            RunParameterList.ApplyUpdates(selected, result.Updates);
+            if (processing) await SaveProcessingFailuresAsync(configured);
+            SetupParameterList.SetRuns(configured, RunParameterList.Items.SourceCollection.Cast<RunParameterItem>());
             PhaseCompleted = PhaseTotal;
             PhaseSummary = $"{phase} finished: {result.Succeeded:N0} succeeded, {result.Failed:N0} failed, {result.Skipped:N0} skipped.";
+            if (result.Cancelled > 0)
+                PhaseSummary = $"{phase} cancelled: {result.Succeeded:N0} succeeded, {result.Failed:N0} failed, {result.Skipped:N0} skipped, {result.Cancelled:N0} cancelled.";
             foreach (var error in result.Errors) Issues.Add(error);
             Status = PhaseSummary;
             PhaseActionsChanged();
@@ -722,10 +873,22 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             Status = $"Could not run {phase}: {error.GetBaseException().Message}";
             // Re-read on stale selections too; never leave outdated parameters available for another attempt.
             await LoadRunParametersAsync(false);
+            if (processing)
+            {
+                var selectedIds = selected.Select(row => row.Parameters.GetId()?.Value).ToHashSet();
+                foreach (var row in RunParameterList.Items.SourceCollection.Cast<RunParameterItem>())
+                    if (selectedIds.Contains(row.Parameters.GetId()?.Value) && row.Status != "Completed")
+                        row.ShowStatus(runRowStatus.Failed, error.GetBaseException().Message);
+                await SaveProcessingFailuresAsync(configured);
+            }
         }
         finally
         {
             acceptingProgress = false;
+            foreach (var row in selected) row.ShowGeneration(null);
+            phaseCancellation = null;
+            Changed(nameof(IsPhaseRunning));
+            Changed(nameof(CanCancelPhase));
             isRunningPhase = false;
             IsBusy = false;
         }

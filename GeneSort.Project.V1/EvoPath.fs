@@ -23,6 +23,7 @@ type evoWorkflow = {
     RunQueryCatalogName: string
     SetupQueryCatalogName: string
     MakerNames: evolutionMakerNames
+    CheckpointIntervalsName: string option
     GenSaveIntervalsName: string
     GenSaveSubIntervalsName: string
 }
@@ -73,6 +74,7 @@ type evoPath = private {
     member this.Settings = this.settings
     member this.Start = this.start
     member this.SetupInputs = Map.ofList [this.start.Tests.OutputDataType, this.start.Tests; this.start.Pool.OutputDataType, this.start.Pool]
+    member this.CheckpointIntervals = this.workflow.CheckpointIntervalsName |> Option.map (RunIntervals.resolve this.workflow.RunName)
     member this.GenSaveIntervals = this.intervals
     member this.GenSaveSubIntervals = this.subIntervals
 
@@ -235,6 +237,7 @@ module EvoPath =
             ExecuteFunctionName = configured.ExecuteFunctionName
             RunQueryCatalogName = configured.RunQueryCatalogName; SetupQueryCatalogName = configured.SetupQueryCatalogName
             MakerNames = SgdRun.makerNames sgd
+            CheckpointIntervalsName = SgdRun.checkpointIntervalsName sgd
             GenSaveIntervalsName = SgdRun.genSaveIntervalsName sgd; GenSaveSubIntervalsName = SgdRun.genSaveSubIntervalsName sgd
         }
 

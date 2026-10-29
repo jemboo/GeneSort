@@ -1,5 +1,8 @@
 # One evolutionary path
 
+Architectural constraint: preserve [future single-machine deployment](../GeneSort.Dispatch.V1/CLOUD_WORKFLOW.md#single-machine-deployment-architectural-requirements).
+This guides local development; cloud features are explicitly deferred.
+
 `run` describes a workflow and its alternatives. `evoPath` describes one selected
 execution: one replica, one value for each parameter, and concrete setup inputs.
 
@@ -120,3 +123,59 @@ let unchanged = EvoPath.toParameters path progress
 
 See [SetupInputs.md](SetupInputs.md) for direct Setup identities and saved references.
 
+
+## Crash-safe checkpoint recovery
+
+Standard and Soss publish each Results checkpoint as one group: the pool,
+summaries, and bin series. FileDb writes each payload to a temporary sibling,
+flushes it to disk, and atomically renames it. Parameter files use the same atomic
+publication, so an interrupted replacement retains the previous file.
+
+A pending commit manifest is installed before checkpoint payloads are changed.
+Each member has a `.checkpoint` link to the manifest. Only after every payload is
+flushed does an atomic manifest replacement publish its relative path and SHA-256
+checksum. Readers reject pending groups, missing members, and checksum mismatches.
+Recovery searches backwards for the newest readable checkpoint; it does not trust
+saved GenerationCurrent or the presence of the pool alone. Retrying an interrupted
+group can replace its incomplete files even when ordinary overwrite is disabled.
+Earlier snapshots are retained; ordinary recovery checkpoints are pruned after a newer group commits. A per-group file lock prevents two
+writers from publishing the same checkpoint concurrently and is released on death.
+
+Legacy files without sidecars remain readable but do not acquire group integrity
+guarantees retroactively. Copy sidecars along with data when moving a database;
+all references are relative. Orphan `.tmp` files are ignored. Retention only prunes
+explicitly classified checkpoints; no cloud infrastructure is introduced.
+
+CheckpointFileTests kills a separate worker process at pending, partial-member,
+pre-commit, and post-commit boundaries for Standard/Soss payloads, reopens the
+database, checks fallback, replays incomplete work, and corrupts a companion to
+check integrity validation. This verifies abrupt process termination on the local
+filesystem; it is not a hardware power-loss or remote filesystem durability test.
+
+## Checkpoint and snapshot schedules
+
+The editor's Snapshot schedule is the existing `GenSaveIntervalsName` setting.
+`GenerationIntervalLast` continues to select its zero-based endpoint, preserving
+existing run lengths. `CheckpointIntervalsName` independently selects recovery
+save generations. The execution loop saves on the union of both schedules and
+always saves the endpoint as a snapshot. A generation on both schedules is one
+snapshot group, not duplicated data. Summary sampling remains independent.
+
+An absent checkpoint schedule in older run files means the snapshot schedule
+also supplies recovery points. Existing unclassified files are preserved, never
+retroactively deleted. New checkpoint schedule settings round-trip through the
+run editor and MessagePack run definition.
+
+FileDb retention is scoped to each processing-row ID (including its replica),
+not the shared run name. It keeps the highest valid generation plus all snapshots.
+Snapshot groups are immutable under retention, including when ordinary overwrite
+is enabled. A successful save validates the new group before retiring older
+ordinary checkpoints. Cleanup first invalidates an old group and records its
+member list, then deletes its files. Interrupted cleanup can finish on a later
+save; a busy reader can temporarily defer deletion. Never manually remove sidecars.
+
+Interim checkpoints include the summary/bin segment since the last snapshot.
+Resume restores that segment and snapshots reset it. Deleting interim checkpoints
+therefore does not remove samples needed for permanent timeline analysis. Local
+cancellation uses both schedules when restoring GenerationCurrent. Cloud storage,
+uploads, and provisioning remain deferred.

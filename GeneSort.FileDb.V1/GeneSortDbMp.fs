@@ -13,6 +13,8 @@ open GeneSort.Project.V1.Storage
 type private DbMessage =
     | SaveParameterSet of runParameterSet * runParameterWriteMode * IProgress<string> option * AsyncReplyChannel<Result<unit, string>>
     | Save of string<pathToRootFolder> * geneSortDataMode * queryParams * outputData * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
+    | SaveRetainedCheckpoint of Guid<queryParamsId> * bool * (queryParams * outputData) array * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
+    | SaveCheckpoint of (queryParams * outputData) array * bool<allowOverwrite> * AsyncReplyChannel<Result<unit, string>>
     | Load of string<pathToRootFolder> * geneSortDataMode * queryParams * AsyncReplyChannel<Result<outputData, string>>
     | GetRunParameters of string<runName> * (int<replNumber> option) * (int<replNumber> option) * CancellationToken option * IProgress<string> option * AsyncReplyChannel<Result<runParameters[], string>>
 
@@ -38,6 +40,12 @@ type GeneSortDbMp(
                     replyChannel.Reply res
                 | Save (projectFolder, dataMode, queryParams, data, allowOverwrite, replyChannel) ->
                     let! res = OutputDataFile.saveToFileAsync projectFolder dataMode queryParams data allowOverwrite
+                    replyChannel.Reply res
+                | SaveRetainedCheckpoint (owner, snapshot, outputs, overwrite, replyChannel) ->
+                    let! res = CheckpointFiles.saveRetainedAsync rootFolder owner snapshot outputs overwrite None
+                    replyChannel.Reply res
+                | SaveCheckpoint (outputs, overwrite, replyChannel) ->
+                    let! res = CheckpointFiles.saveAsync rootFolder outputs overwrite None
                     replyChannel.Reply res
                 | Load (projectFolder, dataMode, queryParams, replyChannel) ->
                     let! res = OutputDataFile.getOutputDataAsync projectFolder dataMode queryParams None
@@ -66,6 +74,14 @@ type GeneSortDbMp(
                         | _ -> None)
                     |> Set.ofSeq
         }
+
+    interface IRetainedCheckpointStore with
+        member _.saveRetainedCheckpointAsync owner snapshot outputs overwrite =
+            mailbox.PostAndAsyncReply(fun reply -> SaveRetainedCheckpoint(owner, snapshot, outputs, overwrite, reply))
+
+    interface ICheckpointStore with
+        member _.saveCheckpointAsync outputs overwrite =
+            mailbox.PostAndAsyncReply(fun reply -> SaveCheckpoint(outputs, overwrite, reply))
 
     interface IRunParameterStore with
         member _.saveRunParameterSetAsync prepared mode progress =

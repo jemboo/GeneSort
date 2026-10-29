@@ -158,6 +158,7 @@ module internal EvoContinuation =
             GenSaveIntervalsName = SgdRun.genSaveIntervalsName sourceSgd
             GenSaveSubIntervalsName = SgdRun.genSaveSubIntervalsName sourceSgd
         }
+        |> SgdRun.withCheckpointIntervals (SgdRun.checkpointIntervalsName sourceSgd)
         |> Run.ofSgd
         |> Run.withParameterSource source [
             ParamKeys.sourceMutationModKey, config.Source.SourceMutationMods |> List.map string

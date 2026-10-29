@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="CheckpointIntegrity.fs" />
     <Compile Include="OutputDataFile.fs" />
+    <Compile Include="CheckpointFiles.fs" />
     <Compile Include="RunFileStorage.fs" />
     <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="RunDefinitionFiles.fs" />

@@ -11,15 +11,11 @@ internal static partial class Program
 {
     private static void CheckRunTypes(string root, RunEditorViewModel model, RunEditorView view, StringBuilder bindingErrors)
     {
-        var typePicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Run type");
-        var examplePicker = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Example run");
-        Check(typePicker.Items.Count == model.RunTypes.Length, "Run type picker did not populate.");
-        typePicker.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedItemProperty,
-            model.RunTypes.Single(type => type.Name == "SortableTests.Prefix"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix"));
         Layout(view);
         Check(model.SelectedRunType?.Name == "SortableTests.Prefix", "Picking a run type did not update the editor.");
         model.New();
-        examplePicker.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, model.Examples.Last());
+        model.SelectExample(model.Examples.Last());
         Layout(view);
         Check(ReferenceEquals(model.SelectedExample, model.Examples.Last()), "Picking an example did not update the editor.");
         model.ProjectsFolder = root;
@@ -31,8 +27,8 @@ internal static partial class Program
             {
                 model.SelectExample(example);
                 Layout(view);
-                Check(ReferenceEquals(typePicker.SelectedItem, kind), "Run type selection binding is stale.");
-                Check(ReferenceEquals(examplePicker.SelectedItem, example), "Example selection binding is stale.");
+                Check(ReferenceEquals(model.SelectedRunType, kind), "Run type selection is stale.");
+                Check(ReferenceEquals(model.SelectedExample, example), "Example selection is stale.");
                 var built = model.Validate();
                 Check(built is not null, $"Invalid {kind.Name}.{example.Name}: {string.Join("; ", model.Issues)}");
                 Check(RunTypeEditor.matches(example.Run, built!), "Catalog selections changed.");

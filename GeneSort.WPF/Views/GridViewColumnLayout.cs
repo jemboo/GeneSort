@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -6,7 +7,7 @@ using GeneSort.WPF.Settings;
 namespace GeneSort.WPF.Views;
 
 /// Retains the user's column layout while the table's rows and available fields change.
-internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<string> sort)
+internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<string> sort, Func<string, DataTemplate?>? cellTemplate = null)
 {
     // Keep the columns themselves so widths (including automatic sizing) survive reloads.
     private readonly List<GridViewColumn> layout =
@@ -73,7 +74,8 @@ internal sealed class GridViewColumnLayout(string rowNumberProperty, Action<stri
                 layout.Add(column);
             }
             // The backing schema can change independently of the displayed column order.
-            column.DisplayMemberBinding = new Binding($"Cells[{index}]");
+            column.CellTemplate = cellTemplate?.Invoke(key);
+            column.DisplayMemberBinding = column.CellTemplate is null ? new Binding($"Cells[{index}]") : null;
         }
         ShowVisibleColumns();
     }

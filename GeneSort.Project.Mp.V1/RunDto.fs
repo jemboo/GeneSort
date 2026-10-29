@@ -38,6 +38,7 @@ type runDto =
         ExecuteFunctionName: string
         ParameterSource: runDto option
         SourceParameterSpans: parameterSpanDto []
+        CheckpointIntervalsName: string
     }
 
 module RunDto =
@@ -50,6 +51,7 @@ module RunDto =
             ProjectName = %project.ProjectName
             RunName = %project.RunName
             Description = project.Description
+            CheckpointIntervalsName = project.CheckpointIntervalsName |> Option.toObj
             GenSaveIntervalsName = saveIntervalsName
             GenSaveSubIntervalsName = saveSubIntervalsName
             RunQueryCatalogName = project.RunQueryCatalogName
@@ -153,7 +155,7 @@ module RunDto =
                     MakerNames = makerNames
                     GenSaveIntervalsName = (saveIntervals |> Option.defaultValue GenIntervalNames.expInterval100_L50ss)
                     GenSaveSubIntervalsName = (saveSubIntervals |> Option.defaultValue GenIntervalNames.summaryInterval_C_1p5C)
-                }
+                } |> SgdRun.withCheckpointIntervals (Option.ofObj dto.CheckpointIntervalsName)
             )
         match dto.ParameterSource with
         | None -> configured

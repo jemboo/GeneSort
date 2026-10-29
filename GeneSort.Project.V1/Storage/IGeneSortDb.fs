@@ -54,3 +54,11 @@ type sourceDatabaseOpener = string<projectName> -> string<databaseName> -> strin
 /// Checkpoint discovery can match IDs in memory instead of probing every candidate file.
 type IOutputDataListing =
     abstract member getOutputIds : geneSortDataMode -> queryParams -> Async<Set<Guid<queryParamsId>>>
+
+/// Durable stores publish a checkpoint group as a single recovery boundary.
+type ICheckpointStore =
+    abstract member saveCheckpointAsync: (queryParams * outputData) array -> bool<allowOverwrite> -> Async<Result<unit, string>>
+
+/// Retention ownership is the processing-row identity, not the shared run name.
+type IRetainedCheckpointStore =
+    abstract member saveRetainedCheckpointAsync: Guid<queryParamsId> -> bool -> (queryParams * outputData) array -> bool<allowOverwrite> -> Async<Result<unit, string>>

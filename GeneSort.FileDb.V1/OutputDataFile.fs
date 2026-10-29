@@ -114,7 +114,7 @@ module OutputDataFile =
                 :Async<Result<outputData, string>> =
         async {
             let filePath = getFullOutputDataFilePath pathToProjectFolder dataMode queryParams
-            if not (File.Exists %filePath) then
+            if not (File.Exists %filePath) || not (CheckpointIntegrity.isReadable %filePath) then
                 return Error (sprintf "File not found: %s" %filePath)
             else
             let token = defaultArg ct CancellationToken.None
@@ -236,9 +236,8 @@ module OutputDataFile =
                 elif not sharedSetup && (not %allowOverwrite) && File.Exists %filePath then
                     return Error "Overwrite not allowed"
                 else
-                    // Publish Setup atomically: concurrent processes cannot overwrite a shared source
-                    // or observe a partially serialized file.
-                    let writePath = if sharedSetup then %filePath + "." + Guid.NewGuid().ToString("N") + ".tmp" else %filePath
+                    // Publish every file atomically; the previous version survives interrupted serialization.
+                    let writePath = %filePath + "." + Guid.NewGuid().ToString("N") + ".tmp"
                     try
                         try
                             use stream = new FileStream(writePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync = true)
@@ -273,10 +272,12 @@ module OutputDataFile =
                                         do! stream.WriteAsync(textBytes, 0, textBytes.Length) |> Async.AwaitTask
                                     }
                             do! stream.FlushAsync() |> Async.AwaitTask
+                            stream.Flush(true)
                             stream.Dispose()
                             if sharedSetup then
                                 try File.Move(writePath, %filePath, false)
                                 with :? IOException when File.Exists %filePath -> ()
+                            else File.Move(writePath, %filePath, %allowOverwrite)
                             return Ok ()
                         with e ->
                             let detailedError = buildDetailedMessage e

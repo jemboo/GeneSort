@@ -154,7 +154,7 @@ module RunParameterGeneration =
                                runQuery enhanced (geneSortDataType.Run configured.RunName)
                                |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"
                                                                                configured.RunQueryCatalogName (RunParameters.reportKvps enhanced)))
-                           yield enhanced.WithId(Some query.Id) |]
+                           yield enhanced.WithId(Some query.Id).WithSetupCompleted(Some false) |]
 
     /// Resolve catalog functions for callers that do not have a run host.
     and generateWithSourceSelection selectSources (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =

@@ -22,6 +22,7 @@ module RunTypeEditor =
             SortableTestsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SortableTestsDatabaseName) |> Option.defaultValue ""
             SorterSetEvalsDatabaseName = configured.SgdSetup |> Option.map (fun setup -> string setup.SorterSetEvalsDatabaseName) |> Option.defaultValue ""
             Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
+            CheckpointIntervalsName = configured.CheckpointIntervalsName |> Option.orElse configured.GenSaveIntervalsName |> Option.defaultValue ""
             GenSaveIntervalsName = configured.GenSaveIntervalsName |> Option.defaultValue ""
             GenSaveSubIntervalsName = configured.GenSaveSubIntervalsName |> Option.defaultValue ""
             SetupParameters = rows configured.SetupParameterSpans
@@ -200,6 +201,8 @@ module RunTypeEditor =
         if isEvolution template then
             for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
                 issues.AddRange(RunIdentity.validate field value)
+            if not (String.IsNullOrWhiteSpace draft.CheckpointIntervalsName) && not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey draft.CheckpointIntervalsName) then
+                add "CheckpointIntervalsName" "Choose a registered generation interval."
             for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
                 if String.IsNullOrWhiteSpace name || not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey name) then
                     add field "Choose a registered generation interval."
@@ -260,7 +263,7 @@ module RunTypeEditor =
                                   QueryCatalogName = template.SetupQueryCatalogName; EnhancerFunctionName = template.SetupEnhancerFunctionName
                                   ParameterSpans = spans draft.SetupParameters }
                     } { MakerNames = template.MakerNames.Value; GenSaveIntervalsName = draft.GenSaveIntervalsName
-                        GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName } |> Run.ofSgd
+                        GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName } |> SgdRun.withCheckpointIntervals (Option.ofObj draft.CheckpointIntervalsName) |> Run.ofSgd
             match template.ParameterSource with
             | Some (source, selections) -> Run.withParameterSource source selections configured |> Ok
             | None -> Ok configured

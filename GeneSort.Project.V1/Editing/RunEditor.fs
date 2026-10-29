@@ -59,6 +59,7 @@ type runDraftArgs = {
     RunName: string
     Description: string
     AllowOverwrite: bool
+    CheckpointIntervalsName: string
     GenSaveIntervalsName: string
     GenSaveSubIntervalsName: string
     SetupParameters: parameterDraft[]
@@ -74,6 +75,7 @@ type runDraft =
     member this.RunName = this.settings.RunName
     member this.Description = this.settings.Description
     member this.AllowOverwrite = this.settings.AllowOverwrite
+    member this.CheckpointIntervalsName = this.settings.CheckpointIntervalsName
     member this.GenSaveIntervalsName = this.settings.GenSaveIntervalsName
     member this.GenSaveSubIntervalsName = this.settings.GenSaveSubIntervalsName
     member this.SetupParameters = Array.copy this.settings.SetupParameters
@@ -115,6 +117,7 @@ module RunEditor =
             ProjectName = "SorterSgd.p32.Msuf4a.Standard"; DatabaseName = "Test"; RunName = "NewRun"
             SortableTestsDatabaseName = "Prefix"; SorterSetEvalsDatabaseName = "Prefix"
             Description = "Standard Msuf32p4a run"; AllowOverwrite = false
+            CheckpointIntervalsName = GenIntervalNames.uniformInterval1
             GenSaveIntervalsName = GenIntervalNames.uniformInterval10
             GenSaveSubIntervalsName = GenIntervalNames.uniformInterval1
             SetupParameters = [|
@@ -143,6 +146,8 @@ module RunEditor =
             issues.AddRange(RunIdentity.validate field value)
         for field, value in ["Setup.SortableTestsDatabaseName", draft.SortableTestsDatabaseName; "Setup.SorterSetEvalsDatabaseName", draft.SorterSetEvalsDatabaseName] do
             issues.AddRange(RunIdentity.validate field value)
+        if not (String.IsNullOrWhiteSpace draft.CheckpointIntervalsName) && not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey draft.CheckpointIntervalsName) then
+            add "CheckpointIntervalsName" "Choose a registered generation interval."
         for field, name in ["GenSaveIntervalsName", draft.GenSaveIntervalsName; "GenSaveSubIntervalsName", draft.GenSaveSubIntervalsName] do
             if String.IsNullOrWhiteSpace name || not (GenIntervalRegistry.genIntervalConfigsDict.ContainsKey name) then
                 add field "Choose a registered generation interval."
@@ -181,7 +186,7 @@ module RunEditor =
             } {
                 MakerNames = workflow.MakerNames
                 GenSaveIntervalsName = draft.GenSaveIntervalsName; GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName
-            } |> Run.ofSgd |> Ok
+            } |> SgdRun.withCheckpointIntervals (Option.ofObj draft.CheckpointIntervalsName) |> Run.ofSgd |> Ok
 
     /// Reject incompatible catalogs rather than silently changing an opened run's behavior.
     let fromRun (configured: run) =
@@ -195,6 +200,7 @@ module RunEditor =
                 SortableTestsDatabaseName = string configured.SgdSetup.Value.SortableTestsDatabaseName
                 SorterSetEvalsDatabaseName = string configured.SgdSetup.Value.SorterSetEvalsDatabaseName
                 Description = configured.Description; AllowOverwrite = configured.AllowOverwrite
+                CheckpointIntervalsName = configured.CheckpointIntervalsName |> Option.defaultValue configured.GenSaveIntervalsName.Value
                 GenSaveIntervalsName = configured.GenSaveIntervalsName.Value; GenSaveSubIntervalsName = configured.GenSaveSubIntervalsName.Value
                 SetupParameters = rows configured.SetupParameterSpans; ExecutionParameters = rows configured.RunParameterSpans
             } |> Ok

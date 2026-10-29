@@ -180,7 +180,8 @@ module Utils =
 
     /// Search the run's complete save schedule, loading only the highest saved slice.
     /// File databases list existing IDs once; other stores use existence probes.
-    let loadOutputDataWithHighestGenerationNumber<'T>
+    let loadOutputDataWithSchedules<'T>
+            (checkpointConfig: genIntervalConfig option)
             (extractFn: outputData -> Result<'T, string>)
             (dataType: geneSortDataType)
             (saveConfig: genIntervalConfig)
@@ -208,6 +209,15 @@ module Utils =
                     // An imported initial pool lives only in Setup. Results start after it.
                     |> Seq.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
                     |> Seq.toArray
+                let intervals =
+                    match checkpointConfig, Array.tryLast intervals with
+                    | Some config, Some last ->
+                        GenIntervalConfig.getSampleSetMaxBound config (int last)
+                        |> Seq.map UMX.tag<generationNumber>
+                        |> Seq.append intervals
+                        |> Seq.filter (fun gen -> rp.GetGenerationFirst() |> Option.forall (fun first -> gen > first))
+                        |> Seq.distinct |> Seq.sort |> Seq.toArray
+                    | _ -> intervals
 
                 let getQueryParams index =
                     generationalDb.makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some intervals.[index])) dataType
@@ -236,21 +246,25 @@ module Utils =
                                 match existingIds with
                                 | Some ids -> async.Return (Set.contains query.Id ids)
                                 | None -> generationalDb.doesOutPutDataExist geneSortDataMode.Results query
-                            if exists then return Some query
+                            if exists then
+                                let! raw = generationalDb.loadIfFoundAsync geneSortDataMode.Results query
+                                match raw with
+                                | Some data ->
+                                    match extractFn data with
+                                    | Ok value -> return Some value
+                                    | Error _ -> return! findHighest (index - 1)
+                                | None -> return! findHighest (index - 1)
                             else return! findHighest (index - 1)
                 }
 
                 let! highest =
                     if existingIds |> Option.exists Set.isEmpty then async.Return None
                     else findHighest (intervals.Length - 1)
-                match highest with
-                | None -> return Ok None
-                | Some query ->
-                    let! rawDataOpt = generationalDb.loadIfFoundAsync geneSortDataMode.Results query
-                    match rawDataOpt with
-                    | None -> return Ok None
-                    | Some rawData -> return extractFn rawData |> Result.map Some
+                return Ok highest
         }
+
+    let loadOutputDataWithHighestGenerationNumber extractFn dataType saveConfig db rp =
+        loadOutputDataWithSchedules None extractFn dataType saveConfig db rp
 
     /// Ergonomic 1-liner wrapper for SorterRunResult.
     let loadHighestGenSorterPoolSet

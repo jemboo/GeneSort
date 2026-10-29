@@ -25,6 +25,10 @@ type parameterSet<'kind> =
 
     member this.ParamMap with get() : Map<string,string> = this.paramMap
 
+    member this.GetSetupCompleted() = ParamKeys.tryGetBool "SetupCompleted" this.paramMap
+    member this.WithSetupCompleted(value: bool option) =
+        { paramMap = ParamKeys.addOrRemove "SetupCompleted" (value |> Option.map string) this.paramMap }
+
     member this.GetActivationProbability() = ParamKeys.tryGetFloat ParamKeys.activationProbabilityKey this.paramMap
 
     member this.WithActivationProbability(value: float option) =

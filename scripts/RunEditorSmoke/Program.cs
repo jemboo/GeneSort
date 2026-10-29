@@ -49,6 +49,20 @@ internal static partial class Program
                 Background = (Brush)application.FindResource("SurfaceBrush")
             };
             Layout(view);
+            if (args.Contains("--folder-settings"))
+            {
+                CheckFolderSettings(root);
+                Console.WriteLine("Projects folder persistence, wizard selection, startup state, and invalid-settings recovery passed.");
+                return 0;
+            }
+            if (args.Contains("--selection"))
+            {
+                CheckRunSelection(root, model, view, errors);
+                Console.WriteLine("Run selection hierarchy, saved counterparts, custom leaves, folder isolation, and WPF tiles passed.");
+                return 0;
+            }
+            model.CancelSelection();
+            Layout(view);
             if (args.Contains("--setup-tabs"))
             {
                 CheckSetupProcessing(root, model, view, errors);
@@ -243,7 +257,7 @@ internal static partial class Program
                 Layout(view);
                 if (index == 1)
                 {
-                    var interval = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Generation save schedule");
+                    var interval = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Snapshot schedule");
                     interval.SelectedValue = GenIntervalNames.uniformInterval2;
                     Pump();
                     Check(model.SaveIntervals == GenIntervalNames.uniformInterval2, "Interval selection did not update the draft.");
@@ -290,7 +304,7 @@ internal static partial class Program
                     model.ExecutionSection.CancelAdd();
                     Layout(view);
                 }
-                if (((TabItem)tabs.Items[index]).Header.Equals("Run parameters"))
+                if (((TabItem)tabs.Items[index]).Header.Equals("Processing parameters"))
                 {
                     var list = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
                     Check(list.Items.Count == 4, "The RunParameters items control does not show the saved set.");
@@ -332,7 +346,7 @@ internal static partial class Program
                     Wait(model.OpenAsync(savedDefinition));
                     Layout(view);
                     Check(model.RunParameterList.Count == 4 && model.CanSave, "Opening a definition did not load and validate its saved parameters.");
-                    var runExecution = Button(view, "Run Execution");
+                    var runExecution = Button(view, "Run Processing");
                     var summaryReports = Button(view, "Generate Summary Reports");
                     Check(!model.CanRunSetup && !runExecution.IsEnabled && !summaryReports.IsEnabled, "A run action is enabled without a selection.");
                     list.SelectedItems.Add(list.Items[1]);
@@ -361,7 +375,7 @@ internal static partial class Program
                     };
                     Click(runSetup);
                     WaitUntil(() => !model.IsBusy);
-                    SelectEditorTab(view, "Run parameters");
+                    SelectEditorTab(view, "Processing parameters");
                     Layout(view);
                     Check(sawBusy && sawProgress && model.PhaseTotal == 2 && model.PhaseCompleted == 2,
                         "Setup did not disable other operations or report progress for the selected rows.");
@@ -396,7 +410,7 @@ internal static partial class Program
                     Layout(view);
                     Check(sawBusy && sawProgress && model.PhaseTotal == 2 && model.PhaseCompleted == 2,
                         "Execution did not disable other operations or report selected-row progress.");
-                    Check(model.PhaseSummary == "Execution finished: 0 succeeded, 2 failed, 0 skipped."
+                    Check(model.PhaseSummary == "Processing finished: 0 succeeded, 2 failed, 0 skipped."
                         && model.Issues.Count == 2 && model.Issues.All(issue => issue.Contains("Setup") && !issue.Contains("source library")),
                         "Execution did not report missing prepared inputs independently of Setup.");
                     Check(model.RunParameterList.Count == 4 && model.RunParameterList.SelectedCount == 0
@@ -460,7 +474,7 @@ internal static partial class Program
             var parameterBytes = File.ReadAllBytes(parameterPath);
             if (model.RunParameterList.SortKey != ParamKeys.mutationModKey) model.RunParameterList.Sort(ParamKeys.mutationModKey);
             if (!model.RunParameterList.Descending) model.RunParameterList.Sort(ParamKeys.mutationModKey);
-            SelectEditorTab(view, "Run parameters"); Layout(view);
+            SelectEditorTab(view, "Processing parameters"); Layout(view);
             var parameterColumns = ((GridView)Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters").View).Columns;
             var layoutBeforeFailure = parameterColumns.Select(column => ((column.Header as GridViewColumnHeader)?.Tag, column.Width)).ToArray();
             File.WriteAllText(parameterPath, "invalid");
@@ -508,7 +522,7 @@ internal static partial class Program
         var path1 = WriteReport(1, $"Score\tRunName\tMutationMod\tSeed\tExtra[0]\tLabel\n2\t{configured.RunName}\t1\t18446744073709551614\tyes\tbeta\nInfinity\t{configured.RunName}\t1\t2\t\tgamma\n");
         var before0 = File.ReadAllBytes(path0);
         var before1 = File.ReadAllBytes(path1);
-        SelectEditorTab(view, "Run parameters"); Layout(view);
+        SelectEditorTab(view, "Processing parameters"); Layout(view);
         var parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         parameterList.SelectedItems.Add(parameters[0]);
         parameterList.SelectedItems.Add(parameters[1]);
@@ -548,7 +562,7 @@ internal static partial class Program
         Check(reports.SortKey == "Extra[0]" && reports.Count == 4, "Refreshing reports lost the sort or report rows.");
         Check(before0.SequenceEqual(File.ReadAllBytes(path0)) && before1.SequenceEqual(File.ReadAllBytes(path1)), "Viewing or sorting reports changed the saved files.");
 
-        SelectEditorTab(view, "Run parameters"); Layout(view);
+        SelectEditorTab(view, "Processing parameters"); Layout(view);
         parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         // Rapid selection changes exercise cancellation and prevent an older load from winning the race.
         parameterList.SelectedItems.Clear();
@@ -573,7 +587,7 @@ internal static partial class Program
         Check(savingAll.Result && File.ReadAllLines(largeExport).Length == 2001, "Combined export omitted rows outside the visible viewport.");
         // Leave a small, readable combined table for the rendered preview.
         File.WriteAllBytes(path0, before0);
-        SelectEditorTab(view, "Run parameters"); Layout(view);
+        SelectEditorTab(view, "Processing parameters"); Layout(view);
         parameterList = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
         parameterList.SelectedItems.Add(parameters[1]); Pump(); WaitUntil(() => !reports.IsLoading);
         SelectEditorTab(view, "Summary Reports"); Layout(view);
@@ -773,7 +787,7 @@ internal static partial class Program
         GridViewColumn Column(string? key) => Columns().Single(column => Key(column) == key);
         void Select(params int[] indices)
         {
-            SelectEditorTab(view, "Run parameters"); Layout(view);
+            SelectEditorTab(view, "Processing parameters"); Layout(view);
             var list = Descendants<ListView>(view).Single(list => AutomationProperties.GetName(list) == "Saved RunParameters");
             list.SelectedItems.Clear();
             foreach (var index in indices) list.SelectedItems.Add(parameters[index]);

@@ -274,6 +274,7 @@ type sgdRun =
     private
         {
           baseRun: simpleRun
+          checkpointIntervalsName: string option
           genSaveIntervalsName: string
           genSaveSubIntervalsName: string
           makerNames: evolutionMakerNames
@@ -288,11 +289,15 @@ module SgdRun =
             invalidArg "GenSaveSubIntervalsName" "Generation summary interval name cannot be empty"
         {
           baseRun = SimpleRun.createEvolutionSource config
+          checkpointIntervalsName = None
           genSaveIntervalsName = sgd.GenSaveIntervalsName
           genSaveSubIntervalsName = sgd.GenSaveSubIntervalsName
           makerNames = sgd.MakerNames
         }
 
+    let withCheckpointIntervals name (run: sgdRun) =
+        { run with checkpointIntervalsName = name |> Option.filter (fun value -> not (String.IsNullOrWhiteSpace value) && value <> run.genSaveIntervalsName) }
+    let checkpointIntervalsName (run: sgdRun) = run.checkpointIntervalsName
     let baseRun (run: sgdRun) = run.baseRun
     let withParameterSource source spans (run: sgdRun) =
         { run with baseRun = SimpleRun.withParameterSource source spans run.baseRun }
@@ -331,6 +336,10 @@ type run =
     member this.RunEnhancerFunctionName = SimpleRun.runEnhancerFunctionName this.BaseRun
     member this.SetupEnhancerFunctionName = SimpleRun.setupEnhancerFunctionName this.BaseRun
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
+    member this.CheckpointIntervalsName =
+        match this with
+        | EvolutionRun value | ContinuationRun value -> SgdRun.checkpointIntervalsName value
+        | _ -> None
     member this.GenSaveIntervalsName =
         match this with
         | DirectRun _ | PreparedRun _ -> None

@@ -109,8 +109,8 @@ module RunSummaryFiles =
             return summaryReportFiles.create (reports.ToArray()) (errors.ToArray())
         }), cancellation)
 
-    let runAsync projectsFolder configured selected progress =
-        RunPhaseFiles.runAsync {
+    let runCancellableAsync token projectsFolder configured selected progress =
+        RunPhaseFiles.runCancellableAsync token 1 {
             Name = "Summary Reports"
             ToParameters = id
             Bind = fun configured storage ->
@@ -118,4 +118,8 @@ module RunSummaryFiles =
                 fun row overwrite cts sink -> report row overwrite cts sink |> Async.map (Result.map Parameters)
             SkipFinished = false
             SaveParameters = false
+            RecoverCancelled = None
         } projectsFolder configured selected progress
+
+    let runAsync projectsFolder configured selected progress =
+        runCancellableAsync CancellationToken.None projectsFolder configured selected progress

@@ -102,7 +102,9 @@ module SgdEx_Standard =
                 log "evaluateEvolutionRun completed."
                 return activeState.WithCurrentGeneration(Some finalRunResult.GenerationNumber).WithFinished(Some true)
 
-            with e ->
+            with
+            | :? OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | e ->
                 let errorMsg = sprintf "Error in evaluateEvolutionRun: %s" e.Message
                 log errorMsg
                 return! Error errorMsg

@@ -2,6 +2,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
+using GeneSort.FileDb.V1;
 using GeneSort.Project.V1;
 using GeneSort.Project.V1.Parameters;
 using GeneSort.Project.V1.Runtime;
@@ -10,8 +11,26 @@ using RunParameters = GeneSort.Project.V1.Parameters.parameterSet<GeneSort.Proje
 
 namespace GeneSort.WPF.ViewModels;
 
-public sealed class RunParameterItem
+public sealed class RunParameterItem : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private int? liveGeneration;
+    private string[] columnKeys = [];
+    public string Status { get; private set; } = "Waiting";
+    public string FailureMessage { get; private set; } = "";
+    public string FailureDetails => $"Run: {Parameters.GetRunName()?.Value}\nReplica: {Parameters.GetRepl()?.Value}\nID: {Parameters.GetId()?.Value}\n\n{FailureMessage}";
+    internal void ShowStatus(runRowStatus status, string? error = null)
+    {
+        // Cancellation stops this attempt; the unfinished row is available to run again.
+        Status = status == runRowStatus.Cancelled ? "Waiting" : status.ToString();
+        FailureMessage = status == runRowStatus.Failed
+            ? string.IsNullOrWhiteSpace(error) ? ProcessingFailureStore.MissingMessage : error
+            : "";
+        PropertyChanged?.Invoke(this, new(nameof(FailureMessage)));
+        PropertyChanged?.Invoke(this, new(nameof(FailureDetails)));
+        PropertyChanged?.Invoke(this, new(nameof(Status)));
+        SetColumns(columnKeys);
+    }
     public int Number { get; }
     private runPhaseOutput state;
     private string? executionError;
@@ -20,11 +39,12 @@ public sealed class RunParameterItem
     public string?[] Cells { get; private set; } = [];
     public Tuple<evoPath, evoProgress> Evolution => state is runPhaseOutput.Evolution evolution
         ? Tuple.Create(evolution.Item1, evolution.Item2)
-        : throw new InvalidOperationException($"Row {Number}: {executionError ?? "Run Setup before execution."}");
+        : throw new InvalidOperationException($"Row {Number}: {executionError ?? "Run Setup before processing."}");
 
     internal RunParameterItem(int number, RunParameters parameters, run? configured)
     {
         Number = number;
+        Status = parameters.GetRunFinished()?.Value == true ? "Completed" : "Waiting";
         state = runPhaseOutput.NewParameters(parameters);
         // This is the saved-run opening boundary. Phase updates never reconstruct the path.
         if (configured?.IsEvolution == true)
@@ -46,7 +66,19 @@ public sealed class RunParameterItem
         Values = Parameters.ParamMap.ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
-    internal void SetColumns(string[] keys) => Cells = keys.Select(key => Values.GetValueOrDefault(key)).ToArray();
+    internal void SetColumns(string[] keys)
+    {
+        columnKeys = keys;
+        Cells = keys.Select(key => key == "Status" ? Status : key == ParamKeys.generationCurrentKey && liveGeneration is int generation
+            ? generation.ToString(CultureInfo.InvariantCulture) : Values.GetValueOrDefault(key)).ToArray();
+        PropertyChanged?.Invoke(this, new(nameof(Cells)));
+    }
+
+    internal void ShowGeneration(int? generation)
+    {
+        liveGeneration = generation;
+        SetColumns(columnKeys);
+    }
 }
 
 /// A reusable, read-only collection view; sorting never changes the saved parameters.
@@ -99,16 +131,16 @@ public sealed class RunParameterListViewModel : INotifyPropertyChanged
 
     private void ShowItems(RunParameterItem[] data)
     {
-        string[] leading = [ParamKeys.replKey, ParamKeys.mutationModKey, ParamKeys.sourceMutationModKey,
+        string[] leading = ["Status", ParamKeys.replKey, ParamKeys.mutationModKey, ParamKeys.sourceMutationModKey,
             ParamKeys.partitionCountKey, ParamKeys.generationCurrentKey, ParamKeys.runNameKey];
-        var keys = data.SelectMany(row => row.Values.Keys).Distinct(StringComparer.Ordinal).ToArray();
+        var keys = data.SelectMany(row => row.Values.Keys).Concat(data.Length > 0 ? ["Status"] : Array.Empty<string>()).Distinct(StringComparer.Ordinal).ToArray();
         Keys = leading.Where(keys.Contains).Concat(keys.Except(leading).Order(StringComparer.Ordinal)).ToArray();
         foreach (var item in data) item.SetColumns(Keys);
         Items = new(data.ToList());
         Select([]);
         var replicas = data.Select(row => row.Parameters.GetRepl()?.Value).Distinct().Count();
         Summary = data.Length == 0 ? "No saved RunParameter files for this run."
-            : $"{data.Length:N0} saved RunParameters across {replicas:N0} replica(s). Click a column heading to sort; click again to reverse.";
+            : $"{data.Length:N0} read-only generated RunParameters across {replicas:N0} replica(s). Click a column heading to sort; click again to reverse.";
         NotifyRows();
         // Keep the preferred sort through empty results or temporarily absent fields.
         var sortKey = SortKey ?? Keys.FirstOrDefault();

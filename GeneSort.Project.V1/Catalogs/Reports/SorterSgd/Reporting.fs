@@ -97,7 +97,9 @@ module Reporting =
                 log (sprintf "%s successfully completed." reportNameTag)
                 return finalRp
 
-            with e -> 
+            with
+            | :? System.OperationCanceledException when cts.IsCancellationRequested -> return! Error "Operation cancelled"
+            | e ->
                 return! Error (sprintf "Error in %s for run %s: %s" reportNameTag (rp |> RunParameters.getIdString) e.Message)
         } |> Async.map (logResult progress (fun msg -> OpsUtils.report progress msg))
 

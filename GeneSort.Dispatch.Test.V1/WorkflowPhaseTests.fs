@@ -949,9 +949,13 @@ let ``Soss serialized checkpoint resumes match uninterrupted cycles at every bou
                                elif position < 2 then "0" elif position < 4 then "1" else "Merge"
                 verifySavedSossReport resumed rp generation partitions prefix selected true
 
-let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cancelAfter: int option) =
+let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cancelAfter: int option) checkpoints =
     GeneSort.Core.Mp.MessagePackSetup.configure()
-    let host = runHost.Create (singleSource ()) 1
+    let configured =
+        match singleSource () with
+        | EvolutionRun sgd when checkpoints -> SgdRun.withCheckpointIntervals (Some GenIntervalNames.uniformInterval1) sgd |> Run.ofSgd
+        | value -> value
+    let host = runHost.Create configured 1
     let target = saveEvery * 4
     let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne)
                  .WithPartitionCount(Some 2<partitionCount>)
@@ -1051,14 +1055,14 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
         match outcome with
         | Error message -> Assert.Contains("cancelled", message)
         | Ok _ -> failwith "Expected cancellation"
-        let lastSaved = generation / saveEvery * saveEvery
-        Assert.Equal<(int option * int) list>([for g in saveEvery .. saveEvery .. lastSaved -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
+        let lastSaved = if checkpoints then generation else generation / saveEvery * saveEvery
+        Assert.Equal<(int option * int) list>([for g in (if checkpoints then 1 else saveEvery) .. (if checkpoints then 1 else saveEvery) .. lastSaved -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
         for g in lastSaved + 1 .. generation do
             for kind in [geneSortDataType.SorterPoolSet ""; geneSortDataType.SorterPoolSetSummarySet ""; geneSortDataType.SorterPoolBinsSetSeries ""] do
                 let exists = (uninterrupted :> IGeneSortDb).doesOutPutDataExist geneSortDataMode.Results (query uninterrupted g kind)
                              |> Async.RunSynchronously
                 Assert.False(exists)
-        let checkpoint = Utils.loadHighestGenSorterPoolSetSoss (config saveEvery) uninterrupted rp
+        let checkpoint = EvolutionFiles.loadHighestSoss (config saveEvery) uninterrupted (pathFor host (rp.WithGenerationIntervalLast(Some (UMX.tag (target / saveEvery))))) (EvoProgress.fromParameters rp)
                          |> Async.RunSynchronously |> Result.defaultWith failwith |> Option.get
         Assert.Equal(lastSaved, int checkpoint.GenerationNumber)
         // Resume from serialized persisted state, with all unsaved accumulators gone.
@@ -1070,8 +1074,8 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
     execute uninterrupted saveEvery
     match cancelAfter with
     | Some generation ->
-        let lastSaved = generation / saveEvery * saveEvery
-        Assert.Equal<(int option * int) list>([for g in lastSaved + saveEvery .. saveEvery .. target -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
+        let lastSaved = if checkpoints then generation else generation / saveEvery * saveEvery
+        Assert.Equal<(int option * int) list>([for g in lastSaved + (if checkpoints then 1 else saveEvery) .. (if checkpoints then 1 else saveEvery) .. target -> Some g, g], List.ofSeq uninterrupted.PoolGenerations)
     | None -> ()
     // Check uninterrupted execution and resume from each saved checkpoint,
     // including checkpoints between reports and an already-completed run.
@@ -1088,7 +1092,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
                 saveValue resumed geneSortDataMode.Results resumeAt (geneSortDataType.SorterPoolSet "") (outputData.SorterPoolSet (sorterPoolSet.Soss restored))
                 resumed.PoolGenerations.Clear()
                 execute resumed saveEvery
-                Assert.Equal<(int option * int) list>([for g in resumeAt + saveEvery .. saveEvery .. target -> Some g, g], List.ofSeq resumed.PoolGenerations)
+                Assert.Equal<(int option * int) list>([for g in resumeAt + (if checkpoints then 1 else saveEvery) .. (if checkpoints then 1 else saveEvery) .. target -> Some g, g], List.ofSeq resumed.PoolGenerations)
                 resumed
         for savedGeneration in resumeAt + saveEvery .. saveEvery .. target do
             let expected = [| for g in savedGeneration - saveEvery + 1 .. savedGeneration do if g % reportEvery = 0 then yield g |]
@@ -1117,7 +1121,7 @@ let private verifyBufferedSossReports (saveEvery: int) (reportEvery: int) (cance
 [<InlineData(3, 7)>]
 [<InlineData(7, 3)>]
 let ``Soss buffered reports retain their own generations and subsets across saves and resume`` saveEvery reportEvery =
-    verifyBufferedSossReports saveEvery reportEvery None
+    verifyBufferedSossReports saveEvery reportEvery None false
 
 [<Theory>]
 [<InlineData(5, 1, 6)>]
@@ -1128,7 +1132,7 @@ let ``Soss buffered reports retain their own generations and subsets across save
 [<InlineData(3, 1, 5)>]
 [<InlineData(5, 2, 8)>]
 let ``Soss cancellation discards unsaved work and resume regenerates reports on the original cycle`` saveEvery reportEvery cancelAfter =
-    verifyBufferedSossReports saveEvery reportEvery (Some cancelAfter)
+    verifyBufferedSossReports saveEvery reportEvery (Some cancelAfter) false
 
 [<Theory>]
 [<InlineData(0)>]
@@ -2967,3 +2971,42 @@ let ``Dispatch SimpleS settings reject missing invalid and incompatible activato
                  |> GeneSort.Model.Sorting.V1.SorterModelGen.makeSorterModelFromIndex (UMX.tag 0)
     Assert.True(MutatorMakers.validateModels (pathFor host (rp.WithActivationProbability None)) [paired] |> Result.isError)
     Assert.True(MutatorMakers.validateModels (pathFor host rp) [paired] |> Result.isOk)
+
+[<Theory>]
+[<InlineData(5, 1, 7)>]
+[<InlineData(5, 2, 8)>]
+[<InlineData(3, 1, 5)>]
+let ``Interim checkpoints preserve Soss snapshot report segments after cancellation`` saveEvery reportEvery cancelAfter =
+    verifyBufferedSossReports saveEvery reportEvery (Some cancelAfter) true
+
+[<Fact>]
+let ``Standard interim checkpoint resumes a complete snapshot report segment`` () =
+    let configured =
+        match standardSource () with
+        | EvolutionRun sgd -> SgdRun.withCheckpointIntervals (Some GenIntervalNames.uniformInterval1) sgd |> Run.ofSgd
+        | _ -> failwith "Expected evolution run"
+    let host = runHost.Create configured 1
+    let rp = (host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.exactlyOne).WithGenerationIntervalLast(Some (UMX.tag 2))
+    let path = pathFor host rp
+    let state = EvoProgress.fromParameters rp
+    let mutator = (hostMutator host) path |> Async.RunSynchronously |> Result.defaultWith failwith |> GeneSort.Model.Sorting.V1.sorterModelMutator.Simple
+    let initial = sorterPoolSet_Standard.create (UMX.tag Guid.Empty) 0<generationNumber> (Dim1 1) None
+    let memory = MemoryDb()
+    let snapshots = { intervals with Method = Constant 5; MaxCount = Some 3 }
+    let samples = { intervals with MaxCount = Some 11 }
+    let execute seed token log =
+        EvoOrch_Standard.runStandardEvolutionAsync memory snapshots samples path state (UMX.tag false) seed tests
+            (ceBlock.create (UMX.tag Guid.Empty) 2<sortingWidth> [||]) mutator token log |> Async.RunSynchronously
+    use cts = new CancellationTokenSource()
+    let interrupted = execute initial cts.Token (fun message -> if message = "Starting evolution step. Generation 7 of 10" then cts.Cancel())
+    Assert.True(Result.isError interrupted)
+    let checkpoint = EvolutionFiles.loadHighestStandard snapshots memory path state |> Async.RunSynchronously |> Result.defaultWith failwith |> Option.get
+    Assert.Equal(7, int checkpoint.GenerationNumber)
+    execute checkpoint CancellationToken.None ignore |> Result.defaultWith failwith |> ignore
+    for generation in [5; 10] do
+        let query = (memory :> IGeneSortDb).makeQueryParamsFromRunParams (rp.WithGenerationCurrent(Some (UMX.tag generation))) (geneSortDataType.SorterPoolSetSummarySet "") |> Option.get
+        match (memory :> IGeneSortDb).loadAsync geneSortDataMode.Results query |> Async.RunSynchronously |> Result.defaultWith failwith with
+        | outputData.SorterPoolSetSummarySet (spSummarySet.Standard summaries) ->
+            // Standard samples the input pool before each step; preserve that established convention.
+            Assert.Equal<int[]>([|generation - 5 .. generation - 1|], summaries.SorterPoolSetSummaries |> Array.map (fun s -> int s.GenerationNumber) |> Array.sort)
+        | _ -> failwith "Expected Standard summaries"

@@ -1,5 +1,72 @@
 # Local setup and cloud execution
 
+## Single-machine deployment architectural requirements
+
+**Decision:** Preserve support for a future deployment to one provisioned virtual
+machine. Cloud deployment is not current implementation work. The intended first
+workflow is local configuration, parameter generation and Setup, followed by
+copying the prepared run and a compatible application build to one machine for
+the entire Processing phase. That machine may process several parameter rows in
+parallel using its own CPU and memory. Distribution across machines is not required.
+
+These requirements guide ordinary local development as well as future deployment:
+
+1. **Relocatable storage.** Resolve run data through a configurable Projects root.
+   Changing the root must not change run identities, file references, or generated
+   parameter values. Do not introduce dependencies on a developer's drive letters,
+   user profile, working directory, or local source checkout into Processing.
+   Keep relative project/database layout meaningful on the destination machine.
+2. **Self-contained prepared runs.** Successful Setup must materialize and identify
+   all inputs required by Processing, including imported continuation inputs.
+   Processing must be able to use the saved run definition, generated parameter
+   rows, and referenced Setup artifacts without access to the original source
+   databases. It must not silently perform Setup, recreate missing inputs, or
+   regenerate parameter values. Missing or incompatible inputs should produce a
+   clear error. Shared inputs may be reused and remain immutable after Setup.
+3. **Processing independent of the desktop UI.** Keep execution, persistence,
+   progress, and cooperative cancellation in reusable non-UI code. A future
+   unattended entry point must be able to invoke the same behavior without WPF,
+   dialogs, keyboard input, or interactive sign-in. This is an architectural
+   boundary, not a request to build that entry point now.
+4. **One machine owns the run.** Preserve bounded local parallelism and protection
+   against conflicting writes to the same parameter rows or result files. Do not
+   require a distributed scheduler, cross-machine coordination, or a remote
+   service for normal execution. CPU and memory limits should be controllable
+   without changing the scientific run configuration or its identities.
+5. **Checkpoint-based recovery.** Preserve resumability from completed saved
+   checkpoints after either cooperative cancellation or unexpected process/machine
+   interruption. Live GenerationCurrent is not proof that a checkpoint was saved.
+   After cancellation, reconcile it to the last saved generation (or initial Setup
+   generation if there is no Results checkpoint), keeping unfinished work resumable.
+   Recovery must not depend on a clean shutdown or a final UI save. Retain both
+   Project and Results data on storage that survives the intended VM lifecycle;
+   copying Setup alone is insufficient for resuming an interrupted job.
+6. **Compatible, inspectable artifacts.** Preserve stable run IDs, explicit file
+   references, and understandable errors when reading saved definitions, inputs,
+   and checkpoints. Moving data must not silently change its meaning. A future
+   deployment must use a compatible application build and validate its target OS
+   and architecture; Linux support is not implied by this decision. Generated
+   inputs remain determined by configuration; progress and diagnostic history
+   are separate execution state.
+
+A future acceptance check should run a prepared selection from a different Projects
+root with the original source databases unavailable, then interrupt, reopen, and
+resume from retained checkpoints. It should also verify that completed rows are
+not rerun, generated inputs remain unchanged, and parallel rows retain their own
+results and errors. These are future readiness criteria, not a claim that cloud
+portability or unattended deployment has already been verified.
+
+**Explicitly deferred:** provisioning, choosing a cloud provider, deployment scripts,
+package export/import, upload/download automation, remote monitoring, object-store
+integration, containers, distributed workers, queues, autoscaling, and managed
+batch orchestration. Do not add these features solely to satisfy this document.
+Continue improving local workflows while maintaining the boundaries above.
+
+The sections below describe existing workflow conventions and historical deployment
+examples. They do not supersede this scope decision or establish deployment readiness.
+
+## Workflow conventions
+
 Run configuration modules live directly in each workflow's folder and
 namespace: `SorterSgd`, `SorterEval`, `SorterMutate`, and
 `SortableTests`. Execution code and shared database readers stay in their
@@ -281,9 +348,16 @@ Standalone test Results use only the source database, replica, prefix/merge libr
 
 Each dispatch module exposes `prepareRun()` (initialize parameters, then setup), `setupRunParams()` (setup existing parameters), and `runRunParams()` (execute existing parameters). The combined `executeSetupAndRuns` and `makeParamsAndRun` entry points have been removed.
 
-## Commands
+## Command examples and current entry-point limitation
 
-Build the dispatch project, then prepare locally:
+These examples describe the intended phase-oriented command interface. They are
+not currently a safe unattended deployment recipe: `Program.fs` selects a
+hard-coded `yab` command rather than `argv` and calls `Console.ReadKey()` after
+execution. In particular, supplying `setup sgd` does not currently select Setup.
+An eventual unattended entry point must address those limitations before these
+examples are used. No entry-point changes are included in this architectural decision.
+
+Intended local preparation command:
 
 ```powershell
 $env:GENESORT_PROJECTS_ROOT = 'C:\Projects'
@@ -297,9 +371,9 @@ $env:GENESORT_PROJECTS_ROOT = 'D:\GeneSortJobs'
 dotnet GeneSort.Dispatch.V1/bin/Debug/net10.0/GeneSort.Dispatch.V1.dll execute sgd
 ```
 
-Supported workflow names are `sgd`, `eval`, `mutate`, and `tests`. These select the run spec, replica range, and parallelism currently configured in the corresponding dispatch module. They do not yet load an arbitrary saved run definition from a command-line path. Use the same configuration and application build on both machines. Run without valid arguments to print usage; it performs no batch work.
+Supported workflow names are `sgd`, `eval`, `mutate`, and `tests`. These select the run spec, replica range, and parallelism currently configured in the corresponding dispatch module. They do not yet load an arbitrary saved run definition from a command-line path. Use the same configuration and application build on both machines. Argument-driven selection and usage handling must be restored before relying on that command-line contract.
 
-Exit codes: 0 for a successful batch (including skipped runs or no work), 1 for failure/cancellation, 2 for invalid arguments. There is no interactive console pause. Session logs go under `GENESORT_PROJECTS_ROOT/Logs`. If the variable is unset, the root defaults to `C:\Projects` on Windows or `./Projects` on other platforms. This override controls the run database; existing library/source database locations used during local setup retain their own configuration.
+The intended unattended contract is exit code 0 for success, 1 for failure/cancellation, and 2 for invalid arguments, with no interactive console pause. The current hard-coded entry point does not implement that full contract. Session logs go under `GENESORT_PROJECTS_ROOT/Logs`. If the variable is unset, the root defaults to `C:\Projects` on Windows or `./Projects` on other platforms. This override controls the run database; existing library/source database locations used during local setup retain their own configuration.
 
 ## Transfer layout
 
@@ -315,14 +389,13 @@ Setup alone is insufficient: execution discovers its work through the Project ru
 
 When moving an in-progress job, also copy its Results folder and current Project files. After execution, retain both Results and Project: Project records completion. Keep the original prepared bundle separately. Do not run `setup` on the cloud worker or regenerate parameters when resuming.
 
-## Suggested next steps
+## Deferred deployment conveniences
 
-- Add a bundle manifest containing the selected run, replica range, application revision, and hashes of Project/Setup files. Validate it before starting paid compute and reject incomplete transfers.
-- Load the saved run definition directly when creating the cloud host, with command-line replica and parallelism options. This would remove dependence on the dispatch module's compiled spec.
-- Assign disjoint replicas to workers and retain checkpoints on durable storage. Avoid concurrent writers for the same run parameters or result files.
-- Keep Setup immutable after preparation. Upload a completed bundle before submitting execution jobs, and download Project plus Results afterward.
-
-These commands separate phases but do not upload files or provision cloud resources.
+When deployment becomes an active requirement, a dependency manifest, an entry
+point that loads saved definitions, and transfer validation may simplify moving
+a run to one machine. They are optional future work, not the next implementation
+steps. Retain the single-machine scope above; assigning work to multiple machines
+requires a separate decision.
 
 ## Continuing an evolution run
 

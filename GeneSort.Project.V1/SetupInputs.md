@@ -1,5 +1,8 @@
 # Setup files and saved inputs
 
+Architectural constraint: preserve [future single-machine deployment](../GeneSort.Dispatch.V1/CLOUD_WORKFLOW.md#single-machine-deployment-architectural-requirements).
+This guides local development; cloud features are explicitly deferred.
+
 Setup constructors return the actual stored file identities directly. There is
 no requested-file alias map and no separate canonical-file constructor layer.
 

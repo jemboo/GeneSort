@@ -12,11 +12,21 @@ public partial class RunParameterListView : UserControl
 
     public RunParameterListView()
     {
-        columnLayout = new(nameof(RunParameterItem.Number), key => model?.Sort(key));
+        columnLayout = new(nameof(RunParameterItem.Number), key => model?.Sort(key),
+            key => key == "Status" ? (DataTemplate)FindResource("ProcessingStatusTemplate") : null);
         InitializeComponent();
         DataContextChanged += (_, _) => Attach();
         Loaded += (_, _) => Attach();
         Unloaded += (_, _) => Detach();
+    }
+
+    private void FailedStatus_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkContentElement { DataContext: RunParameterItem { Status: "Failed" } row })
+        {
+            e.Handled = true;
+            MessageDialog.Show(Window.GetWindow(this), row.FailureDetails, "Run failed", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void Detach()

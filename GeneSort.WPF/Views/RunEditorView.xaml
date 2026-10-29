@@ -19,14 +19,29 @@
             <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
         </DataTemplate>
     </UserControl.Resources>
-    <Grid Margin="16" IsEnabled="{Binding IsReady}">
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" Padding="16,10"
+                Visibility="{Binding IsPhaseRunning, Converter={StaticResource VisibleIfTrue}}">
+            <DockPanel>
+                <Button Content="Cancel" Click="CancelPhase_Click" IsEnabled="{Binding CanCancelPhase}" DockPanel.Dock="Left"
+                        ToolTip="Stop queued rows and request active work to stop at its next safe point." />
+                <TextBlock Text="{Binding PhaseSummary}" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </DockPanel>
+        </Border>
+    <local:RunSelectionView x:Name="RunSelection" DataContext="{Binding Selection}"
+                            Visibility="{Binding DataContext.IsSelectingRun, RelativeSource={RelativeSource AncestorType=local:RunEditorView}, Converter={StaticResource VisibleIfTrue}}" />
+    <Button Content="Return to editor" Click="ReturnToEditor_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20"
+            Visibility="{Binding CanReturnToEditor, Converter={StaticResource VisibleIfTrue}}" />
+    <Grid Margin="16" Visibility="{Binding IsEditingRun, Converter={StaticResource VisibleIfTrue}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DockPanel Margin="0,0,0,12">
+        <DockPanel Margin="0,0,0,8" IsEnabled="{Binding IsReady}">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Choose run…" Click="ChooseRun_Click" />
                 <Button Content="New" Click="New_Click" />
                 <Button Content="Open…" Click="Open_Click" />
                 <Button Content="Validate" Click="Validate_Click" />
@@ -34,24 +49,30 @@
                         ToolTip="{Binding SaveHint}" ToolTipService.ShowOnDisabled="True" />
             </StackPanel>
             <StackPanel>
-                <TextBlock Text="Run editor" FontSize="22" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding DirtyLabel}" Foreground="{DynamicResource WarningBrush}" />
+                <TextBlock Text="Run editor" FontSize="20" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding DirtyLabel}" Foreground="{DynamicResource WarningBrush}">
+                    <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
+                        <DataTrigger Binding="{Binding DirtyLabel}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                    </Style.Triggers></Style></TextBlock.Style>
+                </TextBlock>
             </StackPanel>
         </DockPanel>
         <ScrollViewer x:Name="EditorScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="0,0,12,0">
-                <TextBlock Text="Run type" />
-                <ComboBox ItemsSource="{Binding RunTypes}" DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedRunType, Mode=OneWay}" SelectionChanged="RunType_SelectionChanged"
-                          AutomationProperties.Name="Run type" />
-                <TextBlock Text="Example run" Margin="0,8,0,0" />
-                <ComboBox ItemsSource="{Binding Examples}" DisplayMemberPath="Name"
-                          SelectedItem="{Binding SelectedExample, Mode=OneWay}" SelectionChanged="Example_SelectionChanged"
-                          AutomationProperties.Name="Example run" />
-                <TextBlock Text="The example supplies parameter defaults and catalog selections for the new run." TextWrapping="Wrap" Margin="0,4,0,12" />
-                <TextBlock Text="{Binding WorkflowName}" FontSize="16" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding WorkflowDescription}" Foreground="{DynamicResource MutedBrush}" Margin="0,3,0,12" />
-                <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
+                <Border Background="{DynamicResource CanvasBrush}" CornerRadius="6" Padding="12,10" IsEnabled="{Binding IsReady}">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Setter Property="Padding" Value="6,3" />
+                        </Style>
+                    </StackPanel.Resources>
+                <TextBlock Text="{Binding WorkflowName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding WorkflowDescription}" Margin="0,0,0,6" />
+                <TextBlock Text="{Binding SourceDescription}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}">
+                    <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers>
+                        <DataTrigger Binding="{Binding SourceDescription}" Value=""><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                    </Style.Triggers></Style></TextBlock.Style>
+                </TextBlock>
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
                     <StackPanel Margin="0,0,12,0">
@@ -64,18 +85,41 @@
                         <TextBlock Text="Run name" /><TextBox Text="{Binding RunName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Run name" />
                     </StackPanel>
                 </Grid>
-                <TextBlock Text="Description" Margin="0,10,0,0" />
-                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
-                <CheckBox Content="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="0,8,0,4" />
-                <TextBlock Text="Projects folder" Margin="0,10,0,0" />
-                <DockPanel>
+                <Grid Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Description" />
+                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
+                    </StackPanel>
+                    <CheckBox Grid.Column="1" Content="Allow output overwrite" ToolTip="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="16,18,0,0" VerticalAlignment="Center" />
+                </Grid>
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock Text="Projects folder" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,10,0" />
                     <Button Content="Browse…" DockPanel.Dock="Right" Margin="8,0,0,0" Click="Browse_Click" />
                     <TextBox Text="{Binding ProjectsFolder, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Projects folder" />
                 </DockPanel>
-                <TextBlock Text="{Binding Destination}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,4,0,12" />
-                <TabControl>
+                <TextBlock Text="{Binding Destination}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Destination}"
+                           Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0" />
+                </StackPanel>
+                </Border>
+                <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,20,0,0">
+                <StackPanel>
+                    <Border BorderBrush="{DynamicResource AccentBrush}" BorderThickness="3,0,0,0" Padding="10,0,0,0" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="Configure &amp; run" FontSize="16" FontWeight="SemiBold" />
+                            <TextBlock Text="Set parameters, generate files, then process and review results." Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" FontSize="12" Margin="0,3,0,0" />
+                        </StackPanel>
+                    </Border>
+                <WrapPanel Margin="0,0,0,12">
+                    <TextBlock Text="Parallel threads" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Text="{Binding ParallelThreads, UpdateSourceTrigger=PropertyChanged}" Width="70"
+                             IsEnabled="{Binding IsReady}" AutomationProperties.Name="Parallel threads"
+                             ToolTip="Maximum selected rows running concurrently during Setup or Processing." />
+                    <TextBlock Text="{Binding ParallelThreadsError}" Foreground="Orange" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </WrapPanel>
+                <TabControl AutomationProperties.Name="Run configuration, processing and results">
                     <TabItem Header="Parameters">
-                        <StackPanel Margin="12">
+                        <StackPanel Margin="12" IsEnabled="{Binding IsReady}">
                             <StackPanel Visibility="{Binding HasSgdSourceSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
                                 <TextBlock Text="Setup source databases" FontWeight="SemiBold" />
                                 <TextBlock Text="SortableTests database" />
@@ -113,10 +157,13 @@
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Save intervals" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">
-                        <StackPanel Margin="12">
-                            <TextBlock Text="Generation save schedule" />
-                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" AutomationProperties.Name="Generation save schedule" />
-                            <TextBlock Text="GenerationIntervalLast selects a zero-based index in this schedule." Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
+                        <StackPanel Margin="12" IsEnabled="{Binding IsReady}">
+                            <TextBlock Text="Checkpoint schedule" />
+                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding CheckpointIntervals}" AutomationProperties.Name="Checkpoint schedule" />
+                            <TextBlock Text="Keep the latest valid recovery checkpoint for each processing row. Older checkpoints are removed after a successful save." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
+                            <TextBlock Text="Snapshot schedule" />
+                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" AutomationProperties.Name="Snapshot schedule" />
+                            <TextBlock Text="Keep all snapshots for timeline analysis. GenerationIntervalLast selects a zero-based index in this snapshot schedule." Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
                             <TextBlock Text="Summary sampling schedule" />
                             <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SummaryIntervals}" AutomationProperties.Name="Summary sampling schedule" />
                             <TextBlock Text="This is a run setting. Replacing a saved run definition asks for confirmation separately." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
@@ -134,7 +181,7 @@
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Generate parameters">
-                        <StackPanel Margin="12">
+                        <StackPanel Margin="12" IsEnabled="{Binding IsReady}">
                             <TextBlock Text="Generate RunParameters" FontWeight="SemiBold" FontSize="16" />
                             <TextBlock Text="{Binding PhaseHelp}"
                                        TextWrapping="Wrap" Margin="0,6,0,14" />
@@ -173,12 +220,12 @@
                             <local:SetupParameterListView DataContext="{Binding SetupParameterList}" Height="360" />
                         </StackPanel>
                     </TabItem>
-                    <TabItem x:Name="RunParametersTab" Header="Run parameters">
+                    <TabItem x:Name="RunParametersTab" Header="Processing parameters">
                         <StackPanel Margin="12">
                             <WrapPanel Margin="0,0,0,10">
                                 <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
-                                <Button Content="Run Execution" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
-                                        ToolTip="Execute the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
+                                <Button Content="Run Processing" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
+                                        ToolTip="Process the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
                                 <Button Content="Generate Summary Reports" Click="GenerateSummaryReports_Click" IsEnabled="{Binding CanGenerateSummaryReports}" FontWeight="SemiBold"
                                         ToolTip="Generate Summary Reports from saved results for the selected rows, including finished runs. Uses the run's output overwrite setting." ToolTipService.ShowOnDisabled="True" />
                             </WrapPanel>
@@ -189,7 +236,7 @@
                     </TabItem>
                     <TabItem Header="Summary Reports" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">
                         <StackPanel Margin="12">
-                            <TextBlock Text="Select rows in Run parameters to view their saved Summary Reports here." TextWrapping="Wrap" Margin="0,0,0,8" />
+                            <TextBlock Text="Select rows in Processing parameters to view their saved Summary Reports here." TextWrapping="Wrap" Margin="0,0,0,8" />
                             <Button Content="Refresh reports" Click="RefreshReports_Click" IsEnabled="{Binding CanRefreshSummaryReports}" HorizontalAlignment="Left" Margin="0,0,0,10" />
                             <ProgressBar IsIndeterminate="True" Height="6" Margin="0,0,0,8" AutomationProperties.Name="Loading Summary Reports"
                                          Visibility="{Binding SummaryReportList.IsLoading, Converter={StaticResource VisibleIfTrue}}" />
@@ -197,6 +244,8 @@
                         </StackPanel>
                     </TabItem>
                 </TabControl>
+                </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
@@ -212,5 +261,6 @@
             <TextBox Text="{Binding Status, Mode=OneWay}" Style="{StaticResource SelectableMessage}" Margin="0,4,0,0"
                      MaxHeight="110" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Run status" />
         </StackPanel>
+    </Grid>
     </Grid>
 </UserControl>
