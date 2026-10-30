@@ -26,11 +26,11 @@ module Pool_32 =
 
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.SimpleParams.simpleSetupParams
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let runParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
     let setupFunctionName = SetupCatalogNames.sgdSoss
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
     let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -63,13 +63,13 @@ module Pool_32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix
@@ -96,11 +96,11 @@ module Pool_512 =
 
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.SimpleParams.simpleSetupParams
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let runParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
     let setupFunctionName = SetupCatalogNames.sgdSoss
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
     let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -137,13 +137,13 @@ module Pool_512 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix

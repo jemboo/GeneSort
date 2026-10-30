@@ -63,10 +63,10 @@ internal static partial class Program
             }
             model.CancelSelection();
             Layout(view);
-            if (args.Contains("--clone"))
+            if (args.Contains("--create-own"))
             {
-                CheckCloning(root, model, view, errors);
-                Console.WriteLine("Code and saved clones, module ownership, editable names and spans, and artifact isolation passed.");
+                CheckCreateOwn(root, model, view, errors);
+                Console.WriteLine("Custom runs from code and saved templates, editable descriptions, and source isolation passed.");
                 return 0;
             }
             if (args.Contains("--setup-tabs"))
@@ -232,7 +232,7 @@ internal static partial class Program
             Check(!model.HasUnsavedChanges && model.ExecutionParameters.Count == 1 && model.Issues.Count == 0,
                 "Cancelling added a row, dirtied the saved definition or left a stale pending warning.");
             var orphan = model.SetupParameters[0];
-            model.New();
+            CreateOwn(root, model);
             orphan.Values[0].Text = "99";
             Check(!model.IsDirty, "Cleared rows still affect the editor.");
 
@@ -249,7 +249,7 @@ internal static partial class Program
             variant.PropertyChanged += (_, _) => changes++;
             detachedValue.Text = "V3";
             Check(changes == 0, "Removed values still notify their old row.");
-            model.New();
+            CreateOwn(root, model);
             // Keep the generation/report fixture small independently of code-preset defaults.
             var fixtureMutations = model.SetupParameters.Single(row => row.Key == ParamKeys.mutationModKey);
             while (fixtureMutations.Values.Count > 4) fixtureMutations.Values.RemoveAt(fixtureMutations.Values.Count - 1);
@@ -422,7 +422,7 @@ internal static partial class Program
                     Check(model.RunParameterList.Count == 4 && model.RunParameterList.SelectedCount == 0
                         && !runSetup.IsEnabled && !runExecution.IsEnabled, "Execution did not refresh rows and reset phase actions.");
                     CheckParameterLayout();
-                    Check(!Directory.Exists(Path.Combine(root, model.ProjectName, model.DatabaseName, "Data", "Setup")),
+                    Check(!Directory.Exists(Path.Combine(DatabasePaths.dataRoot(root, model.ProjectName, model.DatabaseName), "Setup")),
                         "Execution unexpectedly prepared missing setup files.");
                     Check(!summaryReports.IsEnabled, "Summary Reports is enabled after the completed selection was cleared.");
                     list.SelectedItems.Add(list.Items[1]);
@@ -444,7 +444,7 @@ internal static partial class Program
                         && !runSetup.IsEnabled && !runExecution.IsEnabled && !summaryReports.IsEnabled,
                         "Summary Reports did not refresh rows and reset actions.");
                     CheckParameterLayout();
-                    Check(!Directory.Exists(Path.Combine(root, model.ProjectName, model.DatabaseName, "Data", "Setup")),
+                    Check(!Directory.Exists(Path.Combine(DatabasePaths.dataRoot(root, model.ProjectName, model.DatabaseName), "Setup")),
                         "Reporting unexpectedly prepared setup files.");
                 }
                 if (((TabItem)tabs.Items[index]).Header.Equals("Summary Reports"))
@@ -511,8 +511,8 @@ internal static partial class Program
             "Report viewing is enabled without a selection.");
         Check(!Button(view, "Save combined report…").IsEnabled, "Combined export is enabled without displayed rows.");
         var configured = model.Build().ResultValue;
-        var dataRoot = Path.Combine(root, configured.ProjectName, configured.DatabaseName, "Data");
-        IGeneSortDb database = new GeneSortDbMp(dataRoot, FSharpOption<string>.Some(configured.RunQueryCatalogName));
+        var dataRoot = DatabasePaths.dataRoot(root, configured.ProjectName, configured.DatabaseName);
+        IGeneSortDb database = new GeneSortDbMp(dataRoot, FSharpOption<string>.Some(configured.RunQueryCatalogName), FSharpOption<string>.Some(configured.ProjectName));
         var generation = GenIntervalConfig.getSampleAtIndex(RunIntervals.forRun(configured).Value, 0).Value;
         var parameters = model.RunParameterList.Items.Cast<RunParameterItem>().OrderBy(row => row.Values[ParamKeys.mutationModKey]).ToArray();
         string WriteReport(int index, string contents)

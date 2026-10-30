@@ -8,8 +8,8 @@ Dispatch, FileDb, or application filesystem paths.
 | Folder | Purpose | Entry points |
 | --- | --- | --- |
 | `Queries` | Build setup and execution storage queries | `QueryParamsCatalogSetup`, `QueryParamsCatalogRun` |
-| `RunParameters` | Enhance run parameters | `RunParamBuilderNames`, `RunParamEnhancerBuilders` |
-| `SetupParameters` | Enhance setup parameters and record source references | `SetupEnhancerCatalog` |
+| `RunParameters` | Enhance run parameters | `RunParametersEnhancers`, `RunParametersEnhancerNames`, `RunParametersEnhancerCatalog` |
+| `SetupParameters` | Enhance setup parameters and record source references | `SetupParametersEnhancers`, `SetupParametersEnhancerNames`, `SetupParametersEnhancerCatalog` |
 | `Evolution` | Build tests, seed pools, and mutators | `SortableTestsMakerCatalog`, `SeedSorterPoolSetMakerCatalog`, `MutatorMakerCatalog` |
 | `Execution` | Execute prepared runs, including Standard and Soss evolution | `ExecuteFunctionCatalog` |
 | `Setup` | Generate or copy inputs and select continuation sources | `SetupCatalog`, `SetupExecutorCatalog` |
@@ -26,11 +26,20 @@ duplicate registrations; run-parameter catalogs retain their existing replacemen
 behavior.
 
 Run parameter combinations pass directly to the selected enhancer. Specify the
-desired combinations in the run's parameter spans; refinement retains every
+desired combinations in the run's parameter spans; enhancement retains every
 combination.
 
+Both enhancer types have the form `context -> parameters -> parameters`:
+`setupParametersEnhancer` uses `setupParametersEnhancerContext` and `setupParameters`,
+and `runParametersEnhancer` uses `runParametersEnhancerContext` and `runParameters`.
+The `...Enhancers` modules implement the transformations, `...EnhancerNames` define
+registration IDs, and `...EnhancerCatalog` modules handle registration and lookup.
+IDs use `setup-parameters-enhancer.` and `run-parameters-enhancer.` prefixes.
+Run definitions select them through `SetupParametersEnhancerName` and
+`RunParametersEnhancerName`; each phase configuration uses `ParametersEnhancerName`.
+
 Setup enhancers place required source file IDs on `setupParameters`. Use
-`SetupEnhancerCatalog.withFileReferences` to resolve IDs from the setup query
+`SetupParametersEnhancers.withFileReferences` to resolve IDs from the setup query
 builder, or set the IDs directly for external sources. Run generation copies
 these references into each paired `runParameters`. Setup queries exclude the
 references from identity; run queries include them. Keep source ID metadata out

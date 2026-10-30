@@ -34,7 +34,7 @@ let private configuration () =
         Setup = {
             FunctionName = SetupCatalogNames.standard
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-            EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+            ParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
             ParameterSpans = [
                 ParamKeys.excludeSelfCeKey, ["true"]
                 ParamKeys.collectSortableTestsKey, ["false"]
@@ -48,7 +48,7 @@ let private configuration () =
         Execution = {
             FunctionName = ExecuteFunctionNames.sorterEval
             QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+            ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
             ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V1"; "V2"]]
         }
     } |> Run.ofSimple

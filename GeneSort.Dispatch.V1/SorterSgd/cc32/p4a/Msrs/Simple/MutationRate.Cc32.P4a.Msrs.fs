@@ -36,11 +36,11 @@ module MutationRate =
 
     module VarModR_32 =
 
-        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+        let runParametersEnhancerName = RunParametersEnhancerNames.msrs32MutationRate
         let executionFunctionName = ExecuteFunctionNames.standard
         let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
@@ -69,7 +69,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -77,7 +77,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -111,7 +111,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -119,7 +119,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -154,7 +154,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -162,7 +162,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -186,11 +186,11 @@ module MutationRate =
 
     module VarModR_64 =
 
-        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRate
+        let runParametersEnhancerName = RunParametersEnhancerNames.msrs32MutationRate
         let executionFunctionName = ExecuteFunctionNames.standard
         let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
@@ -219,7 +219,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -227,7 +227,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -261,7 +261,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -269,7 +269,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -304,7 +304,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -312,7 +312,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -338,11 +338,11 @@ module MutationRate =
 
     module MaxModR_32 =
 
-        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+        let runParametersEnhancerName = RunParametersEnhancerNames.msrs32MutationRateMax
         let executionFunctionName = ExecuteFunctionNames.standard
         let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
@@ -371,7 +371,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -379,7 +379,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -402,11 +402,11 @@ module MutationRate =
 
     module MaxModR_64 =
 
-        let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.msrs32MutationRateMax
+        let runParametersEnhancerName = RunParametersEnhancerNames.msrs32MutationRateMax
         let executionFunctionName = ExecuteFunctionNames.standard
         let setupFunctionName = SetupCatalogNames.sgdStandard
         let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrs32MutationRate
-        let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+        let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
         let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrs32MutationRate
 
 
@@ -435,7 +435,7 @@ module MutationRate =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
@@ -443,7 +443,7 @@ module MutationRate =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix

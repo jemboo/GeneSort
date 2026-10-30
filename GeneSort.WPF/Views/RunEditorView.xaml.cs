@@ -1,9 +1,7 @@
-using System.IO;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
-using GeneSort.FileDb.V1;
 using GeneSort.WPF.ViewModels;
 
 namespace GeneSort.WPF.Views;
@@ -41,8 +39,6 @@ public partial class RunEditorView : UserControl
     private async void ChooseRun_Click(object sender, RoutedEventArgs e) => await Model.BeginSelectionAsync();
     private void ReturnToEditor_Click(object sender, RoutedEventArgs e) => Model.CancelSelection();
 
-    private void New_Click(object sender, RoutedEventArgs e) { if (DiscardChanges()) Model.New(); }
-    private void Clone_Click(object sender, RoutedEventArgs e) => Model.Clone();
     private void Validate_Click(object sender, RoutedEventArgs e) => Model.Validate();
     private void CopyErrors_Click(object sender, RoutedEventArgs e)
     {
@@ -57,30 +53,6 @@ public partial class RunEditorView : UserControl
     {
         var dialog = new OpenFolderDialog { Title = "Choose the folder containing your Sortopia projects" };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true) Model.ProjectsFolder = dialog.FolderName;
-    }
-    private async void Open_Click(object sender, RoutedEventArgs e)
-    {
-        if (!DiscardChanges()) return;
-        var dialog = new OpenFileDialog { Title = "Open a saved run definition", Filter = "Run definitions (Run_*.msgpack)|Run_*.msgpack|MessagePack files|*.msgpack" };
-        if (dialog.ShowDialog(Window.GetWindow(this)) != true) return;
-        await PerformAsync(() => Model.OpenAsync(dialog.FileName));
-    }
-    private async void Save_Click(object sender, RoutedEventArgs e)
-    {
-        if (!Model.CanSave) return;
-        var configured = Model.Validate();
-        if (configured is null) return;
-        await PerformAsync(async () =>
-        {
-            var path = RunDefinitionFiles.pathFor(Model.ProjectsFolder, configured);
-            var overwrite = File.Exists(path);
-            if (overwrite)
-            {
-                Model.Status = "A saved run already has this name. Choose another name for the new run.";
-                return;
-            }
-            await Model.SaveAsync(configured, overwrite);
-        });
     }
     private async void RefreshParameters_Click(object sender, RoutedEventArgs e)
     {

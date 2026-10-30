@@ -18,10 +18,10 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalMerge
+    let runParametersEnhancerName = RunParametersEnhancerNames.sorterEvalMerge
     let executionFunctionName = ExecuteFunctionNames.sorterEval
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalMerge
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
     let setupFunctionName = SetupCatalogNames.merge
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalMerge
 
@@ -61,13 +61,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -109,13 +109,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -155,13 +155,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -198,13 +198,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -242,13 +242,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )

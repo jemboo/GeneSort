@@ -27,7 +27,8 @@ module RunDefinitionFiles =
     let tryProjectsFolder (path: string) (configured: run) =
         let file = FileInfo(Path.GetFullPath path)
         let mutable parent = file.Directory
-        for _ in 1 .. 6 do
+        let folderCount = (DatabasePaths.relativeFolder %configured.ProjectName %configured.DatabaseName).Split(Path.DirectorySeparatorChar).Length
+        for _ in 1 .. folderCount + 4 do
             if not (isNull parent) then parent <- parent.Parent
         if isNull parent then None
         else

@@ -29,12 +29,12 @@ module Pool_X =
 
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.SimpleParams.simpleSetupParams
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let runParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
     let executionFunctionName = ExecuteFunctionNames.soss
     let setupFunctionName = SetupCatalogNames.sgdSoss
     let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
     let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
     let setupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
     let partitionCount = 4
@@ -84,13 +84,13 @@ module Pool_X =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = setupQueryCatalogName
-                        EnhancerFunctionName = setupEnhancerFunctionName
+                        ParametersEnhancerName = setupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix

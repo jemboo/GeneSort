@@ -40,10 +40,10 @@ module RunEditorTests =
         ProjectCatalogs.registerAll ()
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         Assert.Equal(Some GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard, configured.SetupFunctionName)
-        SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName |> ignore
+        SetupParametersEnhancerCatalog.get configured.SetupParametersEnhancerName |> ignore
         QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName |> ignore
         QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName |> ignore
-        RunParamEnhancerBuilders.get configured.RunEnhancerFunctionName |> ignore
+        RunParametersEnhancerCatalog.get configured.RunParametersEnhancerName |> ignore
         ExecuteFunctionCatalog.get configured.ExecuteFunctionName |> ignore
         SortableTestsMakerCatalog.get configured.MakerNames.Value.SortableTests |> ignore
         SeedSorterPoolSetMakerCatalog.get configured.MakerNames.Value.SeedPoolSet |> ignore
@@ -169,7 +169,7 @@ module RunEditorTests =
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let continuation = configured |> Run.withParameterSource configured []
         Assert.True(RunEditor.fromRun continuation |> Result.isError)
-        let incompatible = { RunDto.fromDomain configured with SetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32R } |> RunDto.toDomain
+        let incompatible = { RunDto.fromDomain configured with SetupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32R } |> RunDto.toDomain
         Assert.True(RunEditor.fromRun incompatible |> Result.isError)
 
     [<Fact>]
@@ -186,18 +186,18 @@ module RunEditorTests =
         let workflow = WorkflowDefinitions.standardMsuf32
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let dto = RunDto.fromDomain configured
-        let selected = [| dto.SetupFunctionName; dto.SetupQueryCatalogName; dto.SetupEnhancerFunctionName
-                          dto.ExecuteFunctionName; dto.RunQueryCatalogName; dto.RunEnhancerFunctionName
+        let selected = [| dto.SetupFunctionName; dto.SetupQueryCatalogName; dto.SetupParametersEnhancerName
+                          dto.ExecuteFunctionName; dto.RunQueryCatalogName; dto.RunParametersEnhancerName
                           dto.SortableTestsMakerName; dto.SeedPoolSetMakerName; dto.MutatorMakerName |]
         Assert.Equal<string>(selected, RunEditor.catalogChoices() |> Array.map (fun choice -> choice.Name))
         Assert.True(workflow.Matches configured)
         let mismatches = [
             { dto with SetupFunctionName = "another-setup" }
             { dto with SetupQueryCatalogName = "another-query" }
-            { dto with SetupEnhancerFunctionName = "another-enhancer" }
+            { dto with SetupParametersEnhancerName = "another-enhancer" }
             { dto with ExecuteFunctionName = "another-executor" }
             { dto with RunQueryCatalogName = "another-query" }
-            { dto with RunEnhancerFunctionName = "another-enhancer" }
+            { dto with RunParametersEnhancerName = "another-enhancer" }
             { dto with SortableTestsMakerName = "another-tests-maker" }
             { dto with SeedPoolSetMakerName = "another-seed-maker" }
             { dto with MutatorMakerName = "another-mutator" }
@@ -271,7 +271,7 @@ module RunEditorTests =
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let context = { Run = configured; QueryParamsFromSetupParams = fun _ _ -> failwith "Seed validation must not query files." }
         let parameters = setupParameters.create (Map.ofList [ParamKeys.channelCountKey, string RunEditor.channelCount; ParamKeys.sorterCountPerPoolKey, "32"; ParamKeys.sorterPoolCountKey, "2"])
-        let enhanced = SetupEnhancerCatalog.sossMsuf32 context parameters
+        let enhanced = SetupParametersEnhancers.sossMsuf32 context parameters
         Assert.Equal(2, int (enhanced.GetSorterPoolCount().Value))
 
     [<Theory>]

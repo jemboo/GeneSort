@@ -66,7 +66,7 @@ module internal RunPhaseFiles =
             let! saved = RunDefinitionFiles.loadAsync (RunDefinitionFiles.pathFor projectsFolder configured)
             if RunDto.fromDomain saved <> RunDto.fromDomain configured then
                 invalidOp (sprintf "The saved run definition has changed. Open it again before running %s." phase.Name)
-            let db = new GeneSortDbMp(root, saved.RunQueryCatalogName) :> IGeneSortDb
+            let db = new GeneSortDbMp(root, saved.RunQueryCatalogName, saved.ProjectName) :> IGeneSortDb
             let queryFor = QueryParamsCatalogRun.get saved.RunQueryCatalogName saved.ProjectName saved.DatabaseName
             let query (row: runParameters) =
                 if row.GetRunName() <> Some saved.RunName then invalidArg "selected" "A selected row belongs to another run."

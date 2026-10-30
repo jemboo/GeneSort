@@ -24,10 +24,10 @@ module Standard =
 
     let sorterEvalModule = sprintf "SorterEval.Standard.Channels%d" (int channelCount)
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandardFormat
+    let runParametersEnhancerName = RunParametersEnhancerNames.sorterMutateStandardFormat
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterMutate
     let setupFunctionName = SetupCatalogNames.mutantStandard
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
 
@@ -73,13 +73,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -126,13 +126,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )

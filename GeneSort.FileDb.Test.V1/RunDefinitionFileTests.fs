@@ -18,6 +18,13 @@ open GeneSort.Project.V1.Storage
 open MessagePack
 
 module RunDefinitionFileTests =
+    [<Theory>]
+    [<InlineData("SortableTests.Prefix.Channels32", "Channels32", "SortableTests/Prefix/Channels32")>]
+    [<InlineData("SortableTests.Prefix.Channels32", "Custom", "SortableTests/Prefix/Channels32/Custom")>]
+    [<InlineData("SortableTests", "Prefix", "SortableTests/Prefix")>]
+    let ``database folders expand project hierarchy without duplicating its final module`` project database expected =
+        Assert.Equal((expected: string).Replace('/', Path.DirectorySeparatorChar), DatabasePaths.relativeFolder project database)
+
     let private configured description =
         let args = RunEditor.newDraft().ToArgs()
         match runDraft.create { args with Description = description; AllowOverwrite = true } |> RunEditor.build with
@@ -40,7 +47,7 @@ module RunDefinitionFileTests =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests
                     QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests
                     ParameterSpans = [
                         ParamKeys.sortableDataFormatKey, ["BitVector512"]
                         ParamKeys.prefixLibIdKey, ["PrefixLibId(channelCount=24, stageLength=3, Variant=PrefixA)";
@@ -81,7 +88,7 @@ module RunDefinitionFileTests =
         let! opened = RunDefinitionFiles.loadAsync path
         Assert.True(RunDto.fromDomain original = RunDto.fromDomain opened)
         Assert.Equal(Some root, RunDefinitionFiles.tryProjectsFolder path opened)
-        Assert.Equal(Path.Combine(root, string original.ProjectName, string original.DatabaseName, "Data", "Project", "Run", string original.RunName, "Run_" + string original.RunName + ".msgpack"), path)
+        Assert.Equal(Path.Combine(DatabasePaths.dataRoot root (string original.ProjectName) (string original.DatabaseName), "Project", "Run", string original.RunName, "Run_" + string original.RunName + ".msgpack"), path)
         Assert.Equal<string>([|path|], Directory.GetFiles(root, "*", SearchOption.AllDirectories))
     })
 

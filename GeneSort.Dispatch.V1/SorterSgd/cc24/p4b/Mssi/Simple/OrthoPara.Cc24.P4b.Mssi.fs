@@ -29,11 +29,11 @@ module OrthoPara64 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4b.Mssi.Simple.SimpleParams.simpleSetupParams
 
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+    let runParametersEnhancerName = RunParametersEnhancerNames.mssi24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -60,7 +60,7 @@ module OrthoPara64 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -68,7 +68,7 @@ module OrthoPara64 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -102,7 +102,7 @@ module OrthoPara64 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -110,7 +110,7 @@ module OrthoPara64 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -144,7 +144,7 @@ module OrthoPara64 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -152,7 +152,7 @@ module OrthoPara64 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -181,11 +181,11 @@ module OrthoPara128 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4b.Mssi.Simple.SimpleParams.simpleSetupParams
 
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.mssi24p3bOrthoPara
+    let runParametersEnhancerName = RunParametersEnhancerNames.mssi24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMssiOrthoPara
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMssiOrthoPara
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -212,7 +212,7 @@ module OrthoPara128 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -220,7 +220,7 @@ module OrthoPara128 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

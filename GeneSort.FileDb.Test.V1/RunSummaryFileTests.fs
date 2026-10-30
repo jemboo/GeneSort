@@ -32,7 +32,7 @@ module RunSummaryFileTests =
             do! RunParameterFiles.generateAsync prepared false null
             let! rows = RunParameterFiles.loadAllAsync folder configured
             let rows = rows |> Array.sortBy (fun row -> row.GetRepl(), row.GetMutationMod())
-            let root = Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag
+            let root = DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag
             let queryFor = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
             let write (row: runParameters) (generation: int) (text: string) =
                 let query = queryFor (row.WithGenerationCurrent(Some (UMX.tag<generationNumber> generation))) (geneSortDataType.TextReport (UMX.tag "SummaryReport")) |> Option.get

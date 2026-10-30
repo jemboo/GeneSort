@@ -28,16 +28,16 @@ module Controlled =
 
     let moduleParameters = SimpleParams.simpleSetupParams
 
-    let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
-    let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let standardRunParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+    let sossRunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
     let standardExecutionFunctionName = ExecuteFunctionNames.standard
     let standardSetupFunctionName = SetupCatalogNames.sgdStandard
     let sossExecutionFunctionName = ExecuteFunctionNames.soss
     let sossSetupFunctionName = SetupCatalogNames.sgdSoss
     let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
     let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-    let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
-    let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let standardSetupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
+    let sossSetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
     let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
     let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
@@ -84,13 +84,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = standardSetupQueryCatalogName
-                        EnhancerFunctionName = standardSetupEnhancerFunctionName
+                        ParametersEnhancerName = standardSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = standardExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = standardExecutionEnhancerFunctionName
+                        ParametersEnhancerName = standardRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -128,13 +128,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = standardSetupQueryCatalogName
-                        EnhancerFunctionName = standardSetupEnhancerFunctionName
+                        ParametersEnhancerName = standardSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = standardExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = standardExecutionEnhancerFunctionName
+                        ParametersEnhancerName = standardRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -172,13 +172,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = standardSetupQueryCatalogName
-                        EnhancerFunctionName = standardSetupEnhancerFunctionName
+                        ParametersEnhancerName = standardSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = standardExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = standardExecutionEnhancerFunctionName
+                        ParametersEnhancerName = standardRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -216,13 +216,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = standardSetupQueryCatalogName
-                        EnhancerFunctionName = standardSetupEnhancerFunctionName
+                        ParametersEnhancerName = standardSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = standardExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = standardExecutionEnhancerFunctionName
+                        ParametersEnhancerName = standardRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -271,13 +271,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = sossSetupQueryCatalogName
-                        EnhancerFunctionName = sossSetupEnhancerFunctionName
+                        ParametersEnhancerName = sossSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = sossExecutionEnhancerFunctionName
+                        ParametersEnhancerName = sossRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix
@@ -316,13 +316,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = sossSetupQueryCatalogName
-                        EnhancerFunctionName = sossSetupEnhancerFunctionName
+                        ParametersEnhancerName = sossSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = sossExecutionEnhancerFunctionName
+                        ParametersEnhancerName = sossRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix
@@ -361,13 +361,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = sossSetupQueryCatalogName
-                        EnhancerFunctionName = sossSetupEnhancerFunctionName
+                        ParametersEnhancerName = sossSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = sossExecutionEnhancerFunctionName
+                        ParametersEnhancerName = sossRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix
@@ -406,13 +406,13 @@ module Controlled =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = sossSetupQueryCatalogName
-                        EnhancerFunctionName = sossSetupEnhancerFunctionName
+                        ParametersEnhancerName = sossSetupParametersEnhancerName
                     }
                     Execution = {
                         FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = sossExecutionEnhancerFunctionName
+                        ParametersEnhancerName = sossRunParametersEnhancerName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix

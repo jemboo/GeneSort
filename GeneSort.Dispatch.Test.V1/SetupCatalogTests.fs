@@ -32,13 +32,13 @@ let private makeRun queryCatalog setupCatalog =
             FunctionName = executeName
             ParameterSpans = []
             QueryCatalogName = queryCatalog
-            EnhancerFunctionName = "sortable-test"
+            ParametersEnhancerName = "run-parameters-enhancer.sortable-tests"
         }
         Setup = {
             FunctionName = setupCatalog
             ParameterSpans = []
             QueryCatalogName = queryCatalog
-            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            ParametersEnhancerName = SetupParametersEnhancerNames.noOp
         }
     } |> Run.ofSimple
 

@@ -25,7 +25,7 @@ internal static partial class Program
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss"));
         model.SelectExample(model.Examples.Single(example => example.Name == "SossS"));
         model.ProjectsFolder = root;
-        model.Clone();
+        CreateOwn(root, model);
         SelectEditorTab(view, "Save intervals");
         var checkpoints = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Checkpoint schedule");
         var snapshots = Descendants<ComboBox>(view).Single(box => AutomationProperties.GetName(box) == "Snapshot schedule");
@@ -109,7 +109,7 @@ internal static partial class Program
 
         // Exercise real Setup and Execution with a tiny generated evaluation library.
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard.Channels4"));
-        model.Clone();
+        CreateOwn(root, model);
         void Set(string key, string value)
         {
             var row = model.SetupParameters.Single(row => row.Key == key);

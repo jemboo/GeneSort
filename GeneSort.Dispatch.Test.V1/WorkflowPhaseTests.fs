@@ -1175,13 +1175,13 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
                 ParameterSpans = baseline.SetupParameterSpans |> List.map (fun (key, values) ->
                     if key = ParamKeys.mutationModKey then key, ["0"; "1"; "2"] else key, values)
                 QueryCatalogName = baseline.SetupQueryCatalogName
-                EnhancerFunctionName = baseline.SetupEnhancerFunctionName
+                ParametersEnhancerName = baseline.SetupParametersEnhancerName
             }
             Execution = {
                 FunctionName = baseline.ExecuteFunctionName
                 ParameterSpans = baseline.RunParameterSpans
                 QueryCatalogName = baseline.RunQueryCatalogName
-                EnhancerFunctionName = baseline.RunEnhancerFunctionName
+                ParametersEnhancerName = baseline.RunParametersEnhancerName
             }
         } {
             MakerNames = baseline.MakerNames.Value
@@ -1322,8 +1322,8 @@ let ``Append source branching shares one database copy of each checkpoint and te
     GeneSort.Core.Mp.MessagePackSetup.configure()
     let root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "GeneSort-append-" + Guid.NewGuid().ToString("N"))
     let makeDb (configured: run) =
-        let dataRoot = System.IO.Path.Combine(root, %configured.ProjectName, %configured.DatabaseName, "Data")
-        dataRoot, (new GeneSort.FileDb.V1.GeneSortDbMp(UMX.tag dataRoot, configured.RunQueryCatalogName) :> IGeneSortDb)
+        let dataRoot = GeneSort.FileDb.V1.DatabasePaths.dataRoot root %configured.ProjectName %configured.DatabaseName
+        dataRoot, (new GeneSort.FileDb.V1.GeneSortDbMp(UMX.tag dataRoot, configured.RunQueryCatalogName, configured.ProjectName) :> IGeneSortDb)
     let persist (db: IGeneSortDb) mode query data =
         db.saveAsync mode query data (UMX.tag true) |> Async.RunSynchronously |> Result.defaultWith failwith
     try
@@ -1439,6 +1439,11 @@ let ``Append source branching shares one database copy of each checkpoint and te
         let finalGeneration = GenIntervalConfig.getSampleAtIndex host.GenSaveIntervals.Value 2 |> Option.get
         let resumedRp = rp.WithGenerationCurrent(Some (UMX.tag finalGeneration))
         let finalQuery = host.QueryParamsFromRunParams resumedRp (geneSortDataType.SorterPoolSet "") |> Option.get
+        // Checkpoint lookup must use the full logical project identity, not a folder segment.
+        let lookupQuery = EvolutionFiles.queryAtGeneration db (pathFor host rp) (EvoProgress.fromParameters rp)
+                              (UMX.tag finalGeneration) (geneSortDataType.SorterPoolSet "") |> Option.get
+        Assert.Equal<string<projectName>>(configured.ProjectName, lookupQuery.ProjectName)
+        Assert.Equal(finalQuery.Id, lookupQuery.Id)
         persist db geneSortDataMode.Results finalQuery (outputData.SorterPoolSet(pool soss finalGeneration))
         let result = host.ExecuteFunction rp (UMX.tag false) cts None
                      |> Async.RunSynchronously |> Result.defaultWith failwith

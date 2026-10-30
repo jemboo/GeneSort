@@ -32,7 +32,7 @@ database name changes. Older files are associated by project/database identity
 when unambiguous; otherwise they appear under **Saved runs**. Discovery reads
 canonical definition folders only, avoiding large parameter and result trees.
 
-Project names contain the full namespace and module hierarchy after `GeneSort.Dispatch.V1` (for example, `SortableTests.Prefix.Channels32`). Database names use the immediately containing module (`Channels32` in this example). Existing saved files are not relocated.
+Project names contain the full namespace and module hierarchy after `GeneSort.Dispatch.V1` (for example, `SortableTests.Prefix.Channels32`). Database names use the immediately containing module (`Channels32` in this example). Storage expands the dotted project hierarchy into folders and appends the database only if it is not already the final hierarchy segment: `C:\Projects\SortableTests\Prefix\Channels32`. Existing saved files are not relocated; move the existing database folder to the new location to reuse its data.
 
 The starting definition supplies parameter fields, defaults, catalog selections,
 evolution makers and schedules. SortableTests runs have one Processing
@@ -88,8 +88,8 @@ The MessagePack definition itself does not store a module identifier, so older
 renamed definitions without sidecars may match several compatible modules.
 
 1. Create a new definition or open an existing `Run_*.msgpack` file.
-2. Code-defined and saved runs are read-only. Choose **Clone** to edit the new
-   run's name and its declared Setup/Execution parameter values before saving.
+2. Code-defined and saved runs are read-only. Choose **Create your own** in a module to edit the new
+   run's name, description, and declared Setup/Execution parameter values before saving.
    Each module declares one fixed `channelCount`, displayed above the editor.
    Mixed-channel workflows have `ChannelsN` child modules. Select the appropriate
    module in the wizard rather than changing a run's channel count.
@@ -97,7 +97,7 @@ renamed definitions without sidecars may match several compatible modules.
    read-only singleton. Prefix, merge and sorter library dropdowns use the module
    count; model-type choices respect generator channel-count constraints.
    Validation rejects mismatched IDs, mutator counts and channel-count sweeps.
-   Clones and saved definitions retain their source module's count.
+   Custom drafts and saved definitions retain their source module's count.
    Long identities
    wrap at narrower window widths. Dropdowns exclude values selected elsewhere in
    the same parameter, and **+ value** chooses an unused option. Duplicate typed
@@ -411,17 +411,15 @@ the distance between them. Comparator counts and stage counts remain separate.
 This rename intentionally changes stored names without legacy aliases or migration.
 
 
-### Cloning a run
+### Creating a custom run
 
-Open a code-defined or saved run and choose **Clone**. The definition is copied into an unsaved draft named `<source>_clone`; the name remains editable. The clone stays in the source module and project/database. Saving records that module association so the clone appears beside its source in the wizard.
+In a module, choose **Create your own**, then select a code-defined or saved run as a template. The draft starts as `NewRun` (or an unused numbered name) in the same module and project/database. Its name, description, and declared Setup/Execution parameter values are editable. Saving records the module association so the new run appears beside its template in the wizard.
 
-Only the run name and values of parameters declared in the source's Setup and Execution spans are editable. Phase membership remains fixed, and inherited/continuation-source restrictions still apply. Project/database identity, description, source modules, overwrite policy, schedules, functions, catalogs, and makers belong to the module. They remain read-only when opening module runs and clones. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
+Project/database identity, source modules, overwrite policy, schedules, functions, catalogs, and makers remain module-owned and read-only. Phase membership and inherited/continuation-source restrictions still apply. Validation enforces these restrictions as well as the controls. Projects folder and execution controls remain operational settings.
 
-Cloning copies no generated rows, statuses, checkpoints, snapshots, or results. Saving a clone does not save or overwrite its source. An existing destination cannot be replaced from the editor; choose a different name for the clone.
+Creating a run copies no generated rows, statuses, checkpoints, snapshots, or results, and does not save or overwrite its template. An existing destination cannot be replaced from the editor; choose another name.
 
-
-Code-defined and saved definitions are immutable in the editor, including their names and parameter spans. Clone to make an editable draft; saving or generating its first parameters makes it read-only. Replica range and parallel-thread controls remain available. Generating replicas adds missing files and preserves existing replicas (including progress and status), even outside the requested range. It refuses a different definition under an existing run name.
-
+Code-defined and saved definitions are read-only, including their names, descriptions, and parameter spans. Saving or generating a custom draft's first parameters makes it read-only. Replica range and parallel-thread controls remain available. Generating replicas adds missing files and preserves existing replicas (including progress and status), even outside the requested range. It refuses a different definition under an existing run name.
 
 ### Channel module storage
 
@@ -429,7 +427,7 @@ Channel-specific children of the SortableTests and SorterEval workflow modules
 share their parent's project/database library location. This keeps setup readers
 and channel-keyed library queries consistent. Presets split from a multi-channel
 sweep have unique names such as `Small_16`; each calls `RunNaming.create` itself.
-The `.module.json` label records the full channel-specific module for saved clones.
+The `.module.json` label records the full channel-specific module for saved custom runs.
 When a label is missing, matching also checks channel count. Every run-bearing
 module exposes an explicit positive `channelCount` and registers it in `runType`.
 
@@ -437,14 +435,14 @@ module exposes an explicit positive `channelCount` and registers it in `runType`
 
 SGD modules declare model type, prefix stage/variant, evaluation measures, RNG type,
 and data format in `moduleParameters`. These values appear in Setup and remain
-read-only when cloning; validation rejects edits and removal. Continuations inherit
+read-only in custom drafts; validation rejects edits and removal. Continuations inherit
 them from their source. Existing evaluation/model/prefix comparison workflows retain
 their explicit sweeps. The Msuf6 initial-measure value `SameAsEvaluation` resolves to
 each Setup row's evaluation measure without adding another sweep dimension.
 
 `ExcludeSelfCe` and `CollectNewSortableTests` (`CollectSortableTests` in saved spans)
 are also fixed module policies. SimpleR's `AMax` and SimpleS's `ActivationProbability`
-are explicit Setup run parameters, editable in clones. Their module defaults are 3
+are explicit Setup run parameters, editable in custom drafts. Their module defaults are 3
 and 0.5 respectively; existing sweeps are preserved. Missing activation settings
 are validation errors rather than requests for enhancer defaults.
 

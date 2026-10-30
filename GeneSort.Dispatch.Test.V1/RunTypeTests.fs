@@ -44,9 +44,9 @@ let ``Soss editor exposes activator sweep and uses module selections`` () =
     let configured = RunTypeEditor.build original draft |> function Ok value -> value | Error _ -> failwith "Invalid draft"
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionFunctionName, configured.ExecuteFunctionName)
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionQueryCatalogName, configured.RunQueryCatalogName)
-    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionEnhancerFunctionName, configured.RunEnhancerFunctionName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.runParametersEnhancerName, configured.RunParametersEnhancerName)
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupQueryCatalogName, configured.SetupQueryCatalogName)
-    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupEnhancerFunctionName, configured.SetupEnhancerFunctionName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupParametersEnhancerName, configured.SetupParametersEnhancerName)
     Assert.Equal<(string * string list) list>(original.RunParameterSpans, configured.RunParameterSpans)
 
 [<Fact>]
@@ -172,9 +172,9 @@ let ``Sorter choices preserve saved IDs and offer other registered variants at t
             DatabaseName = original.DatabaseName; ProjectName = original.ProjectName; RunName = original.RunName
             Description = original.Description; AllowOverwrite = false
             Setup = { FunctionName = Run.requireSetupFunctionName original; QueryCatalogName = original.SetupQueryCatalogName
-                      EnhancerFunctionName = original.SetupEnhancerFunctionName; ParameterSpans = [ParamKeys.sorterLibIdKey, savedIds] }
+                      ParametersEnhancerName = original.SetupParametersEnhancerName; ParameterSpans = [ParamKeys.sorterLibIdKey, savedIds] }
             Execution = { FunctionName = original.ExecuteFunctionName; QueryCatalogName = original.RunQueryCatalogName
-                          EnhancerFunctionName = original.RunEnhancerFunctionName; ParameterSpans = [] }
+                          ParametersEnhancerName = original.RunParametersEnhancerName; ParameterSpans = [] }
         } |> Run.ofSimple
     let spec = RunTypeEditor.parameters configured |> Array.find (fun spec -> spec.Key = ParamKeys.sorterLibIdKey)
     Assert.Equal(parameterValueKind.Choice, spec.ValueKind)
@@ -200,22 +200,25 @@ let ``Prefix and sorter duplicates are compared by parsed identity`` () =
 
 
 [<Fact>]
-let ``Clones preserve module settings and allow only source phase parameters`` () =
+let ``Custom drafts preserve module settings and allow only source phase parameters`` () =
     for kind in RunTypeCatalog.all do
         for example in kind.Examples do
             let source = example.Run
-            let draft = RunTypeEditor.cloneDraft source
-            Assert.Equal(string source.RunName + "_clone", draft.RunName)
-            let clone = RunTypeEditor.buildModuleRun source draft |> function Ok value -> value | Error errors -> failwithf "%s: %A" example.Name errors
-            Assert.True(source.ProjectName = clone.ProjectName, "Clone changed ProjectName.")
-            Assert.True(source.DatabaseName = clone.DatabaseName, "Clone changed DatabaseName.")
-            Assert.True(source.SetupParameterSpans = clone.SetupParameterSpans, "Clone changed SetupParameterSpans.")
-            Assert.True(source.RunParameterSpans = clone.RunParameterSpans, "Clone changed RunParameterSpans.")
-            Assert.Equal(source.MakerNames, clone.MakerNames)
-            Assert.Equal(source.ParameterSource, clone.ParameterSource)
+            let draft = RunTypeEditor.newDraft source
+            Assert.Equal("NewRun", draft.RunName)
+            let custom = RunTypeEditor.buildModuleRun source draft |> function Ok value -> value | Error errors -> failwithf "%s: %A" example.Name errors
+            Assert.True(source.ProjectName = custom.ProjectName, "Draft changed ProjectName.")
+            Assert.True(source.DatabaseName = custom.DatabaseName, "Draft changed DatabaseName.")
+            Assert.True(source.SetupParameterSpans = custom.SetupParameterSpans, "Draft changed SetupParameterSpans.")
+            Assert.True(source.RunParameterSpans = custom.RunParameterSpans, "Draft changed RunParameterSpans.")
+            Assert.Equal(source.MakerNames, custom.MakerNames)
+            Assert.Equal(source.ParameterSource, custom.ParameterSource)
             let args = draft.ToArgs()
-            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with RunName = "RenamedClone" }) |> Result.isOk)
-            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with Description = args.Description + " changed" }) |> Result.isError)
+            Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with RunName = "RenamedDraft" }) |> Result.isOk)
+            let described = RunTypeEditor.buildModuleRun source (runDraft.create { args with Description = args.Description + " changed" })
+                            |> Result.defaultWith (fun issues -> failwithf "%A" issues)
+            Assert.Equal(args.Description + " changed", described.Description)
+            Assert.Equal(source.AllowOverwrite, custom.AllowOverwrite)
             Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with DatabaseName = "OtherDatabase" }) |> Result.isError)
             Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with ExecutionParameters = Array.append args.ExecutionParameters [| parameterDraft.create "NotDeclaredBySource" [|"1"|] |] }) |> Result.isError)
             for row in args.SetupParameters do
@@ -273,17 +276,17 @@ let ``Every module owns one channel count and all its presets agree`` () =
 [<Fact>]
 let ``Module validation rejects channel changes encoded in library and mutator parameters`` () =
     let source = SortableTests.Prefix.Channels24.Channels24 ()
-    let args = (RunTypeEditor.cloneDraft source).ToArgs()
+    let args = (RunTypeEditor.newDraft source).ToArgs()
     let changed = args.ExecutionParameters |> Array.map (fun row ->
         if row.Key = ParamKeys.prefixLibIdKey then parameterDraft.create row.Key [|PrefixLibId.toString (prefixLibId.create 32<channelCount> 4<stageLength> prefixLibVariant.PrefixA)|]
         else row)
     Assert.NotEmpty(RunTypeEditor.validateChannelCount 24 source (runDraft.create { args with ExecutionParameters = changed }))
     let standard = SorterEval.Standard.Channels16.Test ()
-    let args = (RunTypeEditor.cloneDraft standard).ToArgs()
+    let args = (RunTypeEditor.newDraft standard).ToArgs()
     let changed = args.SetupParameters |> Array.map (fun row -> if row.Key = ParamKeys.channelCountKey then parameterDraft.create row.Key [|"16"; "24"|] else row)
     Assert.NotEmpty(RunTypeEditor.validateChannelCount 16 standard (runDraft.create { args with SetupParameters = changed }))
     let mutant = GeneSort.Dispatch.V1.SorterMutate.Standard.Msrs ()
-    let args = (RunTypeEditor.cloneDraft mutant).ToArgs()
+    let args = (RunTypeEditor.newDraft mutant).ToArgs()
     let changed = args.SetupParameters |> Array.map (fun row ->
         if row.Key = ParamKeys.mutatorParamsKey then
             parameterDraft.create row.Key [|MutatorParams.msrsParamsRL 24<channelCount> rngType.Lcg mutatorVariant.V1 |> MutatorParams.toString|]
@@ -292,7 +295,7 @@ let ``Module validation rejects channel changes encoded in library and mutator p
 
 [<Fact>]
 let ``Seed enhancer preserves explicit module settings`` () =
-    let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupEnhancerContext = {
+    let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupParametersEnhancerContext = {
         Run = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss.Pool_32.Gens100 ()
         QueryParamsFromSetupParams = fun _ _ -> None
     }
@@ -309,7 +312,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
         ParamKeys.excludeSelfCeKey, "false"
         ParamKeys.collectSortableTestsKey, "true"
     ])
-    let enhanced = GeneSort.Project.V1.Catalogs.SetupParameters.SetupEnhancerCatalog.sossMsuf32 context parameters
+    let enhanced = GeneSort.Project.V1.Catalogs.SetupParameters.SetupParametersEnhancers.sossMsuf32 context parameters
     Assert.Equal(16, int (enhanced.GetChannelCount().Value))
     Assert.Equal(16, int (enhanced.GetPrefixLibId().Value.ChannelCount))
     Assert.Equal(2, int (enhanced.GetPrefixLibId().Value.StageLength))
@@ -318,9 +321,9 @@ let ``Seed enhancer preserves explicit module settings`` () =
         Assert.Equal(parameters.ParamMap[key], enhanced.ParamMap[key])
 
 [<Fact>]
-let ``Evolution clones cannot change or remove module owned settings`` () =
+let ``Evolution drafts cannot change or remove module owned settings`` () =
     let source = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Standard.TestStandard ()
-    let draft = RunTypeEditor.cloneDraft source
+    let draft = RunTypeEditor.newDraft source
     let args = draft.ToArgs()
     for row in args.SetupParameters |> Array.filter (fun row -> RunTypeEditor.isModuleOwnedParameter source row.Key) do
         let changed = args.SetupParameters |> Array.map (fun other -> if other.Key = row.Key then parameterDraft.create row.Key [|"changed"|] else other)
@@ -329,19 +332,19 @@ let ``Evolution clones cannot change or remove module owned settings`` () =
         Assert.True(RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = removed }) |> Result.isError)
 
 [<Fact>]
-let ``Activation settings are explicit editable clone parameters and affect setup identity`` () =
+let ``Activation settings are explicit editable draft parameters and affect setup identity`` () =
     for source, key, defaultValue, changedValue in [
         GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Test (), ParamKeys.aMaxKey, "3", "7"
         GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.Test (), ParamKeys.activationProbabilityKey, "0.5", "0.25"
     ] do
-        let args = (RunTypeEditor.cloneDraft source).ToArgs()
+        let args = (RunTypeEditor.newDraft source).ToArgs()
         let original = args.SetupParameters |> Array.find (fun row -> row.Key = key)
         Assert.Equal<string>([|defaultValue|], original.Values)
         Assert.False(RunTypeEditor.isModuleOwnedParameter source key)
         let changed = args.SetupParameters |> Array.map (fun row -> if row.Key = key then parameterDraft.create key [|changedValue|] else row)
-        let clone = RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = changed }) |> Result.defaultWith (fun issues -> failwithf "%A" issues)
+        let custom = RunTypeEditor.buildModuleRun source (runDraft.create { args with SetupParameters = changed }) |> Result.defaultWith (fun issues -> failwithf "%A" issues)
         let before = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
-        let after = RunParameterGeneration.generate clone 0<replNumber> 1<replNumber>
+        let after = RunParameterGeneration.generate custom 0<replNumber> 1<replNumber>
         Assert.Equal(before.Length, after.Length)
         for row in after do
             Assert.Equal(changedValue, row.ParamMap[key])

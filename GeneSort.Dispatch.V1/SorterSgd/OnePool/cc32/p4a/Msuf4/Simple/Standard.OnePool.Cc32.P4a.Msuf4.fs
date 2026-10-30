@@ -44,13 +44,13 @@ module Standard =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = SimpleParams.simpleStandardSetupParams @ parameterSpansSetup
                     QueryCatalogName = standardSetupQueryCatalogName
-                    EnhancerFunctionName = standardSetupEnhancerFunctionName
+                    ParametersEnhancerName = standardSetupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = standardExecutionFunctionName
                     ParameterSpans = []
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = standardExecutionEnhancerFunctionName
+                    ParametersEnhancerName = standardRunParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

@@ -56,7 +56,7 @@ module SetupOutputs =
             let query =
                 QueryParamsCatalogSetup.get configured.SetupQueryCatalogName
                     configured.ProjectName configured.DatabaseName
-            let enhance = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
+            let enhance = SetupParametersEnhancerCatalog.get configured.SetupParametersEnhancerName
             let context = { Run = configured; QueryParamsFromSetupParams = query }
             let parameters =
                 SimpleRun.makeSetupParameters repl (Checked.(+) repl 1<replNumber>)

@@ -56,7 +56,7 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
             FunctionName = executeName
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-            EnhancerFunctionName = RunParamBuilderNames.Enhancer.msuf32MutationRate
+            ParametersEnhancerName = RunParametersEnhancerNames.msuf32MutationRate
         }
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.sgdStandard
@@ -64,7 +64,7 @@ let private makeRunWithExecuteName executeName names (projectName: string) (runN
             SorterEvalModule = UMX.tag "SorterEval.Prefix"
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            ParametersEnhancerName = SetupParametersEnhancerNames.noOp
         }
     } {
         MakerNames = names
@@ -95,13 +95,13 @@ let private makeSimpleRun executeName =
             FunctionName = executeName
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-            EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+            ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
         }
         Setup = {
             FunctionName = GeneSort.Project.V1.Catalogs.Setup.SetupCatalogNames.standard
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-            EnhancerFunctionName = SetupEnhancerFunctionNames.noOp
+            ParametersEnhancerName = SetupParametersEnhancerNames.noOp
         }
     }
     |> Run.ofSimple
@@ -117,8 +117,8 @@ let ``setup spans and query catalogs survive serialization for simple and SGD ru
         Assert.Equal("tests.setup-query", restored.SetupQueryCatalogName)
         Assert.Equal<(string * string list) list>(original.RunParameterSpans, restored.RunParameterSpans)
         Assert.Equal(original.RunQueryCatalogName, restored.RunQueryCatalogName)
-        Assert.Equal(original.RunEnhancerFunctionName, restored.RunEnhancerFunctionName)
-        Assert.Equal(original.SetupEnhancerFunctionName, restored.SetupEnhancerFunctionName)
+        Assert.Equal(original.RunParametersEnhancerName, restored.RunParametersEnhancerName)
+        Assert.Equal(original.SetupParametersEnhancerName, restored.SetupParametersEnhancerName)
 
 [<Theory>]
 [<InlineData(false)>]
@@ -146,8 +146,8 @@ let ``host generates independent setup and run combinations using their own quer
         Some (queryParams.create database project (rp.GetRepl()) None dataType [|"Phase", "run"|]))
     QueryParamsCatalogSetup.register setupQuery (fun project database sp dataType ->
         Some (queryParams.create database project (sp.GetRepl()) None dataType [|"Phase", "setup"|]))
-    let setupEnhancerName = "tests.setup-enhancer." + Guid.NewGuid().ToString("N")
-    SetupEnhancerCatalog.register setupEnhancerName (fun context sp ->
+    let setupParametersEnhancerName = "tests.setup-parameters-enhancer." + Guid.NewGuid().ToString("N")
+    SetupParametersEnhancerCatalog.register setupParametersEnhancerName (fun context sp ->
         let query = context.QueryParamsFromSetupParams sp (geneSortDataType.Run context.Run.RunName) |> Option.get
         sp.WithId(Some query.Id))
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
@@ -157,7 +157,7 @@ let ``host generates independent setup and run combinations using their own quer
             RunQueryCatalogName = runQuery
             SetupParameterSpans = [|{ Key = "SetupOnly"; Values = [|"one"; "two"|] }|]
             SetupQueryCatalogName = setupQuery
-            SetupEnhancerFunctionName = setupEnhancerName }
+            SetupParametersEnhancerName = setupParametersEnhancerName }
         |> RunDto.toDomain
     let host = runHost.Create configured 1
     let runParameters = host.MakeRunParameters 0<replNumber> 2<replNumber>
@@ -178,15 +178,15 @@ let ``host generates independent setup and run combinations using their own quer
 [<Fact>]
 let ``parameter refinement enhances every parameter combination`` () =
     let enhancerName = "tests.enhance-every-combination"
-    RunParamEnhancerBuilders.register enhancerName (fun _ rp -> rp.WithRunFinished(Some false)) |> ignore
+    RunParametersEnhancerCatalog.register enhancerName (fun _ rp -> rp.WithRunFinished(Some false)) |> ignore
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
-    let configuredRun = { dto with RunEnhancerFunctionName = enhancerName } |> RunDto.toDomain
+    let configuredRun = { dto with RunParametersEnhancerName = enhancerName } |> RunDto.toDomain
     let host = runHost.Create configuredRun 1
     let inputs =
         [| for width in [ 3; 4; 5; 8 ] ->
             emptyParameters.WithChannelCount(Some (UMX.tag<channelCount> width))
                 .WithSimpleSorterModelType(Some simpleSorterModelType.Msuf4) |]
-    let results = host.ParamMapRefiner inputs |> Seq.toArray
+    let results = host.EnhanceRunParameters inputs |> Seq.toArray
     Assert.Equal(inputs.Length, results.Length)
     Array.iter2 (fun (input: runParameters) (result: runParameters) ->
         Assert.Equal(input.GetChannelCount(), result.GetChannelCount())
@@ -197,7 +197,7 @@ let ``hosts reject unknown enhancers at creation`` () =
     for original in [makeSimpleRun ExecuteFunctionNames.sorterEval; makeRun EvolutionMakerNames.standard "Tests" "Sgd"] do
         let dto = RunDto.fromDomain original
         let unknown = "tests.unknown-enhancer." + Guid.NewGuid().ToString("N")
-        for configured in [ { dto with RunEnhancerFunctionName = unknown }; { dto with SetupEnhancerFunctionName = unknown } ] do
+        for configured in [ { dto with RunParametersEnhancerName = unknown }; { dto with SetupParametersEnhancerName = unknown } ] do
             let error = Assert.Throws<InvalidOperationException>(fun () -> runHost.Create (RunDto.toDomain configured) 1 |> ignore)
             Assert.Contains(unknown, error.Message)
 
@@ -207,23 +207,23 @@ let ``hosts retain resolved enhancers for refinement and generation`` () =
         let name = "tests.stored-enhancer." + Guid.NewGuid().ToString("N")
         let mutable runCalls = 0
         let mutable setupCalls = 0
-        let enhanceRun : runParamEnhancerBuilder = fun _ rp ->
+        let enhanceRun : runParametersEnhancer = fun _ rp ->
             runCalls <- runCalls + 1
             rp.WithRunFinished(Some false)
-        let enhanceSetup : setupEnhancerFunction = fun _ sp ->
+        let enhanceSetup : setupParametersEnhancer = fun _ sp ->
             setupCalls <- setupCalls + 1
             sp
-        RunParamEnhancerBuilders.register name enhanceRun |> ignore
-        SetupEnhancerCatalog.register name enhanceSetup
+        RunParametersEnhancerCatalog.register name enhanceRun |> ignore
+        SetupParametersEnhancerCatalog.register name enhanceSetup
         QueryParamsCatalogRun.register name (fun project database rp dataType ->
             Some (queryParams.create database project (rp.GetRepl()) None dataType [||]))
         let dto = RunDto.fromDomain original
-        let configured = RunDto.toDomain { dto with RunEnhancerFunctionName = name; SetupEnhancerFunctionName = name; RunQueryCatalogName = name }
+        let configured = RunDto.toDomain { dto with RunParametersEnhancerName = name; SetupParametersEnhancerName = name; RunQueryCatalogName = name }
         let host = runHost.Create configured 1
-        Assert.Same(enhanceRun, host.RunEnhancer)
-        Assert.Same(enhanceSetup, host.SetupEnhancer)
-        RunParamEnhancerBuilders.register name (fun _ _ -> failwith "Host looked up the run enhancer again.") |> ignore
-        let refined = host.ParamMapRefiner [emptyParameters] |> Seq.exactlyOne
+        Assert.Same(enhanceRun, host.RunParametersEnhancer)
+        Assert.Same(enhanceSetup, host.SetupParametersEnhancer)
+        RunParametersEnhancerCatalog.register name (fun _ _ -> failwith "Host looked up the run enhancer again.") |> ignore
+        let refined = host.EnhanceRunParameters [emptyParameters] |> Seq.exactlyOne
         Assert.Equal(Some false, refined.GetRunFinished())
         host.MakeSetupParameters 0<replNumber> 1<replNumber> |> ignore
         let generated = host.MakeRunParameters 0<replNumber> 1<replNumber>
@@ -235,11 +235,11 @@ let ``hosts retain resolved enhancers for refinement and generation`` () =
 [<Fact>]
 let ``no-op setup enhancers preserve parameters without invoking the run enhancer`` () =
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
-    for name in [SetupEnhancerFunctionNames.noOp; SetupEnhancerFunctionNames.sortableTests] do
-        let configured = RunDto.toDomain { dto with SetupEnhancerFunctionName = name }
+    for name in [SetupParametersEnhancerNames.noOp; SetupParametersEnhancerNames.sortableTests] do
+        let configured = RunDto.toDomain { dto with SetupParametersEnhancerName = name }
         let host = runHost.Create configured 1
         let input = setupParameters.create (Map.ofList ["custom", "preserved"])
-        let result = host.SetupParamMapRefiner [input] |> Seq.exactlyOne
+        let result = host.EnhanceSetupParameters [input] |> Seq.exactlyOne
         Assert.Same(input, result)
         let generated = host.MakeSetupParameters 0<replNumber> 2<replNumber>
         Assert.Equal(2, generated.Length)
@@ -251,14 +251,14 @@ let ``no-op setup enhancers preserve parameters without invoking the run enhance
 [<InlineData(" ")>]
 let ``both enhancer function names are required when constructing runs`` missing =
     let dto = makeSimpleRun ExecuteFunctionNames.sorterEval |> RunDto.fromDomain
-    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with RunEnhancerFunctionName = missing } |> ignore) |> ignore
-    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with SetupEnhancerFunctionName = missing } |> ignore) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with RunParametersEnhancerName = missing } |> ignore) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> RunDto.toDomain { dto with SetupParametersEnhancerName = missing } |> ignore) |> ignore
 
 [<Fact>]
 let ``setup enhancer catalog rejects unknown names and duplicate registrations`` () =
-    Assert.Throws<InvalidOperationException>(fun () -> SetupEnhancerCatalog.get (Guid.NewGuid().ToString()) |> ignore) |> ignore
-    Assert.Throws<InvalidOperationException>(fun () -> SetupEnhancerCatalog.register SetupEnhancerFunctionNames.noOp SetupEnhancerCatalog.noOp) |> ignore
-    Assert.Throws<ArgumentException>(fun () -> SetupEnhancerCatalog.register " " SetupEnhancerCatalog.noOp) |> ignore
+    Assert.Throws<InvalidOperationException>(fun () -> SetupParametersEnhancerCatalog.get (Guid.NewGuid().ToString()) |> ignore) |> ignore
+    Assert.Throws<InvalidOperationException>(fun () -> SetupParametersEnhancerCatalog.register SetupParametersEnhancerNames.noOp SetupParametersEnhancers.noOp) |> ignore
+    Assert.Throws<ArgumentException>(fun () -> SetupParametersEnhancerCatalog.register " " SetupParametersEnhancers.noOp) |> ignore
 
 [<Theory>]
 [<InlineData("sorter-eval.evaluate")>]

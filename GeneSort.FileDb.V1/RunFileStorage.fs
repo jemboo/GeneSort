@@ -25,7 +25,7 @@ module internal RunFileStorage =
         validateIdentity configured
         if String.IsNullOrWhiteSpace projectsFolder || not (Path.IsPathFullyQualified projectsFolder) then
             invalidArg "projectsFolder" "Choose an absolute projects folder."
-        Path.Combine(Path.GetFullPath projectsFolder, %configured.ProjectName, %configured.DatabaseName, "Data") |> UMX.tag<pathToRootFolder>
+        DatabasePaths.dataRoot (Path.GetFullPath projectsFolder) %configured.ProjectName %configured.DatabaseName |> UMX.tag<pathToRootFolder>
 
     /// Check every path before moving or recursively deleting generated directories.
     let private within (root: string<pathToRootFolder>) path =
@@ -43,7 +43,8 @@ module internal RunFileStorage =
     let paths (root: string<pathToRootFolder>) (configured: run) =
         validateIdentity configured
         let database = DirectoryInfo(%root).Parent
-        if isNull database || isNull database.Parent || database.Name <> %configured.DatabaseName || database.Parent.Name <> %configured.ProjectName then
+        let suffix = string Path.DirectorySeparatorChar + DatabasePaths.relativeFolder %configured.ProjectName %configured.DatabaseName
+        if isNull database || not (database.FullName.EndsWith(suffix, comparison)) then
             invalidArg "root" "The destination database does not match this run."
         let definition = OutputDataFile.getFullOutputDataFilePath root geneSortDataMode.Project
                             (queryParams.createForRun configured.DatabaseName configured.ProjectName configured.RunName) |> UMX.untag |> within root

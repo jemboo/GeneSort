@@ -23,7 +23,7 @@ module RunParameterFileTests =
         |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors)
 
     let private request configured first count = { Run = configured; FirstReplica = first; ReplicaCount = count }
-    let private rootFor root (configured: run) = Path.Combine(root, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag<pathToRootFolder>
+    let private rootFor root (configured: run) = DatabasePaths.dataRoot root (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag<pathToRootFolder>
     let private database root configured = new GeneSortDbMp(rootFor root configured, configured.RunQueryCatalogName) :> IGeneSortDb
     let private snapshot root =
         Directory.GetFiles(root, "*", SearchOption.AllDirectories)

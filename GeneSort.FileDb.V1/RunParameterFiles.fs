@@ -70,13 +70,13 @@ module RunParameterFiles =
                 if args.Run.ParameterSource.IsNone then RunPreparation.prepare args
                 else
                     let openSource (source: run) : IGeneSortDb =
-                        new GeneSortDbMp(RunFileStorage.dataRoot projectsFolder source, source.RunQueryCatalogName)
+                        new GeneSortDbMp(RunFileStorage.dataRoot projectsFolder source, source.RunQueryCatalogName, source.ProjectName)
                     RunPreparation.prepareWith
                         (RunParameterGeneration.generateWithSourceSelection (EvoCondenseSelection.select openSource) args.Run) args
             preparedRunFiles.create root prepared)
 
     let generateAsync (prepared: preparedRunFiles) (replace: bool) (progress: IProgress<string>) = task {
-        let db = new GeneSortDbMp(prepared.Root, prepared.Run.RunQueryCatalogName) :> IGeneSortDb
+        let db = new GeneSortDbMp(prepared.Root, prepared.Run.RunQueryCatalogName, prepared.Run.ProjectName) :> IGeneSortDb
         let mode = if replace then runParameterWriteMode.Replace else runParameterWriteMode.CreateNew
         let! result = RunPreparation.publishAsync db prepared.Prepared mode (Option.ofObj progress) |> Async.StartAsTask
         match result with
@@ -87,7 +87,7 @@ module RunParameterFiles =
 
     /// Add missing replica files without replacing any saved progress or changing the definition.
     let appendAsync (prepared: preparedRunFiles) (progress: IProgress<string>) = task {
-        let db = new GeneSortDbMp(prepared.Root, prepared.Run.RunQueryCatalogName) :> IGeneSortDb
+        let db = new GeneSortDbMp(prepared.Root, prepared.Run.RunQueryCatalogName, prepared.Run.ProjectName) :> IGeneSortDb
         let! result = RunPreparation.publishAsync db prepared.Prepared runParameterWriteMode.Append (Option.ofObj progress) |> Async.StartAsTask
         match result with
         | Ok () -> return ()

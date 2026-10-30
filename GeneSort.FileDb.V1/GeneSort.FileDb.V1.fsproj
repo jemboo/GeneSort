@@ -9,6 +9,7 @@
     <Compile Include="CheckpointIntegrity.fs" />
     <Compile Include="OutputDataFile.fs" />
     <Compile Include="CheckpointFiles.fs" />
+    <Compile Include="DatabasePaths.fs" />
     <Compile Include="RunFileStorage.fs" />
     <Compile Include="GeneSortDbMp.fs" />
     <Compile Include="RunDefinitionFiles.fs" />

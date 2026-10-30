@@ -24,13 +24,12 @@ module SorterEvalDbs =
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
-        let dbFolder = 
-                $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolder = RunHost.makeDataFolder sourceRun
 
 
         let makeQueryParams = QueryParamsBuildersRun.SorterEval.Standard.makeLibraryQueryParams projectName dbName
         let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Standard.libraryQueryFromParameters projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalStandard)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalStandard, projectName)
 
 
 
@@ -40,12 +39,11 @@ module SorterEvalDbs =
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
-        let dbFolder = 
-                $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolder = RunHost.makeDataFolder sourceRun
 
         let makeQueryParams = QueryParamsBuildersRun.SorterEval.Merge.makeLibraryQueryParams projectName dbName
         let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Merge.libraryQueryFromParameters projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalMerge)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalMerge, projectName)
 
 
 
@@ -63,14 +61,13 @@ module SorterEvalDbs =
             |> UMX.tag<sorterCount>
 
         let dbName = sourceRun.DatabaseName
-        let dbFolder = 
-                $"c:\\Projects\\{projectName}\\{%dbName}\\Data" |> UMX.tag<pathToRootFolder>
+        let dbFolder = RunHost.makeDataFolder sourceRun
 
         let makeQueryParams repl rng prefixLib model dataFormat sorterCount evalType outputType =
             QueryParamsBuildersRun.SorterEval.Prefix.makeLibraryQueryParams
                 projectName dbName repl rng prefixLib model dataFormat sorterCount evalType outputType
         let queryParamsFromRunParams = QueryParamsBuildersRun.SorterEval.Prefix.libraryQueryFromParameters projectName dbName
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalPrefix)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sorterEvalPrefix, projectName)
 
 
 

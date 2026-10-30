@@ -18,7 +18,7 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+    let runParametersEnhancerName = RunParametersEnhancerNames.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
 
@@ -56,7 +56,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -86,7 +86,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -116,7 +116,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -173,7 +173,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -226,7 +226,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -253,7 +253,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )

@@ -20,13 +20,13 @@ let private makeRun spans query enhancer =
             FunctionName = "unused.execute"
             ParameterSpans = ["RunOnly", ["unused"]]
             QueryCatalogName = "unused.run-query"
-            EnhancerFunctionName = "unused.run-enhancer"
+            ParametersEnhancerName = "unused.run-enhancer"
         }
         Setup = {
             FunctionName = "unused.setup-function"
             ParameterSpans = spans
             QueryCatalogName = query
-            EnhancerFunctionName = enhancer
+            ParametersEnhancerName = enhancer
         }
     }
 
@@ -38,7 +38,7 @@ let ``setup prediction uses the setup registry when run and setup names match`` 
     QueryParamsCatalogRun.register name (fun _ _ _ _ -> failwith "Run builder must not be used for setup")
     QueryParamsCatalogSetup.register name (fun project database sp outputType ->
         Some (queryParams.create database project (sp.GetRepl()) None outputType [|"Source", "setup"|]))
-    let configured = makeRun [] name SetupEnhancerFunctionNames.noOp
+    let configured = makeRun [] name SetupParametersEnhancerNames.noOp
     let outputType = geneSortDataType.SorterModelSet ""
     let ids = SetupOutputs.getIds configured 0<replNumber> outputType |> unwrap
     let expected = queryParams.create (UMX.tag "Database") (UMX.tag "Project") (Some 0<replNumber>) None outputType [|"Source", "setup"|]
@@ -48,7 +48,7 @@ let ``setup prediction uses the setup registry when run and setup names match`` 
 let ``IDs use every enhanced setup combination for exactly the requested replica and output type`` () =
     let name = Guid.NewGuid().ToString("N")
     let mutable enhanced = 0
-    SetupEnhancerCatalog.register name (fun context sp ->
+    SetupParametersEnhancerCatalog.register name (fun context sp ->
         Assert.Equal("Run", %context.Run.RunName)
         enhanced <- enhanced + 1
         sp.WithGenerationCurrent(Some (UMX.tag 12)))
@@ -72,7 +72,7 @@ let ``duplicate IDs are preserved for different parameter combinations`` () =
     let name = Guid.NewGuid().ToString("N")
     QueryParamsCatalogSetup.register name (fun project database sp outputType ->
         Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
-    let configured = makeRun ["IgnoredByQuery", ["a"; "b"]] name SetupEnhancerFunctionNames.noOp
+    let configured = makeRun ["IgnoredByQuery", ["a"; "b"]] name SetupParametersEnhancerNames.noOp
     let ids = SetupOutputs.getIds configured 0<replNumber> (geneSortDataType.SortableTests "") |> unwrap
     Assert.Equal(2, ids.Length)
     Assert.Equal(ids.[0], ids.[1])
@@ -83,7 +83,7 @@ let ``missing query returns an error instead of silently dropping a combination`
     QueryParamsCatalogSetup.register name (fun project database sp outputType ->
         if sp.ParamMap.["A"] = "missing" then None
         else Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
-    let configured = makeRun ["A", ["ok"; "missing"]] name SetupEnhancerFunctionNames.noOp
+    let configured = makeRun ["A", ["ok"; "missing"]] name SetupParametersEnhancerNames.noOp
     match SetupOutputs.getIds configured 3<replNumber> (geneSortDataType.SorterModelSet "") with
     | Ok _ -> failwith "Expected incomplete query generation to fail"
     | Error message ->
@@ -97,7 +97,7 @@ let ``empty spans produce one ID while an empty span produces none`` () =
     QueryParamsCatalogSetup.register name (fun project database sp outputType ->
         Some (queryParams.create database project (sp.GetRepl()) None outputType [||]))
     let outputType = geneSortDataType.SortableTests ""
-    let ids = SetupOutputs.getIds (makeRun [] name SetupEnhancerFunctionNames.noOp) 0<replNumber> outputType |> unwrap
+    let ids = SetupOutputs.getIds (makeRun [] name SetupParametersEnhancerNames.noOp) 0<replNumber> outputType |> unwrap
     Assert.Single(ids) |> ignore
-    let empty = SetupOutputs.getIds (makeRun ["A", []] name SetupEnhancerFunctionNames.noOp) 0<replNumber> outputType |> unwrap
+    let empty = SetupOutputs.getIds (makeRun ["A", []] name SetupParametersEnhancerNames.noOp) 0<replNumber> outputType |> unwrap
     Assert.Empty(empty)

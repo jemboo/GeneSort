@@ -20,7 +20,8 @@ type private DbMessage =
 
 type GeneSortDbMp(
                 rootFolder: string<pathToRootFolder>,
-                ?queryCatalogName: string) =
+                ?queryCatalogName: string,
+                ?projectIdentity: string<projectName>) =
 
     let dataFolder = DirectoryInfo(%rootFolder)
     let databaseFolder = dataFolder.Parent
@@ -92,7 +93,7 @@ type GeneSortDbMp(
             with get (): string<databaseName> = databaseFolder.Name |> UMX.tag
 
         member _.makeQueryParamsFromRunParams rp odt =
-            let projectName = projectFolder.Name |> UMX.tag<projectName>
+            let projectName = projectIdentity |> Option.defaultWith (fun () -> projectFolder.Name |> UMX.tag<projectName>)
             let databaseName = databaseFolder.Name |> UMX.tag<databaseName>
             (QueryParamsCatalogRun.get catalogName projectName databaseName) rp odt
 

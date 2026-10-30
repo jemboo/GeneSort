@@ -2,11 +2,11 @@
 
 Setup and execution enhancers validate configured settings, derive dependent values, attach file references, and initialize execution identity/state. `ChannelCount` belongs to the run's module: modules place their fixed value in parameter spans, and continuations inherit it from their source. Modules also construct prefix IDs from their channel count, stage length, and variant. Enhancers do not choose these values.
 
-This inventory covers every built-in registration in [SetupEnhancerCatalog.fs](SetupParameters/SetupEnhancerCatalog.fs) and [RunParamFunctionCatalogs.fs](RunParameters/RunParamFunctionCatalogs.fs), including their shared helpers. Values below overwrite an existing value unless explicitly described as a missing-value default or an inheritance rule.
+This inventory covers the built-in functions in [SetupParametersEnhancers.fs](SetupParameters/SetupParametersEnhancers.fs) and [RunParametersEnhancers.fs](RunParameters/RunParametersEnhancers.fs). Their registrations live in [SetupParametersEnhancerCatalog.fs](SetupParameters/SetupParametersEnhancerCatalog.fs) and [RunParametersEnhancerCatalog.fs](RunParameters/RunParametersEnhancerCatalog.fs). Values below overwrite an existing value unless explicitly described as a missing-value default or an inheritance rule.
 
 ## Setup enhancers
 
-Registration names in this section have the prefix `setup-enhancer.`.
+Registration names in this section have the prefix `setup-parameters-enhancer.`.
 
 | Registration | Parameters assigned |
 | --- | --- |
@@ -27,13 +27,15 @@ The shared seed calculations and initial state are:
 
 The R/S wrappers validate activation settings before invoking their base enhancer. `standard-msuf32` also validates the full setup settings; `soss-msuf32` validates seed-pool settings.
 
-## Execution enhancers for testing and evaluation
+## Run parameter enhancers for testing and evaluation
+
+Registration names in the run parameter tables have the prefix `run-parameters-enhancer.`.
 
 Every enhancer in this table assigns `DatabaseName` and `RunName` from the run, `RunFinished = false`, and `Id` from the selected run query catalog.
 
 | Registration | Additional assignments |
 | --- | --- |
-| `sortable-test` | None. |
+| `sortable-tests` | None. |
 | `sorter-eval-standard` | None. |
 | `sorter-eval-merge` | None. |
 | `sorter-eval-prefix` | None. |
@@ -46,7 +48,7 @@ Prefix evaluation explicitly copies `RngType`, `PrefixLibId`, `SimpleSorterModel
 
 ## Explicit run settings
 
-Mutation rates, population sizes, and selection settings are now declared in module parameter spans. Clones can edit these values within the source's declared phases. Enhancers do not supply defaults or overwrite them.
+Mutation rates, population sizes, and selection settings are now declared in module parameter spans. Custom drafts can edit these values within the source's declared phases. Enhancers do not supply defaults or overwrite them.
 
 | Parameter | Module defaults and behavior |
 | --- | --- |
@@ -67,7 +69,7 @@ Changing the new execution controls changes run and evolutionary-result identiti
 
 ## Module owned settings
 
-Each SGD module declares a `moduleParameters` list containing its RNG type, model type, data format, prefix identity, evaluation measures, and fixed policies `ExcludeSelfCe = true` and `CollectNewSortableTests = false` (stored as `CollectSortableTests`). Evaluation and mutation modules also explicitly declare these policies. These values are saved in the Setup spans and inherited by execution and continuation runs. The UI shows them read-only in clones; backend validation also rejects changes or removal.
+Each SGD module declares a `moduleParameters` list containing its RNG type, model type, data format, prefix identity, evaluation measures, and fixed policies `ExcludeSelfCe = true` and `CollectNewSortableTests = false` (stored as `CollectSortableTests`). Evaluation and mutation modules also explicitly declare these policies. These values are saved in the Setup spans and inherited by execution and continuation runs. The UI shows them read-only in custom drafts; backend validation also rejects changes or removal.
 
 | Module family | Model | Prefix stage / variant | RNG | Data format |
 | --- | --- | --- | --- | --- |
@@ -77,7 +79,7 @@ Each SGD module declares a `moduleParameters` list containing its RNG type, mode
 | Mssi24 3b | Mssi | 4 / B | Lcg | BitVector512 |
 | Msuf6 24p3b | Msuf6 | 3 / B | Lcg | BitVector512 |
 
-Most SGD modules declare both evaluation measures as `stageBiasedFilterUnsorted`. Msuf6 retains its existing evaluation-measure comparison sweep. Its module declares `SorterEvalMeasureInitial = SameAsEvaluation`; parameter generation resolves that reference for each Setup combination, so the initial and evolution measures stay paired. The measure sweep remains editable in clones of those comparison runs.
+Most SGD modules declare both evaluation measures as `stageBiasedFilterUnsorted`. Msuf6 retains its existing evaluation-measure comparison sweep. Its module declares `SorterEvalMeasureInitial = SameAsEvaluation`; parameter generation resolves that reference for each Setup combination, so the initial and evolution measures stay paired. The measure sweep remains editable in custom drafts of those comparison runs.
 
 Existing non-SGD model/prefix comparison parameters remain configurable. Evaluation and mutation modules now declare their data format explicitly where an enhancer previously supplied it. Single-valued RNG and data-format settings are read-only module settings across workflows; explicit comparison sweeps remain configurable.
 
@@ -93,7 +95,7 @@ All preserve the explicit `SorterPoolCount`, set `RunFinished = false`, copy `Ru
 
 `RunParameterGeneration` pairs setup and execution combinations, copies fixed setup values, attaches setup references, records generated input-file identities, and calculates the final execution identity. It initializes `SetupCompleted = false`. Continuations import source settings and apply their execution overrides after enhancement. These lifecycle assignments are separate from the enhancer defaults listed above.
 
-Registered enhancers no longer supply configurable defaults or fixed experimental policies. Activation settings must be declared by the source run and cannot be removed from a clone; their values remain editable during Setup. Changing either activation setting changes seed/setup identity.
+Registered enhancers no longer supply configurable defaults or fixed experimental policies. Activation settings must be declared by the source run and cannot be removed from a custom draft; their values remain editable during Setup. Changing either activation setting changes seed/setup identity.
 
 ## Consolidated implementations
 

@@ -14,7 +14,7 @@ internal static partial class Program
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SortableTests.Prefix.Channels24"));
         Layout(view);
         Check(model.SelectedRunType?.Name == "SortableTests.Prefix.Channels24", "Picking a run type did not update the editor.");
-        model.New();
+        CreateOwn(root, model);
         model.SelectExample(model.Examples.Last());
         Layout(view);
         Check(ReferenceEquals(model.SelectedExample, model.Examples.Last()), "Picking an example did not update the editor.");
@@ -43,14 +43,14 @@ internal static partial class Program
         {
             var kind = model.RunTypes.Single(type => type.Name == name);
             model.SelectRunType(kind);
-            model.Clone();
+            CreateOwn(root, model);
             model.RunName = "EditorRoundTrip";
             if (model.HasSgdSourceSelection)
             {
                 Layout(view);
                 var testsDatabase = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "SortableTests source module");
                 var evalsDatabase = Descendants<TextBox>(view).Single(box => AutomationProperties.GetName(box) == "SorterEval source module");
-                Check(testsDatabase.IsReadOnly && evalsDatabase.IsReadOnly, "Module source module fields must remain read-only in a clone.");
+                Check(testsDatabase.IsReadOnly && evalsDatabase.IsReadOnly, "Module source module fields must remain read-only in a new draft.");
                 Check(testsDatabase.Text == model.SortableTestsModule && evalsDatabase.Text == model.SorterEvalModule,
                     "Source module fields are not bound.");
                 Check(model.Catalogs.Any(choice => choice.Role == "Setup.FunctionName"), "SGD setup function is not displayed.");
@@ -67,7 +67,7 @@ internal static partial class Program
         var soss = model.RunTypes.Single(type => type.Name == "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss");
         model.SelectRunType(soss);
         model.SelectExample(soss.Examples.Single(example => example.Name == "SossS"));
-        model.Clone();
+        CreateOwn(root, model);
         var rate = model.ExecutionParameters.Single(row => row.Key == ParamKeys.activatorMutationRateKey);
         Check(!rate.IsReadOnly, "Activator mutation rate must remain editable in evolution.");
         var inherited = model.ExecutionSection.InheritedRows;

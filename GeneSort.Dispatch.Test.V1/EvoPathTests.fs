@@ -20,8 +20,8 @@ open GeneSort.Project.Mp.V1
 let private configured () =
     let dto = WorkflowFixtures.sossSource [0; 1; 2; 3] |> RunDto.fromDomain
     { dto with
-        SetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32S
-        RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32S
+        SetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32S
+        RunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32S
         SetupParameterSpans = Array.append dto.SetupParameterSpans [|{ Key = ParamKeys.activationProbabilityKey; Values = [|"0.95"|] }|]
         RunParameterSpans = Array.append dto.RunParameterSpans [|{ Key = ParamKeys.activatorMutationRateKey; Values = [|"0"; "0.01"|] }|]
     } |> RunDto.toDomain

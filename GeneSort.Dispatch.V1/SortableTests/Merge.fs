@@ -17,7 +17,7 @@ open GeneSort.Dispatch.V1
 
 module Merge =
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+    let runParametersEnhancerName = RunParametersEnhancerNames.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestMerge
 
@@ -55,7 +55,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -109,7 +109,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -141,7 +141,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -198,7 +198,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -228,7 +228,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -284,7 +284,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -316,7 +316,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -374,7 +374,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )
@@ -404,7 +404,7 @@ module Merge =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        EnhancerFunctionName = executionEnhancerFunctionName
+                        ParametersEnhancerName = runParametersEnhancerName
                     }
                 }
             )

@@ -26,16 +26,16 @@ module Common =
 
     let onePoolSetupParams = SimpleParams.simpleSetupParams
 
-    let standardExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.evoMsuf32
-    let sossExecutionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32
+    let standardRunParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+    let sossRunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
     let standardExecutionFunctionName = ExecuteFunctionNames.standard
     let standardSetupFunctionName = SetupCatalogNames.sgdStandard
     let sossExecutionFunctionName = ExecuteFunctionNames.soss
     let sossSetupFunctionName = SetupCatalogNames.sgdSoss
     let standardExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
     let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-    let standardSetupEnhancerFunctionName = SetupEnhancerFunctionNames.standardMsuf32
-    let sossSetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32
+    let standardSetupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
+    let sossSetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
     let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
     let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 

@@ -11,7 +11,7 @@ module RunParameterGeneration =
     /// SortableTests has one sweep. The reference is retained solely because it
     /// participates in historical Run/RunParameters IDs; no setup is performed.
     let private generateDirect runQuery enhanceRun (configured: run) minReplica maxReplica =
-        let context = runParamEnhancerContext.create runQuery configured
+        let context = runParametersEnhancerContext.create runQuery configured
         SimpleRun.makeRunParameters minReplica maxReplica id configured.BaseRun
         |> Array.map (fun parameters ->
             let references = SetupOutputs.referencesFor configured (setupParameters.create parameters.ParamMap)
@@ -46,8 +46,8 @@ module RunParameterGeneration =
             (selectSources: run -> run -> runParameters[] -> runParameters[])
             (runQuery: runQueryParamsBuilder)
             (setupQuery: setupQueryParamsBuilder)
-            (enhanceRun: runParamEnhancerBuilder)
-            (enhanceSetup: setupEnhancerFunction)
+            (enhanceRun: runParametersEnhancer)
+            (enhanceSetup: setupParametersEnhancer)
             (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         if configured.IsDirectRun then generateDirect runQuery enhanceRun configured minReplica maxReplica
         else
@@ -102,9 +102,9 @@ module RunParameterGeneration =
                    for setup in setups do
                        let references =
                            if configured.ParameterSource.IsSome
-                              || configured.RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32 then []
+                              || configured.RunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32 then []
                            else SetupOutputs.referencesFor configured setup
-                       let context = runParamEnhancerContext.createForSetup runQuery configured setup
+                       let context = runParametersEnhancerContext.createForSetup runQuery configured setup
                        for parameters in runs do
                            let enhanced =
                                parameters
@@ -136,7 +136,7 @@ module RunParameterGeneration =
                            for KeyValue(key, value) in setup.ParamMap do
                                if RunParameterRoles.isFixed (Run.parameterRole configured key)
                                   && Map.tryFind key enhanced.ParamMap <> Some value then
-                                   invalidArg "RunEnhancerFunctionName"
+                                   invalidArg "RunParametersEnhancerName"
                                        (sprintf "Execution changed fixed Setup value '%s'. Its enhancer must preserve the prepared value." key)
                            // Resolve identities from the fully enhanced maker inputs. Execution-only
                            // parameters never enter these identities; continuations record imports in Setup.
@@ -154,11 +154,11 @@ module RunParameterGeneration =
     and generateWithSourceSelection selectSources (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         ProjectCatalogs.registerAll ()
         let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-        let enhanceRun = RunParamEnhancerBuilders.get configured.RunEnhancerFunctionName
+        let enhanceRun = RunParametersEnhancerCatalog.get configured.RunParametersEnhancerName
         if configured.IsDirectRun then generateDirect runQuery enhanceRun configured minReplica maxReplica
         else
             let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
-            let enhanceSetup = SetupEnhancerCatalog.get configured.SetupEnhancerFunctionName
+            let enhanceSetup = SetupParametersEnhancerCatalog.get configured.SetupParametersEnhancerName
             generateWithBindingsAndSourceSelection selectSources runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica
 
     let private unrankedSources (configured: run) source candidates =

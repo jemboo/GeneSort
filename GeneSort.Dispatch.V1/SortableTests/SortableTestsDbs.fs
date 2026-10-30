@@ -20,8 +20,7 @@ module SortableTestsDbs =
         let projectName = sourceRun.ProjectName
 
         let dbName = sourceRun.DatabaseName
-        let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
-                       |> UMX.tag<pathToRootFolder>
+        let dbFolder = RunHost.makeDataFolder sourceRun
 
 
         let makeMergeQueryParams repl mergeLibId sortableDataFormat outputDataType =
@@ -30,7 +29,7 @@ module SortableTestsDbs =
         let makeMergeQueryParamsFromRunParams rp odt =
             QueryParamsBuildersRun.SortableTests.Merge.libraryQueryFromParameters projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestMerge)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestMerge, projectName)
 
 
         let getMergeSortableTests
@@ -53,8 +52,7 @@ module SortableTestsDbs =
         let projectName = sourceRun.ProjectName
     
         let dbName = sourceRun.DatabaseName
-        let dbFolder = $"c:\\Projects\\{projectName}\\{%dbName}\\Data"
-                       |> UMX.tag<pathToRootFolder>
+        let dbFolder = RunHost.makeDataFolder sourceRun
 
 
         let makePrefixQueryParams repl prefixLibId sortableDataFormat outputDataType =
@@ -63,7 +61,7 @@ module SortableTestsDbs =
         let makePrefixQueryParamsFromRunParams rp odt =
             QueryParamsBuildersRun.SortableTests.Prefix.libraryQueryFromParameters projectName dbName rp odt
 
-        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestPrefix)
+        let db = new GeneSortDbMp(dbFolder, QueryCatalogNamesRun.sortableTestPrefix, projectName)
 
 
 

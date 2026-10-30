@@ -46,7 +46,7 @@ module RunTypeEditor =
 
     let newDraft configured =
         let args = (fromRun configured).ToArgs()
-        runDraft.create { args with RunName = "NewRun"; AllowOverwrite = false }
+        runDraft.create { args with RunName = "NewRun" }
 
     let canEditSetup (configured: run) key =
         configured.HasSetup && not configured.IsContinuationRun
@@ -246,13 +246,13 @@ module RunTypeEditor =
     let catalogChoices (configured: run) =
         [| yield catalogChoice.create "Execution.FunctionName" configured.ExecuteFunctionName "Execution function"
            yield catalogChoice.create "Execution.QueryCatalogName" configured.RunQueryCatalogName "Result file identity"
-           yield catalogChoice.create "Execution.EnhancerFunctionName" configured.RunEnhancerFunctionName "Execution parameters"
+           yield catalogChoice.create "Execution.ParametersEnhancerName" configured.RunParametersEnhancerName "Execution parameters"
            if configured.HasSetup then
                match configured.SetupFunctionName with
                | Some name -> yield catalogChoice.create "Setup.FunctionName" name "Setup function"
                | None -> ()
                yield catalogChoice.create "Setup.QueryCatalogName" configured.SetupQueryCatalogName "Shared input file identity"
-               yield catalogChoice.create "Setup.EnhancerFunctionName" configured.SetupEnhancerFunctionName "Setup parameters" |]
+               yield catalogChoice.create "Setup.ParametersEnhancerName" configured.SetupParametersEnhancerName "Setup parameters" |]
 
     /// Module identity is not stored in the existing file format. Match the complete
     /// workflow, then let the UI prefer the original project/database when available.
@@ -260,10 +260,10 @@ module RunTypeEditor =
         isEvolution example = isEvolution configured
         && example.ExecuteFunctionName = configured.ExecuteFunctionName
         && example.RunQueryCatalogName = configured.RunQueryCatalogName
-        && example.RunEnhancerFunctionName = configured.RunEnhancerFunctionName
+        && example.RunParametersEnhancerName = configured.RunParametersEnhancerName
         && example.SetupFunctionName = configured.SetupFunctionName
         && example.SetupQueryCatalogName = configured.SetupQueryCatalogName
-        && example.SetupEnhancerFunctionName = configured.SetupEnhancerFunctionName
+        && example.SetupParametersEnhancerName = configured.SetupParametersEnhancerName
         && example.MakerNames = configured.MakerNames
         && example.ParameterSource.IsSome = configured.ParameterSource.IsSome
 
@@ -330,7 +330,7 @@ module RunTypeEditor =
         else
             let execution: executionConfig = {
                 FunctionName = template.ExecuteFunctionName; QueryCatalogName = template.RunQueryCatalogName
-                EnhancerFunctionName = template.RunEnhancerFunctionName; ParameterSpans = spans draft.ExecutionParameters }
+                ParametersEnhancerName = template.RunParametersEnhancerName; ParameterSpans = spans draft.ExecutionParameters }
             let configured =
                 match template with
                 | run.DirectRun _ ->
@@ -343,7 +343,7 @@ module RunTypeEditor =
                         ProjectName = UMX.tag draft.ProjectName; DatabaseName = UMX.tag draft.DatabaseName; RunName = UMX.tag draft.RunName
                         Description = draft.Description; AllowOverwrite = draft.AllowOverwrite; Execution = execution
                         Setup = { FunctionName = Run.requireSetupFunctionName template; QueryCatalogName = template.SetupQueryCatalogName
-                                  EnhancerFunctionName = template.SetupEnhancerFunctionName; ParameterSpans = spans draft.SetupParameters }
+                                  ParametersEnhancerName = template.SetupParametersEnhancerName; ParameterSpans = spans draft.SetupParameters }
                     } |> Run.ofSimple
                 | run.EvolutionRun _ | run.ContinuationRun _ ->
                     SgdRun.create {
@@ -352,7 +352,7 @@ module RunTypeEditor =
                         Setup = { FunctionName = template.SgdSetup.Value.FunctionName
                                   SortableTestsModule = UMX.tag draft.SortableTestsModule
                                   SorterEvalModule = UMX.tag draft.SorterEvalModule
-                                  QueryCatalogName = template.SetupQueryCatalogName; EnhancerFunctionName = template.SetupEnhancerFunctionName
+                                  QueryCatalogName = template.SetupQueryCatalogName; ParametersEnhancerName = template.SetupParametersEnhancerName
                                   ParameterSpans = spans draft.SetupParameters }
                     } { MakerNames = template.MakerNames.Value; GenSaveIntervalsName = draft.GenSaveIntervalsName
                         GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName } |> SgdRun.withCheckpointIntervals (Option.ofObj draft.CheckpointIntervalsName) |> Run.ofSgd
@@ -360,11 +360,6 @@ module RunTypeEditor =
             | Some (source, selections) -> Run.withParameterSource source selections configured |> Ok
             | None -> Ok configured
 
-
-    /// Clone only the definition; generated rows and output files are separate artifacts.
-    let cloneDraft (configured: run) =
-        let args = (fromRun configured).ToArgs()
-        runDraft.create { args with RunName = args.RunName + "_clone" }
 
     /// Module-owned settings and phase membership remain fixed while editing a leaf.
     let buildModuleRun (template: run) (draft: runDraft) =
@@ -377,7 +372,6 @@ module RunTypeEditor =
         let add field = issues.Add(validationIssue.create field "This property is owned by the module and cannot be edited.")
         if edited.ProjectName <> original.ProjectName then add "ProjectName"
         if edited.DatabaseName <> original.DatabaseName then add "DatabaseName"
-        if edited.Description <> original.Description then add "Description"
         if edited.AllowOverwrite <> original.AllowOverwrite then add "AllowOverwrite"
         if edited.SortableTestsModule <> original.SortableTestsModule then add "SortableTestsModule"
         if edited.SorterEvalModule <> original.SorterEvalModule then add "SorterEvalModule"

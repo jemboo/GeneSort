@@ -85,7 +85,7 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
         Refresh();
     }
     public string Help => folderStep ? "Choose the folder containing your projects. Code definitions and runs saved there will appear together." :
-        creating ? "Choose a template for your new leaf. You can edit its name and parameters before saving." :
+        creating ? "Choose a template for your new leaf. You can edit its name, description, and parameters before saving." :
         "Open a module to continue. Select a run to configure and execute it, or create your own leaf.";
     public RunSelectionTile[] Tiles { get; private set; } = [];
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -178,8 +178,16 @@ public sealed class RunSelectionViewModel : INotifyPropertyChanged
             try { return Directory.Exists(path) ? Directory.GetDirectories(path).Where(p => (File.GetAttributes(p) & FileAttributes.ReparsePoint) == 0).ToArray() : []; }
             catch (Exception error) when (error is IOException or UnauthorizedAccessException) { errors.Add($"{path}: {error.Message}"); return []; }
         }
-        foreach (var project in Directories(root))
-            foreach (var database in Directories(project))
+        IEnumerable<string> Databases(string folder)
+        {
+            if (Directory.Exists(Path.Combine(folder, "Data", "Project", "Run")))
+                yield return folder;
+            foreach (var child in Directories(folder))
+                if (!string.Equals(Path.GetFileName(child), "Data", StringComparison.OrdinalIgnoreCase))
+                    foreach (var database in Databases(child))
+                        yield return database;
+        }
+        foreach (var database in Databases(root))
                 foreach (var runFolder in Directories(Path.Combine(database, "Data", "Project", "Run")))
                 {
                     string[] paths;

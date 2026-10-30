@@ -27,9 +27,9 @@ internal static partial class Program
             model.ProjectsFolder = root;
             Check(model.Validate() is not null, string.Join("; ", model.Issues));
             var count = model.ModuleChannelCount;
-            model.Clone();
+            CreateOwn(root, model);
             Layout(view);
-            Check(model.ModuleChannelCount == count && model.CanEditDefinition, "Clone changed the module channel count.");
+            Check(model.ModuleChannelCount == count && model.CanEditDefinition, "New draft changed the module channel count.");
             Check(!Descendants<Button>(view).Any(button => button.Content is "Save" or "New" or "Open…"),
                 "Removed editor actions remain visible.");
             var configurationTabs = Descendants<TabControl>(view).Single();
@@ -43,11 +43,11 @@ internal static partial class Program
             configurationTabs.SelectedIndex = 0;
             Layout(view);
             foreach (var row in model.SetupParameters.Where(row => row.Key == ParamKeys.aMaxKey || row.Key == ParamKeys.activationProbabilityKey))
-                Check(!row.IsReadOnly, $"Activation parameter {row.Key} is not editable in a clone.");
+                Check(!row.IsReadOnly, $"Activation parameter {row.Key} is not editable in a new draft.");
             if (name.StartsWith("SorterSgd", StringComparison.Ordinal))
                 foreach (var row in model.SetupParameters.Where(row => RunTypeEditor.isModuleOwnedParameter(model.SelectedExample!.Run, row.Key)))
                 {
-                    Check(row.IsReadOnly, $"Module setting {row.Key} is editable in a clone.");
+                    Check(row.IsReadOnly, $"Module setting {row.Key} is editable in a new draft.");
                     var originalValue = row.Values[0].Text;
                     row.Values[0].Text = "changed";
                     Check(model.Validate() is null, $"Module setting {row.Key} bypassed validation.");
@@ -77,14 +77,14 @@ internal static partial class Program
             Wait(model.SaveAsync(configured, false));
             Wait(model.OpenAsync(RunDefinitionFiles.pathFor(root, configured)));
             Check(model.SelectedRunType?.Name == name && model.ModuleChannelCount == count && model.DefinitionReadOnly,
-                "Saved clone reopened under another channel module.");
+                "Saved custom run reopened under another channel module.");
         }
         foreach (var (name, key, control) in new[] {
             ("SortableTests.Prefix.Channels24", ParamKeys.prefixLibIdKey, "Prefix library value"),
             ("SortableTests.Merge.Channels32", ParamKeys.mergeLibIdKey, "Merge library value") })
         {
             model.SelectRunType(model.RunTypes.Single(type => type.Name == name));
-            model.Clone();
+            CreateOwn(root, model);
             CheckLibrarySelection(model, view, key, control);
         }
         Check(bindingErrors.Length == 0, bindingErrors.ToString());

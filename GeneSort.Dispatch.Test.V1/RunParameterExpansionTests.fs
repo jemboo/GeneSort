@@ -89,17 +89,17 @@ let ``standalone test Results use the same identity for generation and downstrea
 let private configure runValues setupValues outputTypes setupQuery =
     let name = Guid.NewGuid().ToString("N")
     let setupCalls = ref 0
-    SetupEnhancerCatalog.register name (fun context sp ->
+    SetupParametersEnhancerCatalog.register name (fun context sp ->
         setupCalls.Value <- setupCalls.Value + 1
         sp.WithGenerationCurrent(Some (UMX.tag 12))
-        |> SetupEnhancerCatalog.withFileReferences outputTypes context)
+        |> SetupParametersEnhancers.withFileReferences outputTypes context)
     QueryParamsCatalogSetup.register name setupQuery
     QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
         // A registered builder owns its full identity; the catalog adds nothing.
         queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]
         |> QueryParamsBuildersRun.withSetupReferences rp
         |> Some)
-    RunParamEnhancerBuilders.register name (fun context rp ->
+    RunParametersEnhancerCatalog.register name (fun context rp ->
         let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
         Assert.Equal(setup.GetRepl(), rp.GetRepl())
         Assert.True(rp.GetSetupParametersId().IsSome)
@@ -116,13 +116,13 @@ let private configure runValues setupValues outputTypes setupQuery =
                 FunctionName = "unused"
                 ParameterSpans = ["R", runValues]
                 QueryCatalogName = name + ".run"
-                EnhancerFunctionName = name
+                ParametersEnhancerName = name
             }
             Setup = {
                 FunctionName = "unused"
                 ParameterSpans = ["S", setupValues]
                 QueryCatalogName = name
-                EnhancerFunctionName = name
+                ParametersEnhancerName = name
             }
         } |> Run.ofSimple
     configured, setupCalls
@@ -206,7 +206,7 @@ let ``built-in setup enhancers populate their required file IDs`` () =
     let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
     let context = { Run = configured; QueryParamsFromSetupParams = setupQuery }
     let input = (setupParameters.create (Map.ofList ["S", "one"])).WithRepl(Some 0<replNumber>)
-    for enhancer, pool in [SetupEnhancerCatalog.sorterEval, false; SetupEnhancerCatalog.sorterMutate, false; SetupEnhancerCatalog.sorterSgd, true] do
+    for enhancer, pool in [SetupParametersEnhancers.sorterEval, false; SetupParametersEnhancers.sorterMutate, false; SetupParametersEnhancers.sorterSgd, true] do
         let enhanced = enhancer context input
         let expected outputType = setupQuery enhanced outputType |> Option.get |> fun q -> Some q.Id
         Assert.Equal(expected (geneSortDataType.SortableTestsWithPrefix ""), enhanced.GetSetupSortableTestsWithPrefixId())

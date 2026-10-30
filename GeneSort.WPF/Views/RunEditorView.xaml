@@ -47,10 +47,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <DockPanel Margin="0,0,0,8" IsEnabled="{Binding IsReady}">
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="Back" Click="ChooseRun_Click" ToolTip="Back to this run module. Your editor changes are kept." />
-                <Button Content="Clone" Click="Clone_Click" IsEnabled="{Binding CanClone}" ToolTip="Clone the opened definition in the same module. Parameter files and results are not copied." />
-            </StackPanel>
+            <Button DockPanel.Dock="Right" VerticalAlignment="Center" Content="Back" Click="ChooseRun_Click" ToolTip="Back to this run module. Your editor changes are kept." />
             <StackPanel>
                 <TextBlock Text="Run editor" FontSize="20" FontWeight="SemiBold" />
                 <TextBlock Text="{Binding DirtyLabel}" Foreground="{DynamicResource WarningBrush}">
@@ -77,10 +74,10 @@
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
                     <StackPanel Margin="0,0,12,0">
-                        <TextBlock Text="Project name" /><TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Project name" />
+                        <TextBlock Text="Project name" /><TextBox IsReadOnly="True" Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Project name" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Margin="0,0,12,0">
-                        <TextBlock Text="Database name" /><TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Database name" />
+                        <TextBlock Text="Database name" /><TextBox IsReadOnly="True" Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Database name" />
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Run name" /><TextBox IsReadOnly="{Binding DefinitionReadOnly}" Text="{Binding RunName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Run name" />
@@ -90,9 +87,9 @@
                     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <StackPanel>
                         <TextBlock Text="Description" />
-                        <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
+                        <TextBox IsReadOnly="{Binding DefinitionReadOnly}" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
                     </StackPanel>
-                    <CheckBox Grid.Column="1" IsEnabled="{Binding CanEditModuleProperties}" Content="Allow output overwrite" ToolTip="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="16,18,0,0" VerticalAlignment="Center" />
+                    <CheckBox Grid.Column="1" IsEnabled="False" Content="Allow output overwrite" ToolTip="Allow workflow output overwrite" IsChecked="{Binding AllowOverwrite}" Margin="16,18,0,0" VerticalAlignment="Center" />
                 </Grid>
                 <DockPanel Margin="0,8,0,0">
                     <TextBlock Text="Projects folder" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,10,0" />
@@ -124,11 +121,11 @@
                             <StackPanel Visibility="{Binding HasSgdSourceSelection, Converter={StaticResource VisibleIfTrue}}" Margin="0,0,0,12">
                                 <TextBlock Text="Setup source modules" FontWeight="SemiBold" />
                                 <TextBlock Text="SortableTests module" />
-                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SortableTestsModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SortableTests source module" />
+                                <TextBox IsReadOnly="True" Text="{Binding SortableTestsModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SortableTests source module" />
                                 <TextBlock Text="SorterEval module" Margin="0,6,0,0" />
-                                <TextBox IsReadOnly="{Binding ModulePropertiesLocked}" Text="{Binding SorterEvalModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterEval source module" />
+                                <TextBox IsReadOnly="True" Text="{Binding SorterEvalModule, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="SorterEval source module" />
                             </StackPanel>
-                            <TextBlock Text="{Binding DefinitionEditHelp}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8" Visibility="{Binding ModulePropertiesLocked, Converter={StaticResource VisibleIfTrue}}" />
+                            <TextBlock Text="{Binding DefinitionEditHelp}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8" />
                             <TextBlock Text="Use + value for a parameter sweep. Multiple values create combinations within each phase." TextWrapping="Wrap" />
                             <local:ParameterSectionView DataContext="{Binding SetupSection}" Visibility="{Binding DataContext.HasSetup, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibleIfTrue}}" />
                             <local:ParameterSectionView DataContext="{Binding ExecutionSection}" />
@@ -144,13 +141,13 @@
                     <TabItem Header="Save intervals" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">
                         <StackPanel Margin="12" IsEnabled="{Binding IsReady}">
                             <TextBlock Text="Checkpoint schedule" />
-                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding CheckpointIntervals}" IsEnabled="{Binding CanEditModuleProperties}" AutomationProperties.Name="Checkpoint schedule" />
+                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding CheckpointIntervals}" IsEnabled="False" AutomationProperties.Name="Checkpoint schedule" />
                             <TextBlock Text="Keep the latest valid recovery checkpoint for each processing row. Older checkpoints are removed after a successful save." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
                             <TextBlock Text="Snapshot schedule" />
-                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" IsEnabled="{Binding CanEditModuleProperties}" AutomationProperties.Name="Snapshot schedule" />
+                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SaveIntervals}" IsEnabled="False" AutomationProperties.Name="Snapshot schedule" />
                             <TextBlock Text="Keep all snapshots for timeline analysis. GenerationIntervalLast selects a zero-based index in this snapshot schedule." Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,12" />
                             <TextBlock Text="Summary sampling schedule" />
-                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SummaryIntervals}" IsEnabled="{Binding CanEditModuleProperties}" AutomationProperties.Name="Summary sampling schedule" />
+                            <ComboBox ItemsSource="{Binding Intervals}" ItemTemplate="{StaticResource IntervalTemplate}" SelectedValuePath="Name" SelectedValue="{Binding SummaryIntervals}" IsEnabled="False" AutomationProperties.Name="Summary sampling schedule" />
                             <TextBlock Text="This is a run setting. Replacing a saved run definition asks for confirmation separately." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" />
                         </StackPanel>
                     </TabItem>

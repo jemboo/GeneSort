@@ -75,7 +75,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     {
         if (IsBusy || tile.Definition is null) return;
         definitionReadOnly = !tile.CreateNew;
-        modulePropertiesLocked = true;
         if (tile.SavedPath is not null && !tile.CreateNew)
         {
             await OpenAsync(tile.SavedPath);
@@ -98,7 +97,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
             }
             IsDirty = tile.CreateNew;
             Validate();
-            Status = tile.CreateNew ? "New leaf. Edit its name and parameters, then save." :
+            Status = tile.CreateNew ? "New run. Edit its name, description, and parameters, then generate its parameter files." :
                 "Code definition selected. Save and generate its parameters before running.";
         }
         sourceModule = tile.ModulePath;
@@ -110,14 +109,10 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     public bool DefinitionReadOnly => definitionReadOnly;
     public bool CanEditDefinition => !definitionReadOnly && !IsBusy;
     public string DefinitionEditHelp => definitionReadOnly
-        ? "This run definition is read-only. Add replicas, or Clone to edit a new run."
-        : "Edit the run name and declared parameter values. Module settings are read-only.";
-    private bool modulePropertiesLocked;
-    public bool ModulePropertiesLocked => modulePropertiesLocked;
-    public bool CanEditModuleProperties => !modulePropertiesLocked && CanEditDefinition;
-    public bool CanClone => !IsBusy && !HasPendingParameter && editorTemplate is not null && Build().IsOk;
-    private bool AllowedInPhase(string key, bool setup) => !RunTypeEditor.isModuleOwnedParameter(editorTemplate, key) && (!modulePropertiesLocked ||
-        (setup ? editorTemplate.SetupParameterSpans : editorTemplate.RunParameterSpans).Any(span => span.Item1 == key));
+        ? "This run definition is read-only. Add replicas, or go Back and choose Create your own to start a new run."
+        : "Edit the run name, description, and declared parameter values. Module settings are read-only.";
+    private bool AllowedInPhase(string key, bool setup) => !RunTypeEditor.isModuleOwnedParameter(editorTemplate, key) &&
+        (setup ? editorTemplate.SetupParameterSpans : editorTemplate.RunParameterSpans).Any(span => span.Item1 == key);
     private run editorTemplate = null!;
     public runType[] RunTypes { get; } = RunTypeCatalog.all;
     public runType? SelectedRunType { get; private set; }
@@ -196,9 +191,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private bool HasProjectsFolder => !string.IsNullOrWhiteSpace(ProjectsFolder)
         && Path.IsPathFullyQualified(ProjectsFolder) && Directory.Exists(ProjectsFolder);
     public bool CanSave => CanEditDefinition && !HasPendingParameter && validatedRun is not null && HasProjectsFolder;
-    public string SaveHint => definitionReadOnly ? "This definition is read-only. Clone it to make changes." : !HasProjectsFolder ? "Select an existing projects folder first."
-        : HasPendingParameter ? "Add or cancel the pending parameter first."
-        : validatedRun is null ? "Validate the current definition before saving." : "Save the validated run definition.";
     public bool CanLoadRunParameters => !IsBusy && !HasPendingParameter && HasProjectsFolder && Build().IsOk;
     private string parallelThreads = "1";
     public string ParallelThreads
@@ -229,9 +221,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private void SaveStateChanged()
     {
         Changed(nameof(DefinitionReadOnly)); Changed(nameof(CanEditDefinition)); Changed(nameof(DefinitionEditHelp));
-
-        Changed(nameof(CanClone)); Changed(nameof(ModulePropertiesLocked)); Changed(nameof(CanEditModuleProperties));
-        Changed(nameof(CanSave)); Changed(nameof(SaveHint));
+        Changed(nameof(CanSave));
     }
 
     private runPreparationArgs PreparationArgs(run configured)
@@ -348,21 +338,20 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         SelectedExample = example;
         sourceModule = SelectedRunType?.Name;
         definitionReadOnly = true;
-        modulePropertiesLocked = true;
         editorTemplate = example.Run;
         Apply(RunTypeEditor.fromRun(editorTemplate));
         IsDirty = false;
-        Status = "Code definition selected. Add replicas, or Clone to edit a new run.";
+        Status = "Code definition selected. Add replicas, or go Back and choose Create your own to start a new run.";
     }
 
     public Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]> Build()
     {
-        if (definitionReadOnly && !Equals(Snapshot(), RunTypeEditor.fromRun(editorTemplate)))
+        var draft = Snapshot();
+        if (definitionReadOnly && !Equals(draft, RunTypeEditor.fromRun(editorTemplate)))
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
-                [validationIssue.create("Run", "This definition is read-only. Clone it to edit its name or parameters.")]);
-        var built = modulePropertiesLocked ? RunTypeEditor.buildModuleRun(editorTemplate, Snapshot())
-            : RunTypeEditor.build(editorTemplate, Snapshot());
-        var channelIssues = RunTypeEditor.validateChannelCount(ModuleChannelCount, editorTemplate, Snapshot());
+                [validationIssue.create("Run", "This definition is read-only. Go Back and choose Create your own to start a new run.")]);
+        var built = RunTypeEditor.buildModuleRun(editorTemplate, draft);
+        var channelIssues = RunTypeEditor.validateChannelCount(ModuleChannelCount, editorTemplate, draft);
         if (channelIssues.Length > 0)
             return Microsoft.FSharp.Core.FSharpResult<run, validationIssue[]>.NewError(
                 built.IsError ? [.. built.ErrorValue, .. channelIssues] : channelIssues);
@@ -480,31 +469,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         GenerationChanged();
     }
 
-    public void Clone()
-    {
-        if (!CanClone) return;
-        var source = Build().ResultValue;
-        var draft = RunTypeEditor.cloneDraft(source);
-        editorTemplate = RunTypeEditor.buildModuleRun(source, draft).ResultValue;
-        definitionReadOnly = false;
-        modulePropertiesLocked = true;
-        Apply(draft);
-        IsDirty = true;
-        hasChosenRun = true;
-        IsSelectingRun = false;
-        Validate();
-        Status = "Cloned definition. Edit the run name and declared parameter values, then save. Module settings are read-only.";
-    }
-
-    public void New()
-    {
-        definitionReadOnly = false;
-        modulePropertiesLocked = true;
-        editorTemplate = SelectedExample?.Run ?? editorTemplate;
-        Apply(RunTypeEditor.newDraft(editorTemplate));
-        Status = "New definition. Select a projects folder and validate before saving.";
-    }
-
     public run? Validate()
     {
         validatedRun = null;
@@ -547,7 +511,6 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         sourceModule = match.Type?.Name;
         SelectedExample = match.Example;
         definitionReadOnly = true;
-        modulePropertiesLocked = true;
         editorTemplate = configured;
         var root = RunDefinitionFiles.tryProjectsFolder(path, configured);
         Apply(RunTypeEditor.fromRun(configured));
@@ -571,7 +534,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         definitionReadOnly = true;
         IsDirty = false;
         SaveStateChanged();
-        Status = $"Saved {path}. The definition is now read-only; add replicas or Clone to make changes.";
+        Status = $"Saved {path}. The definition is now read-only; add replicas or go Back and choose Create your own to start a new run.";
     }
 
     public async Task<preparedRunFiles?> PrepareGenerationAsync()

@@ -18,7 +18,7 @@ open GeneSort.Project.V1.Storage
 /// Test libraries are addressed by their input parameters; evaluation libraries use saved definitions.
 module WorkflowSourceFiles =
     let private loadTests projectsFolder database workflow request query = async {
-        let root = Path.Combine(projectsFolder, "SortableTests", database, "Data") |> UMX.tag<pathToRootFolder>
+        let root = DatabasePaths.dataRoot projectsFolder "SortableTests" database |> UMX.tag<pathToRootFolder>
         let file = OutputDataFile.getFullOutputDataFilePath root geneSortDataMode.Results query |> UMX.untag
         if not (File.Exists file) then
             return Error (sprintf "Missing source library SortableTests/%s: %s. Expected result: %s. Generate and execute SortableTests.%s with these values in database '%s' under %s (any run name), then rerun Setup." database request file workflow database projectsFolder)
@@ -29,7 +29,7 @@ module WorkflowSourceFiles =
     }
 
     let private load projectsFolder project database queryCatalog replica matches outputType convert = async {
-        let root = Path.Combine(projectsFolder, project, database, "Data") |> UMX.tag<pathToRootFolder>
+        let root = DatabasePaths.dataRoot projectsFolder project database |> UMX.tag<pathToRootFolder>
         let definitionsFolder = Path.Combine(%root, "Project", "Run")
         let definitions =
             if not (Directory.Exists definitionsFolder) then [||]
@@ -69,7 +69,7 @@ module WorkflowSourceFiles =
             invalidArg "projectsFolder" "Choose an absolute projects folder."
         ProjectCatalogs.registerAll ()
         let openDatabase project database catalog =
-            new GeneSortDbMp(Path.Combine(projectsFolder, string project, string database, "Data") |> UMX.tag, catalog) :> IGeneSortDb
+            new GeneSortDbMp(DatabasePaths.dataRoot projectsFolder (string project) (string database) |> UMX.tag, catalog, project) :> IGeneSortDb
         let evals database queryCatalog replica matches =
             load projectsFolder "SorterEval" database queryCatalog replica matches (geneSortDataType.SorterSetEval "") OutputData.asSorterSetEval
         let resolveSource key (parameters: setupParameters) =

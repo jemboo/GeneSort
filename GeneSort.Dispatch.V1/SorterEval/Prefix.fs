@@ -21,10 +21,10 @@ module Prefix =
     let channelCount = 32<GeneSort.Sorting.channelCount>
     let sortableTestsModule = "SortableTests.Prefix.Channels32"
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalPrefix
+    let runParametersEnhancerName = RunParametersEnhancerNames.sorterEvalPrefix
     let executionFunctionName = ExecuteFunctionNames.sorterEval
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterEvalPrefix
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterEvalPrefix
     let setupFunctionName = SetupCatalogNames.prefix
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
 
@@ -63,13 +63,13 @@ module Prefix =
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
             }
         )
@@ -108,13 +108,13 @@ module Prefix =
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
             }
         )

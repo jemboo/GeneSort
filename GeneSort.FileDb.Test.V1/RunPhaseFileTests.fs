@@ -44,7 +44,7 @@ module RunPhaseFileTests =
         return! RunParameterFiles.loadAllAsync folder configured
     }
     let private db folder (configured: run) =
-        new GeneSortDbMp(Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag, configured.RunQueryCatalogName) :> IGeneSortDb
+        new GeneSortDbMp(DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag, configured.RunQueryCatalogName, configured.ProjectName) :> IGeneSortDb
     let private save folder (configured: run) row =
         let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName row (geneSortDataType.RunParameters configured.RunName) |> Option.get
         (db folder configured).saveAsync geneSortDataMode.Project query (outputData.RunParameters row) (UMX.tag true) |> Async.StartAsTask
@@ -217,7 +217,7 @@ module RunPhaseFileTests =
         | "duplicate" -> selection <- [|rows[0]; rows[0]|]
         | "missing" ->
             let query = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName rows[1] (geneSortDataType.RunParameters configured.RunName) |> Option.get
-            let root = Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag
+            let root = DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag
             File.Delete(string (OutputDataFile.getFullOutputDataFilePath root geneSortDataMode.Project query))
         | "changed" ->
             let! result = save folder configured (rows[1].WithMessage(Some "changed externally"))
@@ -271,7 +271,7 @@ module RunPhaseFileTests =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                EnhancerFunctionName = SetupEnhancerFunctionNames.sorterEval
+                ParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
                 ParameterSpans = [ParamKeys.excludeSelfCeKey, ["true"]; ParamKeys.collectSortableTestsKey, ["false"];
                                   ParamKeys.channelCountKey, ["4"]; ParamKeys.sortableDataFormatKey, ["BitVector512"]; ParamKeys.rngTypeKey, ["LCG"]
                                   ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]; ParamKeys.sorterCountKey, ["2"]]
@@ -279,7 +279,7 @@ module RunPhaseFileTests =
             Execution = {
                 FunctionName = ExecuteFunctionNames.sorterEval
                 QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                EnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterEvalStandard
+                ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
                 ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
             }
         } |> Run.ofSimple
@@ -361,7 +361,7 @@ module RunPhaseFileTests =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests
                     QueryCatalogName = testsCatalog
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests
+                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests
                     ParameterSpans = [ParamKeys.prefixLibIdKey, [PrefixLibId.toString prefix]
                                       ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString sortableDataFormat.BitVector512]]
                 }
@@ -420,17 +420,17 @@ module RunPhaseFileTests =
     let ``evaluation setup requires matching tests and accepts any source run name`` database = withFolder (fun folder -> task {
         let prefix = prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA
         let merge = mergeLibId.create 8<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
-        let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupEnhancer, runEnhancer =
+        let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupParametersEnhancer, runParametersEnhancer =
             if database = "Prefix" then
                 ParamKeys.prefixLibIdKey, PrefixLibId.toString prefix, sortableDataFormat.BitVector512,
                 QueryCatalogNamesRun.sortableTestPrefix, SetupCatalogNames.prefix,
                 QueryCatalogNamesSetup.sorterEvalPrefix, QueryCatalogNamesRun.sorterEvalPrefix,
-                SetupEnhancerFunctionNames.sorterEvalPrefix, RunParamBuilderNames.Enhancer.sorterEvalPrefix
+                SetupParametersEnhancerNames.sorterEvalPrefix, RunParametersEnhancerNames.sorterEvalPrefix
             else
                 ParamKeys.mergeLibIdKey, MergeLibId.toString merge, sortableDataFormat.Int8Vector512,
                 QueryCatalogNamesRun.sortableTestMerge, SetupCatalogNames.merge,
                 QueryCatalogNamesSetup.sorterEvalMerge, QueryCatalogNamesRun.sorterEvalMerge,
-                SetupEnhancerFunctionNames.sorterEval, RunParamBuilderNames.Enhancer.sorterEvalMerge
+                SetupParametersEnhancerNames.sorterEval, RunParametersEnhancerNames.sorterEvalMerge
         GeneSort.Project.V1.Catalogs.ProjectCatalogs.registerAll ()
         let producerCatalog = testCatalog + ".module-source-test"
         let originalBuilder = QueryParamsCatalogRun.get testCatalog
@@ -454,7 +454,7 @@ module RunPhaseFileTests =
                 Description = "Tests saved under a user-selected name"; AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests; QueryCatalogName = producerCatalog
-                    EnhancerFunctionName = RunParamBuilderNames.Enhancer.sortableTests; ParameterSpans = inputs
+                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests; ParameterSpans = inputs
                 }
             } |> run.DirectRun
         let evaluation =
@@ -462,13 +462,13 @@ module RunPhaseFileTests =
                 ProjectName = UMX.tag "SorterEval"; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
                 Description = "Evaluation of the saved test library"; AllowOverwrite = false
                 Setup = {
-                    FunctionName = setupCatalog; QueryCatalogName = querySetup; EnhancerFunctionName = setupEnhancer
+                    FunctionName = setupCatalog; QueryCatalogName = querySetup; ParametersEnhancerName = setupParametersEnhancer
                     ParameterSpans = inputs @ [ParamKeys.sortableTestsModuleKey, [sourceModule]; ParamKeys.rngTypeKey, ["LCG"]; ParamKeys.sorterCountKey, ["2"];
                                               ParamKeys.simpleSorterModelTypeKey, ["Msce"]]
                 }
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval; QueryCatalogName = queryRun
-                    EnhancerFunctionName = runEnhancer; ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
+                    ParametersEnhancerName = runParametersEnhancer; ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
                 }
             } |> run.PreparedRun
         let! rows = publish folder evaluation
@@ -491,7 +491,7 @@ module RunPhaseFileTests =
         Assert.Empty(generated.Errors)
         Assert.Equal(1, generated.Succeeded)
         let query = QueryParamsCatalogRun.get producerCatalog tests.ProjectName tests.DatabaseName testRows[0] (geneSortDataType.SortableTests "") |> Option.get
-        let sourceRoot = Path.Combine(folder, sourceProject, database, "Data") |> UMX.tag
+        let sourceRoot = DatabasePaths.dataRoot folder sourceProject database |> UMX.tag
         let sourceFile = OutputDataFile.getFullOutputDataFilePath sourceRoot geneSortDataMode.Results query |> UMX.untag
         Assert.True(File.Exists sourceFile)
         Assert.Contains(sourceFile, error)
@@ -623,7 +623,7 @@ module RunPhaseFileTests =
         let database = db folder configured
         let intervals = RunIntervals.forRun configured |> Option.get
         let generations = [|0; 1|] |> Array.map (GenIntervalConfig.getSampleAtIndex intervals >> Option.get >> UMX.tag<generationNumber>)
-        let root = Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag
+        let root = DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag
         let summaryType = geneSortDataType.SorterPoolSetSummarySet ""
         let reportType = geneSortDataType.TextReport (UMX.tag "SummaryReport")
         let outputQuery (row: runParameters) generation kind =

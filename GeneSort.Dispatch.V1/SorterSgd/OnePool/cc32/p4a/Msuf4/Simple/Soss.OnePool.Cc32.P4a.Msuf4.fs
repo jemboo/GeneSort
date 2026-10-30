@@ -50,13 +50,13 @@ module Soss =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = onePoolSetupParams @ parameterSpansSetup
                     QueryCatalogName = sossSetupQueryCatalogName
-                    EnhancerFunctionName = sossSetupEnhancerFunctionName
+                    ParametersEnhancerName = sossSetupParametersEnhancerName
                 }
                 Execution = {
                     FunctionName = sossExecutionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = sossExecutionEnhancerFunctionName
+                    ParametersEnhancerName = sossRunParametersEnhancerName
                 }
             } {
                 MakerNames = EvolutionMakerNames.sossPrefix

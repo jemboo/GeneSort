@@ -18,8 +18,8 @@ let private sweep () =
     let dto = WorkflowFixtures.sossSource [0] |> RunDto.fromDomain
     let configured =
         { dto with
-            SetupEnhancerFunctionName = SetupEnhancerFunctionNames.sossMsuf32S
-            RunEnhancerFunctionName = RunParamBuilderNames.Enhancer.sossMsuf32S
+            SetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32S
+            RunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32S
             SetupParameterSpans = Array.append dto.SetupParameterSpans [|{ Key = "ActivationProbability"; Values = [|"0.95"|] }|]
             RunParameterSpans = Array.append dto.RunParameterSpans [|{ Key = "ActivatorMutationRate"; Values = [|"0"; "0.01"|] }|]
         } |> RunDto.toDomain
@@ -108,22 +108,22 @@ let private enhancerContext setup =
     let configured = WorkflowFixtures.sossSource [0]
     let query (rp: runParameters) output =
         Some (queryParams.create configured.DatabaseName configured.ProjectName (rp.GetRepl()) None output (Map.toArray rp.ParamMap))
-    runParamEnhancerContext.createForSetup query configured (setupParameters.create setup)
+    runParametersEnhancerContext.createForSetup query configured (setupParameters.create setup)
 
 [<Fact>]
 let ``equivalent prepared enhancers preserve execution overrides and exclude setup references`` () =
     let context = enhancerContext (Map.ofList ["Inherited", "setup"; "Override", "setup"; ParamKeys.setupSorterModelSetIdKey, string (Guid.NewGuid())])
     let parameters = runParameters.create (Map.ofList ["Override", "execution"])
     let results =
-        [RunParamEnhancerBuilders.sorterEvalStandard; RunParamEnhancerBuilders.sorterEvalMerge;
-         RunParamEnhancerBuilders.sorterMutateStandard; RunParamEnhancerBuilders.sorterMutateStandardFormat]
+        [RunParametersEnhancers.sorterEvalStandard; RunParametersEnhancers.sorterEvalMerge;
+         RunParametersEnhancers.sorterMutateStandard; RunParametersEnhancers.sorterMutateStandardFormat]
         |> List.map (fun enhance -> (enhance context parameters).ParamMap)
     for result in results do
         Assert.Equal<Map<string, string>>(results.Head, result)
         Assert.Equal("setup", result["Inherited"])
         Assert.Equal("execution", result["Override"])
         Assert.False(result.ContainsKey ParamKeys.setupSorterModelSetIdKey)
-    let direct = RunParamEnhancerBuilders.sortableTests context parameters
+    let direct = RunParametersEnhancers.sortableTests context parameters
     Assert.False(direct.ParamMap.ContainsKey "Inherited")
 
 [<Fact>]
@@ -132,10 +132,10 @@ let ``prefix enhancer retains strict setup precedence and missing field validati
                 ParamKeys.sortableDataFormatKey; ParamKeys.sorterCountKey; ParamKeys.aMaxKey]
     let setup = keys |> List.map (fun key -> key, "setup") |> Map.ofList
     let parameters = keys |> List.map (fun key -> key, "execution") |> Map.ofList |> runParameters.create
-    let result = RunParamEnhancerBuilders.sorterEvalPrefix (enhancerContext setup) parameters
+    let result = RunParametersEnhancers.sorterEvalPrefix (enhancerContext setup) parameters
     for key in keys do Assert.Equal("setup", result.ParamMap[key])
     let error = Assert.Throws<InvalidOperationException>(fun () ->
-        RunParamEnhancerBuilders.sorterEvalPrefix (enhancerContext (Map.remove ParamKeys.rngTypeKey setup)) parameters |> ignore)
+        RunParametersEnhancers.sorterEvalPrefix (enhancerContext (Map.remove ParamKeys.rngTypeKey setup)) parameters |> ignore)
     Assert.Contains(ParamKeys.rngTypeKey, error.Message)
 
 [<Fact>]
@@ -145,10 +145,10 @@ let ``equivalent SGD continuation enhancers preserve generation and validate poo
     let parameters = parameters.WithGenerationCurrent(Some 42<generationNumber>)
     let context = enhancerContext Map.empty
     let enhancers =
-        [RunParamEnhancerBuilders.Sgd.msrs32MutationRate; RunParamEnhancerBuilders.Sgd.msrs32MutationRateMax;
-         RunParamEnhancerBuilders.Sgd.msuf624p3bMutationRate; RunParamEnhancerBuilders.Sgd.msrs24p3aOrthoPara;
-         RunParamEnhancerBuilders.Sgd.msrs24p3aPoolModComp; RunParamEnhancerBuilders.Sgd.msrs24p3bOrthoPara;
-         RunParamEnhancerBuilders.Sgd.mssi24p3bOrthoPara]
+        [RunParametersEnhancers.Sgd.msrs32MutationRate; RunParametersEnhancers.Sgd.msrs32MutationRateMax;
+         RunParametersEnhancers.Sgd.msuf624p3bMutationRate; RunParametersEnhancers.Sgd.msrs24p3aOrthoPara;
+         RunParametersEnhancers.Sgd.msrs24p3aPoolModComp; RunParametersEnhancers.Sgd.msrs24p3bOrthoPara;
+         RunParametersEnhancers.Sgd.mssi24p3bOrthoPara]
     let expected = (enhancers.Head context parameters).ParamMap
     for enhance in enhancers do
         let result = enhance context parameters
@@ -166,7 +166,7 @@ let ``equivalent SGD continuation enhancers preserve generation and validate poo
             let error = Assert.Throws<ArgumentException>(fun () -> enhance context missing |> ignore)
             Assert.Contains(key, error.Message)
             Assert.Contains("required", error.Message)
-    let reset = RunParamEnhancerBuilders.Sgd.msuf32FromSetup context parameters
+    let reset = RunParametersEnhancers.Sgd.msuf32FromSetup context parameters
     Assert.Equal(Some 0<generationNumber>, reset.GetGenerationCurrent())
 
 

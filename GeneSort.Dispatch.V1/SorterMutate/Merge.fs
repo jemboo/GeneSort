@@ -26,10 +26,10 @@ module Merge =
     let sortableTestsModule = sprintf "SortableTests.Merge.Channels%d" (int channelCount)
     let sorterEvalModule = sprintf "SorterEval.Merge.Channels%d" (int channelCount)
 
-    let executionEnhancerFunctionName = RunParamBuilderNames.Enhancer.sorterMutateStandard
+    let runParametersEnhancerName = RunParametersEnhancerNames.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateMerge
-    let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterMutate
+    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterMutate
     let setupFunctionName = SetupCatalogNames.mutantMerge
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutateMerge
 
@@ -75,13 +75,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -128,13 +128,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -181,13 +181,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )
@@ -234,13 +234,13 @@ module Merge =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    EnhancerFunctionName = executionEnhancerFunctionName
+                    ParametersEnhancerName = runParametersEnhancerName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    EnhancerFunctionName = setupEnhancerFunctionName
+                    ParametersEnhancerName = setupParametersEnhancerName
                 }
             }
         )

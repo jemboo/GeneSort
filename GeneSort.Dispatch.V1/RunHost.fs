@@ -25,12 +25,12 @@ module RunHost =
         | _ -> System.IO.Path.Combine(System.Environment.CurrentDirectory, "Projects")
 
     let makeDataFolder (run: run) =
-        System.IO.Path.Combine(projectsRoot (), %run.ProjectName, %run.DatabaseName, "Data")
+        DatabasePaths.dataRoot (projectsRoot ()) %run.ProjectName %run.DatabaseName
         |> UMX.tag<pathToRootFolder>
 
     let openDatabase project database queryCatalog : IGeneSortDb =
-        let root = System.IO.Path.Combine(projectsRoot (), %project, %database, "Data") |> UMX.tag<pathToRootFolder>
-        new GeneSortDbMp(root, queryCatalog)
+        let root = DatabasePaths.dataRoot (projectsRoot ()) %project %database |> UMX.tag<pathToRootFolder>
+        new GeneSortDbMp(root, queryCatalog, project)
 
     let makeDatabase (run: run) = openDatabase run.ProjectName run.DatabaseName run.RunQueryCatalogName
 
@@ -42,8 +42,8 @@ type simpleRunHost = private {
     setup: setupFunction option
     bindExecution: runStorage -> runFunction
     executeFunction: runFunction
-    runEnhancer: runParamEnhancerBuilder
-    setupEnhancer: setupEnhancerFunction
+    runParametersEnhancer: runParametersEnhancer
+    setupParametersEnhancer: setupParametersEnhancer
 }
 
 type sgdRunHost = private {
@@ -90,8 +90,8 @@ type runHost =
               setup = None
               bindExecution = bindExecution
               executeFunction = bindExecution storage
-              runEnhancer = RunParamEnhancerBuilders.get run.RunEnhancerFunctionName
-              setupEnhancer = if run.HasSetup then SetupEnhancerCatalog.get run.SetupEnhancerFunctionName else fun _ parameters -> parameters }
+              runParametersEnhancer = RunParametersEnhancerCatalog.get run.RunParametersEnhancerName
+              setupParametersEnhancer = if run.HasSetup then SetupParametersEnhancerCatalog.get run.SetupParametersEnhancerName else fun _ parameters -> parameters }
 
         let lookupInterval = RunIntervals.resolve run.RunName
 
@@ -200,31 +200,31 @@ type runHost =
         | SimpleRunHost host -> host.maxParallel
         | SgdRunHost host -> host.simpleHost.maxParallel
 
-    member this.RunEnhancer : runParamEnhancerBuilder =
+    member this.RunParametersEnhancer : runParametersEnhancer =
         match this with
-        | SimpleRunHost host -> host.runEnhancer
-        | SgdRunHost host -> host.simpleHost.runEnhancer
+        | SimpleRunHost host -> host.runParametersEnhancer
+        | SgdRunHost host -> host.simpleHost.runParametersEnhancer
 
-    member this.SetupEnhancer : setupEnhancerFunction =
+    member this.SetupParametersEnhancer : setupParametersEnhancer =
         match this with
-        | SimpleRunHost host -> host.setupEnhancer
-        | SgdRunHost host -> host.simpleHost.setupEnhancer
+        | SimpleRunHost host -> host.setupParametersEnhancer
+        | SgdRunHost host -> host.simpleHost.setupParametersEnhancer
 
-    member this.ParamMapRefiner (runParametersSeq: runParameters seq) : runParameters seq =
-        let context = runParamEnhancerContext.create this.QueryParamsFromRunParams this.Run
+    member this.EnhanceRunParameters (runParametersSeq: runParameters seq) : runParameters seq =
+        let context = runParametersEnhancerContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
-        |> Seq.map (this.RunEnhancer context)
+        |> Seq.map (this.RunParametersEnhancer context)
 
-    member this.SetupParamMapRefiner (parameters: setupParameters seq) : setupParameters seq =
+    member this.EnhanceSetupParameters (parameters: setupParameters seq) : setupParameters seq =
         let context = { Run = this.Run; QueryParamsFromSetupParams = this.QueryParamsFromSetupParams }
-        parameters |> Seq.map (this.SetupEnhancer context)
+        parameters |> Seq.map (this.SetupParametersEnhancer context)
 
     member this.MakeRunParameters minReplica maxReplica =
         RunParameterGeneration.generateWithBindingsAndSourceSelection
             (EvoCondenseSelection.select RunHost.makeDatabase)
             this.QueryParamsFromRunParams this.QueryParamsFromSetupParams
-            this.RunEnhancer this.SetupEnhancer this.Run minReplica maxReplica
+            this.RunParametersEnhancer this.SetupParametersEnhancer this.Run minReplica maxReplica
 
     member this.MakeSetupParameters minReplica maxReplica =
         if not this.Run.HasSetup then [||]
-        else SimpleRun.makeSetupParameters minReplica maxReplica this.SetupParamMapRefiner this.Run.BaseRun
+        else SimpleRun.makeSetupParameters minReplica maxReplica this.EnhanceSetupParameters this.Run.BaseRun

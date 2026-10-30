@@ -45,7 +45,6 @@ internal static partial class Program
         Wait(model.ChooseRunAsync(original));
         Check(!model.IsSelectingRun && model.RunName == codeRunName, "Code selection must retain the actual run name rather than NewRun.");
         Check(model.ProjectsFolder == root && !model.IsDirty && model.DefinitionReadOnly, "Code selection lost its folder or read-only state.");
-        Check(model.ModulePropertiesLocked, "Code module properties are editable.");
         var configured = model.Validate() ?? throw new Exception(string.Join("; ", model.Issues));
         Wait(model.SaveAsync(configured, false));
         Wait(model.BeginSelectionAsync());
@@ -100,7 +99,7 @@ internal static partial class Program
         Check(!customTile.IsCodeDefined && customTile.SavedPath is not null && customTile.ModulePath == original.ModulePath, "Renamed custom leaf was not restored to its source module.");
         Wait(model.ChooseRunAsync(customTile));
         Check(model.SelectedRunType?.Name == original.ModulePath, "Custom leaf was associated with an unrelated compatible module.");
-        model.Clone();
+        CreateOwn(root, model);
         model.RunName = "KeepThisDraft";
         wizard.Home(); // The editor must return to its module, not this stale wizard location.
         Layout(view);

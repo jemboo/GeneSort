@@ -29,7 +29,7 @@ module CheckpointFileTests =
         let get = Result.defaultWith failwith
         try
             let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors)
-            let root = Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag
+            let root = DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag
             let db = GeneSortDbMp(root, configured.RunQueryCatalogName) :> IGeneSortDb
             let rp =
                 (RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>).[0]
@@ -71,7 +71,7 @@ module CheckpointFileTests =
     let private crashFixture folder soss =
         MessagePackSetup.configure()
         let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (sprintf "%A" >> failwith)
-        let root = Path.Combine(folder, string configured.ProjectName, string configured.DatabaseName, "Data") |> UMX.tag
+        let root = DatabasePaths.dataRoot folder (string configured.ProjectName) (string configured.DatabaseName) |> UMX.tag
         let db = GeneSortDbMp(root, configured.RunQueryCatalogName) :> IGeneSortDb
         let rp = (RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>).[0]
                     .WithGenerationIntervalLast(Some 10<generationIntervalLast>)
