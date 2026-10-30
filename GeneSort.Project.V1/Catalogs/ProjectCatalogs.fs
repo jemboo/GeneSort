@@ -9,5 +9,5 @@ module ProjectCatalogs =
     let registerAll () =
         QueryParamsBuildersSetup.registerAll ()
         QueryParamsBuildersRun.registerAll ()
-        RunParametersEnhancerCatalog.registerAll ()
+        RunParametersPipelineCatalog.registerAll ()
         SorterSgdMakerCatalogs.registerAll ()

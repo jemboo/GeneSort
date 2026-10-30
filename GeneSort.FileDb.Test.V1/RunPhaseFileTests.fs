@@ -271,7 +271,7 @@ module RunPhaseFileTests =
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                ParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
+                ParametersPipelineName = SetupParametersPipelineNames.sorterEval
                 ParameterSpans = [ParamKeys.excludeSelfCeKey, ["true"]; ParamKeys.collectSortableTestsKey, ["false"];
                                   ParamKeys.channelCountKey, ["4"]; ParamKeys.sortableDataFormatKey, ["BitVector512"]; ParamKeys.rngTypeKey, ["LCG"]
                                   ParamKeys.simpleSorterModelTypeKey, ["Msce"; "Msrs"]; ParamKeys.sorterCountKey, ["2"]]
@@ -279,7 +279,7 @@ module RunPhaseFileTests =
             Execution = {
                 FunctionName = ExecuteFunctionNames.sorterEval
                 QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
+                ParametersPipelineName = RunParametersPipelineNames.sorterEvalStandard
                 ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
             }
         } |> Run.ofSimple
@@ -361,7 +361,7 @@ module RunPhaseFileTests =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests
                     QueryCatalogName = testsCatalog
-                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests
+                    ParametersPipelineName = RunParametersPipelineNames.sortableTests
                     ParameterSpans = [ParamKeys.prefixLibIdKey, [PrefixLibId.toString prefix]
                                       ParamKeys.sortableDataFormatKey, [SortableDataFormat.toString sortableDataFormat.BitVector512]]
                 }
@@ -420,17 +420,17 @@ module RunPhaseFileTests =
     let ``evaluation setup requires matching tests and accepts any source run name`` database = withFolder (fun folder -> task {
         let prefix = prefixLibId.create 8<channelCount> 3<stageLength> prefixLibVariant.PrefixA
         let merge = mergeLibId.create 8<channelCount> 2<mergeDimension> sorterLibVariant.VariantA
-        let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupParametersEnhancer, runParametersEnhancer =
+        let key, library, format, testCatalog, setupCatalog, querySetup, queryRun, setupParametersPipelineName, runParametersPipelineName =
             if database = "Prefix" then
                 ParamKeys.prefixLibIdKey, PrefixLibId.toString prefix, sortableDataFormat.BitVector512,
                 QueryCatalogNamesRun.sortableTestPrefix, SetupCatalogNames.prefix,
                 QueryCatalogNamesSetup.sorterEvalPrefix, QueryCatalogNamesRun.sorterEvalPrefix,
-                SetupParametersEnhancerNames.sorterEvalPrefix, RunParametersEnhancerNames.sorterEvalPrefix
+                SetupParametersPipelineNames.sorterEvalPrefix, RunParametersPipelineNames.sorterEvalPrefix
             else
                 ParamKeys.mergeLibIdKey, MergeLibId.toString merge, sortableDataFormat.Int8Vector512,
                 QueryCatalogNamesRun.sortableTestMerge, SetupCatalogNames.merge,
                 QueryCatalogNamesSetup.sorterEvalMerge, QueryCatalogNamesRun.sorterEvalMerge,
-                SetupParametersEnhancerNames.sorterEval, RunParametersEnhancerNames.sorterEvalMerge
+                SetupParametersPipelineNames.sorterEval, RunParametersPipelineNames.sorterEvalMerge
         GeneSort.Project.V1.Catalogs.ProjectCatalogs.registerAll ()
         let producerCatalog = testCatalog + ".module-source-test"
         let originalBuilder = QueryParamsCatalogRun.get testCatalog
@@ -454,7 +454,7 @@ module RunPhaseFileTests =
                 Description = "Tests saved under a user-selected name"; AllowOverwrite = false
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests; QueryCatalogName = producerCatalog
-                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests; ParameterSpans = inputs
+                    ParametersPipelineName = RunParametersPipelineNames.sortableTests; ParameterSpans = inputs
                 }
             } |> run.DirectRun
         let evaluation =
@@ -462,13 +462,13 @@ module RunPhaseFileTests =
                 ProjectName = UMX.tag "SorterEval"; DatabaseName = UMX.tag database; RunName = UMX.tag "NewRun"
                 Description = "Evaluation of the saved test library"; AllowOverwrite = false
                 Setup = {
-                    FunctionName = setupCatalog; QueryCatalogName = querySetup; ParametersEnhancerName = setupParametersEnhancer
+                    FunctionName = setupCatalog; QueryCatalogName = querySetup; ParametersPipelineName = setupParametersPipelineName
                     ParameterSpans = inputs @ [ParamKeys.sortableTestsModuleKey, [sourceModule]; ParamKeys.rngTypeKey, ["LCG"]; ParamKeys.sorterCountKey, ["2"];
                                               ParamKeys.simpleSorterModelTypeKey, ["Msce"]]
                 }
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sorterEval; QueryCatalogName = queryRun
-                    ParametersEnhancerName = runParametersEnhancer; ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
+                    ParametersPipelineName = runParametersPipelineName; ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
                 }
             } |> run.PreparedRun
         let! rows = publish folder evaluation

@@ -32,11 +32,11 @@ module VarModR_32 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p3b.Msuf6.Simple.SimpleParams.simpleSetupParams
 
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.msuf624p3bMutationRate
+    let runParametersPipelineName = RunParametersPipelineNames.msuf624p3bMutationRate
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdUf6MutationRate
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdUf6MutationRate
 
 
@@ -63,7 +63,7 @@ module VarModR_32 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans |> List.filter (fun (key, _) -> key <> ParamKeys.sorterEvalMeasureKey)
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -71,7 +71,7 @@ module VarModR_32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -103,7 +103,7 @@ module VarModR_32 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans |> List.filter (fun (key, _) -> key <> ParamKeys.sorterEvalMeasureKey)
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -111,7 +111,7 @@ module VarModR_32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

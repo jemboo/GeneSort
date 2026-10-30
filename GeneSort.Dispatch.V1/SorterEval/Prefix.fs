@@ -21,10 +21,10 @@ module Prefix =
     let channelCount = 32<GeneSort.Sorting.channelCount>
     let sortableTestsModule = "SortableTests.Prefix.Channels32"
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.sorterEvalPrefix
+    let runParametersPipelineName = RunParametersPipelineNames.sorterEvalPrefix
     let executionFunctionName = ExecuteFunctionNames.sorterEval
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterEvalPrefix
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterEvalPrefix
     let setupFunctionName = SetupCatalogNames.prefix
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
 
@@ -63,13 +63,13 @@ module Prefix =
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
             }
         )
@@ -108,13 +108,13 @@ module Prefix =
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpansSetup
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpansRun
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
             }
         )

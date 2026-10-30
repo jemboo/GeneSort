@@ -24,8 +24,6 @@ module private ParameterGeneration =
             else
                 fullSpans
                 |> Combinatorics.cartesianProductMaps
-                |> Seq.map ParameterValidation.resolveSelection
-                |> Seq.map ParameterValidation.resolveEvaluationMeasures
                 |> Seq.map parameterSet<'kind>.create
                 |> Seq.toArray
 
@@ -43,7 +41,7 @@ type executionConfig = {
     FunctionName: string
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
-    ParametersEnhancerName: string
+    ParametersPipelineName: string
 }
 
 /// Setup settings for evaluation and mutation runs.
@@ -51,7 +49,7 @@ type preparedSetupConfig = {
     FunctionName: string
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
-    ParametersEnhancerName: string
+    ParametersPipelineName: string
 }
 
 /// Complete configuration validated by SimpleRun.create.
@@ -82,7 +80,7 @@ type sgdSetupConfig = {
     SorterEvalModule: string<runModuleName>
     ParameterSpans: (string * string list) list
     QueryCatalogName: string
-    ParametersEnhancerName: string
+    ParametersPipelineName: string
 }
 
 /// The run database stores prepared inputs and execution results.
@@ -117,8 +115,8 @@ type simpleRun =
           setupFunctionName: string option
           sortableTestsModule: string<runModuleName> option
           sorterEvalModule: string<runModuleName> option
-          runParametersEnhancerName: string
-          setupParametersEnhancerName: string
+          runParametersPipelineName: string
+          setupParametersPipelineName: string
           allowOverwrite: bool
           executeFunctionName: string
           parameterSource: (simpleRun * (string * string list) list) option
@@ -148,18 +146,18 @@ module SimpleRun =
         let runParameterSpans = config.Execution.ParameterSpans
         let runQueryCatalogName = config.Execution.QueryCatalogName
         let setupFunctionName = config.Setup.FunctionName
-        let runParametersEnhancerName = config.Execution.ParametersEnhancerName
+        let runParametersPipelineName = config.Execution.ParametersPipelineName
         let allowOverwrite = config.AllowOverwrite
         let setupParameterSpans = config.Setup.ParameterSpans
         let setupQueryCatalogName = config.Setup.QueryCatalogName
-        let setupParametersEnhancerName = config.Setup.ParametersEnhancerName
+        let setupParametersPipelineName = config.Setup.ParametersPipelineName
         if String.IsNullOrWhiteSpace executeFunctionName then
             invalidArg (nameof executeFunctionName) "Execute function name cannot be empty."
         if String.IsNullOrWhiteSpace runQueryCatalogName then
             invalidArg (nameof runQueryCatalogName) "Run query catalog name cannot be empty."
         if String.IsNullOrWhiteSpace setupFunctionName then
             invalidArg (nameof setupFunctionName) "Setup function name cannot be empty."
-        for argument, value in [nameof setupQueryCatalogName, setupQueryCatalogName; nameof runParametersEnhancerName, runParametersEnhancerName; nameof setupParametersEnhancerName, setupParametersEnhancerName] do
+        for argument, value in [nameof setupQueryCatalogName, setupQueryCatalogName; nameof runParametersPipelineName, runParametersPipelineName; nameof setupParametersPipelineName, setupParametersPipelineName] do
             if String.IsNullOrWhiteSpace value then
                 invalidArg argument "Function names cannot be empty."
         if String.IsNullOrWhiteSpace %databaseName then
@@ -176,8 +174,8 @@ module SimpleRun =
           setupFunctionName = Some setupFunctionName
           sortableTestsModule = None
           sorterEvalModule = None
-          runParametersEnhancerName = runParametersEnhancerName
-          setupParametersEnhancerName = setupParametersEnhancerName
+          runParametersPipelineName = runParametersPipelineName
+          setupParametersPipelineName = setupParametersPipelineName
           allowOverwrite = allowOverwrite
           executeFunctionName = executeFunctionName
           parameterSource = None
@@ -188,9 +186,9 @@ module SimpleRun =
         for argument, value in ["ExecuteFunctionName", config.Execution.FunctionName
                                 "SetupFunctionName", config.Setup.FunctionName
                                 "RunQueryCatalogName", config.Execution.QueryCatalogName
-                                "RunParametersEnhancerName", config.Execution.ParametersEnhancerName
+                                "RunParametersPipelineName", config.Execution.ParametersPipelineName
                                 "SetupQueryCatalogName", config.Setup.QueryCatalogName
-                                "SetupParametersEnhancerName", config.Setup.ParametersEnhancerName] do
+                                "SetupParametersPipelineName", config.Setup.ParametersPipelineName] do
             if String.IsNullOrWhiteSpace value then invalidArg argument "Function names cannot be empty."
         if String.IsNullOrWhiteSpace %config.DatabaseName then
             invalidArg "DatabaseName" "Database name cannot be empty."
@@ -215,8 +213,8 @@ module SimpleRun =
             setupFunctionName = Some config.Setup.FunctionName
             sortableTestsModule = Some config.Setup.SortableTestsModule
             sorterEvalModule = Some config.Setup.SorterEvalModule
-            runParametersEnhancerName = config.Execution.ParametersEnhancerName
-            setupParametersEnhancerName = config.Setup.ParametersEnhancerName
+            runParametersPipelineName = config.Execution.ParametersPipelineName
+            setupParametersPipelineName = config.Setup.ParametersPipelineName
             allowOverwrite = config.AllowOverwrite
             executeFunctionName = config.Execution.FunctionName
             parameterSource = None
@@ -238,10 +236,10 @@ module SimpleRun =
             SorterEvalModule = run.sorterEvalModule.Value
             ParameterSpans = run.setupParameterSpans
             QueryCatalogName = run.setupQueryCatalogName
-            ParametersEnhancerName = run.setupParametersEnhancerName
+            ParametersPipelineName = run.setupParametersPipelineName
         })
-    let runParametersEnhancerName (run: simpleRun) = run.runParametersEnhancerName
-    let setupParametersEnhancerName (run: simpleRun) = run.setupParametersEnhancerName
+    let runParametersPipelineName (run: simpleRun) = run.runParametersPipelineName
+    let setupParametersPipelineName (run: simpleRun) = run.setupParametersPipelineName
     let allowOverwrite (run: simpleRun) = run.allowOverwrite
     let executeFunctionName (run: simpleRun) = run.executeFunctionName
     let parameterSource (run: simpleRun) = run.parameterSource
@@ -270,7 +268,7 @@ module DirectRun =
             Setup = {
                 FunctionName = if prefix then Catalogs.Setup.SetupCatalogNames.prefix else Catalogs.Setup.SetupCatalogNames.merge
                 QueryCatalogName = if prefix then Catalogs.Queries.QueryCatalogNamesSetup.sortableTestPrefix else Catalogs.Queries.QueryCatalogNamesSetup.sortableTestMerge
-                ParametersEnhancerName = "setup-parameters-enhancer.sortable-tests"
+                ParametersPipelineName = "setup-parameters-pipeline.sortable-tests"
                 ParameterSpans = []
             }
         }
@@ -338,8 +336,8 @@ type run =
     member this.SetupQueryCatalogName = SimpleRun.setupQueryCatalogName this.BaseRun
     member this.SetupFunctionName with get() = SimpleRun.setupFunctionName this.BaseRun
     member this.SgdSetup = SimpleRun.sgdSetup this.BaseRun
-    member this.RunParametersEnhancerName = SimpleRun.runParametersEnhancerName this.BaseRun
-    member this.SetupParametersEnhancerName = SimpleRun.setupParametersEnhancerName this.BaseRun
+    member this.RunParametersPipelineName = SimpleRun.runParametersPipelineName this.BaseRun
+    member this.SetupParametersPipelineName = SimpleRun.setupParametersPipelineName this.BaseRun
     member this.AllowOverwrite = SimpleRun.allowOverwrite this.BaseRun
     member this.CheckpointIntervalsName =
         match this with

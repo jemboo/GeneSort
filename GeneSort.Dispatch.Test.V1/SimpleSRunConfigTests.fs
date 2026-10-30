@@ -83,21 +83,21 @@ let ``SimpleS catalog entries reject malformed and conflicting activation parame
     let host = runHost.Create (configuration soss false) 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber> |> Array.head
     let setupContext = { Run = host.Run; QueryParamsFromSetupParams = host.QueryParamsFromSetupParams }
-    let enhanceSetup = SetupParametersEnhancerCatalog.get host.Run.SetupParametersEnhancerName
+    let applySetupPipeline = SetupParametersPipelineCatalog.get host.Run.SetupParametersPipelineName |> ParameterPipeline.apply
     for key, value in [ParamKeys.activationProbabilityKey, "-0.1"; ParamKeys.activationProbabilityKey, "1.1";
                           ParamKeys.activationProbabilityKey, "NaN"; ParamKeys.activationProbabilityKey, "Infinity";
                           ParamKeys.activationProbabilityKey, "bad"; ParamKeys.aMaxKey, "3"] do
         let bad = setupParameters.create (Map.add key value setup.ParamMap)
-        Assert.Throws<ArgumentException>(fun () -> enhanceSetup setupContext bad |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> applySetupPipeline setupContext bad |> ignore) |> ignore
     let parameters = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let context = runParametersEnhancerContext.createForSetup host.QueryParamsFromRunParams host.Run setup
-    let enhanceRun = RunParametersEnhancerCatalog.get host.Run.RunParametersEnhancerName
+    let context = runParametersPipelineContext.createForSetup host.QueryParamsFromRunParams host.Run setup
+    let applyRunPipeline = RunParametersPipelineCatalog.get host.Run.RunParametersPipelineName |> ParameterPipeline.apply
     for value in ["-0.1"; "1.1"; "NaN"; "Infinity"; "bad"] do
         let bad = runParameters.create (Map.add ParamKeys.activatorMutationRateKey value parameters.ParamMap)
-        Assert.Throws<ArgumentException>(fun () -> enhanceRun context bad |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> applyRunPipeline context bad |> ignore) |> ignore
     for key, value in [ParamKeys.activationProbabilityKey, "-0.1"; ParamKeys.activationProbabilityKey, "NaN"; ParamKeys.aMaxKey, "3"] do
         let bad = runParameters.create (Map.add key value parameters.ParamMap)
-        Assert.Throws<ArgumentException>(fun () -> enhanceRun context bad |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> applyRunPipeline context bad |> ignore) |> ignore
 
 [<Theory>]
 [<InlineData(false)>]
@@ -107,13 +107,13 @@ let ``SimpleS catalog entries accept probability and mutation rate endpoints`` s
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber> |> Array.head
     let parameters = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
     let setupContext = { Run = host.Run; QueryParamsFromSetupParams = host.QueryParamsFromSetupParams }
-    let enhanceSetup = SetupParametersEnhancerCatalog.get host.Run.SetupParametersEnhancerName
-    let enhanceRun = RunParametersEnhancerCatalog.get host.Run.RunParametersEnhancerName
+    let applySetupPipeline = SetupParametersPipelineCatalog.get host.Run.SetupParametersPipelineName |> ParameterPipeline.apply
+    let applyRunPipeline = RunParametersPipelineCatalog.get host.Run.RunParametersPipelineName |> ParameterPipeline.apply
     for probability in [0.0; 1.0] do
-        let prepared = enhanceSetup setupContext (setup.WithActivationProbability(Some probability))
-        let context = runParametersEnhancerContext.createForSetup host.QueryParamsFromRunParams host.Run prepared
+        let prepared = applySetupPipeline setupContext (setup.WithActivationProbability(Some probability))
+        let context = runParametersPipelineContext.createForSetup host.QueryParamsFromRunParams host.Run prepared
         for rate in [0.0; 1.0] do
-            let rp = enhanceRun context (parameters.WithActivationProbability(Some probability).WithActivatorMutationRate(Some rate))
+            let rp = applyRunPipeline context (parameters.WithActivationProbability(Some probability).WithActivatorMutationRate(Some rate))
             Assert.Equal(Some probability, rp.GetActivationProbability())
             Assert.Equal(Some rate, rp.GetActivatorMutationRate())
             Assert.True(rp.GetAMax().IsNone)

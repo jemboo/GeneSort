@@ -18,8 +18,8 @@ let private sweep () =
     let dto = WorkflowFixtures.sossSource [0] |> RunDto.fromDomain
     let configured =
         { dto with
-            SetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32S
-            RunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32S
+            SetupParametersPipelineName = SetupParametersPipelineNames.sossMsuf32S
+            RunParametersPipelineName = RunParametersPipelineNames.sossMsuf32S
             SetupParameterSpans = Array.append dto.SetupParameterSpans [|{ Key = "ActivationProbability"; Values = [|"0.95"|] }|]
             RunParameterSpans = Array.append dto.RunParameterSpans [|{ Key = "ActivatorMutationRate"; Values = [|"0"; "0.01"|] }|]
         } |> RunDto.toDomain
@@ -104,69 +104,69 @@ let ``Soss direct builder matches its catalog and separates both activator rates
     Assert.Equal(rows[0].GetSetupSorterPoolSetId(), rows[1].GetSetupSorterPoolSetId())
 
 // Exercise inheritance independently of query recipes so every input field affects identity.
-let private enhancerContext setup =
+let private pipelineContext setup =
     let configured = WorkflowFixtures.sossSource [0]
     let query (rp: runParameters) output =
         Some (queryParams.create configured.DatabaseName configured.ProjectName (rp.GetRepl()) None output (Map.toArray rp.ParamMap))
-    runParametersEnhancerContext.createForSetup query configured (setupParameters.create setup)
+    runParametersPipelineContext.createForSetup query configured (setupParameters.create setup)
 
 [<Fact>]
-let ``equivalent prepared enhancers preserve execution overrides and exclude setup references`` () =
-    let context = enhancerContext (Map.ofList ["Inherited", "setup"; "Override", "setup"; ParamKeys.setupSorterModelSetIdKey, string (Guid.NewGuid())])
+let ``equivalent prepared pipelines preserve execution overrides and exclude setup references`` () =
+    let context = pipelineContext (Map.ofList ["Inherited", "setup"; "Override", "setup"; ParamKeys.setupSorterModelSetIdKey, string (Guid.NewGuid())])
     let parameters = runParameters.create (Map.ofList ["Override", "execution"])
     let results =
-        [RunParametersEnhancers.sorterEvalStandard; RunParametersEnhancers.sorterEvalMerge;
-         RunParametersEnhancers.sorterMutateStandard; RunParametersEnhancers.sorterMutateStandardFormat]
-        |> List.map (fun enhance -> (enhance context parameters).ParamMap)
+        [RunParametersPipelines.sorterEvalStandard; RunParametersPipelines.sorterEvalMerge;
+         RunParametersPipelines.sorterMutateStandard; RunParametersPipelines.sorterMutateStandardFormat]
+        |> List.map (fun pipeline -> (ParameterPipeline.apply pipeline context parameters).ParamMap)
     for result in results do
         Assert.Equal<Map<string, string>>(results.Head, result)
         Assert.Equal("setup", result["Inherited"])
         Assert.Equal("execution", result["Override"])
         Assert.False(result.ContainsKey ParamKeys.setupSorterModelSetIdKey)
-    let direct = RunParametersEnhancers.sortableTests context parameters
+    let direct = ParameterPipeline.apply RunParametersPipelines.sortableTests context parameters
     Assert.False(direct.ParamMap.ContainsKey "Inherited")
 
 [<Fact>]
-let ``prefix enhancer retains strict setup precedence and missing field validation`` () =
+let ``prefix pipeline retains strict setup precedence and missing field validation`` () =
     let keys = [ParamKeys.rngTypeKey; ParamKeys.prefixLibIdKey; ParamKeys.simpleSorterModelTypeKey;
                 ParamKeys.sortableDataFormatKey; ParamKeys.sorterCountKey; ParamKeys.aMaxKey]
     let setup = keys |> List.map (fun key -> key, "setup") |> Map.ofList
     let parameters = keys |> List.map (fun key -> key, "execution") |> Map.ofList |> runParameters.create
-    let result = RunParametersEnhancers.sorterEvalPrefix (enhancerContext setup) parameters
+    let result = RunParametersEnhancers.sorterEvalPrefix (pipelineContext setup) parameters
     for key in keys do Assert.Equal("setup", result.ParamMap[key])
-    let error = Assert.Throws<InvalidOperationException>(fun () ->
-        RunParametersEnhancers.sorterEvalPrefix (enhancerContext (Map.remove ParamKeys.rngTypeKey setup)) parameters |> ignore)
-    Assert.Contains(ParamKeys.rngTypeKey, error.Message)
+    let issues = RunParametersPipelines.sorterEvalPrefix.ValidateInput
+                    (pipelineContext (Map.remove ParamKeys.rngTypeKey setup)) parameters
+    Assert.Contains(issues, fun issue -> issue.Field = "Setup." + ParamKeys.rngTypeKey)
 
 [<Fact>]
-let ``equivalent SGD continuation enhancers preserve generation and validate pool sizes`` () =
+let ``equivalent SGD continuation pipelines preserve generation and validate pool sizes`` () =
     let configured = WorkflowFixtures.sossSource [0]
     let parameters = (RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>)[0]
     let parameters = parameters.WithGenerationCurrent(Some 42<generationNumber>)
-    let context = enhancerContext Map.empty
-    let enhancers =
-        [RunParametersEnhancers.Sgd.msrs32MutationRate; RunParametersEnhancers.Sgd.msrs32MutationRateMax;
-         RunParametersEnhancers.Sgd.msuf624p3bMutationRate; RunParametersEnhancers.Sgd.msrs24p3aOrthoPara;
-         RunParametersEnhancers.Sgd.msrs24p3aPoolModComp; RunParametersEnhancers.Sgd.msrs24p3bOrthoPara;
-         RunParametersEnhancers.Sgd.mssi24p3bOrthoPara]
-    let expected = (enhancers.Head context parameters).ParamMap
-    for enhance in enhancers do
-        let result = enhance context parameters
+    let context = pipelineContext Map.empty
+    let pipelines =
+        [RunParametersPipelines.Sgd.msrs32MutationRate; RunParametersPipelines.Sgd.msrs32MutationRateMax;
+         RunParametersPipelines.Sgd.msuf624p3bMutationRate; RunParametersPipelines.Sgd.msrs24p3aOrthoPara;
+         RunParametersPipelines.Sgd.msrs24p3aPoolModComp; RunParametersPipelines.Sgd.msrs24p3bOrthoPara;
+         RunParametersPipelines.Sgd.mssi24p3bOrthoPara]
+    let expected = (ParameterPipeline.apply pipelines.Head context parameters).ParamMap
+    for pipeline in pipelines do
+        let result = ParameterPipeline.apply pipeline context parameters
         Assert.Equal<Map<string, string>>(expected, result.ParamMap)
         Assert.Equal(Some 42<generationNumber>, result.GetGenerationCurrent())
         let invalid = parameters.ParamMap |> Map.add ParamKeys.sorterCountPerPoolKey "2" |> Map.add ParamKeys.sorterPoolCountKey "2147483647" |> runParameters.create
-        Assert.Throws<ArgumentException>(fun () -> enhance context invalid |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> ParameterPipeline.apply pipeline context invalid |> ignore) |> ignore
         for key in [ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterPoolCountKey] do
             for value in ["0"; "-1"; "1.5"; "not-a-number"; "2147483648"] do
                 let invalid = parameters.ParamMap |> Map.add key value |> runParameters.create
-                let error = Assert.Throws<ArgumentException>(fun () -> enhance context invalid |> ignore)
+                let error = Assert.Throws<ArgumentException>(fun () -> ParameterPipeline.apply pipeline context invalid |> ignore)
                 Assert.Contains(key, error.Message)
                 Assert.Contains("Positive", error.Message)
             let missing = parameters.ParamMap |> Map.remove key |> runParameters.create
-            let error = Assert.Throws<ArgumentException>(fun () -> enhance context missing |> ignore)
+            let error = Assert.Throws<ArgumentException>(fun () -> ParameterPipeline.apply pipeline context missing |> ignore)
             Assert.Contains(key, error.Message)
             Assert.Contains("required", error.Message)
-    let reset = RunParametersEnhancers.Sgd.msuf32FromSetup context parameters
+    let reset = ParameterPipeline.apply RunParametersPipelines.Sgd.msuf32FromSetup context parameters
     Assert.Equal(Some 0<generationNumber>, reset.GetGenerationCurrent())
 
 

@@ -24,10 +24,10 @@ module Standard =
 
     let sorterEvalModule = sprintf "SorterEval.Standard.Channels%d" (int channelCount)
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.sorterMutateStandardFormat
+    let runParametersPipelineName = RunParametersPipelineNames.sorterMutateStandardFormat
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutateStandard
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterMutate
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterMutate
     let setupFunctionName = SetupCatalogNames.mutantStandard
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutateStandard
 
@@ -73,13 +73,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -126,13 +126,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )

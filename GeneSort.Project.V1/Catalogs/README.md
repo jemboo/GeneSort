@@ -8,8 +8,8 @@ Dispatch, FileDb, or application filesystem paths.
 | Folder | Purpose | Entry points |
 | --- | --- | --- |
 | `Queries` | Build setup and execution storage queries | `QueryParamsCatalogSetup`, `QueryParamsCatalogRun` |
-| `RunParameters` | Enhance run parameters | `RunParametersEnhancers`, `RunParametersEnhancerNames`, `RunParametersEnhancerCatalog` |
-| `SetupParameters` | Enhance setup parameters and record source references | `SetupParametersEnhancers`, `SetupParametersEnhancerNames`, `SetupParametersEnhancerCatalog` |
+| `RunParameters` | Validate, enhance, and finalize run parameters | `RunParametersPipelines`, `RunParametersPipelineNames`, `RunParametersPipelineCatalog` |
+| `SetupParameters` | Validate, enhance, and finalize setup parameters | `SetupParametersPipelines`, `SetupParametersPipelineNames`, `SetupParametersPipelineCatalog` |
 | `Evolution` | Build tests, seed pools, and mutators | `SortableTestsMakerCatalog`, `SeedSorterPoolSetMakerCatalog`, `MutatorMakerCatalog` |
 | `Execution` | Execute prepared runs, including Standard and Soss evolution | `ExecuteFunctionCatalog` |
 | `Setup` | Generate or copy inputs and select continuation sources | `SetupCatalog`, `SetupExecutorCatalog` |
@@ -25,25 +25,51 @@ the relevant catalog's `get` function. Query and evolution catalogs reject
 duplicate registrations; run-parameter catalogs retain their existing replacement
 behavior.
 
-Run parameter combinations pass directly to the selected enhancer. Specify the
-desired combinations in the run's parameter spans; enhancement retains every
-combination.
+Parameter combinations retain every declared sweep row. Both parameter catalogs
+return a complete `setupParametersPipeline` or `runParametersPipeline`
+record with four stages, executed by `ParameterPipeline.apply`:
 
-Both enhancer types have the form `context -> parameters -> parameters`:
-`setupParametersEnhancer` uses `setupParametersEnhancerContext` and `setupParameters`,
-and `runParametersEnhancer` uses `runParametersEnhancerContext` and `runParameters`.
-The `...Enhancers` modules implement the transformations, `...EnhancerNames` define
-registration IDs, and `...EnhancerCatalog` modules handle registration and lookup.
-IDs use `setup-parameters-enhancer.` and `run-parameters-enhancer.` prefixes.
-Run definitions select them through `SetupParametersEnhancerName` and
-`RunParametersEnhancerName`; each phase configuration uses `ParametersEnhancerName`.
+1. `ValidateInput` checks supplied values and incompatible settings without changing
+   the collection. Values that enhancement will inherit or derive may still be absent.
+2. `Enhance` inherits, overrides, and derives values. Symbolic choices such as
+   `All` and `SameAsEvaluation` are resolved here by `ParameterResolution`.
+3. `ValidateEffective` checks required values, cross-field constraints, resolved
+   choices, and preservation of fixed setup settings on the complete collection.
+4. `Finalize` assigns file references and execution identity/state only after
+   both validations succeed.
 
-Setup enhancers place required source file IDs on `setupParameters`. Use
-`SetupParametersEnhancers.withFileReferences` to resolve IDs from the setup query
-builder, or set the IDs directly for external sources. Run generation copies
-these references into each paired `runParameters`. Setup queries exclude the
-references from identity; run queries include them. Keep source ID metadata out
-of setup identity calculations when adding new query entry points.
+Validators return `validationIssue[]` and never modify their input. The shared
+`ParameterPipeline.tryApply` returns validation failures as `Error issues`;
+`apply` adapts them to the argument exceptions expected by existing generation
+callers. Operational failures in enhancement/finalization still propagate normally.
+The same pipeline serves run hosts, standalone generation, and setup ID prediction.
+Continuation overrides are applied before effective validation.
+
+The `...Enhancers` modules contain only transformations with the signature
+`context -> parameters -> parameters`. The `...Validators` modules own validation,
+`...Finalizers` own IDs/references, and `...Pipelines` bind the stages together.
+Catalog registration requires a complete record, so a workflow's validation is
+selected together with its transformation. Custom entries can explicitly replace
+stages using F# record updates.
+
+`SetupParametersPipeline.fs` and `RunParametersPipeline.fs` define each pipeline,
+its shared context, and the `setupParametersTransform` / `runParametersTransform`
+function types used by enhancement and finalization. Hosts expose the resolved
+`SetupParametersPipeline` and `RunParametersPipeline` and apply all four stages
+through `ApplySetupParametersPipeline` and `ApplyRunParametersPipeline`.
+
+`...PipelineNames` define registration IDs and `...PipelineCatalog` modules handle
+registration and lookup. IDs use `setup-parameters-pipeline.` and
+`run-parameters-pipeline.` prefixes. Run definitions select them through
+`SetupParametersPipelineName` and `RunParametersPipelineName`; each phase
+configuration uses `ParametersPipelineName`.
+
+Setup finalizers place required source file IDs on `setupParameters`. Use
+`SetupParametersFinalizers.withFileReferences` to resolve IDs from the setup query
+builder, or set external source IDs in the finalizer. Run generation copies these
+references into each paired `runParameters` after effective validation. Setup queries
+exclude references from identity; run queries include them. Keep source ID metadata
+out of setup identity calculations when adding new query entry points.
 
 Setup constructors return shared stored-file IDs directly. Run generation records
 these IDs on each execution, and prepared runs expose a unique `SetupFiles`
@@ -71,7 +97,7 @@ Dispatch and WPF use `WorkflowSourceFiles` to resolve the configured source modu
 `SgdRun.create` takes maker names in its named SGD configuration record.
 Its `sgdBaseConfig.Setup` is a standalone `sgdSetupConfig` with an explicit
 `FunctionName`, `SortableTestsModule`, `SorterEvalModule`, parameter
-spans, query catalog, and enhancer. `SetupExecutorCatalog` maps the setup function
+spans, query catalog, and parameter pipeline. `SetupExecutorCatalog` maps the setup function
 directly to its executor. `preparedSetupConfig` describes evaluation/mutation setup
 separately; neither setup record inherits from the other. SortableTests retains
 `directRunConfig`, with no Setup phase.

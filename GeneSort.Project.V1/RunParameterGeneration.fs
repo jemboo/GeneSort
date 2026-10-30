@@ -10,14 +10,16 @@ open GeneSort.Project.V1.Parameters
 module RunParameterGeneration =
     /// SortableTests has one sweep. The reference is retained solely because it
     /// participates in historical Run/RunParameters IDs; no setup is performed.
-    let private generateDirect runQuery enhanceRun (configured: run) minReplica maxReplica =
-        let context = runParametersEnhancerContext.create runQuery configured
+    let private generateDirect runQuery (pipeline: runParametersPipeline) (configured: run) minReplica maxReplica =
+        let context = runParametersPipelineContext.create runQuery configured
+        let definition = { pipeline with
+                            Finalize = fun context parameters ->
+                                let references = SetupOutputs.referencesFor configured (setupParameters.create parameters.ParamMap)
+                                let enhanced = parameters |> SetupFileReferences.attach references |> pipeline.Finalize context
+                                let query = runQuery enhanced (geneSortDataType.Run configured.RunName) |> Option.get
+                                enhanced.WithId(Some query.Id) }
         SimpleRun.makeRunParameters minReplica maxReplica id configured.BaseRun
-        |> Array.map (fun parameters ->
-            let references = SetupOutputs.referencesFor configured (setupParameters.create parameters.ParamMap)
-            let enhanced = parameters |> SetupFileReferences.attach references |> enhanceRun context
-            let query = runQuery enhanced (geneSortDataType.Run configured.RunName) |> Option.get
-            enhanced.WithId(Some query.Id))
+        |> Array.map (ParameterPipeline.apply definition context)
 
     let validateRoles (configured: run) =
         configured.RunParameterSpans |> List.choose (fun (key, _) ->
@@ -46,10 +48,10 @@ module RunParameterGeneration =
             (selectSources: run -> run -> runParameters[] -> runParameters[])
             (runQuery: runQueryParamsBuilder)
             (setupQuery: setupQueryParamsBuilder)
-            (enhanceRun: runParametersEnhancer)
-            (enhanceSetup: setupParametersEnhancer)
+            (runPipeline: runParametersPipeline)
+            (setupPipeline: setupParametersPipeline)
             (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
-        if configured.IsDirectRun then generateDirect runQuery enhanceRun configured minReplica maxReplica
+        if configured.IsDirectRun then generateDirect runQuery runPipeline configured minReplica maxReplica
         else
             validateRoles configured |> ParameterValidation.ensureValid "configured"
             let setupContext = { Run = configured; QueryParamsFromSetupParams = setupQuery }
@@ -59,7 +61,7 @@ module RunParameterGeneration =
                    let runs = SimpleRun.makeRunParameters repl next id configured.BaseRun
                    let setups =
                        match configured.ParameterSource with
-                       | None -> SimpleRun.makeSetupParameters repl next (Seq.map (enhanceSetup setupContext)) configured.BaseRun
+                       | None -> SimpleRun.makeSetupParameters repl next (Seq.map (ParameterPipeline.apply setupPipeline setupContext)) configured.BaseRun
                        | Some (source, spans) ->
                            let sourceParameters = generateWithSourceSelection selectSources source repl next
                            let filters = spans |> List.filter (fst >> (<>) ParamKeys.selectedSorterPoolCountKey)
@@ -102,64 +104,64 @@ module RunParameterGeneration =
                    for setup in setups do
                        let references =
                            if configured.ParameterSource.IsSome
-                              || configured.RunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32 then []
+                              || configured.RunParametersPipelineName = RunParametersPipelineNames.sossMsuf32 then []
                            else SetupOutputs.referencesFor configured setup
-                       let context = runParametersEnhancerContext.createForSetup runQuery configured setup
+                       let context = runParametersPipelineContext.createForSetup runQuery configured setup
                        for parameters in runs do
-                           let enhanced =
-                               parameters
-                               |> fun parameters ->
-                                   // All executors receive their fixed setup values, including
-                                   // older enhancers that used to rely on duplicated spans.
-                                   (SetupFileReferences.withoutReferences setup).ParamMap
-                                   |> Map.fold (fun map key value ->
-                                       if RunParameterRoles.isFixed (Run.parameterRole configured key) then Map.add key value map
-                                       else map) parameters.ParamMap
-                                   |> fun map ->
-                                       if effectiveSpans configured |> Map.tryFind ParamKeys.selectedSorterCountPerPoolKey
-                                          |> Option.exists (function [value] -> System.String.Equals(value, "All", System.StringComparison.OrdinalIgnoreCase) | _ -> false) then
-                                           Map.add ParamKeys.selectedSorterCountPerPoolKey "All" map
-                                       else map
-                                   |> ParameterValidation.resolveSelection
-                                   |> runParameters.create
-                               |> SetupFileReferences.attach references
-                               |> enhanceRun context
-                               |> fun enhanced ->
-                                   if configured.ParameterSource.IsSome then
-                                       // Execution spans override source values and enhancer defaults.
-                                       // Apply before computing the final identity below.
-                                       Map.fold (fun map key value -> Map.add key value map) enhanced.ParamMap parameters.ParamMap
-                                       |> ParameterValidation.resolveSelection
-                                       |> runParameters.create
-                                   else enhanced
-                               |> SetupFileReferences.attach references
-                           for KeyValue(key, value) in setup.ParamMap do
-                               if RunParameterRoles.isFixed (Run.parameterRole configured key)
-                                  && Map.tryFind key enhanced.ParamMap <> Some value then
-                                   invalidArg "RunParametersEnhancerName"
-                                       (sprintf "Execution changed fixed Setup value '%s'. Its enhancer must preserve the prepared value." key)
-                           // Resolve identities from the fully enhanced maker inputs. Execution-only
-                           // parameters never enter these identities; continuations record imports in Setup.
-                           let enhanced =
-                               if configured.ParameterSource.IsSome then enhanced
-                               else
-                                   SetupInputReferences.recordFiles (SetupOutputs.generatedFiles configured enhanced) enhanced
-                           let query =
-                               runQuery enhanced (geneSortDataType.Run configured.RunName)
-                               |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"
-                                                                               configured.RunQueryCatalogName (RunParameters.reportKvps enhanced)))
-                           yield enhanced.WithId(Some query.Id).WithSetupCompleted(Some false) |]
+                           let definition = {
+                               runPipeline with
+                                   Enhance = fun context input ->
+                                       // Input has been validated before fixed values, inherited settings,
+                                       // or symbolic choices can replace anything supplied by the caller.
+                                       let prepared =
+                                           (SetupFileReferences.withoutReferences setup).ParamMap
+                                           |> Map.fold (fun map key value ->
+                                               if RunParameterRoles.isFixed (Run.parameterRole configured key) then Map.add key value map
+                                               else map) input.ParamMap
+                                           |> fun map ->
+                                               if effectiveSpans configured |> Map.tryFind ParamKeys.selectedSorterCountPerPoolKey
+                                                  |> Option.exists (function [value] -> System.String.Equals(value, "All", System.StringComparison.OrdinalIgnoreCase) | _ -> false) then
+                                                   Map.add ParamKeys.selectedSorterCountPerPoolKey "All" map
+                                               else map
+                                           |> runParameters.create
+                                       let enhanced = runPipeline.Enhance context prepared
+                                       // Continuation overrides belong to enhancement, so effective validation
+                                       // sees the collection that will actually be executed.
+                                       let effective =
+                                           if configured.ParameterSource.IsSome then
+                                               Map.fold (fun map key value -> Map.add key value map) enhanced.ParamMap input.ParamMap
+                                               |> runParameters.create
+                                           else enhanced
+                                       RunParametersEnhancers.resolve effective
+                                   ValidateEffective = fun context effective ->
+                                       Array.append
+                                           (runPipeline.ValidateEffective context effective)
+                                           (RunParametersValidators.validateFixedSettings context effective)
+                                       |> Array.distinct
+                                   Finalize = fun context effective ->
+                                       let referenced = SetupFileReferences.attach references effective
+                                       let recorded =
+                                           if configured.ParameterSource.IsSome then referenced
+                                           else SetupInputReferences.recordFiles (SetupOutputs.generatedFiles configured referenced) referenced
+                                       let enhanced = runPipeline.Finalize context recorded
+                                       let query =
+                                           runQuery enhanced (geneSortDataType.Run configured.RunName)
+                                           |> Option.defaultWith (fun () -> invalidOp (sprintf "Run query '%s' could not build an identity for the enhanced parameters.\n%s"
+                                                                                                           configured.RunQueryCatalogName (RunParameters.reportKvps enhanced)))
+                                       enhanced.WithId(Some query.Id).WithSetupCompleted(Some false)
+                           }
+                           yield ParameterPipeline.apply definition context parameters |]
 
-    /// Resolve catalog functions for callers that do not have a run host.
+    /// Resolve catalog pipelines for callers that do not have a run host.
     and generateWithSourceSelection selectSources (configured: run) (minReplica: int<replNumber>) (maxReplica: int<replNumber>) : runParameters[] =
         ProjectCatalogs.registerAll ()
         let runQuery = QueryParamsCatalogRun.get configured.RunQueryCatalogName configured.ProjectName configured.DatabaseName
-        let enhanceRun = RunParametersEnhancerCatalog.get configured.RunParametersEnhancerName
-        if configured.IsDirectRun then generateDirect runQuery enhanceRun configured minReplica maxReplica
+        let runPipeline = RunParametersPipelineCatalog.get configured.RunParametersPipelineName
+        if configured.IsDirectRun then generateDirect runQuery runPipeline configured minReplica maxReplica
         else
             let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
-            let enhanceSetup = SetupParametersEnhancerCatalog.get configured.SetupParametersEnhancerName
-            generateWithBindingsAndSourceSelection selectSources runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica
+            let setupPipeline = SetupParametersPipelineCatalog.get configured.SetupParametersPipelineName
+            generateWithBindingsAndSourceSelection selectSources runQuery setupQuery runPipeline setupPipeline configured minReplica maxReplica
 
     let private unrankedSources (configured: run) source candidates =
         let spans = configured.ParameterSource |> Option.map snd |> Option.defaultValue []
@@ -171,9 +173,9 @@ module RunParameterGeneration =
         | _ -> ()
         candidates
 
-    let generateWithBindings runQuery setupQuery enhanceRun enhanceSetup (configured: run) minReplica maxReplica =
-        if configured.IsDirectRun then generateDirect runQuery enhanceRun configured minReplica maxReplica
-        else generateWithBindingsAndSourceSelection unrankedSources runQuery setupQuery enhanceRun enhanceSetup configured minReplica maxReplica
+    let generateWithBindings runQuery setupQuery runPipeline setupPipeline (configured: run) minReplica maxReplica =
+        if configured.IsDirectRun then generateDirect runQuery runPipeline configured minReplica maxReplica
+        else generateWithBindingsAndSourceSelection unrankedSources runQuery setupQuery runPipeline setupPipeline configured minReplica maxReplica
 
     let generate configured minReplica maxReplica =
         generateWithSourceSelection unrankedSources configured minReplica maxReplica

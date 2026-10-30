@@ -1,12 +1,12 @@
-# Enhancer parameter inventory
+# Parameter pipeline inventory
 
-Setup and execution enhancers validate configured settings, derive dependent values, attach file references, and initialize execution identity/state. `ChannelCount` belongs to the run's module: modules place their fixed value in parameter spans, and continuations inherit it from their source. Modules also construct prefix IDs from their channel count, stage length, and variant. Enhancers do not choose these values.
+Setup and execution catalog entries execute `ValidateInput -> Enhance -> ValidateEffective -> Finalize`. Validators inspect collections without changing them; enhancers inherit and derive values; finalizers attach references and initialize execution identity/state after validation. `ChannelCount` belongs to the run's module: modules place their fixed value in parameter spans, and continuations inherit it from their source. Modules also construct prefix IDs from their channel count, stage length, and variant. Enhancers do not choose these values.
 
-This inventory covers the built-in functions in [SetupParametersEnhancers.fs](SetupParameters/SetupParametersEnhancers.fs) and [RunParametersEnhancers.fs](RunParameters/RunParametersEnhancers.fs). Their registrations live in [SetupParametersEnhancerCatalog.fs](SetupParameters/SetupParametersEnhancerCatalog.fs) and [RunParametersEnhancerCatalog.fs](RunParameters/RunParametersEnhancerCatalog.fs). Values below overwrite an existing value unless explicitly described as a missing-value default or an inheritance rule.
+This inventory covers the complete built-in definitions in [SetupParametersPipelines.fs](SetupParameters/SetupParametersPipelines.fs) and [RunParametersPipelines.fs](RunParameters/RunParametersPipelines.fs). Their registrations live in [SetupParametersPipelineCatalog.fs](SetupParameters/SetupParametersPipelineCatalog.fs) and [RunParametersPipelineCatalog.fs](RunParameters/RunParametersPipelineCatalog.fs). Values below overwrite an existing value unless explicitly described as a missing-value default or an inheritance rule.
 
-## Setup enhancers
+## Setup parameter pipelines
 
-Registration names in this section have the prefix `setup-parameters-enhancer.`.
+Registration names in this section have the prefix `setup-parameters-pipeline.`.
 
 | Registration | Parameters assigned |
 | --- | --- |
@@ -25,13 +25,13 @@ The shared seed calculations and initial state are:
 | `SorterPoolCount` | Explicit positive setup value, preserved by enhancers. |
 | `GenerationCurrent` | `0` |
 
-The R/S wrappers validate activation settings before invoking their base enhancer. `standard-msuf32` also validates the full setup settings; `soss-msuf32` validates seed-pool settings.
+The R/S input validators reject malformed or conflicting supplied activation settings. Effective validators require the activation setting for the chosen model family. `standard-msuf32` requires the full setup settings; `soss-msuf32` requires seed-pool settings. Required values, pool capacity, and unresolved symbolic choices are checked after enhancement and before file-reference calculation.
 
-## Run parameter enhancers for testing and evaluation
+## Run parameter pipelines for testing and evaluation
 
-Registration names in the run parameter tables have the prefix `run-parameters-enhancer.`.
+Registration names in the run parameter tables have the prefix `run-parameters-pipeline.`.
 
-Every enhancer in this table assigns `DatabaseName` and `RunName` from the run, `RunFinished = false`, and `Id` from the selected run query catalog.
+The finalizer for every registration in this table assigns `DatabaseName` and `RunName` from the run, `RunFinished = false`, and `Id` from the selected run query catalog.
 
 | Registration | Additional assignments |
 | --- | --- |
@@ -85,23 +85,23 @@ Existing non-SGD model/prefix comparison parameters remain configurable. Evaluat
 
 The `24p3a` and `24p3b` Msrs/Mssi names still use stage length 4, preserving their former behavior. Only the Msuf6 `24p3b` module uses stage length 3.
 
-## Remaining SGD enhancer assignments
+## SGD pipeline assignments
 
-Execution enhancers still set `CollectNewSortableTests = false` and None.. The Msuf32 family initializes `GenerationCurrent = 0`; the other families preserve it. Model, prefix, evaluation measure, RNG, and format defaults are no longer supplied by any registered enhancer.
+The Msuf32 family initializes `GenerationCurrent = 0`; the other families preserve it. Model, prefix, evaluation measure, RNG, and format defaults are no longer supplied by any registered pipeline.
 
-All preserve the explicit `SorterPoolCount`, set `RunFinished = false`, copy `RunName`, and calculate `Id`. The `evo` and `soss` Msuf32 wrappers merge setup and execution maps with execution winning. R/S wrappers validate explicit activator mutation rates and reject activation parameters from the other family; they no longer invent mutation-rate defaults.
+All preserve the explicit `SorterPoolCount`. Their finalizers set `RunFinished = false`, copy `RunName`, and calculate `Id`. The `evo` and `soss` Msuf32 wrappers merge setup and execution maps with execution winning. R/S validators check explicit activator mutation rates and reject activation parameters from the other family; enhancers do not invent mutation-rate defaults.
 
-## Assignments outside enhancers
+## Generation orchestration
 
-`RunParameterGeneration` pairs setup and execution combinations, copies fixed setup values, attaches setup references, records generated input-file identities, and calculates the final execution identity. It initializes `SetupCompleted = false`. Continuations import source settings and apply their execution overrides after enhancement. These lifecycle assignments are separate from the enhancer defaults listed above.
+`RunParameterGeneration` pairs setup and execution combinations, copies fixed setup values, attaches setup references, records generated input-file identities, and calculates the final execution identity. It initializes `SetupCompleted = false`. Continuations import source settings and apply their execution overrides within enhancement, before effective validation. These assignments run within the appropriate enhancement and finalization stages.
 
-Registered enhancers no longer supply configurable defaults or fixed experimental policies. Activation settings must be declared by the source run and cannot be removed from a custom draft; their values remain editable during Setup. Changing either activation setting changes seed/setup identity.
+Registered pipelines do not supply configurable defaults or fixed experimental policies. Activation settings must be declared by the source run and cannot be removed from a custom draft; their values remain editable during Setup. Changing either activation setting changes seed/setup identity.
 
 ## Consolidated implementations
 
 Existing catalog names remain available, but equivalent registrations share one implementation:
 
-- Setup evaluation, prefix evaluation, and mutation share the model-set and prefixed-test file-reference enhancer.
+- Setup evaluation, prefix evaluation, and mutation share the model-set and prefixed-test file-reference finalizer.
 - Execution standard evaluation, merge evaluation, and both standard mutation registrations share setup inheritance and run initialization.
 - The seven MSRS/MSUF6/MSSI continuation registrations share pool-size validation and run initialization without resetting the supplied generation.
 

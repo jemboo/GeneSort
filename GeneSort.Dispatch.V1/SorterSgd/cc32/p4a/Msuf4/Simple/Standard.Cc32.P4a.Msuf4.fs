@@ -26,11 +26,11 @@ module Pool_32 =
 
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.SimpleParams.simpleSetupParams
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+    let runParametersPipelineName = RunParametersPipelineNames.evoMsuf32
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
+    let setupParametersPipelineName = SetupParametersPipelineNames.standardMsuf32
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -58,13 +58,13 @@ module Pool_32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = []
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -102,13 +102,13 @@ module Pool_32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = []
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -135,11 +135,11 @@ module Pool_512 =
 
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.SimpleParams.simpleSetupParams
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+    let runParametersPipelineName = RunParametersPipelineNames.evoMsuf32
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
+    let setupParametersPipelineName = SetupParametersPipelineNames.standardMsuf32
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -171,13 +171,13 @@ module Pool_512 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
                 Execution = {
                     FunctionName = executionFunctionName
                     ParameterSpans = []
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

@@ -89,22 +89,27 @@ let ``standalone test Results use the same identity for generation and downstrea
 let private configure runValues setupValues outputTypes setupQuery =
     let name = Guid.NewGuid().ToString("N")
     let setupCalls = ref 0
-    SetupParametersEnhancerCatalog.register name (fun context sp ->
-        setupCalls.Value <- setupCalls.Value + 1
-        sp.WithGenerationCurrent(Some (UMX.tag 12))
-        |> SetupParametersEnhancers.withFileReferences outputTypes context)
+    SetupParametersPipelineCatalog.register name {
+        SetupParametersPipelines.noOp with
+            Enhance = fun _ sp ->
+                setupCalls.Value <- setupCalls.Value + 1
+                sp.WithGenerationCurrent(Some (UMX.tag 12))
+            Finalize = SetupParametersFinalizers.withFileReferences outputTypes
+    }
     QueryParamsCatalogSetup.register name setupQuery
     QueryParamsCatalogRun.register (name + ".run") (fun project database rp outputType ->
         // A registered builder owns its full identity; the catalog adds nothing.
         queryParams.create database project (rp.GetRepl()) None outputType [|"R", rp.ParamMap.["R"]|]
         |> QueryParamsBuildersRun.withSetupReferences rp
         |> Some)
-    RunParametersEnhancerCatalog.register name (fun context rp ->
-        let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
-        Assert.Equal(setup.GetRepl(), rp.GetRepl())
-        Assert.True(rp.GetSetupParametersId().IsSome)
-        let enhanced = rp.ParamMap |> Map.add "SeenSetup" setup.ParamMap.["S"] |> runParameters.create
-        enhanced.WithRunName(Some context.Run.RunName)) |> ignore
+    RunParametersPipelineCatalog.register name {
+        RunParametersPipelines.sortableTests with
+            Enhance = fun context rp ->
+                let setup = context.SetupParameters |> Option.defaultWith (fun () -> failwith "Missing associated setup")
+                Assert.Equal(setup.GetRepl(), rp.GetRepl())
+                let enhanced = rp.ParamMap |> Map.add "SeenSetup" setup.ParamMap.["S"] |> runParameters.create
+                enhanced.WithRunName(Some context.Run.RunName)
+    } |> ignore
     let configured =
         SimpleRun.create {
             DatabaseName = UMX.tag "db"
@@ -116,13 +121,13 @@ let private configure runValues setupValues outputTypes setupQuery =
                 FunctionName = "unused"
                 ParameterSpans = ["R", runValues]
                 QueryCatalogName = name + ".run"
-                ParametersEnhancerName = name
+                ParametersPipelineName = name
             }
             Setup = {
                 FunctionName = "unused"
                 ParameterSpans = ["S", setupValues]
                 QueryCatalogName = name
-                ParametersEnhancerName = name
+                ParametersPipelineName = name
             }
         } |> Run.ofSimple
     configured, setupCalls
@@ -191,8 +196,9 @@ let ``source file IDs affect run identities but not setup identities`` () =
         Assert.False(actual.Properties.ContainsKey ParamKeys.setupSorterModelSetIdKey)
         Assert.Equal(Some source, linked.GetSetupSorterModelSetId())
     let generate source =
-        RunParameterGeneration.generateWithBindings runQuery setupQuery (fun _ rp -> rp)
-            (fun _ sp -> sp.WithSetupSorterModelSetId(Some source)) configured 0<replNumber> 1<replNumber>
+        RunParameterGeneration.generateWithBindings runQuery setupQuery
+            { RunParametersPipelines.sortableTests with Finalize = RunParametersEnhancers.noOp }
+            { SetupParametersPipelines.noOp with Finalize = fun _ sp -> sp.WithSetupSorterModelSetId(Some source) } configured 0<replNumber> 1<replNumber>
         |> Array.exactlyOne
     let a, b = generate first, generate second
     Assert.Equal(a.GetSetupParametersId(), b.GetSetupParametersId())
@@ -201,13 +207,13 @@ let ``source file IDs affect run identities but not setup identities`` () =
     Assert.NotEqual(a.GetId(), b.GetId())
 
 [<Fact>]
-let ``built-in setup enhancers populate their required file IDs`` () =
+let ``built-in setup pipelines populate their required file IDs`` () =
     let configured, _ = configure ["a"] ["one"] [] query
     let setupQuery = QueryParamsCatalogSetup.get configured.SetupQueryCatalogName configured.ProjectName configured.DatabaseName
     let context = { Run = configured; QueryParamsFromSetupParams = setupQuery }
     let input = (setupParameters.create (Map.ofList ["S", "one"])).WithRepl(Some 0<replNumber>)
-    for enhancer, pool in [SetupParametersEnhancers.sorterEval, false; SetupParametersEnhancers.sorterMutate, false; SetupParametersEnhancers.sorterSgd, true] do
-        let enhanced = enhancer context input
+    for pipeline, pool in [SetupParametersPipelines.sorterEval, false; SetupParametersPipelines.sorterMutate, false; SetupParametersPipelines.sorterSgd, true] do
+        let enhanced = ParameterPipeline.apply pipeline context input
         let expected outputType = setupQuery enhanced outputType |> Option.get |> fun q -> Some q.Id
         Assert.Equal(expected (geneSortDataType.SortableTestsWithPrefix ""), enhanced.GetSetupSortableTestsWithPrefixId())
         if pool then Assert.Equal(expected (geneSortDataType.SorterPoolSet ""), enhanced.GetSetupSorterPoolSetId())

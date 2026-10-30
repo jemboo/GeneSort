@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="Tests.fs" />
     <Compile Include="WorkflowFixtures.fs" />
+    <Compile Include="ParameterPipelineTests.fs" />
     <Compile Include="MakerCatalogTests.fs" />
     <Compile Include="SimpleRRunConfigTests.fs" />
     <Compile Include="SimpleSRunConfigTests.fs" />

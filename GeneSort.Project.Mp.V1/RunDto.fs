@@ -26,8 +26,8 @@ type runDto =
         GenSaveSubIntervalsName: string
         RunQueryCatalogName: string
         SetupQueryCatalogName: string
-        RunParametersEnhancerName: string
-        SetupParametersEnhancerName: string
+        RunParametersPipelineName: string
+        SetupParametersPipelineName: string
         AllowOverwrite: bool
         SortableTestsMakerName: string
         SeedPoolSetMakerName: string
@@ -68,8 +68,8 @@ module RunDto =
             SourceParameterSpans =
                 project.ParameterSource |> Option.map snd |> Option.defaultValue []
                 |> List.map (fun (key, values) -> { Key = key; Values = List.toArray values }) |> List.toArray
-            RunParametersEnhancerName = project.RunParametersEnhancerName
-            SetupParametersEnhancerName = project.SetupParametersEnhancerName
+            RunParametersPipelineName = project.RunParametersPipelineName
+            SetupParametersPipelineName = project.SetupParametersPipelineName
             AllowOverwrite = project.AllowOverwrite
             SortableTestsMakerName = project.MakerNames |> Option.map (fun names -> names.SortableTests) |> Option.toObj
             SeedPoolSetMakerName = project.MakerNames |> Option.map (fun names -> names.SeedPoolSet) |> Option.toObj
@@ -95,7 +95,7 @@ module RunDto =
             |> Array.map (fun span -> span.Key, (span.Values |> Array.toList))
             |> Array.toList
         let runQueryCatalogName = dto.RunQueryCatalogName
-        let runParametersEnhancerName = dto.RunParametersEnhancerName
+        let runParametersPipelineName = dto.RunParametersPipelineName
         let allowOverwrite = dto.AllowOverwrite
         if System.String.IsNullOrWhiteSpace dto.ExecuteFunctionName then
             invalidArg "dto" "Run data must specify an explicit ExecuteFunctionName."
@@ -109,7 +109,7 @@ module RunDto =
                 FunctionName = dto.ExecuteFunctionName
                 ParameterSpans = runParameterSpans
                 QueryCatalogName = runQueryCatalogName
-                ParametersEnhancerName = runParametersEnhancerName
+                ParametersPipelineName = runParametersPipelineName
             }
             Setup = {
                 FunctionName = dto.SetupFunctionName
@@ -117,7 +117,7 @@ module RunDto =
                 SorterEvalModule = UMX.tag dto.SetupSorterEvalModule
                 ParameterSpans = setupParameterSpans
                 QueryCatalogName = dto.SetupQueryCatalogName
-                ParametersEnhancerName = dto.SetupParametersEnhancerName
+                ParametersPipelineName = dto.SetupParametersPipelineName
             }
         }
         let configured =
@@ -136,7 +136,7 @@ module RunDto =
                     FunctionName = dto.SetupFunctionName
                     ParameterSpans = config.Setup.ParameterSpans
                     QueryCatalogName = config.Setup.QueryCatalogName
-                    ParametersEnhancerName = config.Setup.ParametersEnhancerName
+                    ParametersPipelineName = config.Setup.ParametersPipelineName
                 }
             })
           | saveIntervals, saveSubIntervals ->

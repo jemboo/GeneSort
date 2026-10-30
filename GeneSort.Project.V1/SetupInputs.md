@@ -47,14 +47,14 @@ SGD configurations use the standalone `sgdSetupConfig` record:
 - `FunctionName` selects `setup.sgd-standard` or `setup.sgd-soss` directly.
 - `SortableTestsModule` selects the input database under `SortableTests`.
 - `SorterEvalModule` selects the seed evaluation database under `SorterEval`.
-- `ParameterSpans`, `QueryCatalogName`, and `ParametersEnhancerName` describe the setup inputs.
+- `ParameterSpans`, `QueryCatalogName`, and `ParametersPipelineName` describe the setup inputs.
 
 The run-level `DatabaseName` remains the destination for prepared inputs and Results.
 `preparedSetupConfig` is a separate record for evaluation/mutation setup;
 `directRunConfig` describes SortableTests runs without a Setup phase.
 The setup function and source database names are serialized explicitly. Old SGD
 definitions without these fields are unsupported; recreate their definitions and parameters.
-Source database names are recorded before setup enhancement. Test-file constructors
+Source database names are recorded before applying the setup parameter pipeline. Test-file constructors
 include the tests database, and seed-pool constructors include both databases, preventing
 reuse of inputs created from a different source. Activator-rate sweeps still share inputs.
 

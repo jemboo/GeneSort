@@ -1175,13 +1175,13 @@ let ``Append branches execution modifiers from one source checkpoint`` chained =
                 ParameterSpans = baseline.SetupParameterSpans |> List.map (fun (key, values) ->
                     if key = ParamKeys.mutationModKey then key, ["0"; "1"; "2"] else key, values)
                 QueryCatalogName = baseline.SetupQueryCatalogName
-                ParametersEnhancerName = baseline.SetupParametersEnhancerName
+                ParametersPipelineName = baseline.SetupParametersPipelineName
             }
             Execution = {
                 FunctionName = baseline.ExecuteFunctionName
                 ParameterSpans = baseline.RunParameterSpans
                 QueryCatalogName = baseline.RunQueryCatalogName
-                ParametersEnhancerName = baseline.RunParametersEnhancerName
+                ParametersPipelineName = baseline.RunParametersPipelineName
             }
         } {
             MakerNames = baseline.MakerNames.Value

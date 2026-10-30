@@ -47,7 +47,7 @@ module RunDefinitionFileTests =
                 Execution = {
                     FunctionName = ExecuteFunctionNames.sortableTests
                     QueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
-                    ParametersEnhancerName = RunParametersEnhancerNames.sortableTests
+                    ParametersPipelineName = RunParametersPipelineNames.sortableTests
                     ParameterSpans = [
                         ParamKeys.sortableDataFormatKey, ["BitVector512"]
                         ParamKeys.prefixLibIdKey, ["PrefixLibId(channelCount=24, stageLength=3, Variant=PrefixA)";

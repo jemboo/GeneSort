@@ -140,7 +140,7 @@ module internal EvoContinuation =
                 SorterEvalModule = source.SgdSetup.Value.SorterEvalModule
                 ParameterSpans = []
                 QueryCatalogName = QueryCatalogNamesSetup.importedStart
-                ParametersEnhancerName = SetupParametersEnhancerNames.noOp
+                ParametersPipelineName = SetupParametersPipelineNames.noOp
             }
             Execution = {
                 FunctionName = expectedExecutionFunction
@@ -151,7 +151,7 @@ module internal EvoContinuation =
                     ParamKeys.sourceGenerationIntervalKey, [string config.Source.GenerationInterval]
                 ]
                 QueryCatalogName = config.RunQueryCatalogName
-                ParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+                ParametersPipelineName = RunParametersPipelineNames.evoMsuf32
             }
         } {
             MakerNames = SgdRun.makerNames sourceSgd

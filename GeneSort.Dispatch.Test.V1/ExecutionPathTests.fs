@@ -33,13 +33,13 @@ let private createHostWithSaveResult saveResult finished execute =
                 FunctionName = name
                 ParameterSpans = []
                 QueryCatalogName = name
-                ParametersEnhancerName = "run-parameters-enhancer.sortable-tests"
+                ParametersPipelineName = "run-parameters-pipeline.sortable-tests"
             }
             Setup = {
                 FunctionName = name
                 ParameterSpans = []
                 QueryCatalogName = name
-                ParametersEnhancerName = SetupParametersEnhancerNames.noOp
+                ParametersPipelineName = SetupParametersPipelineNames.noOp
             }
         }
         |> Run.ofSimple

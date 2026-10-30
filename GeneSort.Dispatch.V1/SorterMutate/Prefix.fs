@@ -26,10 +26,10 @@ module Prefix =
     let sortableTestsModule = sprintf "SortableTests.Prefix.Channels%d" (int channelCount)
     let sorterEvalModule = "SorterEval.Prefix"
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.sorterMutateStandard
+    let runParametersPipelineName = RunParametersPipelineNames.sorterMutateStandard
     let executionFunctionName = ExecuteFunctionNames.sorterMutate
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterMutate
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterMutate
     let setupFunctionName = SetupCatalogNames.mutantPrefix
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
 
@@ -70,13 +70,13 @@ module Prefix =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -118,13 +118,13 @@ module Prefix =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -166,13 +166,13 @@ module Prefix =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -214,13 +214,13 @@ module Prefix =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )

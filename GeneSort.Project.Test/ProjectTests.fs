@@ -17,13 +17,13 @@ type ProjectTests() =
                 FunctionName = "setup"
                 ParameterSpans = ["SetupValue", ["seed"]]
                 QueryCatalogName = "setup-query"
-                ParametersEnhancerName = "setup-enhancer"
+                ParametersPipelineName = "setup-pipeline"
             }
             Execution = {
                 FunctionName = "execute"
                 ParameterSpans = ["A", ["1"; "2"]; "B", ["x"; "y"]]
                 QueryCatalogName = "run-query"
-                ParametersEnhancerName = "run-enhancer"
+                ParametersPipelineName = "run-pipeline"
             }
         }
         let parameters = SimpleRun.makeRunParameters 0<replNumber> 2<replNumber> id configured

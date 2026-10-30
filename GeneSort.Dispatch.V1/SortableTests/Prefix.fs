@@ -18,7 +18,7 @@ open GeneSort.Dispatch.V1
 
 module Prefix =
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.sortableTests
+    let runParametersPipelineName = RunParametersPipelineNames.sortableTests
     let executionFunctionName = ExecuteFunctionNames.sortableTests
     let executionQueryCatalogName = QueryCatalogNamesRun.sortableTestPrefix
 
@@ -56,7 +56,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )
@@ -86,7 +86,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )
@@ -116,7 +116,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )
@@ -173,7 +173,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )
@@ -226,7 +226,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )
@@ -253,7 +253,7 @@ module Prefix =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                 }
             )

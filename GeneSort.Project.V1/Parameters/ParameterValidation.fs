@@ -182,21 +182,13 @@ module ParameterValidation =
 
     let ofMap parameters = parameters |> Map.toList |> List.map (fun (key, value) -> key, [value])
 
-    /// Resolve an explicit All choice only once the paired pool capacity is available.
-    let resolveSelection parameters =
-        match Map.tryFind ParamKeys.selectedSorterCountPerPoolKey parameters, Map.tryFind ParamKeys.sorterCountPerPoolKey parameters with
-        | Some selected, Some capacity when System.String.Equals(selected, "All", StringComparison.OrdinalIgnoreCase) ->
-            Map.add ParamKeys.selectedSorterCountPerPoolKey capacity parameters
-        | _ -> parameters
-
-    /// Keep a declared initial/evolution measure pair correlated within each sweep row.
-    let resolveEvaluationMeasures parameters =
-        match Map.tryFind ParamKeys.sorterEvalMeasureInitialKey parameters with
-        | Some "SameAsEvaluation" ->
-            match Map.tryFind ParamKeys.sorterEvalMeasureKey parameters with
-            | Some value -> Map.add ParamKeys.sorterEvalMeasureInitialKey value parameters
-            | None -> invalidArg "parameters" "SameAsEvaluation requires SorterEvalMeasure."
-        | _ -> parameters
+    /// Effective collections must no longer contain unresolved symbolic choices.
+    let resolvedValues phase parameters =
+        [| if Map.tryFind ParamKeys.selectedSorterCountPerPoolKey parameters
+                  |> Option.exists (fun value -> String.Equals(value, "All", StringComparison.OrdinalIgnoreCase)) then
+               yield validationIssue.create (field phase ParamKeys.selectedSorterCountPerPoolKey) "All requires SorterCountPerPool."
+           if Map.tryFind ParamKeys.sorterEvalMeasureInitialKey parameters = Some "SameAsEvaluation" then
+               yield validationIssue.create (field phase ParamKeys.sorterEvalMeasureInitialKey) "SameAsEvaluation requires SorterEvalMeasure." |]
 
     /// Check every declared pool-size combination without expanding unrelated parameters.
     let poolSizes phase spans =

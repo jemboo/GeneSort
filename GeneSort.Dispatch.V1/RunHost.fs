@@ -42,8 +42,8 @@ type simpleRunHost = private {
     setup: setupFunction option
     bindExecution: runStorage -> runFunction
     executeFunction: runFunction
-    runParametersEnhancer: runParametersEnhancer
-    setupParametersEnhancer: setupParametersEnhancer
+    runParametersPipeline: runParametersPipeline
+    setupParametersPipeline: setupParametersPipeline
 }
 
 type sgdRunHost = private {
@@ -90,8 +90,8 @@ type runHost =
               setup = None
               bindExecution = bindExecution
               executeFunction = bindExecution storage
-              runParametersEnhancer = RunParametersEnhancerCatalog.get run.RunParametersEnhancerName
-              setupParametersEnhancer = if run.HasSetup then SetupParametersEnhancerCatalog.get run.SetupParametersEnhancerName else fun _ parameters -> parameters }
+              runParametersPipeline = RunParametersPipelineCatalog.get run.RunParametersPipelineName
+              setupParametersPipeline = if run.HasSetup then SetupParametersPipelineCatalog.get run.SetupParametersPipelineName else SetupParametersPipelines.noOp }
 
         let lookupInterval = RunIntervals.resolve run.RunName
 
@@ -200,31 +200,31 @@ type runHost =
         | SimpleRunHost host -> host.maxParallel
         | SgdRunHost host -> host.simpleHost.maxParallel
 
-    member this.RunParametersEnhancer : runParametersEnhancer =
+    member this.RunParametersPipeline : runParametersPipeline =
         match this with
-        | SimpleRunHost host -> host.runParametersEnhancer
-        | SgdRunHost host -> host.simpleHost.runParametersEnhancer
+        | SimpleRunHost host -> host.runParametersPipeline
+        | SgdRunHost host -> host.simpleHost.runParametersPipeline
 
-    member this.SetupParametersEnhancer : setupParametersEnhancer =
+    member this.SetupParametersPipeline : setupParametersPipeline =
         match this with
-        | SimpleRunHost host -> host.setupParametersEnhancer
-        | SgdRunHost host -> host.simpleHost.setupParametersEnhancer
+        | SimpleRunHost host -> host.setupParametersPipeline
+        | SgdRunHost host -> host.simpleHost.setupParametersPipeline
 
-    member this.EnhanceRunParameters (runParametersSeq: runParameters seq) : runParameters seq =
-        let context = runParametersEnhancerContext.create this.QueryParamsFromRunParams this.Run
+    member this.ApplyRunParametersPipeline (runParametersSeq: runParameters seq) : runParameters seq =
+        let context = runParametersPipelineContext.create this.QueryParamsFromRunParams this.Run
         runParametersSeq
-        |> Seq.map (this.RunParametersEnhancer context)
+        |> Seq.map (ParameterPipeline.apply this.RunParametersPipeline context)
 
-    member this.EnhanceSetupParameters (parameters: setupParameters seq) : setupParameters seq =
+    member this.ApplySetupParametersPipeline (parameters: setupParameters seq) : setupParameters seq =
         let context = { Run = this.Run; QueryParamsFromSetupParams = this.QueryParamsFromSetupParams }
-        parameters |> Seq.map (this.SetupParametersEnhancer context)
+        parameters |> Seq.map (ParameterPipeline.apply this.SetupParametersPipeline context)
 
     member this.MakeRunParameters minReplica maxReplica =
         RunParameterGeneration.generateWithBindingsAndSourceSelection
             (EvoCondenseSelection.select RunHost.makeDatabase)
             this.QueryParamsFromRunParams this.QueryParamsFromSetupParams
-            this.RunParametersEnhancer this.SetupParametersEnhancer this.Run minReplica maxReplica
+            this.RunParametersPipeline this.SetupParametersPipeline this.Run minReplica maxReplica
 
     member this.MakeSetupParameters minReplica maxReplica =
         if not this.Run.HasSetup then [||]
-        else SimpleRun.makeSetupParameters minReplica maxReplica this.EnhanceSetupParameters this.Run.BaseRun
+        else SimpleRun.makeSetupParameters minReplica maxReplica this.ApplySetupParametersPipeline this.Run.BaseRun

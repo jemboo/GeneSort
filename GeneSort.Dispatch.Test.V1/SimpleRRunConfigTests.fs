@@ -75,13 +75,13 @@ let ``SimpleR catalog entries reject malformed and conflicting activation parame
     let host = runHost.Create (configuration soss false) 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber> |> Array.head
     let setupContext = { Run = host.Run; QueryParamsFromSetupParams = host.QueryParamsFromSetupParams }
-    let enhanceSetup = SetupParametersEnhancerCatalog.get host.Run.SetupParametersEnhancerName
+    let applySetupPipeline = SetupParametersPipelineCatalog.get host.Run.SetupParametersPipelineName |> ParameterPipeline.apply
     for key, value in [ParamKeys.aMaxKey, "-1"; ParamKeys.aMaxKey, "bad"; ParamKeys.activationProbabilityKey, "0.5"] do
         let bad = setupParameters.create (Map.add key value setup.ParamMap)
-        Assert.Throws<ArgumentException>(fun () -> enhanceSetup setupContext bad |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> applySetupPipeline setupContext bad |> ignore) |> ignore
     let parameters = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
-    let context = runParametersEnhancerContext.createForSetup host.QueryParamsFromRunParams host.Run setup
-    let enhanceRun = RunParametersEnhancerCatalog.get host.Run.RunParametersEnhancerName
+    let context = runParametersPipelineContext.createForSetup host.QueryParamsFromRunParams host.Run setup
+    let applyRunPipeline = RunParametersPipelineCatalog.get host.Run.RunParametersPipelineName |> ParameterPipeline.apply
     for value in ["-0.1"; "1.1"; "NaN"; "bad"] do
         let bad = runParameters.create (Map.add ParamKeys.activatorMutationRateKey value parameters.ParamMap)
-        Assert.Throws<ArgumentException>(fun () -> enhanceRun context bad |> ignore) |> ignore
+        Assert.Throws<ArgumentException>(fun () -> applyRunPipeline context bad |> ignore) |> ignore

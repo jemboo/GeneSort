@@ -44,9 +44,9 @@ let ``Soss editor exposes activator sweep and uses module selections`` () =
     let configured = RunTypeEditor.build original draft |> function Ok value -> value | Error _ -> failwith "Invalid draft"
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionFunctionName, configured.ExecuteFunctionName)
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionQueryCatalogName, configured.RunQueryCatalogName)
-    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.runParametersEnhancerName, configured.RunParametersEnhancerName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.runParametersPipelineName, configured.RunParametersPipelineName)
     Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupQueryCatalogName, configured.SetupQueryCatalogName)
-    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupParametersEnhancerName, configured.SetupParametersEnhancerName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupParametersPipelineName, configured.SetupParametersPipelineName)
     Assert.Equal<(string * string list) list>(original.RunParameterSpans, configured.RunParameterSpans)
 
 [<Fact>]
@@ -172,9 +172,9 @@ let ``Sorter choices preserve saved IDs and offer other registered variants at t
             DatabaseName = original.DatabaseName; ProjectName = original.ProjectName; RunName = original.RunName
             Description = original.Description; AllowOverwrite = false
             Setup = { FunctionName = Run.requireSetupFunctionName original; QueryCatalogName = original.SetupQueryCatalogName
-                      ParametersEnhancerName = original.SetupParametersEnhancerName; ParameterSpans = [ParamKeys.sorterLibIdKey, savedIds] }
+                      ParametersPipelineName = original.SetupParametersPipelineName; ParameterSpans = [ParamKeys.sorterLibIdKey, savedIds] }
             Execution = { FunctionName = original.ExecuteFunctionName; QueryCatalogName = original.RunQueryCatalogName
-                          ParametersEnhancerName = original.RunParametersEnhancerName; ParameterSpans = [] }
+                          ParametersPipelineName = original.RunParametersPipelineName; ParameterSpans = [] }
         } |> Run.ofSimple
     let spec = RunTypeEditor.parameters configured |> Array.find (fun spec -> spec.Key = ParamKeys.sorterLibIdKey)
     Assert.Equal(parameterValueKind.Choice, spec.ValueKind)
@@ -295,7 +295,7 @@ let ``Module validation rejects channel changes encoded in library and mutator p
 
 [<Fact>]
 let ``Seed enhancer preserves explicit module settings`` () =
-    let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupParametersEnhancerContext = {
+    let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupParametersPipelineContext = {
         Run = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss.Pool_32.Gens100 ()
         QueryParamsFromSetupParams = fun _ _ -> None
     }
@@ -312,7 +312,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
         ParamKeys.excludeSelfCeKey, "false"
         ParamKeys.collectSortableTestsKey, "true"
     ])
-    let enhanced = GeneSort.Project.V1.Catalogs.SetupParameters.SetupParametersEnhancers.sossMsuf32 context parameters
+    let enhanced = ParameterPipeline.apply GeneSort.Project.V1.Catalogs.SetupParameters.SetupParametersPipelines.sossMsuf32 context parameters
     Assert.Equal(16, int (enhanced.GetChannelCount().Value))
     Assert.Equal(16, int (enhanced.GetPrefixLibId().Value.ChannelCount))
     Assert.Equal(2, int (enhanced.GetPrefixLibId().Value.StageLength))
@@ -359,7 +359,9 @@ let ``Initial measure follows each evaluation sweep choice without a Cartesian p
         key, if key = ParamKeys.sorterEvalMeasureKey then values else List.take 1 values)
     let execution = configured.RunParameterSpans |> List.map (fun (key, values) -> key, List.take 1 values)
     let sample = Run.withParameterSpans setup execution configured
-    let rows = SimpleRun.makeSetupParameters 0<replNumber> 1<replNumber> id sample.BaseRun
+    let raw = SimpleRun.makeSetupParameters 0<replNumber> 1<replNumber> id sample.BaseRun
+    Assert.All(raw, fun row -> Assert.Equal("SameAsEvaluation", row.ParamMap[ParamKeys.sorterEvalMeasureInitialKey]))
+    let rows = (runHost.Create sample 1).MakeSetupParameters 0<replNumber> 1<replNumber>
     Assert.Equal(4, rows.Length)
     for row in rows do Assert.Equal(row.ParamMap[ParamKeys.sorterEvalMeasureKey], row.ParamMap[ParamKeys.sorterEvalMeasureInitialKey])
 

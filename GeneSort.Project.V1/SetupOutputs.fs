@@ -35,7 +35,7 @@ module SetupOutputs =
             else generatedFiles configured parameters
         recorded @ (generated |> List.filter (fun query -> recorded |> List.exists (fun saved -> saved.OutputDataType = query.OutputDataType) |> not))
 
-    /// Carry enhancer-supplied file references alongside the identity of the setup settings.
+    /// Carry finalizer-supplied file references alongside the identity of the setup settings.
     let referencesFor (configured: run) (parameters: setupParameters) =
         let settings = SetupFileReferences.withoutReferences parameters
         let identity =
@@ -56,11 +56,11 @@ module SetupOutputs =
             let query =
                 QueryParamsCatalogSetup.get configured.SetupQueryCatalogName
                     configured.ProjectName configured.DatabaseName
-            let enhance = SetupParametersEnhancerCatalog.get configured.SetupParametersEnhancerName
+            let applyPipeline = SetupParametersPipelineCatalog.get configured.SetupParametersPipelineName |> ParameterPipeline.apply
             let context = { Run = configured; QueryParamsFromSetupParams = query }
             let parameters =
                 SimpleRun.makeSetupParameters repl (Checked.(+) repl 1<replNumber>)
-                    (Seq.map (enhance context)) simple
+                    (Seq.map (applyPipeline context)) simple
             parameters
             |> Array.mapi (fun index parameters ->
                 match query parameters outputType with

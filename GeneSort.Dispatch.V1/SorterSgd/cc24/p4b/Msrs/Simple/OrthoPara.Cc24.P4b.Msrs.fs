@@ -29,11 +29,11 @@ module OrthoPara32 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4b.Msrs.Simple.SimpleParams.simpleSetupParams
 
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.msrs24p3bOrthoPara
+    let runParametersPipelineName = RunParametersPipelineNames.msrs24p3bOrthoPara
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsOrthoPara
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsOrthoPara
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -56,7 +56,7 @@ module OrthoPara32 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -64,7 +64,7 @@ module OrthoPara32 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

@@ -18,10 +18,10 @@ open GeneSort.Dispatch.V1
 
 module Standard =
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
+    let runParametersPipelineName = RunParametersPipelineNames.sorterEvalStandard
     let executionFunctionName = ExecuteFunctionNames.sorterEval
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterEval
     let setupFunctionName = SetupCatalogNames.standard
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
 
@@ -52,13 +52,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -89,13 +89,13 @@ module Standard =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             }
         )
@@ -415,13 +415,13 @@ module Standard =
                         FunctionName = executionFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = runParametersEnhancerName
+                        ParametersPipelineName = runParametersPipelineName
                     }
                     Setup = {
                         FunctionName = setupFunctionName
                         ParameterSpans = parameterSpans
                         QueryCatalogName = setupQueryCatalogName
-                        ParametersEnhancerName = setupParametersEnhancerName
+                        ParametersPipelineName = setupParametersPipelineName
                     }
                 }
             )

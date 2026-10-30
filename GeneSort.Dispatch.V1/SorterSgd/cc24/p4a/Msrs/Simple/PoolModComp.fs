@@ -29,11 +29,11 @@ module PoolSelSz128 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4a.Msrs.Simple.SimpleParams.simpleSetupParams
 
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.msrs24p3aPoolModComp
+    let runParametersPipelineName = RunParametersPipelineNames.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -62,7 +62,7 @@ module PoolSelSz128 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -70,7 +70,7 @@ module PoolSelSz128 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -96,11 +96,11 @@ module Sz_2048_Of_4096 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4a.Msrs.Simple.SimpleParams.simpleSetupParams
 
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.msrs24p3aPoolModComp
+    let runParametersPipelineName = RunParametersPipelineNames.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
     [<MethodImpl(MethodImplOptions.NoInlining)>]
@@ -126,7 +126,7 @@ module Sz_2048_Of_4096 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -134,7 +134,7 @@ module Sz_2048_Of_4096 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix
@@ -160,11 +160,11 @@ module PoolsSelSzTest_2_vs_256 =
     let moduleParameters = GeneSort.Dispatch.V1.SorterSgd.cc24.p4a.Msrs.Simple.SimpleParams.simpleSetupParams
 
 
-    let runParametersEnhancerName = RunParametersEnhancerNames.msrs24p3aPoolModComp
+    let runParametersPipelineName = RunParametersPipelineNames.msrs24p3aPoolModComp
     let executionFunctionName = ExecuteFunctionNames.standard
     let setupFunctionName = SetupCatalogNames.sgdStandard
     let executionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsrsPoolModComp
-    let setupParametersEnhancerName = SetupParametersEnhancerNames.sorterSgd
+    let setupParametersPipelineName = SetupParametersPipelineNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
     let private poolSize (names: runNames) sorterPoolCount sorterCountPerPool : run =
@@ -188,7 +188,7 @@ module PoolsSelSzTest_2_vs_256 =
                     FunctionName = executionFunctionName
                     ParameterSpans = parameterSpans
                     QueryCatalogName = executionQueryCatalogName
-                    ParametersEnhancerName = runParametersEnhancerName
+                    ParametersPipelineName = runParametersPipelineName
                 }
                 Setup = {
                     FunctionName = setupFunctionName
@@ -196,7 +196,7 @@ module PoolsSelSzTest_2_vs_256 =
                     SorterEvalModule = sorterEvalModule
                     ParameterSpans = moduleParameters @ parameterSpans
                     QueryCatalogName = setupQueryCatalogName
-                    ParametersEnhancerName = setupParametersEnhancerName
+                    ParametersPipelineName = setupParametersPipelineName
                 }
             } {
                 MakerNames = EvolutionMakerNames.prefix

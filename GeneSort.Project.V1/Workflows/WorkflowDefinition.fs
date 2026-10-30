@@ -23,10 +23,10 @@ type workflowDefinitionArgs = {
     Description: string
     SetupFunction: catalogChoice
     SetupQuery: catalogChoice
-    SetupParametersEnhancer: catalogChoice
+    SetupParametersPipeline: catalogChoice
     ExecutionFunction: catalogChoice
     ExecutionQuery: catalogChoice
-    RunParametersEnhancer: catalogChoice
+    RunParametersPipeline: catalogChoice
     TestsMaker: catalogChoice
     SeedMaker: catalogChoice
     Mutator: catalogChoice
@@ -40,8 +40,8 @@ type workflowDefinition =
     member this.Description = this.definition.Description
     member this.CatalogChoices =
         let d = this.definition
-        [| d.SetupFunction; d.SetupQuery; d.SetupParametersEnhancer
-           d.ExecutionFunction; d.ExecutionQuery; d.RunParametersEnhancer
+        [| d.SetupFunction; d.SetupQuery; d.SetupParametersPipeline
+           d.ExecutionFunction; d.ExecutionQuery; d.RunParametersPipeline
            d.TestsMaker; d.SeedMaker; d.Mutator |]
     member this.MakerNames =
         evolutionMakerNames.create {
@@ -54,23 +54,23 @@ type workflowDefinition =
         SortableTestsModule = testsDatabase
         SorterEvalModule = evalsDatabase
         QueryCatalogName = this.definition.SetupQuery.Name
-        ParametersEnhancerName = this.definition.SetupParametersEnhancer.Name
+        ParametersPipelineName = this.definition.SetupParametersPipeline.Name
         ParameterSpans = spans
     }
     member this.ExecutionConfig spans : executionConfig = {
         FunctionName = this.definition.ExecutionFunction.Name
         QueryCatalogName = this.definition.ExecutionQuery.Name
-        ParametersEnhancerName = this.definition.RunParametersEnhancer.Name
+        ParametersPipelineName = this.definition.RunParametersPipeline.Name
         ParameterSpans = spans
     }
     member this.Matches(configured: run) =
         let d = this.definition
         configured.SetupQueryCatalogName = d.SetupQuery.Name
         && configured.SetupFunctionName = Some d.SetupFunction.Name
-        && configured.SetupParametersEnhancerName = d.SetupParametersEnhancer.Name
+        && configured.SetupParametersPipelineName = d.SetupParametersPipeline.Name
         && configured.ExecuteFunctionName = d.ExecutionFunction.Name
         && configured.RunQueryCatalogName = d.ExecutionQuery.Name
-        && configured.RunParametersEnhancerName = d.RunParametersEnhancer.Name
+        && configured.RunParametersPipelineName = d.RunParametersPipeline.Name
         && configured.MakerNames = Some this.MakerNames
 
 module WorkflowDefinitions =
@@ -79,10 +79,10 @@ module WorkflowDefinitions =
         Description = "Simple sorter models, width 32, prefix p4a, Standard evolution."
         SetupFunction = catalogChoice.create "Setup.FunctionName" SetupCatalogNames.sgdStandard "Prepare Standard evolution inputs."
         SetupQuery = catalogChoice.create "Setup query" QueryCatalogNamesSetup.sorterSgdMsufStandard "Identify Standard Msuf setup inputs."
-        SetupParametersEnhancer = catalogChoice.create "Setup parameters" SetupParametersEnhancerNames.standardMsuf32 "Supply width 32, prefix p4a and initial pool settings."
+        SetupParametersPipeline = catalogChoice.create "Setup parameters" SetupParametersPipelineNames.standardMsuf32 "Supply width 32, prefix p4a and initial pool settings."
         ExecutionFunction = catalogChoice.create "Execution" ExecuteFunctionNames.standard "Evolve Standard sorter pools."
         ExecutionQuery = catalogChoice.create "Execution query" QueryCatalogNamesRun.sorterSgdMsufStandard "Identify Standard Msuf execution results."
-        RunParametersEnhancer = catalogChoice.create "Execution parameters" RunParametersEnhancerNames.evoMsuf32 "Inherit setup parameters and apply execution overrides."
+        RunParametersPipeline = catalogChoice.create "Execution parameters" RunParametersPipelineNames.evoMsuf32 "Inherit setup parameters and apply execution overrides."
         TestsMaker = catalogChoice.create "Tests maker" EvolutionMakerNames.prefix.SortableTests "Load sortable tests with the selected prefix."
         SeedMaker = catalogChoice.create "Seed maker" EvolutionMakerNames.prefix.SeedPoolSet "Create Standard pools from the prefix seed library."
         Mutator = catalogChoice.create "Mutator" EvolutionMakerNames.prefix.Mutator "Mutate the underlying simple sorter model."

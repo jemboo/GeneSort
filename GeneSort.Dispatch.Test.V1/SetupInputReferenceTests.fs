@@ -95,13 +95,13 @@ let ``preparation inventories five directly addressed setup files without IO`` (
             Setup = {
                 FunctionName = SetupCatalogNames.standard
                 QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-                ParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
+                ParametersPipelineName = SetupParametersPipelineNames.sorterEval
                 ParameterSpans = ["ChannelCount", ["4"]; "RngType", ["LCG"]; "SimpleSorterModelType", ["Msce"; "Msrs"]; "SorterCount", ["2"]]
             }
             Execution = {
                 FunctionName = ExecuteFunctionNames.sorterEval
                 QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-                ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
+                ParametersPipelineName = RunParametersPipelineNames.sorterEvalStandard
                 ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V1"; "V2"]]
             }
         } |> Run.ofSimple

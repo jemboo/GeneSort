@@ -28,8 +28,8 @@ module SimpleR =
 
     let moduleParameters = SimpleRParams.simpleRSetupParams
 
-    let standardRunParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
-    let sossRunParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
+    let standardRunParametersPipelineName = RunParametersPipelineNames.evoMsuf32
+    let sossRunParametersPipelineName = RunParametersPipelineNames.sossMsuf32
     let standardExecutionFunctionName = ExecuteFunctionNames.standard
     let standardSetupFunctionName = SetupCatalogNames.sgdStandard
     let sossExecutionFunctionName = ExecuteFunctionNames.soss
@@ -38,8 +38,8 @@ module SimpleR =
     let sossExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
     let standardAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandardAppend
     let sossAppendExecutionQueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSossAppend
-    let standardSetupParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
-    let sossSetupParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
+    let standardSetupParametersPipelineName = SetupParametersPipelineNames.standardMsuf32
+    let sossSetupParametersPipelineName = SetupParametersPipelineNames.sossMsuf32
     let standardSetupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
     let sossSetupQueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
 
@@ -78,13 +78,13 @@ module SimpleR =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = standardSetupQueryCatalogName
-                        ParametersEnhancerName = standardSetupParametersEnhancerName
+                        ParametersPipelineName = standardSetupParametersPipelineName
                     }
                     Execution = {
                         FunctionName = standardExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = standardRunParametersEnhancerName
+                        ParametersPipelineName = standardRunParametersPipelineName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.prefix
@@ -130,13 +130,13 @@ module SimpleR =
                         SorterEvalModule = sorterEvalModule
                         ParameterSpans = moduleParameters @ parameterSpansSetup
                         QueryCatalogName = sossSetupQueryCatalogName
-                        ParametersEnhancerName = sossSetupParametersEnhancerName
+                        ParametersPipelineName = sossSetupParametersPipelineName
                     }
                     Execution = {
                         FunctionName = sossExecutionFunctionName
                         ParameterSpans = parameterSpansRun
                         QueryCatalogName = executionQueryCatalogName
-                        ParametersEnhancerName = sossRunParametersEnhancerName
+                        ParametersPipelineName = sossRunParametersPipelineName
                     }
                 } {
                     MakerNames = EvolutionMakerNames.sossPrefix

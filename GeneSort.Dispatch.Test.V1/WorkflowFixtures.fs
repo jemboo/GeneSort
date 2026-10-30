@@ -45,13 +45,13 @@ let sortableTestsRun prefix =
             FunctionName = if prefix then SetupCatalogNames.prefix else SetupCatalogNames.merge
             ParameterSpans = spans
             QueryCatalogName = if prefix then QueryCatalogNamesSetup.sortableTestPrefix else QueryCatalogNamesSetup.sortableTestMerge
-            ParametersEnhancerName = SetupParametersEnhancerNames.sortableTests
+            ParametersPipelineName = SetupParametersPipelineNames.sortableTests
         }
         {
             FunctionName = ExecuteFunctionNames.sortableTests
             ParameterSpans = spans
             QueryCatalogName = if prefix then QueryCatalogNamesRun.sortableTestPrefix else QueryCatalogNamesRun.sortableTestMerge
-            ParametersEnhancerName = RunParametersEnhancerNames.sortableTests
+            ParametersPipelineName = RunParametersPipelineNames.sortableTests
         }
 
 let prefixEvaluation width =
@@ -69,13 +69,13 @@ let prefixEvaluation width =
                 ParamKeys.sorterCountKey, ["8"; "16"]
             ]
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalPrefix
-            ParametersEnhancerName = SetupParametersEnhancerNames.sorterEvalPrefix
+            ParametersPipelineName = SetupParametersPipelineNames.sorterEvalPrefix
         }
         {
             FunctionName = ExecuteFunctionNames.sorterEval
             ParameterSpans = [ParamKeys.sorterEvalTypeKey, ["V2"]]
             QueryCatalogName = QueryCatalogNamesRun.sorterEvalPrefix
-            ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalPrefix
+            ParametersPipelineName = RunParametersPipelineNames.sorterEvalPrefix
         }
 
 // Catalog-resolution fixtures only: no parameters are generated or executed.
@@ -85,13 +85,13 @@ let standardEvaluationHost () =
             FunctionName = SetupCatalogNames.standard
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterEvalStandard
-            ParametersEnhancerName = SetupParametersEnhancerNames.sorterEval
+            ParametersPipelineName = SetupParametersPipelineNames.sorterEval
         }
         {
             FunctionName = ExecuteFunctionNames.sorterEval
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesRun.sorterEvalStandard
-            ParametersEnhancerName = RunParametersEnhancerNames.sorterEvalStandard
+            ParametersPipelineName = RunParametersPipelineNames.sorterEvalStandard
         }
 
 let mutationHost () =
@@ -100,13 +100,13 @@ let mutationHost () =
             FunctionName = SetupCatalogNames.mutantPrefix
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesSetup.sorterMutatePrefix
-            ParametersEnhancerName = SetupParametersEnhancerNames.sorterMutate
+            ParametersPipelineName = SetupParametersPipelineNames.sorterMutate
         }
         {
             FunctionName = ExecuteFunctionNames.sorterMutate
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesRun.sorterMutatePrefix
-            ParametersEnhancerName = RunParametersEnhancerNames.sorterMutateStandard
+            ParametersPipelineName = RunParametersPipelineNames.sorterMutateStandard
         }
 
 // Fixed source for behavioral tests; independent of editable Dispatch presets.
@@ -151,13 +151,13 @@ let standardSource () =
                 ParamKeys.mutatorVariantKey, ["V2"]
             ]
             QueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsufStandard
-            ParametersEnhancerName = SetupParametersEnhancerNames.standardMsuf32
+            ParametersPipelineName = SetupParametersPipelineNames.standardMsuf32
         }
         Execution = {
             FunctionName = ExecuteFunctionNames.standard
             ParameterSpans = []
             QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufStandard
-            ParametersEnhancerName = RunParametersEnhancerNames.evoMsuf32
+            ParametersPipelineName = RunParametersPipelineNames.evoMsuf32
         }
     } {
         MakerNames = EvolutionMakerNames.prefix
@@ -198,7 +198,7 @@ let sossSource (modifiers: int list) =
                 ParamKeys.mutationModKey, List.map string modifiers
             ]
             QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
-            ParametersEnhancerName = SetupParametersEnhancerNames.sossMsuf32
+            ParametersPipelineName = SetupParametersPipelineNames.sossMsuf32
         }
         Execution = {
             FunctionName = ExecuteFunctionNames.soss
@@ -216,7 +216,7 @@ let sossSource (modifiers: int list) =
                 ParamKeys.mutatorVariantKey, ["V2"]
             ]
             QueryCatalogName = QueryCatalogNamesRun.sorterSgdMsufSoss
-            ParametersEnhancerName = RunParametersEnhancerNames.sossMsuf32
+            ParametersPipelineName = RunParametersPipelineNames.sossMsuf32
         }
     } {
         MakerNames = EvolutionMakerNames.sossPrefix

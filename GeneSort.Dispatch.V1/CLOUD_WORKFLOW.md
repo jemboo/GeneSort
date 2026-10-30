@@ -131,10 +131,10 @@ The values participate in file identities and appear in summary metadata.
 has one pool of 32, with mutation variants 0–3. Test runs use 10 generations;
 the rate sweeps use 100 generations and cross AMax values 1, 3, 7 with activator
 mutation rates 0.05, 0.1, 0.2 (36 executions per replica).
-The `standardMsuf32R` / `sossMsuf32R` setup enhancer entries default AMax to 3;
-the `evoMsuf32R` / `sossMsuf32R` execution enhancers default activator mutation
-rate to 0.1. Explicit spans override these defaults. Invalid activation settings
-are rejected during parameter preparation. These presets use the existing prefix
+The presets declare AMax and activator mutation rates in their parameter spans.
+The `standardMsuf32R` / `sossMsuf32R` setup pipelines and
+`evoMsuf32R` / `sossMsuf32R` execution pipelines validate these settings and
+reject invalid activation values during parameter preparation. These presets use the existing prefix
 seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Channels32`
 and `SortableTests.Prefix.Channels32.FourStage_32` before setup. Automatic naming produces
 project `SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR`, databases `Standard` and `Soss`,

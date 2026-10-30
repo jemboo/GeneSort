@@ -208,7 +208,7 @@ module RunTypeEditor =
                 parameterDescription.forChoices spec.Key ((available @ declared) |> List.distinct) spec.RequiredInSetup spec.ExecutionAllowed)
 
     /// Display only: these rows never become execution sweep dimensions. Resolve
-    /// one representative combination to include enhancer-supplied defaults.
+    /// one representative combination to include pipeline-derived values.
     let inheritedParameters (configured: run) (draft: runDraft) =
         if not configured.HasSetup then [||]
         else
@@ -246,13 +246,13 @@ module RunTypeEditor =
     let catalogChoices (configured: run) =
         [| yield catalogChoice.create "Execution.FunctionName" configured.ExecuteFunctionName "Execution function"
            yield catalogChoice.create "Execution.QueryCatalogName" configured.RunQueryCatalogName "Result file identity"
-           yield catalogChoice.create "Execution.ParametersEnhancerName" configured.RunParametersEnhancerName "Execution parameters"
+           yield catalogChoice.create "Execution.ParametersPipelineName" configured.RunParametersPipelineName "Execution parameters"
            if configured.HasSetup then
                match configured.SetupFunctionName with
                | Some name -> yield catalogChoice.create "Setup.FunctionName" name "Setup function"
                | None -> ()
                yield catalogChoice.create "Setup.QueryCatalogName" configured.SetupQueryCatalogName "Shared input file identity"
-               yield catalogChoice.create "Setup.ParametersEnhancerName" configured.SetupParametersEnhancerName "Setup parameters" |]
+               yield catalogChoice.create "Setup.ParametersPipelineName" configured.SetupParametersPipelineName "Setup parameters" |]
 
     /// Module identity is not stored in the existing file format. Match the complete
     /// workflow, then let the UI prefer the original project/database when available.
@@ -260,10 +260,10 @@ module RunTypeEditor =
         isEvolution example = isEvolution configured
         && example.ExecuteFunctionName = configured.ExecuteFunctionName
         && example.RunQueryCatalogName = configured.RunQueryCatalogName
-        && example.RunParametersEnhancerName = configured.RunParametersEnhancerName
+        && example.RunParametersPipelineName = configured.RunParametersPipelineName
         && example.SetupFunctionName = configured.SetupFunctionName
         && example.SetupQueryCatalogName = configured.SetupQueryCatalogName
-        && example.SetupParametersEnhancerName = configured.SetupParametersEnhancerName
+        && example.SetupParametersPipelineName = configured.SetupParametersPipelineName
         && example.MakerNames = configured.MakerNames
         && example.ParameterSource.IsSome = configured.ParameterSource.IsSome
 
@@ -330,7 +330,7 @@ module RunTypeEditor =
         else
             let execution: executionConfig = {
                 FunctionName = template.ExecuteFunctionName; QueryCatalogName = template.RunQueryCatalogName
-                ParametersEnhancerName = template.RunParametersEnhancerName; ParameterSpans = spans draft.ExecutionParameters }
+                ParametersPipelineName = template.RunParametersPipelineName; ParameterSpans = spans draft.ExecutionParameters }
             let configured =
                 match template with
                 | run.DirectRun _ ->
@@ -343,7 +343,7 @@ module RunTypeEditor =
                         ProjectName = UMX.tag draft.ProjectName; DatabaseName = UMX.tag draft.DatabaseName; RunName = UMX.tag draft.RunName
                         Description = draft.Description; AllowOverwrite = draft.AllowOverwrite; Execution = execution
                         Setup = { FunctionName = Run.requireSetupFunctionName template; QueryCatalogName = template.SetupQueryCatalogName
-                                  ParametersEnhancerName = template.SetupParametersEnhancerName; ParameterSpans = spans draft.SetupParameters }
+                                  ParametersPipelineName = template.SetupParametersPipelineName; ParameterSpans = spans draft.SetupParameters }
                     } |> Run.ofSimple
                 | run.EvolutionRun _ | run.ContinuationRun _ ->
                     SgdRun.create {
@@ -352,7 +352,7 @@ module RunTypeEditor =
                         Setup = { FunctionName = template.SgdSetup.Value.FunctionName
                                   SortableTestsModule = UMX.tag draft.SortableTestsModule
                                   SorterEvalModule = UMX.tag draft.SorterEvalModule
-                                  QueryCatalogName = template.SetupQueryCatalogName; ParametersEnhancerName = template.SetupParametersEnhancerName
+                                  QueryCatalogName = template.SetupQueryCatalogName; ParametersPipelineName = template.SetupParametersPipelineName
                                   ParameterSpans = spans draft.SetupParameters }
                     } { MakerNames = template.MakerNames.Value; GenSaveIntervalsName = draft.GenSaveIntervalsName
                         GenSaveSubIntervalsName = draft.GenSaveSubIntervalsName } |> SgdRun.withCheckpointIntervals (Option.ofObj draft.CheckpointIntervalsName) |> Run.ofSgd
