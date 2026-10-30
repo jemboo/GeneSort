@@ -21,8 +21,8 @@ let ``workflows distinguish publication preparation fresh evolution and continua
     Assert.True((SortableTests.Merge.Channels32.HiMD_32()).IsDirectRun)
     Assert.True((SorterEval.Standard.Channels16.Test()).IsPreparedRun)
     Assert.True((SorterMutate.Standard.Msrs()).IsPreparedRun)
-    Assert.True((SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()).IsEvolutionRun)
-    Assert.True((SorterSgd.p32.Msuf4a.Standard_append.Test()).IsContinuationRun)
+    Assert.True((SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()).IsEvolutionRun)
+    Assert.True((SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test()).IsContinuationRun)
     for kind in RunTypeCatalog.all do
         for example in kind.Examples do
             Assert.Equal<run>(example.Run, example.Run |> RunDto.fromDomain |> RunDto.toDomain)
@@ -50,7 +50,7 @@ let ``old direct definitions fold duplicate Setup spans into Execution without c
 
 [<Fact>]
 let ``fixed overrides are rejected by runtime and editor including enhancer supplied defaults`` () =
-    let configured = SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()
+    let configured = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()
     for key, value in [ParamKeys.activationProbabilityKey, "0.5"; ParamKeys.sorterCountPerPoolKey, "64"
                        ParamKeys.rngTypeKey, "LCG"; ParamKeys.channelCountKey, "24"] do
         let changed = Run.withParameterSpans configured.SetupParameterSpans (configured.RunParameterSpans @ [key, [value]]) configured
@@ -61,7 +61,7 @@ let ``fixed overrides are rejected by runtime and editor including enhancer supp
 
 [<Fact>]
 let ``read only rows include resolved defaults and follow Setup edits`` () =
-    let configured = SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()
+    let configured = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()
     let args = (RunTypeEditor.fromRun configured).ToArgs()
     let setup = args.SetupParameters |> Array.map (fun row ->
         if row.Key = ParamKeys.activationProbabilityKey then parameterDraft.create row.Key [|"0.25"; "0.75"|] else row)
@@ -75,9 +75,9 @@ let ``read only rows include resolved defaults and follow Setup edits`` () =
 
 [<Fact>]
 let ``roles depend on workflow and continuations retain explicit resize and branching permissions`` () =
-    let fresh = SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()
+    let fresh = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()
     let mutate = SorterMutate.Standard.Msrs()
-    let continuation = SorterSgd.p32.Msuf4a.Standard_append.Test()
+    let continuation = SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test()
     Assert.Equal(parameterRole.InheritedReadOnly, Run.parameterRole mutate ParamKeys.modificationRateKey)
     Assert.Equal(parameterRole.InheritedOverridable, Run.parameterRole fresh ParamKeys.modificationRateKey)
     Assert.Equal(parameterRole.SetupOnly, Run.parameterRole fresh ParamKeys.controlledSeedAMaxKey)
@@ -89,7 +89,7 @@ let ``roles depend on workflow and continuations retain explicit resize and bran
 
 [<Fact>]
 let ``Soss activator rates still share Setup references and have separate execution identities`` () =
-    let configured = SorterSgd.p32.Msuf4a.SimpleS.Soss.SossS()
+    let configured = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()
     let parameters = generate configured
     Assert.Equal(8, parameters.Length)
     for _, group in parameters |> Array.groupBy (fun rp -> rp.GetMutationMod()) do

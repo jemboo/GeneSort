@@ -14,12 +14,12 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a
+open GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS
 
 let private configuration soss sweep =
     match soss, sweep with
     | false, false -> SimpleS.Standard.Test()
-    | false, true -> GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates32()
+    | false, true -> GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.ActivatorRates32()
     | true, false -> SimpleS.Soss.Test()
     | true, true -> SimpleS.Soss.ActivatorRates()
 
@@ -30,7 +30,7 @@ let private configuration soss sweep =
 [<InlineData(true, true)>]
 let ``Msuf4a SimpleS presets expand distinct executions with boolean models and mutators`` soss sweep =
     let configured = configuration soss sweep
-    Assert.Equal((if soss then "SorterSgd.p32.Msuf4a.SimpleS.Soss" else "SorterSgd.p32.Msuf4a.SimpleS.Standard"), %configured.ProjectName)
+    Assert.Equal((if soss then "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss" else "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard"), %configured.ProjectName)
     Assert.Equal((if soss then "Soss" else "Standard"), %configured.DatabaseName)
     Assert.Equal((if sweep then (if soss then "ActivatorRates" else "ActivatorRates32") else "Test"), %configured.RunName)
     let host = runHost.Create configured 1
@@ -126,10 +126,10 @@ let ``SimpleS catalog entries accept probability and mutation rate endpoints`` s
 [<Fact>]
 let ``split pool-size presets preserve their original explicit population shapes`` () =
     let cases = [
-        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates32(), 16, 32
-        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates64(), 8, 64
-        GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_2(), 256, 2
-        GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_256(), 2, 256
+        GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.ActivatorRates32(), 16, 32
+        GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.ActivatorRates64(), 8, 64
+        GeneSort.Dispatch.V1.SorterSgd.cc24.p4a.Msrs.Simple.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_2(), 256, 2
+        GeneSort.Dispatch.V1.SorterSgd.cc24.p4a.Msrs.Simple.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_256(), 2, 256
     ]
     for configured, poolCount, perPool in cases do
         let spans = configured.SetupParameterSpans |> Map.ofList

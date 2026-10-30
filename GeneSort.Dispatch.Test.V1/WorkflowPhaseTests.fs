@@ -1885,7 +1885,7 @@ let ``Pool evaluation preserves copied models and their pool-specific lengths`` 
 
 [<Fact>]
 let ``Current Standard append config produces three single-pool runs at its single overridden capacity`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Standard_append.Test ()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test ()
     let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
     Assert.Equal(3, parameters.Length)
     Assert.Equal(3, parameters |> Array.map (fun rp -> rp.GetId()) |> Array.distinct |> Array.length)
@@ -1906,11 +1906,11 @@ let ``Current Standard append config produces three single-pool runs at its sing
 [<InlineData(true)>]
 let ``OnePool append test presets continue their bases and preserve one pool of 32 sorters`` soss =
     let configured =
-        if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossAppend ()
-        else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.StandardAppend.TestStandardAppend ()
+        if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend.TestSossAppend ()
+        else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.StandardAppend.TestStandardAppend ()
     let source, spans = configured.ParameterSource.Value
     Assert.Equal((if soss then "TestSoss" else "TestStandard"), %source.RunName)
-    Assert.Equal("SorterSgd.p32.OnePool.Continuation." + %configured.DatabaseName, %configured.ProjectName)
+    Assert.Equal("SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation." + %configured.DatabaseName, %configured.ProjectName)
     Assert.Equal((if soss then "SossAppend" else "StandardAppend"), %configured.DatabaseName)
     Assert.Contains((ParamKeys.sourceMutationModKey, ["0"]), spans)
     let parameters = RunParameterGeneration.generate configured 0<replNumber> 1<replNumber>
@@ -1928,8 +1928,8 @@ let ``OnePool append test presets continue their bases and preserve one pool of 
 [<InlineData(true)>]
 let ``OnePool condense test presets select the best two of four source candidates`` soss =
     let configured =
-        if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossCondense ()
-        else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.StandardAppend.TestStandardCondense ()
+        if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend.TestSossCondense ()
+        else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.StandardAppend.TestStandardCondense ()
     Assert.Equal((if soss then ExecuteFunctionNames.soss else ExecuteFunctionNames.standard), configured.ExecuteFunctionName)
     Assert.Equal(QueryCatalogNamesSetup.importedStart, configured.SetupQueryCatalogName)
     Assert.Equal((if soss then QueryCatalogNamesRun.sorterSgdMsufSossAppend else QueryCatalogNamesRun.sorterSgdMsufStandardAppend), configured.RunQueryCatalogName)
@@ -2274,9 +2274,9 @@ let private assertPoolXExpansion (configured: run) (selected: runParameters[]) (
 
 [<Fact>]
 let ``Pool X Step2 ranks repeated mutation values from distinct Step1 winners within each combination`` () =
-    let baseRun = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.Soss.Base ()
-    let step1 = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.SossAppend.Step1 ()
-    let step2 = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.SossAppend.Step2 ()
+    let baseRun = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss_condense.Pool_X.Soss.Base ()
+    let step1 = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss_condense.Pool_X.SossAppend.Step1 ()
+    let step2 = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss_condense.Pool_X.SossAppend.Step2 ()
     let databases = System.Collections.Generic.Dictionary<string, IGeneSortDb>()
     let seed (configured: run) sourceInterval (parameters: runParameters[]) (score: runParameters -> int) =
         let host = runHost.Create configured 1
@@ -2323,7 +2323,7 @@ let ``Pool X Step2 ranks repeated mutation values from distinct Step1 winners wi
 
 [<Fact>]
 let ``Pool X Step1 expands configured winners within each source combination`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_condense.Pool_X.SossAppend.Step1 ()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss_condense.Pool_X.SossAppend.Step1 ()
     let source = fst configured.ParameterSource.Value
     let candidates = RunParameterGeneration.generate source 0<replNumber> 1<replNumber>
     let score (rp: runParameters) = int (rp.GetMutationMod().Value)
@@ -2335,7 +2335,7 @@ let private condenseFixture scenario = condenseFixtureFor false scenario
 
 [<Fact>]
 let ``OnePool Soss condense preset selects single-pool Soss sources with explicit catalogs`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossCondense ()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend.TestSossCondense ()
     Assert.Equal(ExecuteFunctionNames.soss, configured.ExecuteFunctionName)
     Assert.Equal(QueryCatalogNamesSetup.importedStart, configured.SetupQueryCatalogName)
     Assert.Equal(QueryCatalogNamesRun.sorterSgdMsufSossAppend, configured.RunQueryCatalogName)
@@ -2512,11 +2512,11 @@ let ``OnePool chains preserve their family and expand the immediate source`` sos
     let generate configured = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
     let cases =
         if soss then [
-            GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SameFamilyChain.SossAppend.TestSossAppendCondense(), "TestSossAppend", [|32; 32|]
-            GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SameFamilyChain.SossAppend.TestSossCondenseAppend(), "TestSossCondense", Array.create 8 32
+            GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.SameFamilyChain.SossAppend.TestSossAppendCondense(), "TestSossAppend", [|32; 32|]
+            GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.SameFamilyChain.SossAppend.TestSossCondenseAppend(), "TestSossCondense", Array.create 8 32
         ] else [
-            GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SameFamilyChain.StandardAppend.TestStandardAppendCondense(), "TestStandardAppend", [|32; 32|]
-            GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SameFamilyChain.StandardAppend.TestStandardCondenseAppend(), "TestStandardCondense", [|32; 32|]
+            GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.SameFamilyChain.StandardAppend.TestStandardAppendCondense(), "TestStandardAppend", [|32; 32|]
+            GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.SameFamilyChain.StandardAppend.TestStandardCondenseAppend(), "TestStandardCondense", [|32; 32|]
         ]
     for configured, sourceName, sizes in cases do
         let source, _ = configured.ParameterSource.Value
@@ -2560,14 +2560,14 @@ let ``MixedFamilyChain presets branch and select within the source family`` () =
         | Some (_, [count]) -> candidates |> Array.sortBy (fun rp -> rp.GetId()) |> Array.take (int count)
         | _ -> candidates
     let cases = [
-        GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.MixedFamilyChain.SossAppend.TestStandardAppendSossCondense(), true, [|32; 32|]
-        GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.MixedFamilyChain.SossAppend.TestStandardCondenseSossAppend(), true, [|32; 32|]
-        GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.MixedFamilyChain.StandardAppend.TestSossAppendStandardCondense(), false, [|32; 32|]
-        GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.MixedFamilyChain.StandardAppend.TestSossCondenseStandardAppend(), false, Array.create 8 32
+        GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.MixedFamilyChain.SossAppend.TestStandardAppendSossCondense(), true, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.MixedFamilyChain.SossAppend.TestStandardCondenseSossAppend(), true, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.MixedFamilyChain.StandardAppend.TestSossAppendStandardCondense(), false, [|32; 32|]
+        GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.MixedFamilyChain.StandardAppend.TestSossCondenseStandardAppend(), false, Array.create 8 32
     ]
     for configured, soss, sizes in cases do
         Assert.Equal((if soss then "SossAppend" else "StandardAppend"), %configured.DatabaseName)
-        Assert.Equal("SorterSgd.p32.OnePool.MixedFamilyChain." + %configured.DatabaseName, %configured.ProjectName)
+        Assert.Equal("SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.MixedFamilyChain." + %configured.DatabaseName, %configured.ProjectName)
         Assert.NotEqual<string>(configured.ExecuteFunctionName, (fst configured.ParameterSource.Value).ExecuteFunctionName)
         Assert.Equal((if soss then ExecuteFunctionNames.soss else ExecuteFunctionNames.standard), configured.ExecuteFunctionName)
         let generated = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
@@ -2682,7 +2682,7 @@ let ``Mixed family Setup converts members and execution needs only destination d
 
 [<Fact>]
 let ``OnePool Soss condense branches each selected source into four destination mutations`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossCondense ()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend.TestSossCondense ()
     let select _ _ (candidates: runParameters[]) =
         candidates |> Array.filter (fun rp -> List.contains (int (rp.GetMutationMod().Value)) [1; 3])
     let runs = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
@@ -2718,18 +2718,18 @@ let ``OnePool SimpleR presets inherit bounds and rate while preserving pool capa
         let count = configured.ParameterSource.Value |> snd |> List.find (fst >> (=) ParamKeys.selectedSorterPoolCountKey) |> snd |> List.exactlyOne |> int
         candidates |> Array.sortBy (fun rp -> rp.GetId()) |> Array.take count
     for name, configured in [
-        "Standard", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard()
-        "Soss", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Soss.Soss()
-        "StandardAppend", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.StandardAppend.StandardAppend()
-        "SossCondense", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.SossAppend.SossCondense()
+        "Standard", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Standard()
+        "Soss", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Soss.Soss()
+        "StandardAppend", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.StandardAppend.StandardAppend()
+        "SossCondense", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.SossAppend.SossCondense()
     ] do
         Assert.Equal(name, %configured.RunName)
         Assert.Equal((if name = "SossCondense" then "SossAppend" else name), %configured.DatabaseName)
         let parameters = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
         Assert.NotEmpty(parameters)
         Assert.All(parameters, fun rp ->
-            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.aMax, rp.GetAMax())
-            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.activatorMutationRate, rp.GetActivatorMutationRate())
+            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.aMax, rp.GetAMax())
+            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.activatorMutationRate, rp.GetActivatorMutationRate())
             Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
             Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool()))
 
@@ -2737,7 +2737,7 @@ let ``OnePool SimpleR presets inherit bounds and rate while preserving pool capa
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``SimpleR parameter values distinguish setup files execution files and report metadata`` soss =
-    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Soss.Soss() else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard()
+    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Soss.Soss() else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Standard()
     let host = runHost.Create configured 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber> |> Array.head
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
@@ -2755,7 +2755,7 @@ let ``SimpleR parameter values distinguish setup files execution files and repor
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``SimpleR seed generation setup and evolution execute with bounded activators`` soss =
-    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Soss.Soss() else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard()
+    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Soss.Soss() else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Standard()
     let host = runHost.Create configured 1
     // Use small channel count and complete binary tests to exercise real makers and execution without external data.
     let rp =
@@ -2826,7 +2826,7 @@ let ``SimpleR seed generation setup and evolution execute with bounded activator
 
 [<Fact>]
 let ``Dispatch SimpleR settings reject missing invalid and incompatible activator parameters`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Standard()
     let host = runHost.Create configured 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
     let underlying = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith
@@ -2848,18 +2848,18 @@ let ``OnePool SimpleS presets inherit probability and rate while preserving pool
         let count = configured.ParameterSource.Value |> snd |> List.find (fst >> (=) ParamKeys.selectedSorterPoolCountKey) |> snd |> List.exactlyOne |> int
         candidates |> Array.sortBy (fun rp -> rp.GetId()) |> Array.take count
     for name, configured in [
-        "StandardS", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Standard.StandardS()
-        "SossS", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Soss.SossS()
-        "StandardAppendS", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.StandardAppend.StandardAppendS()
-        "SossCondenseS", GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.SossAppend.SossCondenseS()
+        "StandardS", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.StandardS()
+        "SossS", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS()
+        "StandardAppendS", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.StandardAppend.StandardAppendS()
+        "SossCondenseS", GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.SossAppend.SossCondenseS()
     ] do
         Assert.Equal(name, %configured.RunName)
         Assert.Equal((if name = "SossCondenseS" then "SossAppend" else name.Substring(0, name.Length - 1)), %configured.DatabaseName)
         let parameters = RunParameterGeneration.generateWithSourceSelection select configured 0<replNumber> 1<replNumber>
         Assert.NotEmpty(parameters)
         Assert.All(parameters, fun rp ->
-            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.activationProbability, rp.GetActivationProbability())
-            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.activatorMutationRate, rp.GetActivatorMutationRate())
+            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.activationProbability, rp.GetActivationProbability())
+            Assert.Equal(Some GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.activatorMutationRate, rp.GetActivatorMutationRate())
             Assert.Equal(Some 1<sorterPoolCount>, rp.GetSorterPoolCount())
             Assert.Equal(Some 32<sorterCountPerPool>, rp.GetSorterCountPerPool()))
 
@@ -2867,7 +2867,7 @@ let ``OnePool SimpleS presets inherit probability and rate while preserving pool
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``SimpleS parameter values distinguish setup files execution files and report metadata`` soss =
-    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Soss.SossS() else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Standard.StandardS()
+    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS() else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.StandardS()
     let host = runHost.Create configured 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber> |> Array.head
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
@@ -2885,7 +2885,7 @@ let ``SimpleS parameter values distinguish setup files execution files and repor
 [<InlineData(false)>]
 [<InlineData(true)>]
 let ``SimpleS seed generation setup and evolution execute with boolean activators`` soss =
-    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Soss.SossS() else GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Standard.StandardS()
+    let configured = if soss then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.SossS() else GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.StandardS()
     let host = runHost.Create configured 1
     // Use small channel count and complete binary tests to exercise real makers and execution without external data.
     let rp =
@@ -2955,7 +2955,7 @@ let ``SimpleS seed generation setup and evolution execute with boolean activator
 
 [<Fact>]
 let ``Dispatch SimpleS settings reject missing invalid and incompatible activator parameters`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleS.Standard.StandardS()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.StandardS()
     let host = runHost.Create configured 1
     let rp = host.MakeRunParameters 0<replNumber> 1<replNumber> |> Array.head
     let underlying = (hostMutator host) (pathFor host rp) |> Async.RunSynchronously |> Result.defaultWith failwith

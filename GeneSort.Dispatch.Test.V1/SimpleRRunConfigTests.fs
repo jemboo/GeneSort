@@ -14,7 +14,7 @@ open GeneSort.Project.V1.Catalogs.RunParameters
 open GeneSort.Project.V1.Catalogs.SetupParameters
 open GeneSort.Project.V1.Parameters
 open GeneSort.Dispatch.V1
-open GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a
+open GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleR
 
 let private configuration soss sweep =
     match soss, sweep with
@@ -30,7 +30,7 @@ let private configuration soss sweep =
 [<InlineData(true, true)>]
 let ``Msuf4a SimpleR presets expand distinct executions with bounded models and mutators`` soss sweep =
     let configured = configuration soss sweep
-    Assert.Equal((if soss then "SorterSgd.p32.Msuf4a.SimpleR.Soss" else "SorterSgd.p32.Msuf4a.SimpleR.Standard"), %configured.ProjectName)
+    Assert.Equal((if soss then "SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR.Soss" else "SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard"), %configured.ProjectName)
     Assert.Equal((if soss then "Soss" else "Standard"), %configured.DatabaseName)
     Assert.Equal((if sweep then "ActivatorRates" else "Test"), %configured.RunName)
     let host = runHost.Create configured 1

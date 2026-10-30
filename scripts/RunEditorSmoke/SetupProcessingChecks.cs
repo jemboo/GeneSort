@@ -22,7 +22,7 @@ internal static partial class Program
 
     private static void CheckSetupProcessing(string root, RunEditorViewModel model, RunEditorView view, StringBuilder bindingErrors)
     {
-        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterSgd.p32.Msuf4a.SimpleS.Soss"));
+        model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss"));
         model.SelectExample(model.Examples.Single(example => example.Name == "SossS"));
         model.ProjectsFolder = root;
         model.Clone();

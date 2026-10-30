@@ -306,7 +306,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         {
             if (e.PropertyName == nameof(RunSelectionViewModel.IsLoading)) Changed(nameof(CanReturnToEditor));
         };
-        SelectedRunType = RunTypes.First(type => type.Name == "SorterSgd.p32.Msuf4a.Standard.Pool_32");
+        SelectedRunType = RunTypes.First(type => type.Name == "SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32");
         SelectedExample = SelectedRunType.Examples[0];
         editorTemplate = SelectedExample.Run;
         SetupSection = new("Setup parameters", Parameters.Where(spec => AllowedInPhase(spec.Key, true) && RunTypeEditor.canEditSetup(editorTemplate, spec.Key)).ToArray());

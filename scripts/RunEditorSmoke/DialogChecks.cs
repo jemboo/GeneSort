@@ -11,7 +11,7 @@ internal static partial class Program
 {
     private static void CheckDialogs(string? previewDirectory)
     {
-        const string message = "Replace this run definition?\n\nProjects / SorterSgd.p32.Msuf4a.Standard / Test / NewRun";
+        const string message = "Replace this run definition?\n\nProjects / SorterSgd.cc32.p4a.Msuf4.Simple.Standard / Test / NewRun";
         Check(Show(MessageBoxButton.YesNo, MessageBoxImage.Question, message, dialog =>
         {
             Check(Button(dialog, "_Yes").IsDefault && Button(dialog, "_No").IsCancel, "Confirmation keyboard actions changed.");

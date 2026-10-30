@@ -73,8 +73,8 @@ module RunEditorTests =
     [<Fact>]
     let ``code presets round trip without changing automatic names or parameter phases`` () =
         let presets = [
-            GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Standard.Pool_32.Test()
-            GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Standard.Pool_32.V1()
+            GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32.Test()
+            GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32.V1()
         ]
         for configured in presets do
             let roundTrip = configured |> RunEditor.fromRun |> ok |> RunEditor.build |> ok

@@ -17,8 +17,8 @@ open GeneSort.Dispatch.V1
 open GeneSort.Dispatch.V1.SorterSgd
 
 let isControlled (configured: run) =
-    [ GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Controlled.Standard.runType.Name
-      GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Controlled.Soss.runType.Name ]
+    [ GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.Standard.runType.Name
+      GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.Soss.runType.Name ]
     |> List.contains (string configured.ProjectName)
 
 let unwrap computation = computation |> Async.RunSynchronously |> Result.defaultWith failwith
@@ -26,7 +26,7 @@ let require condition message = if not condition then failwith message
 let mutable controlledOnly = false
 let mutable msuf4Family: string option = None
 let replicaLimit (configured: run) =
-    (if isControlled configured then GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Controlled.replicaCount else 1) |> UMX.tag
+    (if isControlled configured then GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.replicaCount else 1) |> UMX.tag
 let parameters (host: runHost) =
     host.RunDb.getRunParameters host.Run.RunName (Some (UMX.tag 0)) (Some (replicaLimit host.Run)) None None |> unwrap
 let query (host: runHost) rp kind = host.QueryParamsFromRunParams rp kind |> Option.get
@@ -208,8 +208,8 @@ let audit soss configured =
 let currentRuns () =
     let moduleName =
         match msuf4Family with
-        | Some family -> "GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a." + family
-        | None -> "GeneSort.Dispatch.V1.SorterSgd.p32.OnePool"
+        | Some family -> "GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4." + family
+        | None -> "GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a"
     let runs =
         typeof<runHost>.Assembly.GetTypes()
         |> Array.filter (fun candidate -> candidate.FullName.Replace('+', '.') = moduleName || candidate.FullName.Replace('+', '.').StartsWith(moduleName + ".", StringComparison.Ordinal))
@@ -267,7 +267,7 @@ let combineReports () =
     for row in rows do
         combined.AppendDataRow(headers |> Array.map (fun header -> Map.tryFind header row |> Option.defaultValue ""))
     // Keep the aggregate alongside the Standard base run.
-    let baseRun = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Standard.TestStandard()
+    let baseRun = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Standard.TestStandard()
     let filename = if controlledOnly then "OnePool_Controlled_SummaryReport.txt" else "OnePool_SummaryReport.txt"
     let path =
         match msuf4Family with

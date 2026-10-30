@@ -19,8 +19,8 @@ internal static partial class Program
     private static void CheckParameterChoices(string root, RunEditorViewModel model, RunEditorView view, StringBuilder bindingErrors)
     {
         foreach (var name in new[] { "SortableTests.Prefix.Channels24", "SortableTests.Merge.Channels32", "SorterEval.Standard.Channels4",
-            "SorterEval.Standard.Channels16", "SorterMutate.Prefix", "SorterMutate.Standard", "SorterSgd.p24.Msrs3a.OrthoPara.OrthoPara32",
-            "SorterSgd.p32.Msuf4a.SimpleR.Standard", "SorterSgd.p32.Msuf4a.SimpleS.Standard" })
+            "SorterEval.Standard.Channels16", "SorterMutate.Prefix", "SorterMutate.Standard", "SorterSgd.cc24.p4a.Msrs.Simple.OrthoPara.OrthoPara32",
+            "SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard", "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard" })
         {
             model.SelectRunType(model.RunTypes.Single(type => type.Name == name));
             model.SelectExample(model.Examples[0]);

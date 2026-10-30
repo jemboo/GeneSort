@@ -37,21 +37,21 @@ let ``All examples round trip without changing configurations or identities`` ()
 
 [<Fact>]
 let ``Soss editor exposes activator sweep and uses module selections`` () =
-    let example = SorterSgd.p32.Msuf4a.SimpleS.Soss.runType.Examples |> Array.find (fun e -> e.Name = "SossS")
+    let example = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.runType.Examples |> Array.find (fun e -> e.Name = "SossS")
     let original = example.Run
     let draft = RunTypeEditor.newDraft original
     Assert.Contains(RunTypeEditor.parameters original, fun p -> p.Key = ParamKeys.activatorMutationRateKey)
     let configured = RunTypeEditor.build original draft |> function Ok value -> value | Error _ -> failwith "Invalid draft"
-    Assert.Equal(SorterSgd.p32.Msuf4a.SimpleS.Soss.executionFunctionName, configured.ExecuteFunctionName)
-    Assert.Equal(SorterSgd.p32.Msuf4a.SimpleS.Soss.executionQueryCatalogName, configured.RunQueryCatalogName)
-    Assert.Equal(SorterSgd.p32.Msuf4a.SimpleS.Soss.executionEnhancerFunctionName, configured.RunEnhancerFunctionName)
-    Assert.Equal(SorterSgd.p32.Msuf4a.SimpleS.Soss.setupQueryCatalogName, configured.SetupQueryCatalogName)
-    Assert.Equal(SorterSgd.p32.Msuf4a.SimpleS.Soss.setupEnhancerFunctionName, configured.SetupEnhancerFunctionName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionFunctionName, configured.ExecuteFunctionName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionQueryCatalogName, configured.RunQueryCatalogName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.executionEnhancerFunctionName, configured.RunEnhancerFunctionName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupQueryCatalogName, configured.SetupQueryCatalogName)
+    Assert.Equal(SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.setupEnhancerFunctionName, configured.SetupEnhancerFunctionName)
     Assert.Equal<(string * string list) list>(original.RunParameterSpans, configured.RunParameterSpans)
 
 [<Fact>]
 let ``Editor validates required spans probabilities and continuation identity`` () =
-    let original = SorterSgd.p32.Msuf4a.SimpleS.Soss.ActivatorRates ()
+    let original = SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss.ActivatorRates ()
     let args = (RunTypeEditor.fromRun original).ToArgs()
     let missing = runDraft.create { args with SetupParameters = [||] }
     Assert.True(RunTypeEditor.build original missing |> Result.isError)
@@ -59,7 +59,7 @@ let ``Editor validates required spans probabilities and continuation identity`` 
         if row.Key = ParamKeys.activatorMutationRateKey then parameterDraft.create row.Key [|"1.1"|] else row)
     let badRate = runDraft.create { args with ExecutionParameters = badRows }
     Assert.True(RunTypeEditor.build original badRate |> Result.isError)
-    let continuation = SorterSgd.p32.Msuf4a.Standard_append.Test ()
+    let continuation = SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test ()
     let args = (RunTypeEditor.fromRun continuation).ToArgs()
     let changedRows = args.ExecutionParameters |> Array.map (fun row ->
         if row.Key = ParamKeys.sourceRunNameKey then parameterDraft.create row.Key [|"OtherRun"|] else row)
@@ -293,7 +293,7 @@ let ``Module validation rejects channel changes encoded in library and mutator p
 [<Fact>]
 let ``Seed enhancer preserves explicit module settings`` () =
     let context : GeneSort.Project.V1.Catalogs.SetupParameters.setupEnhancerContext = {
-        Run = GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss.Pool_32.Gens100 ()
+        Run = GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss.Pool_32.Gens100 ()
         QueryParamsFromSetupParams = fun _ _ -> None
     }
     let parameters = setupParameters.create (Map.ofList [
@@ -319,7 +319,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
 
 [<Fact>]
 let ``Evolution clones cannot change or remove module owned settings`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Standard.TestStandard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Standard.TestStandard ()
     let draft = RunTypeEditor.cloneDraft source
     let args = draft.ToArgs()
     for row in args.SetupParameters |> Array.filter (fun row -> RunTypeEditor.isModuleOwnedParameter source row.Key) do
@@ -331,8 +331,8 @@ let ``Evolution clones cannot change or remove module owned settings`` () =
 [<Fact>]
 let ``Activation settings are explicit editable clone parameters and affect setup identity`` () =
     for source, key, defaultValue, changedValue in [
-        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleR.Standard.Test (), ParamKeys.aMaxKey, "3", "7"
-        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.Test (), ParamKeys.activationProbabilityKey, "0.5", "0.25"
+        GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Test (), ParamKeys.aMaxKey, "3", "7"
+        GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Standard.Test (), ParamKeys.activationProbabilityKey, "0.5", "0.25"
     ] do
         let args = (RunTypeEditor.cloneDraft source).ToArgs()
         let original = args.SetupParameters |> Array.find (fun row -> row.Key = key)
@@ -351,7 +351,7 @@ let ``Activation settings are explicit editable clone parameters and affect setu
 
 [<Fact>]
 let ``Initial measure follows each evaluation sweep choice without a Cartesian product`` () =
-    let configured = GeneSort.Dispatch.V1.SorterSgd.p24.Msuf63b.MutationRate.VarModR_32.Test ()
+    let configured = GeneSort.Dispatch.V1.SorterSgd.cc24.p3b.Msuf6.Simple.MutationRate.VarModR_32.Test ()
     let setup = configured.SetupParameterSpans |> List.map (fun (key, values) ->
         key, if key = ParamKeys.sorterEvalMeasureKey then values else List.take 1 values)
     let execution = configured.RunParameterSpans |> List.map (fun (key, values) -> key, List.take 1 values)
@@ -362,7 +362,7 @@ let ``Initial measure follows each evaluation sweep choice without a Cartesian p
 
 [<Fact>]
 let ``Explicit evolution controls survive enhancement and separate execution identities`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.SimpleR.SimpleR.Standard.Standard ()
     let first spans = spans |> List.map (fun (key, values) -> key, List.take 1 values)
     let replace key values spans = (key, values) :: (spans |> List.filter (fst >> (<>) key))
     let setup = first source.SetupParameterSpans

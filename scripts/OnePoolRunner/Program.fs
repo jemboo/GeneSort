@@ -12,8 +12,8 @@ open GeneSort.Project.V1.Catalogs.Reports
 open GeneSort.Dispatch.V1
 
 let isControlled (configured: run) =
-    [ GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Controlled.Standard.runType.Name
-      GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Controlled.Soss.runType.Name ]
+    [ GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.Standard.runType.Name
+      GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.Soss.runType.Name ]
     |> List.contains (string configured.ProjectName)
 
 let identity (configured: run) =
@@ -56,7 +56,7 @@ let execute maxParallel includeSummary configured =
     let host = runHost.Create configured maxParallel
     use cts = new CancellationTokenSource()
     let progress = Some { new IProgress<string> with member _.Report message = printfn "%s" message }
-    let maxReplica = if isControlled configured then SorterSgd.p32.OnePool.Controlled.replicaCount else 1
+    let maxReplica = if isControlled configured then SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Controlled.replicaCount else 1
     let minReplica, maxReplica = 0<replNumber>, UMX.tag<replNumber> maxReplica
     printfn "\n=== %s / %s / %s ===" %configured.ProjectName %configured.DatabaseName %configured.RunName
     printfn "Setup"
@@ -93,8 +93,8 @@ let main argv =
         MessagePackSetup.configure ()
         ProjectCatalogs.registerAll ()
         let moduleName =
-            if msuf4r || msuf4s then "GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a." + (if msuf4r then "SimpleR" else "SimpleS")
-            else "GeneSort.Dispatch.V1.SorterSgd.p32.OnePool"
+            if msuf4r || msuf4s then "GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4." + (if msuf4r then "SimpleR" else "SimpleS")
+            else "GeneSort.Dispatch.V1.SorterSgd.OnePool.cc32.p4a"
         let runs = orderedRuns moduleName |> List.filter (fun run -> not controlledOnly || isControlled run)
         let runs = if msuf4r || msuf4s then runs |> List.sortBy (fun run -> (if %run.RunName = "Test" then 0 else 1), %run.DatabaseName) else runs
         let prerequisites = [

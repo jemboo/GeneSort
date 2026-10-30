@@ -39,7 +39,7 @@ internal static partial class Program
                 count++;
             }
         }
-        foreach (var name in new[] { "SortableTests.Prefix.Channels24", "SorterSgd.p32.Msuf4a.SimpleS.Soss", "SorterSgd.p32.Msuf4a.Standard_append" })
+        foreach (var name in new[] { "SortableTests.Prefix.Channels24", "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss", "SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append" })
         {
             var kind = model.RunTypes.Single(type => type.Name == name);
             model.SelectRunType(kind);
@@ -64,7 +64,7 @@ internal static partial class Program
             open.GetAwaiter().GetResult();
             Check(Equals(original, model.Validate()), $"Saved {name} changed on reopening.");
         }
-        var soss = model.RunTypes.Single(type => type.Name == "SorterSgd.p32.Msuf4a.SimpleS.Soss");
+        var soss = model.RunTypes.Single(type => type.Name == "SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS.Soss");
         model.SelectRunType(soss);
         model.SelectExample(soss.Examples.Single(example => example.Name == "SossS"));
         model.Clone();

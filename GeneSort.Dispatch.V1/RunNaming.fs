@@ -26,6 +26,7 @@ module RunNaming =
             if method.IsSpecialName && method.Name.StartsWith("get_", System.StringComparison.Ordinal) then
                 method.Name.Substring(4)
             else method.Name
+
         {
             _projectName = hierarchy.Substring(prefix.Length) |> UMX.tag<projectName>
             _databaseName = container.Name |> UMX.tag<databaseName>

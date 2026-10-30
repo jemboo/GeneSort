@@ -17,11 +17,11 @@ let private allPresets () =
 [<Fact>]
 let ``Project names include the full namespace and containing module hierarchy`` () =
     let presets =
-        [ "SorterSgd.p32.Msuf4a.Standard.Pool_32", SorterSgd.p32.Msuf4a.Standard.Pool_32.Test
-          "SorterSgd.p32.Msuf4a.Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Test
-          "SorterSgd.p32.Msuf4a.Standard_append.Pool_128", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
-          "SorterSgd.p32.OnePool.Continuation.SossAppend", SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossCondense
-          "SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
+        [ "SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32", SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32.Test
+          "SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append", SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test
+          "SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Pool_128", SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Pool_128.V1
+          "SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend", SorterSgd.OnePool.cc32.p4a.Msuf4.Simple.Continuation.SossAppend.TestSossCondense
+          "SorterSgd.cc32.p4a.Msrs.Simple.MutationRate.VarModR_32", SorterSgd.cc32.p4a.Msrs.Simple.MutationRate.VarModR_32.Test
           "SorterEval.Standard.Channels16", SorterEval.Standard.Channels16.Test
           "SorterMutate.Prefix", SorterMutate.Prefix.Mssi
           "SortableTests.Prefix.Channels32", SortableTests.Prefix.Channels32.FourStage_32
@@ -61,15 +61,15 @@ let ``Database names follow their modules and preset identities are unique`` () 
 [<Fact>]
 let ``Standard append database names follow the containing modules`` () =
     let presets =
-        [ "Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Test
-          "Pool_128", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
-          "Pool_512", SorterSgd.p32.Msuf4a.Standard_append.Pool_512.V1 ]
+        [ "Standard_append", SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Test
+          "Pool_128", SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Pool_128.V1
+          "Pool_512", SorterSgd.cc32.p4a.Msuf4.Simple.Standard_append.Pool_512.V1 ]
     for expected, preset in presets do
         Assert.Equal(expected, %(preset ()).DatabaseName)
 
 [<Fact>]
 let ``Caller name is the defining function even when invoked through another function`` () =
-    let invoke () = SorterSgd.p32.Msuf4a.Standard.Pool_32.Test ()
+    let invoke () = SorterSgd.cc32.p4a.Msuf4.Simple.Standard.Pool_32.Test ()
     Assert.Equal("Test", %(invoke ()).RunName)
 
 [<Fact>]

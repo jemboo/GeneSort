@@ -116,7 +116,7 @@ module RunEditor =
     let newDraft () =
         let parameter key values = parameterDraft.create key values
         runDraft.create {
-            ProjectName = "SorterSgd.p32.Msuf4a.Standard"; DatabaseName = "Test"; RunName = "NewRun"
+            ProjectName = "SorterSgd.cc32.p4a.Msuf4.Simple.Standard"; DatabaseName = "Test"; RunName = "NewRun"
             SortableTestsModule = "SortableTests.Prefix.Channels32"; SorterEvalModule = "SorterEval.Prefix"
             Description = "Standard Msuf32p4a run"; AllowOverwrite = false
             CheckpointIntervalsName = GenIntervalNames.uniformInterval1

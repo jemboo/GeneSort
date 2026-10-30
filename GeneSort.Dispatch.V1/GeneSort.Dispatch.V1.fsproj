@@ -32,33 +32,61 @@
     <Compile Include="SorterMutate\Merge.fs" />
     <Compile Include="SorterMutate\Prefix.fs" />
     <Compile Include="SorterMutate\SorterMutateDbs.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\Common.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\Standard.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\Soss.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\SimpleR.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\SimpleS.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\Controlled.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\Continuation.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\SameFamilyChain.fs" />
-    <Compile Include="SorterSgd\p32\OnePool\MixedFamilyChain.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\Standard.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\SimpleR.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\SimpleS.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\Standard_append.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\Standard_condense.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\Soss.fs" />
-    <Compile Include="SorterSgd\p32\Msuf4a\Soss_condense.fs" />
-    <Compile Include="SorterSgd\p24\Msuf63b\Common.fs" />
-    <Compile Include="SorterSgd\p24\Msuf63b\MutationRate.fs" />
-    <Compile Include="SorterSgd\p32\Msrs4a\Common.fs" />
-    <Compile Include="SorterSgd\p32\Msrs4a\MutationRate.fs" />
-    <Compile Include="SorterSgd\p24\Msrs3a\Common.fs" />
-    <Compile Include="SorterSgd\p24\Msrs3a\OrthoPara.fs" />
-    <Compile Include="SorterSgd\p24\Msrs3a\PoolModComp.fs" />
-    <Compile Include="SorterSgd\p24\Msrs3b\Common.fs" />
-    <Compile Include="SorterSgd\p24\Msrs3b\OrthoPara.fs" />
-    <Compile Include="SorterSgd\p24\Mssi3b\Common.fs" />
-    <Compile Include="SorterSgd\p24\Mssi3b\OrthoPara.fs" />
+    <Compile Include="SorterSgd\SorterSgdParams.fs" />
+    <Compile Include="SorterSgd\OnePool\OnePoolParams.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\Cc32Params.OnePool.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\P4aParams.OnePool.Cc32.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Msuf4Params.OnePool.Cc32.P4a.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\SimpleParams.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleR\SimpleRParams.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleS\SimpleSParams.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\Common.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\Standard.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\Soss.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleR\SimpleR.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleS\SimpleS.OnePool.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\Controlled.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\Continuation.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\SameFamilyChain.fs" />
+    <Compile Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\MixedFamilyChain.fs" />
+    <Compile Include="SorterSgd\cc32\Cc32Params.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\P4aParams.Cc32.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Msuf4Params.Cc32.P4a.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\SimpleParams.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\SimpleR\SimpleRParams.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\SimpleS\SimpleSParams.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msrs\MsrsParams.Cc32.P4a.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msrs\Simple\SimpleParams.Cc32.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\Standard.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\SimpleR\SimpleR.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\SimpleS\SimpleS.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\Standard_append.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\Standard_condense.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\Soss.Cc32.P4a.Msuf4.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msuf4\Simple\Soss_condense.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msrs\Simple\Common.Cc32.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc32\p4a\Msrs\Simple\MutationRate.Cc32.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\Cc24Params.fs" />
+    <Compile Include="SorterSgd\cc24\p3b\P3bParams.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\P4aParams.Cc24.fs" />
+    <Compile Include="SorterSgd\cc24\p3b\Msuf6\Msuf6Params.fs" />
+    <Compile Include="SorterSgd\cc24\p3b\Msuf6\Simple\SimpleParams.Cc24.P3b.Msuf6.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\Msrs\MsrsParams.Cc24.P4a.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\Msrs\Simple\SimpleParams.Cc24.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\P4bParams.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Msrs\MsrsParams.Cc24.P4b.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Msrs\Simple\SimpleParams.Cc24.P4b.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Mssi\MssiParams.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Mssi\Simple\SimpleParams.Cc24.P4b.Mssi.fs" />
+    <Compile Include="SorterSgd\cc24\p3b\Msuf6\Simple\Common.Cc24.P3b.Msuf6.fs" />
+    <Compile Include="SorterSgd\cc24\p3b\Msuf6\Simple\MutationRate.Cc24.P3b.Msuf6.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\Msrs\Simple\Common.Cc24.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\Msrs\Simple\OrthoPara.Cc24.P4a.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4a\Msrs\Simple\PoolModComp.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Msrs\Simple\Common.Cc24.P4b.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Msrs\Simple\OrthoPara.Cc24.P4b.Msrs.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Mssi\Simple\Common.Cc24.P4b.Mssi.fs" />
+    <Compile Include="SorterSgd\cc24\p4b\Mssi\Simple\OrthoPara.Cc24.P4b.Mssi.fs" />
     <Compile Include="DispatchLib.fs" />
     <Compile Include="RunTypeCatalog.fs" />
     <Compile Include="WorkflowSources.fs" />
@@ -103,6 +131,12 @@
 
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="11.0.101-rc2.26504.105" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleS\" />
+    <Folder Include="SorterSgd\OnePool\cc32\p4a\Msuf4\SimpleR\" />
+    <Folder Include="SorterSgd\OnePool\cc32\p4a\Msuf4\Simple\" />
   </ItemGroup>
 
 </Project>

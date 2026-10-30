@@ -72,7 +72,39 @@ namespace: `SorterSgd`, `SorterEval`, `SorterMutate`, and
 `SortableTests`. Execution code and shared database readers stay in their
 workflow folders. Project names follow the workflow and enclosing configuration modules.
 
-`SorterSgd.p32.OnePool` provides `TestStandard` and `TestSoss` base
+The `SorterSgd.cc32` and `SorterSgd.cc24` trees use the same channel / prefix /
+model / family hierarchy as `SorterSgd.OnePool.cc32`:
+
+- `cc32/p4a/Msuf4/{Simple,SimpleR,SimpleS}` and `cc32/p4a/Msrs/Simple`.
+- `cc24/p4a/Msrs/Simple`, `cc24/p4b/{Msrs,Mssi}/Simple`, and
+  `cc24/p3b/Msuf6/Simple`.
+
+Repeated source filenames include their branch context so Visual Studio tabs are
+distinct, for example `Common.Cc24.P4a.Msrs.fs` and
+`Standard.OnePool.Cc32.P4a.Msuf4.fs`. These filename suffixes do not change the
+namespaces or module names.
+
+`SorterSgdParams` supplies common setup defaults. Each channel's parameter module
+adds channel count and data format; each prefix module adds only its prefix ID;
+each model module adds only its model type. Family modules add evaluation defaults
+and shared setup lists such as `standardSetupDefaults`, `orthoParaSetupDefaults`,
+and `defaultSetupParams`. These compose the common evolution flags from
+`SorterSgdParams.evolutionSetupDefaults` with fixed family settings and repeated
+sweeps. Runs retain only their differing setup selections, durations, pool sizes,
+and rate ranges. Callers preserve whether each shared list is used during setup,
+execution, or both; extracting defaults does not move settings between phases.
+Shared execution settings start with `SorterSgdParams.evolutionExecutionDefaults`,
+with all-sorter selection and Soss schedule lists composed where needed. OnePool
+and Msuf4 family execution lists inherit these defaults; model lists supply fixed
+mutation settings, and SimpleR/SimpleS lists supply shared activator rates.
+Partition sweeps, durations, matched-flip rates, and continuation-specific changes
+remain local. Legacy cc24 and Msrs workflows expose both setup and execution names
+for their shared lists because they intentionally use the same values in both phases.
+Msuf6 preserves its `SameAsEvaluation` initial measure and shared evaluation sweep.
+The former `Msrs3a`, `Msrs3b`, and `Mssi3b` folders
+used four-stage prefixes, so their new paths are `p4a`/`p4b`; their settings are unchanged.
+
+`SorterSgd.OnePool.cc32.p4a.Msuf4.Simple` provides `TestStandard` and `TestSoss` base
 runs with one pool of 32 sorters for each mutation value 0–3. Run the desired base through
 setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
 `TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
@@ -94,7 +126,7 @@ those bounds. Append and Condense inherit both settings; changing AMax requires
 new seeds, while the activator mutation rate may be overridden for execution.
 The values participate in file identities and appear in summary metadata.
 
-`SorterSgd.p32.Msuf4a.SimpleR` provides `Standard.Test`,
+`SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR` provides `Standard.Test`,
 `Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`. Each execution
 has one pool of 32, with mutation variants 0–3. Test runs use 10 generations;
 the rate sweeps use 100 generations and cross AMax values 1, 3, 7 with activator
@@ -105,7 +137,7 @@ rate to 0.1. Explicit spans override these defaults. Invalid activation settings
 are rejected during parameter preparation. These presets use the existing prefix
 seed-evaluation and sortable-test catalogs; prepare `SorterEval.Prefix.Channels32`
 and `SortableTests.Prefix.Channels32.FourStage_32` before setup. Automatic naming produces
-project `SorterSgd.p32.Msuf4a.SimpleR`, databases `Standard` and `Soss`,
+project `SorterSgd.cc32.p4a.Msuf4.SimpleR.SimpleR`, databases `Standard` and `Soss`,
 and run names matching the preset functions.
 Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleR`; it prepares
 the prerequisites, runs replica 0, resumes completed work, regenerates reports,
@@ -117,7 +149,7 @@ trajectory comparisons across AMax and activator rates. The four mutation
 variants share a seed replica; these results are exploratory rather than a
 comparison across independent seed replicas.
 
-`SorterSgd.p32.Msuf4a.SimpleS` declares pool counts and per-pool capacities explicitly.
+`SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS` declares pool counts and per-pool capacities explicitly.
 The Standard activation sweep is split into `Standard.ActivatorRates32` (16 pools
 of 32) and `Standard.ActivatorRates64` (8 pools of 64), preserving the previous
 512-sorter combinations. `Standard.Test`, `Soss.Test`, and `Soss.ActivatorRates`
@@ -127,7 +159,7 @@ and per-pool capacity explicitly.
 Setup entries `standardMsuf32S` / `sossMsuf32S` and execution entries
 `evoMsuf32S` / `sossMsuf32S` validate the explicit boolean activation settings.
 Both probabilities accept 0 through 1; AMax is rejected. The project is
-`SorterSgd.p32.Msuf4a.SimpleS`, with databases `Standard` and `Soss`.
+`SorterSgd.cc32.p4a.Msuf4.SimpleS.SimpleS`, with databases `Standard` and `Soss`.
 These use the same prefix prerequisites as SimpleR. Equal mutation-rate values
 do not imply equal effective activation flip rates between R and S.
 Run these presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleS`; it performs
@@ -307,7 +339,7 @@ the helper also disables inlining. The naming tests check this requirement.
 
 The project is the module hierarchy above the database module, with the common
 `GeneSort.Dispatch.V1.` prefix removed. For example, `Standard.Pool_32.Test()`
-has project `SorterSgd.p32.Msuf4a.Standard`, database `Pool_32`, and run `Test`.
+has project `SorterSgd.cc32.p4a.Msuf4.Simple.Standard`, database `Pool_32`, and run `Test`.
 Modules directly under a workflow's namespace act as databases. For example,
 `SorterEval.Standard.Channels16.Test()` has project `SorterEval`, database
 `Standard`, and run `Test`. The sortable-test preset
@@ -406,7 +438,7 @@ Select the append spec when creating the dispatch host:
 let host = runHost.Create (Soss_append.Pool_4_append.Debug ()) 8
 ```
 
-The module is `GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.Soss_append`.
+The module is `GeneSort.Dispatch.V1.SorterSgd.cc32.p4a.Msuf4.Simple.Soss_append`.
 It uses `EvoAppend.createSoss` with separate `Source.ParameterSpans` and
 `ExecutionParameterSpans`. Source spans filter configured source executions;
 omitted source keys select all their configured values. Execution spans form a
