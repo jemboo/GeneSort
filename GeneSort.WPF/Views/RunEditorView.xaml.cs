@@ -86,6 +86,10 @@ public partial class RunEditorView : UserControl
     {
         await PerformAsync(() => Model.LoadRunParametersAsync());
     }
+    private void SelectCompleted_Click(object sender, RoutedEventArgs e)
+    {
+        if (Model.IsReady) ProcessingParameters.SelectCompleted();
+    }
     private void CancelPhase_Click(object sender, RoutedEventArgs e) => Model.CancelPhase();
 
     private async void RunSetup_Click(object sender, RoutedEventArgs e)

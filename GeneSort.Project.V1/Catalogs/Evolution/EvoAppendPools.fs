@@ -39,11 +39,11 @@ module EvoAppendPools =
             path.GetMutationMod() |> Result.ofOption "Missing MutationMod."
             |> Result.bind (fun modifier ->
                 let targetCount =
-                    match path.GetSorterCountPerPoolSet(), path.GetSorterCountPerPool() with
-                    | Some total, Some perPool when int total > 0 && int perPool > 0 && int total % int perPool = 0 ->
+                    match path.GetSorterPoolCount(), path.GetSorterCountPerPool() with
+                    | Some count, Some perPool when int count > 0 && int perPool > 0 ->
                         if originals.Length = 0 then Error "Cannot resize an empty imported pool set."
-                        else Ok (int total / int perPool)
-                    | _ -> Error "SorterCountPerPoolSet must be positive and divisible by the positive SorterCountPerPool."
+                        else Ok (int count)
+                    | _ -> Error "SorterPoolCount and SorterCountPerPool must both be positive."
                 targetCount |> Result.bind (fun count ->
                     let resized = count <> originals.Length
                     let newBounds =

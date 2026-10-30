@@ -48,7 +48,7 @@ module Standard =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [8] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 1] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
@@ -98,15 +98,13 @@ module Standard =
         )
 
     // 2000 generations; 4 activation probabilities x 4 activator rates x 2 mutation variants per replica.
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let ActivatorRates () : run =
-        let names = RunNaming.create()
+    let private activatorRates (names: runNames) sorterPoolCount sorterCountPerPool : run =
         let parameterSpansSetup =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
-                (ParamKeys.sorterCountPerPoolKey, [32; 64] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (ParamKeys.sorterCountPerPoolKey, [sorterCountPerPool] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [sorterPoolCount] |> List.map string)
                 (ParamKeys.mutationModKey, [0] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
@@ -159,13 +157,20 @@ module Standard =
 
 
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let ActivatorRates32 () = activatorRates (RunNaming.create()) 16 32
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let ActivatorRates64 () = activatorRates (RunNaming.create()) 8 64
+
     let description = "Standard evolutionary runs using SimpleS models with the 32-input Msuf4a configuration."
 
 
     let runType =
         GeneSort.Dispatch.V1.runType("SorterSgd.p32.Msuf4a.SimpleS.Standard", description, channelCount, executionQueryCatalogName, [|
             runExample("Test", Test)
-            runExample("ActivatorRates", ActivatorRates)
+            runExample("ActivatorRates32", ActivatorRates32)
+            runExample("ActivatorRates64", ActivatorRates64)
         |])
 
 module Soss =
@@ -203,7 +208,7 @@ module Soss =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [8] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 1] |> List.map string)
             ]
         let parameterSpansRun =
@@ -264,7 +269,7 @@ module Soss =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [64] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [256] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [4] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
                 (ParamKeys.activationProbabilityKey, [0.95] |> List.map string)
             ]
@@ -326,7 +331,7 @@ module Soss =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [128] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [4] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
                 (ParamKeys.activationProbabilityKey, [0.95] |> List.map string)
             ]

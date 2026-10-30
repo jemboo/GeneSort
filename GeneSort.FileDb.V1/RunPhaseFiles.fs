@@ -82,6 +82,8 @@ module internal RunPhaseFiles =
                 let! loaded = db.loadAsync geneSortDataMode.Project qp |> Async.StartAsTask
                 let current = loaded |> Result.bind OutputData.asRunParameters |> Result.defaultWith invalidOp
                 if current <> row then invalidOp (sprintf "A selected RunParameter file has changed. Refresh saved files before running %s." phase.Name)
+            if phase.Name = "Summary Reports" && (entries |> Array.exists (fun (_, _, row, _) -> row.GetRunFinished() <> Some true)) then
+                invalidOp "Select only completed runs before generating summary reports."
             let storage = runStorage.create { RunDb = db; QueryParamsFromRunParams = queryFor }
             let executor = phase.Bind saved storage
             use cancellation = CancellationTokenSource.CreateLinkedTokenSource(token)

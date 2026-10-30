@@ -21,10 +21,9 @@ module EvoStartImport =
         let! last = rp.GetGenerationIntervalLast() |> Result.ofOption "Missing GenerationIntervalLast."
         let! final = GenIntervalConfig.getSampleAtIndex intervals (int last) |> Result.ofOption "Destination GenerationIntervalLast is unavailable."
         do! if final > int checkpoint.Generation then Ok () else Error "Destination final generation must be after the imported generation."
-        do! match rp.GetSorterCountPerPoolSet(), rp.GetSorterCountPerPool(), rp.GetSorterPoolCount() with
-            | Some total, Some perPool, Some count when int total > 0 && int perPool > 0 && int count > 0
-                                                       && int total = int perPool * int count -> Ok ()
-            | _ -> Error "Pool capacity must be positive and SorterCountPerPoolSet must equal SorterPoolCount * SorterCountPerPool."
+        do! match rp.GetSorterCountPerPool(), rp.GetSorterPoolCount() with
+            | Some perPool, Some count when int perPool > 0 && int count > 0 -> Ok ()
+            | _ -> Error "SorterPoolCount and SorterCountPerPool must both be positive."
         return ceBlock.create (UMX.tag Guid.Empty) width checkpoint.Prefix
     }
 

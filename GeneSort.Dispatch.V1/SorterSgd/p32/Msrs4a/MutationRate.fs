@@ -61,7 +61,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["16"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -114,7 +114,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["16"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -168,7 +168,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["16"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -244,7 +244,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["8"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -297,7 +297,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["8"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -351,7 +351,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["8"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -429,7 +429,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["16"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -504,7 +504,7 @@ module MutationRate =
             let parameterSpans =
                 [
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                    (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                    (ParamKeys.sorterPoolCountKey, ["8"])
                     (ParamKeys.orthoRateKey, ["4.001"])
                     (ParamKeys.sorterChildCountKey, ["1"])
                     (ParamKeys.distinctSorterHashesKey, ["true"])

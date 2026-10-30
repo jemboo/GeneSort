@@ -62,7 +62,7 @@ module ParameterValidation =
             parameterRule.create ParamKeys.prefixLibIdKey "Prefix library identity with a positive channel count and stage length." Text
             parameterRule.create ParamKeys.sorterLibIdKey "Sorter library identity with a positive channel count." Text
             parameterRule.create ParamKeys.sorterCountPerPoolKey "Positive number of sorters in each pool." (Integer 1)
-            parameterRule.create ParamKeys.sorterCountPerPoolSetKey "Positive total number of sorters in the pool set." (Integer 1)
+            parameterRule.create ParamKeys.sorterPoolCountKey "Positive number of sorter pools." (Integer 1)
             parameterRule.create ParamKeys.codeModKey "Nonempty configuration label used in query identity." Text
             parameterRule.create ParamKeys.adjustCeLengthFrequencyKey "Positive generation frequency for adjusting comparator length." (Integer 1)
             parameterRule.create ParamKeys.generationIntervalLastKey "Nonnegative zero-based index into the generation save schedule." (Integer 0)
@@ -204,10 +204,10 @@ module ParameterValidation =
             spans |> List.filter (fst >> (=) key) |> List.collect snd
             |> List.choose (fun value -> match parseInteger value with true, number when number > 0 -> Some number | _ -> None)
         [| for size in positiveIntegers ParamKeys.sorterCountPerPoolKey do
-               for total in positiveIntegers ParamKeys.sorterCountPerPoolSetKey do
-                   if total % size <> 0 then
-                       yield validationIssue.create (field phase ParamKeys.sorterCountPerPoolSetKey)
-                           (sprintf "Total %d is not divisible by per-pool count %d." total size) |]
+               for count in positiveIntegers ParamKeys.sorterPoolCountKey do
+                   if int64 size * int64 count > int64 System.Int32.MaxValue then
+                       yield validationIssue.create (field phase ParamKeys.sorterPoolCountKey)
+                           "SorterPoolCount * SorterCountPerPool exceeds the supported capacity." |]
 
     let intervalIndex (config: genIntervalConfig) index =
         if index < 0 || (config.MaxCount |> Option.exists (fun count -> index >= count)) then

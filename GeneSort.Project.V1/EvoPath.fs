@@ -199,9 +199,9 @@ type evoPath = private {
         ParamKeys.tryGetInt ParamKeys.sorterCountPerPoolKey this.settings
         |> Option.map UMX.tag<sorterCountPerPool>
 
-    member this.GetSorterCountPerPoolSet() =
-        ParamKeys.tryGetInt ParamKeys.sorterCountPerPoolSetKey this.settings
-        |> Option.map UMX.tag<sorterCountPerPoolSet>
+    member this.GetSorterPoolCount() =
+        ParamKeys.tryGetInt ParamKeys.sorterPoolCountKey this.settings
+        |> Option.map UMX.tag<sorterPoolCount>
 
     member this.GetSorterEvalMeasure() =
         this.settings.TryFind ParamKeys.sorterEvalMeasureKey

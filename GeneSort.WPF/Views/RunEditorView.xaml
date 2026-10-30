@@ -212,14 +212,16 @@
                         <StackPanel Margin="12">
                             <WrapPanel Margin="0,0,0,10">
                                 <Button Content="Refresh saved files" Click="RefreshParameters_Click" IsEnabled="{Binding CanLoadRunParameters}" />
-                                <Button Content="Run Processing" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
+                                <Button Content="Execute Runs" Click="RunExecution_Click" IsEnabled="{Binding CanRunExecution}" FontWeight="SemiBold"
                                         ToolTip="Process the selected saved rows using prepared inputs. Resumes saved checkpoints and skips finished runs." ToolTipService.ShowOnDisabled="True" />
-                                <Button Content="Generate Summary Reports" Click="GenerateSummaryReports_Click" IsEnabled="{Binding CanGenerateSummaryReports}" FontWeight="SemiBold"
-                                        ToolTip="Generate Summary Reports from saved results for the selected rows, including finished runs. Uses the run's output overwrite setting." ToolTipService.ShowOnDisabled="True" />
+                                <Button Content="Select Completed" Click="SelectCompleted_Click" IsEnabled="{Binding IsReady}"
+                                        ToolTip="Replace the selection with all completed runs in this table." />
+                                <Button Content="Summary Reports" Click="GenerateSummaryReports_Click" IsEnabled="{Binding CanGenerateSummaryReports}" FontWeight="SemiBold"
+                                        ToolTip="Select one or more completed runs to generate Summary Reports. Every selected run must be completed. Uses the run's output overwrite setting." ToolTipService.ShowOnDisabled="True" />
                             </WrapPanel>
                             <TextBlock Text="{Binding RunParameterList.SelectionSummary}" TextWrapping="Wrap" Margin="0,0,0,6" />
                             <TextBox Text="{Binding PhaseSummary, Mode=OneWay}" Style="{StaticResource SelectableMessage}" FontWeight="SemiBold" Margin="0,0,0,6" AutomationProperties.Name="Run phase progress" />
-                            <local:RunParameterListView DataContext="{Binding RunParameterList}" Height="360" />
+                            <local:RunParameterListView x:Name="ProcessingParameters" DataContext="{Binding RunParameterList}" Height="360" />
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="Summary Reports" Visibility="{Binding IsEvolution, Converter={StaticResource VisibleIfTrue}}">

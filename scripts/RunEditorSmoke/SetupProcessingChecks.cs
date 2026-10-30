@@ -72,6 +72,41 @@ internal static partial class Program
         setups.Sort(ParamKeys.replKey);
         Check(selected.SetEquals(setups.SelectedRuns), "Sorting changed the selected linked runs.");
 
+        // Report availability uses saved completion state, including mixed selections.
+        model.ReplicaCount = "1";
+        var reportPreparation = model.PrepareGenerationAsync(); Wait(reportPreparation);
+        Wait(model.GenerateParametersAsync(reportPreparation.Result ?? throw new Exception(model.ErrorMessages), false));
+        var reportRows = model.RunParameterList.Items.Cast<RunParameterItem>().Take(2).ToArray();
+        Check(reportRows.Length == 2 && !model.CanGenerateSummaryReports, "Reports are enabled without a selection.");
+        model.RunParameterList.Select(reportRows);
+        Check(!model.CanGenerateSummaryReports, "Unfinished runs enabled report generation.");
+        SelectEditorTab(view, "Processing parameters");
+        Click(Button(view, "Select Completed")); Pump();
+        Check(model.RunParameterList.SelectedCount == 0, "Select Completed selected unfinished runs.");
+        model.RunParameterList.Select(reportRows);
+        var refused = false;
+        try { model.GenerateSummaryReportsAsync().GetAwaiter().GetResult(); }
+        catch (InvalidOperationException) { refused = true; }
+        Check(refused && !model.IsBusy, "Programmatic report generation accepted unfinished runs.");
+        reportRows[0].Apply(GeneSort.Project.V1.Runtime.runPhaseOutput.NewParameters(reportRows[0].Parameters.WithRunFinished(Microsoft.FSharp.Core.FSharpOption<bool>.Some(true))));
+        model.RunParameterList.Select(reportRows);
+        Check(!model.CanGenerateSummaryReports, "A mixed selection enabled report generation.");
+        SelectEditorTab(view, "Processing parameters");
+        Click(Button(view, "Select Completed")); Pump();
+        var reportList = Descendants<ListView>(view).Single(control => AutomationProperties.GetName(control) == "Saved RunParameters");
+        Check(model.RunParameterList.SelectedItems.SequenceEqual(new[] { reportRows[0] })
+            && reportList.SelectedItems.Cast<RunParameterItem>().SequenceEqual(new[] { reportRows[0] }),
+            "Select Completed did not replace the mixed selection in both the table and model.");
+        reportRows[1].Apply(GeneSort.Project.V1.Runtime.runPhaseOutput.NewParameters(reportRows[1].Parameters.WithRunFinished(Microsoft.FSharp.Core.FSharpOption<bool>.Some(true))));
+        model.RunParameterList.Sort(ParamKeys.replKey);
+        Click(Button(view, "Select Completed")); Pump();
+        Check(model.RunParameterList.SelectedItems.ToHashSet().SetEquals(reportRows)
+            && reportList.SelectedItems.Cast<RunParameterItem>().ToHashSet().SetEquals(reportRows),
+            "Select Completed missed completed rows after sorting.");
+        Check(model.CanGenerateSummaryReports, "Completed selection did not enable report generation.");
+        model.RunParameterList.Select([]);
+        Check(!model.CanGenerateSummaryReports, "Clearing the selection left reports enabled.");
+
         // Exercise real Setup and Execution with a tiny generated evaluation library.
         model.SelectRunType(model.RunTypes.Single(type => type.Name == "SorterEval.Standard.Channels4"));
         model.Clone();
@@ -96,7 +131,7 @@ internal static partial class Program
         var originalRows = model.RunParameterList.Items.Cast<RunParameterItem>().ToArray();
         var ids = originalRows.Select(row => row.Parameters.GetId()).ToArray();
         SelectEditorTab(view, "Setup parameters");
-        Check(!Descendants<Button>(view).Any(button => Equals(button.Content, "Run Processing")), "Execution is offered on the Setup tab.");
+        Check(!Descendants<Button>(view).Any(button => Equals(button.Content, "Execute Runs")), "Execution is offered on the Setup tab.");
         var setupList = Descendants<ListView>(view).Single(control => AutomationProperties.GetName(control) == "Shared SetupParameters");
         setupList.SelectedItems.Add(setupList.Items[0]); Pump();
         Check(model.CanRunSetup && !model.CanRunExecution && model.SetupParameterList.SelectedRuns.Length == 2,
@@ -121,7 +156,7 @@ internal static partial class Program
         var processingList = Descendants<ListView>(view).Single(control => AutomationProperties.GetName(control) == "Saved RunParameters");
         Check(processingList.IsEnabled && Descendants<ScrollViewer>(processingList).First().IsEnabled,
             "Processing scrolling is disabled while busy.");
-        Check(!Button(view, "Run Processing").IsEnabled, "Processing could be started while busy.");
+        Check(!Button(view, "Execute Runs").IsEnabled, "Processing could be started while busy.");
         Check(!Descendants<TextBox>(processingList).Any() && !Descendants<TextBox>(setupList).Any(), "Generated parameter cells are editable.");
         Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "artifacts", "processing-check"));
         Render(view, Path.Combine(Environment.CurrentDirectory, "artifacts", "processing-check", "parameters-running.png"));
@@ -162,7 +197,7 @@ internal static partial class Program
         statusRow.ShowStatus(runRowStatus.Waiting);
         runList.SelectedItems.Add(runList.Items[0]); Pump();
         Check(model.CanRunExecution && !model.CanRunSetup, "Run selection changed Setup selection.");
-        Click(Button(view, "Run Processing")); WaitUntil(() => !model.IsBusy); Layout(view);
+        Click(Button(view, "Execute Runs")); WaitUntil(() => !model.IsBusy); Layout(view);
         Check(model.PhaseSummary == "Processing finished: 1 succeeded, 0 failed, 0 skipped.", "Execution failed after shared Setup: " + model.ErrorMessages);
         Check(statusRow.Status == "Completed" && originalRows.Count(row => row.Status == "Pending") == 1,
             "Processing completion updated the wrong row status.");

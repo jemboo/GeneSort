@@ -311,10 +311,6 @@ type parameterSet<'kind> =
         ParamKeys.tryGetInt ParamKeys.sorterCountPerPoolKey this.ParamMap
         |> Option.map UMX.tag<sorterCountPerPool>
 
-    member this.GetSorterCountPerPoolSet() =
-        ParamKeys.tryGetInt ParamKeys.sorterCountPerPoolSetKey this.ParamMap
-        |> Option.map UMX.tag<sorterCountPerPoolSet>
-
     member this.GetSorterEvalMeasure() =
         this.paramMap.TryFind ParamKeys.sorterEvalMeasureKey
         |> Option.map SorterEvalFunctions.fromCompactString
@@ -588,8 +584,6 @@ type parameterSet<'kind> =
     member this.WithSorterCountPerPool(sc: int<sorterCountPerPool> option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sorterCountPerPoolKey (sc |> Option.map UmxExt.intToRaw) }
 
-    member this.WithSorterCountPerPoolSet(sc: int<sorterCountPerPoolSet> option) : parameterSet<'kind> =
-        { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sorterCountPerPoolSetKey (sc |> Option.map UmxExt.intToRaw) }
 
     member this.WithSorterEvalMeasure(sem: sorterEvalMeasure option) : parameterSet<'kind> =
         { paramMap = this.paramMap |> ParamKeys.addOrRemove ParamKeys.sorterEvalMeasureKey (sem |> Option.map SorterEvalFunctions.toCompactString) }

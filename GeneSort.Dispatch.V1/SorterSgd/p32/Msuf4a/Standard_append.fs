@@ -18,7 +18,7 @@ let Test () : run =
     let executionParameterSpans =
         [
             ParamKeys.mutationModKey, [0 .. 2] |> List.map string
-            ParamKeys.sorterCountPerPoolSetKey, [128] |> List.map string
+            ParamKeys.sorterCountPerPoolKey, [128] |> List.map string
             ParamKeys.paraRateKey,    [1.25;] |> List.map string
             ParamKeys.selfSymRateKey, [2.25;]  |> List.map string
             ParamKeys.generationIntervalLastKey, [1] |> List.map string
@@ -87,7 +87,7 @@ module Pool_128 =
         let executionParameterSpans =
             [
                 ParamKeys.mutationModKey, [0; 1] |> List.map string
-                ParamKeys.sorterCountPerPoolSetKey, [256;] |> List.map string
+                ParamKeys.sorterCountPerPoolKey, [256;] |> List.map string
                 ParamKeys.generationIntervalLastKey, [3] |> List.map string
             ]
         evoContinuationConfig.create {
@@ -138,7 +138,7 @@ module Pool_512 =
         let executionParameterSpans =
             [
                 ParamKeys.mutationModKey, [0; 1] |> List.map string
-                ParamKeys.sorterCountPerPoolSetKey, [512;] |> List.map string
+                ParamKeys.sorterCountPerPoolKey, [512;] |> List.map string
                 ParamKeys.generationIntervalLastKey, [3] |> List.map string
             ]
         evoContinuationConfig.create {

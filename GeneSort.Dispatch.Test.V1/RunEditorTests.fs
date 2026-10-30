@@ -98,7 +98,7 @@ module RunEditorTests =
 
     [<Theory>]
     [<InlineData("SorterCountPerPool", "0")>]
-    [<InlineData("SorterCountPerPoolSet", "33")>]
+    [<InlineData("SorterPoolCount", "0")>]
     [<InlineData("GenerationIntervalLast", "-1")>]
     [<InlineData("AdjustCeLengthFrequency", "0")>]
     [<InlineData("ParaRate", "NaN")>]
@@ -140,13 +140,13 @@ module RunEditorTests =
             Assert.Contains(text, messages)
 
     [<Fact>]
-    let ``pool divisibility is checked across every setup combination`` () =
+    let ``pool capacity overflow is checked across every setup combination`` () =
         let draft = change (fun args ->
             { args with
                 SetupParameters =
                     args.SetupParameters |> replace ParamKeys.sorterCountPerPoolKey [|"32"; "64"|]
-                                         |> replace ParamKeys.sorterCountPerPoolSetKey [|"32"; "128"|] })
-        Assert.Contains(RunEditor.validate draft, fun issue -> issue.Message.Contains "Total 32 is not divisible by per-pool count 64")
+                                         |> replace ParamKeys.sorterPoolCountKey [|"1"; "2147483647"|] })
+        Assert.Contains(RunEditor.validate draft, fun issue -> issue.Message.Contains "exceeds the supported capacity")
 
     [<Fact>]
     let ``execution cannot replace setup pool sizes or supply missing setup query fields`` () =
@@ -209,7 +209,7 @@ module RunEditorTests =
 
     [<Theory>]
     [<InlineData("SorterCountPerPool", "0")>]
-    [<InlineData("SorterCountPerPoolSet", "33")>]
+    [<InlineData("SorterPoolCount", "0")>]
     [<InlineData("ParaRate", "NaN")>]
     [<InlineData("SelfSym", "Infinity")>]
     [<InlineData("SeedModificationRate", "-0.01")>]
@@ -254,7 +254,7 @@ module RunEditorTests =
             { original with
                 RunParameterSpans = [|
                     { Key = ParamKeys.sorterCountPerPoolKey; Values = [|"64"|] }
-                    { Key = ParamKeys.sorterCountPerPoolSetKey; Values = [|"64"|] }
+                    { Key = ParamKeys.sorterPoolCountKey; Values = [|"64"|] }
                     { Key = ParamKeys.sorterPoolExpansionRateKey; Values = [|"1.1"|] }
                 |] } |> RunDto.toDomain
         let issues = configured |> RunEditor.fromRun |> ok |> RunEditor.validate
@@ -270,7 +270,7 @@ module RunEditorTests =
     let ``Soss seed setup does not require Standard mutation settings`` () =
         let configured = RunEditor.newDraft() |> RunEditor.build |> ok
         let context = { Run = configured; QueryParamsFromSetupParams = fun _ _ -> failwith "Seed validation must not query files." }
-        let parameters = setupParameters.create (Map.ofList [ParamKeys.channelCountKey, string RunEditor.channelCount; ParamKeys.sorterCountPerPoolKey, "32"; ParamKeys.sorterCountPerPoolSetKey, "64"])
+        let parameters = setupParameters.create (Map.ofList [ParamKeys.channelCountKey, string RunEditor.channelCount; ParamKeys.sorterCountPerPoolKey, "32"; ParamKeys.sorterPoolCountKey, "2"])
         let enhanced = SetupEnhancerCatalog.sossMsuf32 context parameters
         Assert.Equal(2, int (enhanced.GetSorterPoolCount().Value))
 

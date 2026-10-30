@@ -48,7 +48,7 @@ module Standard =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
@@ -106,7 +106,7 @@ module Standard =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
                 (ParamKeys.codeModKey, ["NoMods"] |> List.map string)
                 (ParamKeys.paraRateKey, [1.15] |> List.map string)
@@ -201,7 +201,7 @@ module Soss =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
             ]
         let parameterSpansRun =
@@ -262,7 +262,7 @@ module Soss =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [32] |> List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [32] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 3] |> List.map string)
                 (ParamKeys.aMaxKey, [1; 3; 7] |> List.map string)
             ]

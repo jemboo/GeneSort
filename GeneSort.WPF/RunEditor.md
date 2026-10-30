@@ -207,8 +207,14 @@ checkpoints through the workflow executor, and saves the resulting generation an
 completion state. Missing prepared inputs are reported as failures; use **Run Setup**
 to prepare them before retrying Processing. Other rows in the selection still run.
 
+**Select Completed** in Processing parameters replaces the current selection with
+all completed runs in the table, regardless of sorting or scrolling. It is disabled
+while work is running.
+
 **Generate Summary Reports** uses the existing report catalog to summarize saved
-generation slices, including finished runs. It writes one tab-separated SummaryReport
+generation slices for completed runs only. Select at least one row; every selected
+run must have completed. Both the editor and saved-row runner enforce this rule
+before any reports are written. It writes one tab-separated SummaryReport
 per selected row under the database's `Data/Results/Report` folder, with the
 usual `RunName` column. Missing or empty results are reported per row. Reports honor
 **Allow workflow output overwrite** and leave every RunParameter file and its saved

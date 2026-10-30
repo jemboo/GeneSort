@@ -71,7 +71,6 @@ module RunParameterRoles =
         ParamKeys.aMaxKey, parameterRole.InheritedReadOnly
         ParamKeys.activationProbabilityKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterCountPerPoolKey, parameterRole.InheritedReadOnly
-        ParamKeys.sorterCountPerPoolSetKey, parameterRole.InheritedReadOnly
         ParamKeys.sorterPoolCountKey, parameterRole.InheritedReadOnly
         ParamKeys.mutationModKey, parameterRole.InheritedReadOnly
         ParamKeys.seedSorterPoolSelectionTypeKey, parameterRole.SetupOnly
@@ -97,7 +96,6 @@ module RunParameterRoles =
         evolution
         |> Map.add ParamKeys.mutationModKey parameterRole.InheritedOverridable
         |> Map.add ParamKeys.sorterCountPerPoolKey parameterRole.InheritedOverridable
-        |> Map.add ParamKeys.sorterCountPerPoolSetKey parameterRole.InheritedOverridable
         |> Map.add ParamKeys.sorterPoolCountKey parameterRole.InheritedOverridable
         |> Map.add ParamKeys.sourceProjectNameKey parameterRole.InheritedReadOnly
         |> Map.add ParamKeys.sourceDbNameKey parameterRole.InheritedReadOnly

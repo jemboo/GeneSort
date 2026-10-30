@@ -52,7 +52,7 @@ module OrthoPara32 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["8192"])
+                (ParamKeys.sorterPoolCountKey, ["256"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])

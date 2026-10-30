@@ -19,7 +19,7 @@ open GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a
 let private configuration soss sweep =
     match soss, sweep with
     | false, false -> SimpleS.Standard.Test()
-    | false, true -> SimpleS.Standard.ActivatorRates()
+    | false, true -> GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates32()
     | true, false -> SimpleS.Soss.Test()
     | true, true -> SimpleS.Soss.ActivatorRates()
 
@@ -32,7 +32,7 @@ let ``Msuf4a SimpleS presets expand distinct executions with boolean models and 
     let configured = configuration soss sweep
     Assert.Equal((if soss then "SorterSgd.p32.Msuf4a.SimpleS.Soss" else "SorterSgd.p32.Msuf4a.SimpleS.Standard"), %configured.ProjectName)
     Assert.Equal((if soss then "Soss" else "Standard"), %configured.DatabaseName)
-    Assert.Equal((if sweep then "ActivatorRates" else "Test"), %configured.RunName)
+    Assert.Equal((if sweep then (if soss then "ActivatorRates" else "ActivatorRates32") else "Test"), %configured.RunName)
     let host = runHost.Create configured 1
     let setup = host.MakeSetupParameters 0<replNumber> 1<replNumber>
     let executions = host.MakeRunParameters 0<replNumber> 1<replNumber>
@@ -51,12 +51,12 @@ let ``Msuf4a SimpleS presets expand distinct executions with boolean models and 
     let seedIds = setup |> Array.map (fun sp -> (host.QueryParamsFromSetupParams sp (geneSortDataType.SorterPoolSet "")).Value.Id)
     Assert.Equal(setup.Length, seedIds |> Array.distinct |> Array.length)
     let poolSizes = configured.SetupParameterSpans |> values ParamKeys.sorterCountPerPoolKey [] |> List.map int
-    let poolTotals = configured.SetupParameterSpans |> values ParamKeys.sorterCountPerPoolSetKey [] |> List.map int
+    let poolCounts = configured.SetupParameterSpans |> values ParamKeys.sorterPoolCountKey [] |> List.map int
     let lastIntervals = configured.RunParameterSpans |> values ParamKeys.generationIntervalLastKey [] |> List.map int
     for rp in executions do
         Assert.Contains(int (rp.GetSorterCountPerPool().Value), poolSizes)
-        Assert.Contains(int (rp.GetSorterCountPerPoolSet().Value), poolTotals)
-        Assert.Equal(int (rp.GetSorterCountPerPoolSet().Value) / int (rp.GetSorterCountPerPool().Value), int (rp.GetSorterPoolCount().Value))
+        Assert.Contains(int (rp.GetSorterPoolCount().Value), poolCounts)
+        Assert.False(rp.ParamMap.ContainsKey "SorterCountPerPoolSet")
         Assert.Equal(Some simpleSorterModelType.Msuf4, rp.GetSimpleSorterModelType())
         Assert.Contains(int (rp.GetGenerationIntervalLast().Value), lastIntervals)
         let query = host.QueryParamsFromRunParams rp (geneSortDataType.Run configured.RunName) |> Option.get
@@ -122,3 +122,18 @@ let ``SimpleS catalog entries accept probability and mutation rate endpoints`` s
                 |> SeedSorterModelGeneration.applyParameters rp |> Result.defaultWith failwith
             let model = SorterModelGen.makeSorterModelFromIndex 0<sortingGenIndex> generator |> SorterModel.asSimpleSorterModelS
             Assert.All(model.Activators, fun active -> Assert.Equal((probability = 1.0), active))
+
+[<Fact>]
+let ``split pool-size presets preserve their original explicit population shapes`` () =
+    let cases = [
+        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates32(), 16, 32
+        GeneSort.Dispatch.V1.SorterSgd.p32.Msuf4a.SimpleS.Standard.ActivatorRates64(), 8, 64
+        GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_2(), 256, 2
+        GeneSort.Dispatch.V1.SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256.PoolSz_256(), 2, 256
+    ]
+    for configured, poolCount, perPool in cases do
+        let spans = configured.SetupParameterSpans |> Map.ofList
+        Assert.Equal<string list>([string poolCount], spans[ParamKeys.sorterPoolCountKey])
+        Assert.Equal<string list>([string perPool], spans[ParamKeys.sorterCountPerPoolKey])
+        Assert.False(spans.ContainsKey "SorterCountPerPoolSet")
+        Assert.False(configured.RunParameterSpans |> List.exists (fun (key, _) -> key = "SorterCountPerPoolSet"))

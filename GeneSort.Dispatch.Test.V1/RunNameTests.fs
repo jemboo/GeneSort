@@ -20,7 +20,7 @@ let ``Project names include the full namespace and containing module hierarchy``
         [ "SorterSgd.p32.Msuf4a.Standard.Pool_32", SorterSgd.p32.Msuf4a.Standard.Pool_32.Test
           "SorterSgd.p32.Msuf4a.Standard_append", SorterSgd.p32.Msuf4a.Standard_append.Test
           "SorterSgd.p32.Msuf4a.Standard_append.Pool_128", SorterSgd.p32.Msuf4a.Standard_append.Pool_128.V1
-          "SorterSgd.p32.Test.OnePool.Continuation.SossAppend", SorterSgd.p32.Test.OnePool.Continuation.SossAppend.TestSossCondense
+          "SorterSgd.p32.OnePool.Continuation.SossAppend", SorterSgd.p32.OnePool.Continuation.SossAppend.TestSossCondense
           "SorterSgd.p32.Msrs4a.MutationRate.VarModR_32", SorterSgd.p32.Msrs4a.MutationRate.VarModR_32.Test
           "SorterEval.Standard.Channels16", SorterEval.Standard.Channels16.Test
           "SorterMutate.Prefix", SorterMutate.Prefix.Mssi

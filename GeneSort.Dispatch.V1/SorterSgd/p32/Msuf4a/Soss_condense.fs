@@ -70,7 +70,7 @@ module Pool_X =
                     (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                     (ParamKeys.channelCountKey, [string (int channelCount)])
                     (ParamKeys.sorterCountPerPoolKey, [sorterCount] |>  List.map string)
-                    (ParamKeys.sorterCountPerPoolSetKey, [sorterCount] |> List.map string)
+                    (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                     (ParamKeys.mutationModKey, [0 .. (poolCount - 1)] |> List.map string)
                 ]
             let parameterSpansRun =

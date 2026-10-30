@@ -116,13 +116,13 @@ module RunParamEnhancerBuilders =
         let private fromSorterPoolSet setGenerationCurrent : runParamEnhancerBuilder =
             fun host parameters ->
                 let rp = (inheritSetup host parameters).ParamMap |> ParameterValidation.resolveSelection |> runParameters.create
+                ParameterValidation.requireKeys "Execution" SgdParameterValidation.seedPoolKeys (ParameterValidation.ofMap rp.ParamMap)
+                |> ParameterValidation.ensureValid "parameters"
                 ParameterValidation.validateValues SgdParameterValidation.seedPoolKeys rp.ParamMap
                 |> ParameterValidation.ensureValid "parameters"
                 ParameterValidation.poolSizes "Execution" (ParameterValidation.ofMap rp.ParamMap)
                 |> ParameterValidation.ensureValid "parameters"
-                let perPool = rp.GetSorterCountPerPool().Value
-                let total = rp.GetSorterCountPerPoolSet().Value
-                let enhanced = rp.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
+                let enhanced = rp
                 let enhanced = if setGenerationCurrent then enhanced.WithGenerationCurrent(Some 0<generationNumber>) else enhanced
                 let qp = host.QueryParamsFromRunParams enhanced (geneSortDataType.Run host.Run.RunName)
                 enhanced.WithRunFinished(Some false).WithId(Some qp.Value.Id).WithRunName(Some host.Run.RunName)

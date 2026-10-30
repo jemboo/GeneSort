@@ -139,7 +139,7 @@ let standardSource () =
                 ParamKeys.collectSortableTestsKey, ["false"]
                 ParamKeys.channelCountKey, ["32"]
                 ParamKeys.sorterCountPerPoolKey, ["32"]
-                ParamKeys.sorterCountPerPoolSetKey, ["128"]
+                ParamKeys.sorterPoolCountKey, ["4"]
                 ParamKeys.codeModKey, ["NoMods"]
                 ParamKeys.adjustCeLengthFrequencyKey, ["10"]
                 ParamKeys.generationIntervalLastKey, ["2"]
@@ -194,7 +194,7 @@ let sossSource (modifiers: int list) =
                 ParamKeys.collectSortableTestsKey, ["false"]
                 ParamKeys.channelCountKey, ["32"]
                 ParamKeys.sorterCountPerPoolKey, ["4"]
-                ParamKeys.sorterCountPerPoolSetKey, ["32"]
+                ParamKeys.sorterPoolCountKey, ["8"]
                 ParamKeys.mutationModKey, List.map string modifiers
             ]
             QueryCatalogName = QueryCatalogNamesSetup.sossMsuf32Seed
@@ -234,7 +234,7 @@ let withSetupSpans overrides (source: run) =
 
 let standardSweep v2 =
     standardSource () |> withSetupSpans [
-        ParamKeys.sorterCountPerPoolSetKey, ["512"]
+        ParamKeys.sorterPoolCountKey, [if v2 then "1" else "16"]
         ParamKeys.sorterCountPerPoolKey, [if v2 then "512" else "32"]
         ParamKeys.generationIntervalLastKey, ["3"]
         ParamKeys.paraRateKey, ["0.85"; "0.95"; "1.05"; "1.15"]

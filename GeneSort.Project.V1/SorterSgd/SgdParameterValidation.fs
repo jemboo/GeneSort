@@ -4,7 +4,7 @@ open GeneSort.Project.V1.Parameters
 
 /// Requirements shared by parameter generation, execution and authoring.
 module SgdParameterValidation =
-    let seedPoolKeys = [ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey]
+    let seedPoolKeys = [ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterPoolCountKey]
     let msufQueryKeys = seedPoolKeys @ [
         ParamKeys.codeModKey; ParamKeys.paraRateKey; ParamKeys.selfSymRateKey; ParamKeys.mutationModKey
         ParamKeys.seedModificationRateKey; ParamKeys.modificationRateKey; ParamKeys.mutatorVariantKey

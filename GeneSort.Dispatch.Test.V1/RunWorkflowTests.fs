@@ -82,7 +82,7 @@ let ``roles depend on workflow and continuations retain explicit resize and bran
     Assert.Equal(parameterRole.InheritedOverridable, Run.parameterRole fresh ParamKeys.modificationRateKey)
     Assert.Equal(parameterRole.SetupOnly, Run.parameterRole fresh ParamKeys.controlledSeedAMaxKey)
     Assert.Equal(parameterRole.ExecutionOnly, Run.parameterRole fresh ParamKeys.partitionCountKey)
-    for key in [ParamKeys.mutationModKey; ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey] do
+    for key in [ParamKeys.mutationModKey; ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterPoolCountKey] do
         Assert.Equal(parameterRole.InheritedReadOnly, Run.parameterRole fresh key)
         Assert.Equal(parameterRole.InheritedOverridable, Run.parameterRole continuation key)
     Assert.Equal(parameterRole.InheritedReadOnly, Run.parameterRole continuation ParamKeys.sourceRunNameKey)

@@ -22,7 +22,7 @@ The shared seed calculations and initial state are:
 
 | Parameter | Value |
 | --- | --- |
-| `SorterPoolCount` | `SorterCountPerPoolSet / SorterCountPerPool` |
+| `SorterPoolCount` | Explicit positive setup value, preserved by enhancers. |
 | `GenerationCurrent` | `0` |
 
 The R/S wrappers validate activation settings before invoking their base enhancer. `standard-msuf32` also validates the full setup settings; `soss-msuf32` validates seed-pool settings.
@@ -55,7 +55,7 @@ Mutation rates, population sizes, and selection settings are now declared in mod
 | `AMax` | Explicit Setup parameter for SimpleR; defaults to 3 in module presets, preserving existing sweeps. |
 | `ActivationProbability` | Explicit Setup parameter for SimpleS; defaults to 0.5 in module presets, preserving existing sweeps. |
 | `ActivatorMutationRate` | `0.1` where previously defaulted for R/S runs, preserving existing explicit sweeps. |
-| `SorterCountPerPoolSet` | Explicit total population. Former hidden totals are 512 for Msrs32 and pool comparisons, 8192 for Msrs24 ortho/para, and 1024 for Mssi24. The `Sz_2048_Of_4096` preset declares 4096 to match its pool capacity; its former hidden total of 512 yielded zero pools. |
+| `SorterPoolCount` | Explicit number of pools. Together with `SorterCountPerPool`, defines population size without an inferred total. |
 | `SorterCountPerPool` | Existing explicit pool-capacity values and sweeps. |
 | `SelectedSorterCountPerPool` | A positive count or `All`. Modules that formerly selected the full capacity now declare `All`; pool-comparison modules retain their explicit selected counts. `All` resolves against each paired pool size, including resized continuations. |
 | `SeedPoolSorterSelectionType` | `GuidOrder:512`, now an explicit Setup parameter. |
@@ -63,7 +63,7 @@ Mutation rates, population sizes, and selection settings are now declared in mod
 | `DistinctSorterHashes`, `PrioritizeNewMutants` | `true` |
 | `SortedFraction` | `0.99` |
 
-Changing the new execution controls changes run and evolutionary-result identities. Seed selection remains a Setup choice and contributes to setup identities. `SorterPoolCount` is calculated from total population divided by pool capacity; invalid divisions are rejected.
+Changing the new execution controls changes run and evolutionary-result identities. Seed selection remains a Setup choice and contributes to setup identities. `SorterPoolCount` and `SorterCountPerPool` are explicit positive values. Enhancers preserve both; continuations inherit each value unless explicitly overridden.
 
 ## Module owned settings
 
@@ -87,7 +87,7 @@ The `24p3a` and `24p3b` Msrs/Mssi names still use stage length 4, preserving the
 
 Execution enhancers still set `CollectNewSortableTests = false` and None.. The Msuf32 family initializes `GenerationCurrent = 0`; the other families preserve it. Model, prefix, evaluation measure, RNG, and format defaults are no longer supplied by any registered enhancer.
 
-All calculate `SorterPoolCount`, set `RunFinished = false`, copy `RunName`, and calculate `Id`. The `evo` and `soss` Msuf32 wrappers merge setup and execution maps with execution winning. R/S wrappers validate explicit activator mutation rates and reject activation parameters from the other family; they no longer invent mutation-rate defaults.
+All preserve the explicit `SorterPoolCount`, set `RunFinished = false`, copy `RunName`, and calculate `Id`. The `evo` and `soss` Msuf32 wrappers merge setup and execution maps with execution winning. R/S wrappers validate explicit activator mutation rates and reject activation parameters from the other family; they no longer invent mutation-rate defaults.
 
 ## Assignments outside enhancers
 
@@ -101,6 +101,10 @@ Existing catalog names remain available, but equivalent registrations share one 
 
 - Setup evaluation, prefix evaluation, and mutation share the model-set and prefixed-test file-reference enhancer.
 - Execution standard evaluation, merge evaluation, and both standard mutation registrations share setup inheritance and run initialization.
-- The seven MSRS/MSUF6/MSSI continuation registrations share pool-size validation, pool-count calculation, and run initialization without resetting the supplied generation.
+- The seven MSRS/MSUF6/MSSI continuation registrations share pool-size validation and run initialization without resetting the supplied generation.
 
 Direct sortable-test execution shares run initialization but does not inherit setup. Prefix evaluation retains its required-field checks and setup-wins precedence. SGD MSUF initialization still validates execution settings and resets generation to zero; seed-only versus full setup validation, file-reference handling, and SimpleR/S validation remain distinct. Query builders and identity inputs are unchanged.
+
+Pool configuration now requires `SorterPoolCount` and `SorterCountPerPool`.
+Previously saved definitions using a total-population field must be updated to
+these two explicit values; no pool count or capacity is inferred from a total.

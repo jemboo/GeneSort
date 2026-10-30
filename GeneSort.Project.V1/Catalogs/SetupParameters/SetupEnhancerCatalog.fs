@@ -74,10 +74,7 @@ module SetupEnhancerCatalog =
     let sossMsuf32 : setupEnhancerFunction = fun _ parameters ->
         parameters.ParamMap |> ParameterValidation.ofMap |> SgdParameterValidation.seedPool "Setup"
         |> ParameterValidation.ensureValid "parameters"
-        let perPool = parameters.GetSorterCountPerPool().Value
-        let total = parameters.GetSorterCountPerPoolSet().Value
-        parameters.WithSorterPoolCount(Some (UMX.tag (int total / int perPool)))
-                  .WithGenerationCurrent(Some 0<generationNumber>)
+        parameters.WithGenerationCurrent(Some 0<generationNumber>)
 
     /// Standard seed queries include the full parameter settings and their setup references.
     let standardMsuf32 : setupEnhancerFunction = fun context parameters ->

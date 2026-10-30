@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string] $ReportPath,
-    [Parameter(Mandatory)][string] $SimpleRReportPath
+    [Parameter(Mandatory)][string] $SimpleRReportPath,
+    [ValidateSet('ActivatorRates', 'ActivatorRates32', 'ActivatorRates64')]
+    [string] $SimpleSStandardSweep = 'ActivatorRates32'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,7 +36,8 @@ foreach ($family in @('SimpleS', 'SimpleR')) {
         $testEnd = @($test | Where-Object { [int]$_.GenerationNumber -eq $testLast })
         Write-Output ("Test: generation={0}, executions={1}, CEs={2:F5}, stages={3:F5}, score={4:F5}, unsorted={5:F5}" -f $testLast, $testEnd.Count, (Metric $testEnd 'AveCeLength'), (Metric $testEnd 'AveStageLength'), (Metric $testEnd 'AverageSorterPoolScore'), (Metric $testEnd 'AverageUnsortedCount'))
 
-        $sweep = @($eligible | Where-Object RunName -eq 'ActivatorRates')
+        $sweepName = if ($family -eq 'SimpleS' -and $workflow -eq 'Standard') { $SimpleSStandardSweep } else { 'ActivatorRates' }
+        $sweep = @($eligible | Where-Object RunName -eq $sweepName)
         if ($sweep.Count -eq 0) { throw "Missing $family $workflow sweep." }
         $last = ($sweep.GenerationNumber | ForEach-Object { [int]$_ } | Measure-Object -Maximum).Maximum
         $endpoint = @($sweep | Where-Object { [int]$_.GenerationNumber -eq $last })

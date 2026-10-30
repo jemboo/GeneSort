@@ -243,6 +243,10 @@ module RunPhaseFileTests =
         let runPhase = phaseRunner phase
         let otherPhase = if phase = "Execution" then RunSetupFiles.runAsync else RunExecutionFiles.runSavedAsync
         let! rows = publish folder configured
+        if phase = "Summary Reports" then
+            rows[0] <- rows[0].WithRunFinished(Some true)
+            let! saved = save folder configured rows[0]
+            get saved
         let progress = { new IProgress<runPhaseProgress> with
                             member _.Report _ =
                                 if started.TrySetResult() then release.Task.GetAwaiter().GetResult() }
@@ -612,7 +616,7 @@ module RunPhaseFileTests =
         let! generated = publish folder configured
         let rows = generated |> Array.sortBy (fun row -> row.GetMutationMod())
                             |> Array.map (fun row -> row.WithGenerationCurrent(Some 99<generationNumber>))
-        rows[1] <- rows[1].WithRunFinished(Some true)
+        for index in 0 .. 2 do rows[index] <- rows[index].WithRunFinished(Some true)
         for row in rows do
             let! result = save folder configured row
             get result
@@ -811,4 +815,20 @@ module RunPhaseFileTests =
         Assert.Equal(runRowStatus.Waiting, Assert.Single(result.RowStatuses))
         let _, output = Assert.Single(result.Updates)
         Assert.NotEqual(Some true, (RunPhaseOutput.toParameters output).GetRunFinished())
+    })
+
+    [<Theory>]
+    [<InlineData(false)>]
+    [<InlineData(true)>]
+    let ``summary generation rejects unfinished and mixed selections before writing reports`` mixed = withFolder (fun folder -> task {
+        let configured = RunEditor.newDraft() |> RunEditor.build |> Result.defaultWith (fun errors -> failwithf "%A" errors)
+        let! rows = publish folder configured
+        let selected = if mixed then [| rows[0].WithRunFinished(Some true); rows[1] |] else [| rows[0] |]
+        if mixed then
+            let! saved = save folder configured selected[0]
+            get saved
+        let before = Directory.GetFiles(folder, "*", SearchOption.AllDirectories) |> Array.sort
+        let! error = Assert.ThrowsAsync<InvalidOperationException>(fun () -> RunSummaryFiles.runAsync folder configured selected null :> Task)
+        Assert.Contains("Select only completed runs", error.Message)
+        Assert.Equal<string>(before, Directory.GetFiles(folder, "*", SearchOption.AllDirectories) |> Array.sort)
     })

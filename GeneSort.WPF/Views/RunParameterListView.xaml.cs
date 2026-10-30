@@ -66,8 +66,26 @@ public partial class RunParameterListView : UserControl
         UpdateHeaders();
     }
 
-    private void SelectionChanged(object sender, SelectionChangedEventArgs e) =>
-        (DataContext as RunParameterListViewModel)?.Select(ParameterItems.SelectedItems.Cast<RunParameterItem>());
+    private bool updatingSelection;
+    public void SelectCompleted()
+    {
+        var completed = ParameterItems.Items.Cast<RunParameterItem>()
+            .Where(row => row.Parameters.GetRunFinished()?.Value == true).ToArray();
+        updatingSelection = true;
+        try
+        {
+            ParameterItems.SelectedItems.Clear();
+            foreach (var row in completed) ParameterItems.SelectedItems.Add(row);
+        }
+        finally { updatingSelection = false; }
+        model?.Select(completed);
+    }
+
+    private void SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!updatingSelection)
+            (DataContext as RunParameterListViewModel)?.Select(ParameterItems.SelectedItems.Cast<RunParameterItem>());
+    }
 
     private void ChooseColumns_Click(object sender, RoutedEventArgs e)
     {

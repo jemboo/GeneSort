@@ -106,19 +106,6 @@ module RunParameterGeneration =
                            else SetupOutputs.referencesFor configured setup
                        let context = runParamEnhancerContext.createForSetup runQuery configured setup
                        for parameters in runs do
-                           // A new append total changes capacity, preserving the source pool count.
-                           // An explicitly supplied per-pool count still takes precedence.
-                           let parameters =
-                               if configured.ParameterSource.IsSome
-                                  && Map.containsKey ParamKeys.sorterCountPerPoolSetKey parameters.ParamMap
-                                  && not (Map.containsKey ParamKeys.sorterCountPerPoolKey parameters.ParamMap) then
-                                   match parameters.GetSorterCountPerPoolSet(), setup.GetSorterPoolCount() with
-                                   | Some total, Some count when int total > 0 && int count > 0 && int total % int count = 0 ->
-                                       parameters.WithSorterCountPerPool(Some (UMX.tag (int total / int count)))
-                                   | _ ->
-                                       invalidArg "ExecutionParameterSpans"
-                                           "Append SorterCountPerPoolSet must be positive and divisible by the source SorterPoolCount."
-                               else parameters
                            let enhanced =
                                parameters
                                |> fun parameters ->

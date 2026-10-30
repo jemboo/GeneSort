@@ -51,7 +51,7 @@ module Pool_32 =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [64] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [8] |> List.map string)
                 (ParamKeys.mutationModKey, [0 .. 7] |> List.map string)
             ]
         let parameterSpansRun =
@@ -145,7 +145,7 @@ module Pool_512 =
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.sorterCountPerPoolKey, [512] |>  List.map string)
-                (ParamKeys.sorterCountPerPoolSetKey, [512] |> List.map string)
+                (ParamKeys.sorterPoolCountKey, [1] |> List.map string)
                 (ParamKeys.mutationModKey, [0] |> List.map string)
             ]
         let parameterSpansRun =

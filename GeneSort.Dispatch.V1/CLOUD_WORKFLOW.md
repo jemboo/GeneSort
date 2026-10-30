@@ -72,7 +72,7 @@ namespace: `SorterSgd`, `SorterEval`, `SorterMutate`, and
 `SortableTests`. Execution code and shared database readers stay in their
 workflow folders. Project names follow the workflow and enclosing configuration modules.
 
-`SorterSgd.p32.Test.OnePool` provides `TestStandard` and `TestSoss` base
+`SorterSgd.p32.OnePool` provides `TestStandard` and `TestSoss` base
 runs with one pool of 32 sorters for each mutation value 0–3. Run the desired base through
 setup and execution before using its interval-0 checkpoint in `TestStandardAppend`,
 `TestSossAppend`, `TestStandardCondense`, or `TestSossCondense`.
@@ -117,19 +117,20 @@ trajectory comparisons across AMax and activator rates. The four mutation
 variants share a seed replica; these results are exploratory rather than a
 comparison across independent seed replicas.
 
-`SorterSgd.p32.Msuf4a.SimpleS` mirrors the four SimpleR presets:
-`Standard.Test`, `Standard.ActivatorRates`, `Soss.Test`, and `Soss.ActivatorRates`.
-The test presets use 10 generations and explicit module defaults of
-ActivationProbability 0.5 and ActivatorMutationRate 0.1. The 100-generation sweeps cross activation
-probabilities 0.25, 0.5, 0.75 with mutation rates 0.05, 0.1, 0.2 and mutation
-variants 0–3 (36 executions per replica). Every execution has one pool of 32.
+`SorterSgd.p32.Msuf4a.SimpleS` declares pool counts and per-pool capacities explicitly.
+The Standard activation sweep is split into `Standard.ActivatorRates32` (16 pools
+of 32) and `Standard.ActivatorRates64` (8 pools of 64), preserving the previous
+512-sorter combinations. `Standard.Test`, `Soss.Test`, and `Soss.ActivatorRates`
+remain available.
+Each preset declares its activation probabilities, mutation rates, pool count,
+and per-pool capacity explicitly.
 Setup entries `standardMsuf32S` / `sossMsuf32S` and execution entries
 `evoMsuf32S` / `sossMsuf32S` validate the explicit boolean activation settings.
 Both probabilities accept 0 through 1; AMax is rejected. The project is
 `SorterSgd.p32.Msuf4a.SimpleS`, with databases `Standard` and `Soss`.
 These use the same prefix prerequisites as SimpleR. Equal mutation-rate values
 do not imply equal effective activation flip rates between R and S.
-Run all four presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleS`; it performs
+Run these presets with `scripts/Run-OnePool.ps1 -Msuf4aSimpleS`; it performs
 setup, execution, summary reporting, and verification for replica 0. The combined
 report is `Reports/Msuf4a_SimpleS_SummaryReport.txt` under the SimpleS project,
 with `Workflow` distinguishing Standard and Soss. Compare the completed sweeps
@@ -247,7 +248,7 @@ From the repository root, run the complete OnePool batch with:
 ```
 
 The script builds its runner, prepares the `SortableTests.Prefix.Channels32.FourStage_32`
-and `SorterEval.Prefix.Channels32` library prerequisites, discovers all presets in `Test.OnePool` and its nested modules,
+and `SorterEval.Prefix.Channels32` library prerequisites, discovers all presets in `OnePool` and its nested modules,
 and completes setup, execution, and the evolution summary report for each preset.
 Source presets finish before any dependent Append or Condense presets. It runs
 replica 0, defaults to eight parallel jobs within each phase, respects each preset's
@@ -495,3 +496,7 @@ so each source combination produces one run. They explicitly set
 New Standard checkpoints use the produced generation as their file label and stop
 exactly at the requested final generation. Setup can still read the earlier
 N-labeled checkpoints containing generation N+1.
+
+For SimpleS comparisons, `Compare-Msuf4aSimpleS.ps1` selects
+`ActivatorRates32` by default. Pass `-SimpleSStandardSweep ActivatorRates64`
+to compare the 64-sorter pool variant, or `ActivatorRates` for older reports.

@@ -96,7 +96,7 @@ module RunEditor =
     let catalogChoices () = workflow.CatalogChoices
 
     let private schema =
-        [| ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey; ParamKeys.rngTypeKey; ParamKeys.simpleSorterModelTypeKey; ParamKeys.sortableDataFormatKey; ParamKeys.prefixLibIdKey; ParamKeys.sorterEvalMeasureInitialKey; ParamKeys.sorterEvalMeasureKey; ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey; ParamKeys.sortedFractionKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.channelCountKey; ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey; ParamKeys.codeModKey
+        [| ParamKeys.excludeSelfCeKey; ParamKeys.collectSortableTestsKey; ParamKeys.rngTypeKey; ParamKeys.simpleSorterModelTypeKey; ParamKeys.sortableDataFormatKey; ParamKeys.prefixLibIdKey; ParamKeys.sorterEvalMeasureInitialKey; ParamKeys.sorterEvalMeasureKey; ParamKeys.orthoRateKey; ParamKeys.sorterChildCountKey; ParamKeys.selectedSorterCountPerPoolKey; ParamKeys.seedSorterPoolSelectionTypeKey; ParamKeys.sortedFractionKey; ParamKeys.distinctSorterHashesKey; ParamKeys.prioritizeNewMutantsKey; ParamKeys.channelCountKey; ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterPoolCountKey; ParamKeys.codeModKey
            ParamKeys.adjustCeLengthFrequencyKey; ParamKeys.generationIntervalLastKey; ParamKeys.paraRateKey
            ParamKeys.selfSymRateKey; ParamKeys.mutationModKey; ParamKeys.seedModificationRateKey
            ParamKeys.modificationRateKey; ParamKeys.mutatorVariantKey |]
@@ -140,7 +140,7 @@ module RunEditor =
                 parameter ParamKeys.prioritizeNewMutantsKey [|"true"|]
                 parameter ParamKeys.channelCountKey [|string channelCount|]
                 parameter ParamKeys.sorterCountPerPoolKey [|"32"|]
-                parameter ParamKeys.sorterCountPerPoolSetKey [|"32"|]
+                parameter ParamKeys.sorterPoolCountKey [|"1"|]
                 parameter ParamKeys.codeModKey [|"NoMods"|]
                 parameter ParamKeys.adjustCeLengthFrequencyKey [|"10"|]
                 parameter ParamKeys.generationIntervalLastKey [|"3"|]

@@ -108,10 +108,10 @@ internal static partial class Program
             runName.Text = "EditedRun";
             Pump();
             Check(model.RunName == "EditedRun" && model.IsDirty, "Run name binding did not update the draft.");
-            var size = model.SetupParameters.Single(row => row.Key == ParamKeys.sorterCountPerPoolSetKey);
-            size.Values[0].Text = "33";
-            Check(model.Validate() is null && model.Issues.Any(issue => issue.Contains("divisible")), "Invalid pool size was accepted.");
-            size.Values[0].Text = "32";
+            var size = model.SetupParameters.Single(row => row.Key == ParamKeys.sorterPoolCountKey);
+            size.Values[0].Text = "0";
+            Check(model.Validate() is null && model.Issues.Any(issue => issue.Contains("Positive")), "Invalid pool size was accepted.");
+            size.Values[0].Text = "1";
             Check(!model.CanSave, "Correcting a value enabled Save before revalidation.");
             Check(typeof(ParameterRow).GetProperty(nameof(ParameterRow.Key))!.SetMethod is null, "Parameter identity can still be changed.");
             Check(!model.SetupSection.HasAvailableParameters, "Existing setup keys can still be added twice.");
@@ -352,15 +352,15 @@ internal static partial class Program
                     Wait(model.OpenAsync(savedDefinition));
                     Layout(view);
                     Check(model.RunParameterList.Count == 4 && model.CanSave, "Opening a definition did not load and validate its saved parameters.");
-                    var runExecution = Button(view, "Run Processing");
+                    var runExecution = Button(view, "Execute Runs");
                     var summaryReports = Button(view, "Generate Summary Reports");
                     Check(!model.CanRunSetup && !runExecution.IsEnabled && !summaryReports.IsEnabled, "A run action is enabled without a selection.");
                     list.SelectedItems.Add(list.Items[1]);
                     list.SelectedItems.Add(list.Items[3]);
                     Pump();
                     var selected = model.RunParameterList.SelectedParameters.ToHashSet();
-                    Check(!model.CanRunSetup && runExecution.IsEnabled && summaryReports.IsEnabled && model.RunParameterList.SelectedCount == 2,
-                        "Run selection did not independently enable execution and reporting.");
+                    Check(!model.CanRunSetup && runExecution.IsEnabled && !summaryReports.IsEnabled && model.RunParameterList.SelectedCount == 2,
+                        "Unfinished selection should enable execution but not reporting.");
                     model.RunParameterList.Sort(ParamKeys.mutationModKey); Pump();
                     Check(selected.SetEquals(model.RunParameterList.SelectedParameters), "Sorting changed the selected parameter identities.");
                     SelectEditorTab(view, "Setup parameters");

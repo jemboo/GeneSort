@@ -212,7 +212,8 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
     private bool CanRunSelectedRows => CanProcessSavedRows && RunParameterList.SelectedCount > 0;
     public bool CanRunSetup => HasSetup && CanProcessSavedRows && SetupParameterList.SelectedCount > 0;
     public bool CanRunExecution => CanRunSelectedRows;
-    public bool CanGenerateSummaryReports => IsEvolution && CanRunSelectedRows;
+    public bool CanGenerateSummaryReports => IsEvolution && CanRunSelectedRows
+        && RunParameterList.SelectedItems.All(row => row.Parameters.GetRunFinished()?.Value == true);
     public bool CanRefreshSummaryReports => IsEvolution && CanRunSelectedRows && !SummaryReportList.IsLoading;
     public int PhaseCompleted { get => phaseCompleted; private set { phaseCompleted = value; Changed(); } }
     public int PhaseTotal { get => phaseTotal; private set { phaseTotal = value; Changed(); } }
@@ -653,8 +654,13 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
         configured.IsEvolution
             ? RunExecutionFiles.runPathsCancellableAsync(token, ParallelThreadCount, folder, configured, rows.Select(row => row.Evolution).ToArray(), progress)
             : RunExecutionFiles.runSavedCancellableAsync(token, ParallelThreadCount, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
-    public Task GenerateSummaryReportsAsync() => RunSelectedAsync("Summary Reports", (folder, configured, rows, progress, token) =>
-        RunSummaryFiles.runCancellableAsync(token, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
+    public Task GenerateSummaryReportsAsync()
+    {
+        if (!CanGenerateSummaryReports)
+            throw new InvalidOperationException("Select only completed runs before generating summary reports.");
+        return RunSelectedAsync("Summary Reports", (folder, configured, rows, progress, token) =>
+            RunSummaryFiles.runCancellableAsync(token, folder, configured, rows.Select(row => row.Parameters).ToArray(), progress));
+    }
 
     private void ClearSummaryReports()
     {
@@ -745,7 +751,7 @@ public sealed class RunEditorViewModel : INotifyPropertyChanged
                 && statusIndex.Value >= 0 && statusIndex.Value < selected.Length)
             {
                 if (processing) selected[statusIndex.Value].ShowStatus(rowStatus.Value, rowStatus.Value == runRowStatus.Failed ? update.Message : null);
-                else selected[statusIndex.Value].ShowSetupStatus(rowStatus.Value);
+                else if (phase == "Setup") selected[statusIndex.Value].ShowSetupStatus(rowStatus.Value);
             }
             PhaseCompleted = update.Completed;
             if (cancellation.IsCancellationRequested) return;

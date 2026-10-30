@@ -154,9 +154,9 @@ let ``equivalent SGD continuation enhancers preserve generation and validate poo
         let result = enhance context parameters
         Assert.Equal<Map<string, string>>(expected, result.ParamMap)
         Assert.Equal(Some 42<generationNumber>, result.GetGenerationCurrent())
-        let invalid = parameters.ParamMap |> Map.add ParamKeys.sorterCountPerPoolKey "2" |> Map.add ParamKeys.sorterCountPerPoolSetKey "3" |> runParameters.create
+        let invalid = parameters.ParamMap |> Map.add ParamKeys.sorterCountPerPoolKey "2" |> Map.add ParamKeys.sorterPoolCountKey "2147483647" |> runParameters.create
         Assert.Throws<ArgumentException>(fun () -> enhance context invalid |> ignore) |> ignore
-        for key in [ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterCountPerPoolSetKey] do
+        for key in [ParamKeys.sorterCountPerPoolKey; ParamKeys.sorterPoolCountKey] do
             for value in ["0"; "-1"; "1.5"; "not-a-number"; "2147483648"] do
                 let invalid = parameters.ParamMap |> Map.add key value |> runParameters.create
                 let error = Assert.Throws<ArgumentException>(fun () -> enhance context invalid |> ignore)

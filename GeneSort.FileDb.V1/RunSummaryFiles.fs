@@ -32,7 +32,7 @@ type summaryReportFiles = private { reports: savedSummaryReport[]; errors: strin
     member this.Errors = Array.copy this.errors
     static member internal create reports errors = { reports = reports; errors = errors }
 
-/// Summarize selected saved rows, including finished runs, without changing their execution state.
+/// Summarize selected completed saved rows, without changing their execution state.
 module RunSummaryFiles =
     /// Publish a display snapshot only after the complete TSV has been written successfully.
     let saveCombinedAsync path (report: dataTableReport) overwrite =

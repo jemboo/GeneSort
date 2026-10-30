@@ -52,7 +52,7 @@ module PoolSelSz128 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                (ParamKeys.sorterPoolCountKey, ["16"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -136,7 +136,7 @@ module Sz_2048_Of_4096 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["4096"])
+                (ParamKeys.sorterPoolCountKey, ["1"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -211,13 +211,11 @@ module PoolsSelSzTest_2_vs_256 =
     let setupEnhancerFunctionName = SetupEnhancerFunctionNames.sorterSgd
     let setupQueryCatalogName = QueryCatalogNamesSetup.sorterSgdMsrsPoolModComp
 
-    [<MethodImpl(MethodImplOptions.NoInlining)>]
-    let PoolSz_2n256 ()  : run =
-        let names = RunNaming.create()
+    let private poolSize (names: runNames) sorterPoolCount sorterCountPerPool : run =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["512"])
+                (ParamKeys.sorterPoolCountKey, [string sorterPoolCount])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -226,7 +224,7 @@ module PoolsSelSzTest_2_vs_256 =
                 (ParamKeys.channelCountKey, [string (int channelCount)])
                 (ParamKeys.generationCurrentKey, [0] |> List.map string)
                 (ParamKeys.generationIntervalCountKey, [5] |> List.map string)
-                (ParamKeys.sorterCountPerPoolKey, ["2"; "256";])
+                (ParamKeys.sorterCountPerPoolKey, [string sorterCountPerPool])
                 (ParamKeys.mutationModKey, [0 .. 63;] |> List.map string)
                 (ParamKeys.selectedSorterCountPerPoolKey, ["64"; "128"; "256"] |> List.map string)
             ]
@@ -258,9 +256,16 @@ module PoolsSelSzTest_2_vs_256 =
             }
         )
 
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let PoolSz_2 () = poolSize (RunNaming.create()) 256 2
+
+    [<MethodImpl(MethodImplOptions.NoInlining)>]
+    let PoolSz_256 () = poolSize (RunNaming.create()) 2 256
+
     let description = "Compare pool and selection settings for 24-input Msrs3a evolution (PoolsSelSzTest_2_vs_256)."
 
     let runType =
         GeneSort.Dispatch.V1.runType("SorterSgd.p24.Msrs3a.PoolModComp.PoolsSelSzTest_2_vs_256", description, channelCount, executionQueryCatalogName, [|
-            runExample("PoolSz_2n256", PoolSz_2n256)
+            runExample("PoolSz_2", PoolSz_2)
+            runExample("PoolSz_256", PoolSz_256)
         |])

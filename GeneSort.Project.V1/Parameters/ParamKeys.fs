@@ -192,8 +192,6 @@ module ParamKeys =
     [<Literal>]
     let sorterCountPerPoolKey = "SorterCountPerPool"
     [<Literal>]
-    let sorterCountPerPoolSetKey = "SorterCountPerPoolSet"
-    [<Literal>]
     let sorterEvalMeasureInitialKey = "SorterEvalMeasureInitial"
     [<Literal>]
     let sorterEvalMeasureKey = "SorterEvalMeasure"

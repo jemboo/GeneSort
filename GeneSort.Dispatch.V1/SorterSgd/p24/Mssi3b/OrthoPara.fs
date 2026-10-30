@@ -52,7 +52,7 @@ module OrthoPara64 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["1024"])
+                (ParamKeys.sorterPoolCountKey, ["16"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -103,7 +103,7 @@ module OrthoPara64 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["1024"])
+                (ParamKeys.sorterPoolCountKey, ["16"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -154,7 +154,7 @@ module OrthoPara64 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["1024"])
+                (ParamKeys.sorterPoolCountKey, ["16"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])
@@ -241,7 +241,7 @@ module OrthoPara128 =
         let parameterSpans =
             [
                 (ParamKeys.seedSorterPoolSelectionTypeKey, ["GuidOrder:512"])
-                (ParamKeys.sorterCountPerPoolSetKey, ["1024"])
+                (ParamKeys.sorterPoolCountKey, ["8"])
                 (ParamKeys.orthoRateKey, ["4.001"])
                 (ParamKeys.sorterChildCountKey, ["1"])
                 (ParamKeys.distinctSorterHashesKey, ["true"])

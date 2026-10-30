@@ -299,7 +299,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
     let parameters = setupParameters.create (Map.ofList [
         ParamKeys.channelCountKey, "16"
         ParamKeys.sorterCountPerPoolKey, "4"
-        ParamKeys.sorterCountPerPoolSetKey, "32"
+        ParamKeys.sorterPoolCountKey, "1"
         ParamKeys.prefixLibIdKey, (prefixLibId.create 16<channelCount> 2<stageLength> prefixLibVariant.PrefixA |> PrefixLibId.toString)
         ParamKeys.simpleSorterModelTypeKey, "Msrs"
         ParamKeys.rngTypeKey, "LCG"
@@ -319,7 +319,7 @@ let ``Seed enhancer preserves explicit module settings`` () =
 
 [<Fact>]
 let ``Evolution clones cannot change or remove module owned settings`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.Standard.TestStandard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.Standard.TestStandard ()
     let draft = RunTypeEditor.cloneDraft source
     let args = draft.ToArgs()
     for row in args.SetupParameters |> Array.filter (fun row -> RunTypeEditor.isModuleOwnedParameter source row.Key) do
@@ -362,12 +362,12 @@ let ``Initial measure follows each evaluation sweep choice without a Cartesian p
 
 [<Fact>]
 let ``Explicit evolution controls survive enhancement and separate execution identities`` () =
-    let source = GeneSort.Dispatch.V1.SorterSgd.p32.Test.OnePool.SimpleR.Standard.Standard ()
+    let source = GeneSort.Dispatch.V1.SorterSgd.p32.OnePool.SimpleR.Standard.Standard ()
     let first spans = spans |> List.map (fun (key, values) -> key, List.take 1 values)
     let replace key values spans = (key, values) :: (spans |> List.filter (fst >> (<>) key))
     let setup = first source.SetupParameterSpans
                 |> replace ParamKeys.sorterCountPerPoolKey ["32"; "64"]
-                |> replace ParamKeys.sorterCountPerPoolSetKey ["128"]
+                |> replace ParamKeys.sorterPoolCountKey ["4"]
                 |> replace ParamKeys.seedSorterPoolSelectionTypeKey ["GuidOrder:16"]
     let execution = first source.RunParameterSpans
                     |> replace ParamKeys.orthoRateKey ["1.25"]
@@ -379,7 +379,7 @@ let ``Explicit evolution controls survive enhancement and separate execution ide
     Assert.Equal(2, rows.Length)
     for row in rows do
         Assert.Equal(int (row.GetSorterCountPerPool().Value), int (row.GetSelectedSorterCountPerPool().Value))
-        Assert.Equal(128 / int (row.GetSorterCountPerPool().Value), int (row.GetSorterPoolCount().Value))
+        Assert.Equal(4, int (row.GetSorterPoolCount().Value))
         Assert.Equal(1.25, float (row.GetOrthoRate().Value))
         Assert.Equal(0.25, float (row.GetModificationRate().Value))
         Assert.Equal("0.2", row.ParamMap[ParamKeys.activatorMutationRateKey])
