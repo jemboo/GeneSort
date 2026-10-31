@@ -51,14 +51,13 @@ module CeBlockOpsUint8v256 =
         sorted
 
 
-    /// Computes 32 separate hashes for the 32 lanes in the block.
-    let computeLaneHashes32 (len: int) (vectors: Vector256<uint8>[]) =
-        let hashes = Array.create 32 17u
-        for i = 0 to len - 1 do
-            let v = vectors.[i]
-            for lane = 0 to 31 do
-                hashes.[lane] <- hashes.[lane] * 31u + uint32 (v.GetElement(lane))
-        hashes
+    /// One bit per lane, set when any adjacent channel pair is out of order.
+    let unsortedLaneMask (len: int) (vectors: Vector256<uint8>[]) =
+        let mutable failures = 0u
+        for i = 0 to len - 2 do
+            let inversions = Vector256.GreaterThan(vectors.[i], vectors.[i + 1])
+            failures <- failures ||| Vector256.ExtractMostSignificantBits(inversions)
+        failures
 
 
     let evalSimdSortBlocks
@@ -223,7 +222,6 @@ module CeBlockOpsUint8v256 =
                     Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
                     let data = networkData.[nIdx]
                     let ceCount = data.CeLen
-                    let goldenHashes = Simd256GoldenHashProvider.GetGoldenHashes data.ChannelCount
             
                     // --- Hot Loop: CAS Sorting ---
                     for cIdx = 0 to ceCount - 1 do
@@ -238,19 +236,12 @@ module CeBlockOpsUint8v256 =
                             workBuffer.[lIdx] <- vMin
                             workBuffer.[hIdx] <- Vector256.Max(vLow, vHi)
 
-                    // --- Verification and Failure Extraction ---
-                    // Vertical check (SIMD)
-                    if not (IsBlockSortedMask currentLen workBuffer) then
-                        // Horizontal check (32-bit Hash)
-                        let currentHashes = computeLaneHashes32 currentLen workBuffer
-                    
-                        // Only process lanes that actually contain test data
+                    let failures = unsortedLaneMask currentLen workBuffer
+                    if failures <> 0u then
+                        // Padding lanes never become collected test cases.
                         for lane = 0 to currentBlock.SortableCount - 1 do
-                            if currentHashes.[lane] <> goldenHashes.[lane] then
-                                // Rare path: Extract unique failure sequence
-                                let laneArray = Array.init currentLen (fun i -> 
-                                    int (workBuffer.[i].GetElement(lane)))
-                            
+                            if (failures &&& (1u <<< lane)) <> 0u then
+                                let laneArray = Array.init currentLen (fun i -> int (workBuffer.[i].GetElement(lane)))
                                 failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
             
                 (localUsage, workBuffer)),

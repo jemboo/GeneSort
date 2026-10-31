@@ -47,14 +47,13 @@ module CeBlockOpsUint8v512 =
                 i <- i + 1
         sorted
 
-    /// Computes 64 separate hashes for the 64 lanes in the block.
-    let computeLaneHashes64 (len: int) (vectors: Vector512<uint8>[]) =
-        let hashes = Array.create 64 17u
-        for i = 0 to len - 1 do
-            let v = vectors.[i]
-            for lane = 0 to 63 do
-                hashes.[lane] <- hashes.[lane] * 31u + uint32 (v.GetElement(lane))
-        hashes
+    /// One bit per lane, set when any adjacent channel pair is out of order.
+    let unsortedLaneMask (len: int) (vectors: Vector512<uint8>[]) =
+        let mutable failures = 0uL
+        for i = 0 to len - 2 do
+            let inversions = Vector512.GreaterThan(vectors.[i], vectors.[i + 1])
+            failures <- failures ||| Vector512.ExtractMostSignificantBits(inversions)
+        failures
 
     let inline hashLane (block: Vector512<uint8>[]) (lane: int) =
         let mutable h = 17
@@ -175,7 +174,6 @@ module CeBlockOpsUint8v512 =
                     Array.blit currentBlock.Vectors 0 workBuffer 0 currentLen
                     let data = networkData.[nIdx]
                     let ceCount = data.CeLen
-                    let goldenHashes = Simd512GoldenHashProvider.GetGoldenHashes data.ChannelCount
             
                     for cIdx = 0 to ceCount - 1 do
                         let lIdx = data.Lows.[cIdx]
@@ -189,12 +187,11 @@ module CeBlockOpsUint8v512 =
                             workBuffer.[lIdx] <- vMin
                             workBuffer.[hIdx] <- Vector512.Max(vLow, vHi)
 
-                    // We still check if the block is unsorted, but we don't increment a counter
-                    if not (IsBlockSortedMask currentLen workBuffer) then
-                        let currentHashes = computeLaneHashes64 currentLen workBuffer
-                    
+                    let failures = unsortedLaneMask currentLen workBuffer
+                    if failures <> 0uL then
+                        // Padding lanes never become collected test cases.
                         for lane = 0 to currentBlock.SortableCount - 1 do
-                            if currentHashes.[lane] <> goldenHashes.[lane] then
+                            if (failures &&& (1uL <<< lane)) <> 0uL then
                                 let laneArray = Array.init currentLen (fun i -> int (workBuffer.[i].GetElement(lane)))
                                 failureSets.[nIdx].TryAdd(laneArray, 0uy) |> ignore
             
